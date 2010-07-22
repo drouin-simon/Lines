@@ -31,19 +31,19 @@ bool drwDrawableTexture::Init( int width, int height )
 
 	// Init framebuffer
 	bool success = true;
-	glGenFramebuffers( 1, &m_fbId );
-	glBindFramebuffer( GL_FRAMEBUFFER, m_fbId );
-	glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_RECTANGLE_ARB, m_texId, 0 );
+	glGenFramebuffersEXT( 1, &m_fbId );
+	glBindFramebufferEXT( GL_FRAMEBUFFER_EXT, m_fbId );
+	glFramebufferTexture2DEXT( GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_RECTANGLE_ARB, m_texId, 0 );
 
-	GLenum ret = glCheckFramebufferStatus( GL_FRAMEBUFFER );
-	if( ret != GL_FRAMEBUFFER_COMPLETE )
+	GLenum ret = glCheckFramebufferStatusEXT( GL_FRAMEBUFFER_EXT );
+	if( ret != GL_FRAMEBUFFER_COMPLETE_EXT )
 		success = false;
 
 	// clear the texture
 	glClearColor( 0.0, 0.0, 0.0, 0.0 );
 	glClear( GL_COLOR_BUFFER_BIT );
 
-	glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+	glBindFramebufferEXT( GL_FRAMEBUFFER_EXT, 0 );
 
 	return success;
 }
@@ -61,7 +61,7 @@ void drwDrawableTexture::Resize( int width, int height )
 void drwDrawableTexture::Release()
 {
 	if( m_fbId )
-		glDeleteFramebuffers( 1, &m_fbId );
+		glDeleteFramebuffersEXT( 1, &m_fbId );
 	if( m_texId )
 		glDeleteTextures( 1, &m_texId );
 }
@@ -69,9 +69,9 @@ void drwDrawableTexture::Release()
 void drwDrawableTexture::DrawToTexture( bool drawTo )
 {
 	if( drawTo && m_fbId )
-		glBindFramebuffer( GL_FRAMEBUFFER, m_fbId );
+		glBindFramebufferEXT( GL_FRAMEBUFFER_EXT, m_fbId );
 	else
-		glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+		glBindFramebufferEXT( GL_FRAMEBUFFER_EXT, 0 );
 }
 
 // Paste the content of a sub-rectangle of
