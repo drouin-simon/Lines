@@ -38,7 +38,3 @@ void Node::Draw( const drwDrawingContext & context )
 	}
 }
 
-void Node::ExportToSWF( drwSWFWriter & writer )
-{
-	ThePrimitive->ExportToSWF( writer );
-}

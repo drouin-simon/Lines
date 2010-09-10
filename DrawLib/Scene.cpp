@@ -90,24 +90,6 @@ void Scene::MarkModified()
 	emit Modified();
 }
 
-void Scene::ExportToSWF( const char * filename, int width, int height )
-{
-	drwSWFWriter writer;
-	writer.SetFrameRate( 12 );
-	writer.SetNumberOfFrames( Frames.size() );
-	writer.SetDimensions( 0, 0, 1920, 1080, width, height );
-	writer.SetFilename( filename );
-	writer.Initialize();
-
-	for( unsigned frame = 0; frame < Frames.size(); ++frame ) 
-	{
-		Frames[frame].ExportToSWF( writer );
-		writer.NextFrame();
-	}
-
-	writer.Write();
-}
-
 ImageSprite * Scene::GetImageSprite( const char * filename )
 {
 	// See if a sprite with same filename already exists

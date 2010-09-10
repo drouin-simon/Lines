@@ -39,10 +39,3 @@ Node * Frame::GetNodeById( GLuint Id )
 	return 0;
 }
 
-void Frame::ExportToSWF( drwSWFWriter & writer )
-{
-	for( unsigned i = 0; i < Nodes.size(); ++i )
-	{
-		Nodes[i]->ExportToSWF( writer );
-	}
-}

@@ -35,18 +35,7 @@ include_directories(${QT_INCLUDE_DIR})
 #----------------------------------------
 
 #----------------------------------------
-# Use Ming lib and required dependencies ( Freetype and zlib )
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}")
-find_package(Ming)
-if(MING_FOUND)
-    include_directories( ${MING_INCLUDE_DIR} )
-endif(MING_FOUND)
-
-find_package(ZLIB)
-if(ZLIB_FOUND)
-    include_directories( ${ZLIB_INCLUDE_DIR} ) 
-endif(ZLIB_FOUND)
-
+# Use Opengl
 find_package(OpenGL)
 #----------------------------------------
 

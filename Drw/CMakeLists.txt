@@ -7,15 +7,13 @@ set( Drw_src  main.cpp
 		PrimitiveToolOptionWidget.cpp 
 		NetworkInterfaceWidget.cpp 
 		PlaybackControlerWidget.cpp 
-		DisplaySettingsWidget.cpp 
-		ExportToSWFDialog.cpp )
+		DisplaySettingsWidget.cpp )
 
 set( Drw_hdr MainWindow.h 
 		PrimitiveToolOptionWidget.h 
 		NetworkInterfaceWidget.h 
 		PlaybackControlerWidget.h 
-		DisplaySettingsWidget.h 
-		ExportToSWFDialog.h )
+		DisplaySettingsWidget.h )
 
 # Include dir for DrawLib
 include_directories(${DRAWLIB_INCLUDE_DIR})
@@ -24,8 +22,8 @@ include_directories(${DRAWLIB_INCLUDE_DIR})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 # Create classes from Qt ui files
-set( Drw_ui ExportToSWFDialog.ui )
-qt4_wrap_ui( Drw_hdr_ui ${Drw_ui} )
+# set( Drw_ui ExportToSWFDialog.ui )
+# qt4_wrap_ui( Drw_hdr_ui ${Drw_ui} )
 
 # moc Qt source file without a ui file
 qt4_wrap_cpp( Drw_moc ${Drw_hdr})
@@ -54,7 +52,7 @@ ENDIF(APPLE)
 #
 set( Drw_all_src ${Drw_src} ${Drw_hdr} ${Drw_moc} ${Drw_hdr_ui} )
 add_executable( ${ExecName} ${EXECUTABLE_FLAG} ${Drw_all_src} )
-target_link_libraries( ${ExecName} svl Draw ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY} ${QT_LIBRARIES} ${MING_LIBRARY} ${ZLIB_LIBRARIES} )
+target_link_libraries( ${ExecName} svl Draw ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY} ${QT_LIBRARIES} )
 
 if( NOT APPLE )
 	target_link_libraries( ${ExecName} GLee )

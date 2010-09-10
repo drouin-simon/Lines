@@ -34,8 +34,6 @@ public:
 	// used by other classes to mark end of modification and notify clients they can re-render
 	void MarkModified();
 	
-	void ExportToSWF( const char * filename, int width, int height );
-	
 	ImageSprite * GetImageSprite( const char * filename );
 	
 signals:

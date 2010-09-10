@@ -44,19 +44,3 @@ void Line::AddPoint( double x, double y, double pressure )
     m_pointIndex.push_back( m_pointIndex.size() );
 }
 
-void Line::ExportToSWF( drwSWFWriter & writer )
-{
-	writer.StartLine( m_lineWidth, m_color[0], m_color[1], m_color[2] );
-	drwVec2Array::iterator it = m_pointTable.begin();
-	if( it != m_pointTable.end() )
-	{
-		writer.MovePenTo( (*it)[0], (*it)[1] );
-	}
-	++it;
-	while( it != m_pointTable.end() )
-	{
-		writer.DrawLineTo( (*it)[0], (*it)[1] );
-		++it;
-	}
-	writer.EndLine();
-}

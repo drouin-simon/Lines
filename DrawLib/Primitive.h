@@ -22,8 +22,6 @@ public:
 
 	void SetColor( const Vec3 & col ) { m_color = col; }
 	
-	virtual void ExportToSWF( drwSWFWriter & writer ) = 0;
-	
 protected:
 	
 	virtual void InternDraw( const drwDrawingContext & context ) = 0;

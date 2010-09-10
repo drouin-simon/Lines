@@ -10,7 +10,7 @@
 #include "TabletStateWidget.h"
 #include "NetworkInterfaceWidget.h"
 #include "DisplaySettingsWidget.h"
-#include "ExportToSWFDialog.h"
+//#include "ExportToSWFDialog.h"
 #include "drwNetworkThread.h"
 #include "drwNetworkInterface.h"
 #include "drwNetworkConnection.h"
@@ -114,7 +114,7 @@ void MainWindow::CreateActions()
 	file->addAction( "Open...", this, SLOT( fileOpen() ), Qt::CTRL + Qt::Key_O );
 	file->addAction( "Save", this, SLOT( fileSave() ), Qt::CTRL + Qt::Key_S );
 	file->addAction( "Save As...", this, SLOT( fileSaveAs() ), Qt::SHIFT + Qt::CTRL + Qt::Key_S );
-	file->addAction( "Export To SWF...", this, SLOT( fileExportToSwf() ) );
+	//file->addAction( "Export...", this, SLOT( fileExport() ) );
     file->addAction( "&Exit", this, SLOT( close() ) );
 	
 	// Create the Edit menu
@@ -196,9 +196,9 @@ void MainWindow::fileSaveAs()
 	m_commandDb->Write( m_filename.toAscii() );
 }
 
-bool MainWindow::fileExportToSwf()
+bool MainWindow::fileExport()
 {
-	ExportToSWFDialog dlg( m_exportDefaultPath, m_exportRes.width(), m_exportRes.height() );
+	/*ExportToSWFDialog dlg( m_exportDefaultPath, m_exportRes.width(), m_exportRes.height() );
 	if( dlg.exec() == QDialog::Accepted )
 	{
 		QString path = dlg.GetFileName();
@@ -208,7 +208,7 @@ bool MainWindow::fileExportToSwf()
 		dlg.GetResolution( m_exportRes );
 		m_scene->ExportToSWF( m_exportDefaultPath.toAscii(), m_exportRes.width(), m_exportRes.height() );
 		return true;
-	}
+	}*/
 	return false;
 }
 

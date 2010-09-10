@@ -20,8 +20,6 @@ public:
 	void Draw( const drwDrawingContext & context );
 	void AddNode( Node * node );
 	Node * GetNodeById( unsigned Id );
-	
-	void ExportToSWF( drwSWFWriter & writer );
 		
 protected:
 		

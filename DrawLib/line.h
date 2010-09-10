@@ -19,8 +19,6 @@ public:
     virtual void EndPoint( double x, double y, double pressure );
     virtual void AddPoint( double x, double y, double pressure );
 	
-	virtual void ExportToSWF( drwSWFWriter & writer );
-	
 	void SetWidth( double width ) { m_lineWidth = width; }
 
 protected:

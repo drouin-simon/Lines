@@ -32,8 +32,6 @@ public:
 	
 	SetMacro( IsHidden, bool );
 	
-	void ExportToSWF( drwSWFWriter & writer );
-	
 protected:
 	
 	bool IsHidden;

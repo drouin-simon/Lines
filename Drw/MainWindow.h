@@ -7,6 +7,8 @@
 class QPopupMenu;
 class QWorkspace;
 class QPopupMenu;
+class QDockWidget;
+
 class drwDrawingWidget;
 class Scene;
 class drwLineTool;
@@ -14,7 +16,6 @@ class drwToolbox;
 class drwCommandDatabase;
 class PrimitiveToolOptionWidget;
 class PlaybackControlerWidget;
-class QDockWidget;
 class TabletStateWidget;
 class NetworkInterfaceWidget;
 class DisplaySettingsWidget;
@@ -40,7 +41,7 @@ private slots:
 	void fileOpen();
 	bool fileSave();
 	void fileSaveAs();
-	bool fileExportToSwf();
+	bool fileExport();
 	
 	void editSetNumberOfFrames();
 	

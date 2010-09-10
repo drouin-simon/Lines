@@ -9,10 +9,9 @@ drwGlslShader * WideLine::m_shader = 0;
 
 WideLine::WideLine() 
 : m_prevPoint( 0, 0 )
-, m_prevPressure( 1.0 ) /*, m_prevDir( 0, 1 ), m_prevLeft( -1, 0 ), m_prevRight( 1, 0 )*/
+, m_prevPressure( 1.0 )
 {
     m_width = 8.0;
-    //m_firstPoint = true;
 }
 
 
@@ -174,21 +173,9 @@ void WideLine::AddPoint( double x, double y, double pressure )
 	m_indices.push_back( nextIndex + 8 );
 	m_indices.push_back( nextIndex + 4 );
 
-    // Add a new line segment
-    //AddSegment( left, right, newPoint );
-    
-    // if we have more than 2 points make the joint between th 2 last segments
-    //if( !m_firstPoint )
-        //AddJoint( left, right, direction );
-    //else
-        //m_firstPoint = false;
-
     // cache information for next AddPoint
     m_prevPoint = newPoint;
 	m_prevPressure = pressure;
-    //m_prevDir   = direction;
-    //m_prevLeft  = left;
-    //m_prevRight = right;
 }
 
 static const char* shaderCode = " \
@@ -223,54 +210,3 @@ void WideLine::Init()
 		m_shader->Init();
 	}
 }
-
-/*
-void WideLine::AddSegment( const Vec2 & left, const Vec2 & right, const Vec2 & newPoint )
-{
-    int nextIndex = m_vertex.size();
-	m_vertex.push_back( m_prevPoint );
-    m_vertex.push_back( m_prevPoint + left );
-    m_vertex.push_back( m_prevPoint + right );
-	m_vertex.push_back( newPoint );
-    m_vertex.push_back( newPoint + left );
-	m_vertex.push_back( newPoint + right );
-	
-	m_texCoord.push_back( 1.0 );
-	m_texCoord.push_back( 0.0 );
-	m_texCoord.push_back( 0.0 );
-	m_texCoord.push_back( 1.0 );
-	m_texCoord.push_back( 0.0 );
-	m_texCoord.push_back( 0.0 );
-
-    m_indices.push_back( nextIndex );
-    m_indices.push_back( nextIndex + 4 );
-    m_indices.push_back( nextIndex + 1 );
-	m_indices.push_back( nextIndex );
-    m_indices.push_back( nextIndex + 3 );
-    m_indices.push_back( nextIndex + 4 );
-	m_indices.push_back( nextIndex );
-    m_indices.push_back( nextIndex + 5 );
-    m_indices.push_back( nextIndex + 3 );
-    m_indices.push_back( nextIndex );
-    m_indices.push_back( nextIndex + 2 );
-    m_indices.push_back( nextIndex + 5 );
-}
-
-
-void WideLine::AddJoint( const Vec2 & left, const Vec2 & right, const Vec2 & direction )
-{
-    bool turnLeft = dot( m_prevLeft, direction ) > 0 ? true : false;
-    Vec2 newSide = turnLeft ? right : left;
-    Vec2 oldSide = turnLeft ? m_prevRight : m_prevLeft;
-	
-	int nextIndex = m_vertex.size();
-	m_vertex.push_back( m_prevPoint );
-	m_vertex.push_back( m_prevPoint + newSide );
-	m_vertex.push_back( m_prevPoint + oldSide );
-	m_texCoord.push_back( 1.0 );
-	m_texCoord.push_back( 0.0 );
-	m_texCoord.push_back( 0.0 );
-	m_indices.push_back( nextIndex );
-	m_indices.push_back( nextIndex + 1 );
-	m_indices.push_back( nextIndex + 2 );
-}*/

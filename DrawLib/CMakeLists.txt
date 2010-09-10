@@ -21,7 +21,6 @@ set( DrawLib_src  drwDrawingWidget.cpp
 		ImageFlippingTool.cpp
 		drwCommand.cpp
 		drwCommandDatabase.cpp
-		drwSWFWriter.cpp
 		drwNetworkConnection.cpp
 		drwNetworkInterface.cpp
 		drwNetworkThread.cpp
@@ -59,8 +58,7 @@ set( DrawLib_hdr	drwGlslShader.h
 			ImageSprite.h
 			drwCommand.h
 			drwDataArray.h
-			PolygonData.h
-			drwSWFWriter.h )
+			PolygonData.h )
 
 # Include bin directory for ui_ files
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
