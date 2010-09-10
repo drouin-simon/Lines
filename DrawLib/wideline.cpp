@@ -2,7 +2,7 @@
 #include "IncludeGl.h"
 #include "math.h"
 #include "drwGlslShader.h"
-
+#include "drwDrawingContext.h"
 
 drwGlslShader * WideLine::m_shader = 0;
 
@@ -11,7 +11,7 @@ WideLine::WideLine()
 : m_prevPoint( 0, 0 )
 , m_prevPressure( 1.0 ) /*, m_prevDir( 0, 1 ), m_prevLeft( -1, 0 ), m_prevRight( 1, 0 )*/
 {
-    m_width = 5.0;
+    m_width = 8.0;
     //m_firstPoint = true;
 }
 
@@ -29,6 +29,12 @@ void WideLine::InternDraw( const drwDrawingContext & context )
 		Init();
 	m_shader->UseProgram( true );
 	m_shader->SetVariable( "margin" , float(.5) );
+	
+	if( context.m_isOverridingColor )
+		glColor4d( context.m_colorOverride[0], context.m_colorOverride[1], context.m_colorOverride[2], context.m_opacity );
+	else
+		glColor4d( m_color[0] * context.m_opacity, m_color[1] * context.m_opacity, m_color[2] * context.m_opacity, context.m_opacity );
+		
 	glBlendEquation( GL_MAX );
     glVertexPointer( 2, GL_DOUBLE, 0, m_vertices.GetBuffer() );
 	glTexCoordPointer( 3, GL_DOUBLE, 0, m_texCoord.GetBuffer() );
@@ -48,16 +54,18 @@ void WideLine::InternDraw( const drwDrawingContext & context )
 
 void WideLine::StartPoint( double x, double y, double pressure )
 {
+	double curWidth = m_width * pressure;
+	
 	int nextIndex = m_vertices.size();
 	m_vertices.push_back( Vec2( x, y ) );
-	m_vertices.push_back( Vec2( x, y + m_width ) );
-	m_vertices.push_back( Vec2( x + m_width, y + m_width ) );
-	m_vertices.push_back( Vec2( x + m_width, y ) );
-	m_vertices.push_back( Vec2( x + m_width, y - m_width ) );
-	m_vertices.push_back( Vec2( x, y - m_width ) );
-	m_vertices.push_back( Vec2( x - m_width, y - m_width ) );
-	m_vertices.push_back( Vec2( x - m_width, y ) );
-	m_vertices.push_back( Vec2( x - m_width, y + m_width ) );
+	m_vertices.push_back( Vec2( x, y + curWidth ) );
+	m_vertices.push_back( Vec2( x + curWidth, y + curWidth ) );
+	m_vertices.push_back( Vec2( x + curWidth, y ) );
+	m_vertices.push_back( Vec2( x + curWidth, y - curWidth ) );
+	m_vertices.push_back( Vec2( x, y - curWidth ) );
+	m_vertices.push_back( Vec2( x - curWidth, y - curWidth ) );
+	m_vertices.push_back( Vec2( x - curWidth, y ) );
+	m_vertices.push_back( Vec2( x - curWidth, y + curWidth ) );
 	
 	m_texCoord.push_back( Vec3( 0.0, 0.0, pressure ) );
 	m_texCoord.push_back( Vec3( 0.0, 1.0, pressure ) );
@@ -103,22 +111,27 @@ void WideLine::EndPoint( double x, double y, double pressure )
 
 void WideLine::AddPoint( double x, double y, double pressure )
 {
+	double prevWidth = m_width * m_prevPressure;
+	double curWidth = m_width * pressure;
+	
 	Vec2 newPoint( x, y );
 	Vec2 direction = newPoint - m_prevPoint;
 	direction.Normalise();
 	Vec2 left( -direction[1], direction[0] );
-	left *= m_width;
-	Vec2 right( left * -1 );
+	Vec2 leftOrig = left * prevWidth;
+	Vec2 leftEnd = left * curWidth;
+	Vec2 rightOrig( leftOrig * -1 );
+	Vec2 rightEnd( leftEnd * -1 );
 	
-	Vec2 newPointLeft = newPoint + left;
-	Vec2 newPointRight = newPoint + right;
+	Vec2 newPointLeft = newPoint + leftEnd;
+	Vec2 newPointRight = newPoint + rightEnd;
 	
-	Vec2 midCap = newPoint + direction * m_width;
-	Vec2 leftCap = midCap + left;
-	Vec2 rightCap = midCap + right;
+	Vec2 midCap = newPoint + direction * curWidth;
+	Vec2 leftCap = midCap + leftEnd;
+	Vec2 rightCap = midCap + rightEnd;
 	
-	Vec2 leftStart = m_prevPoint + left;
-	Vec2 rightStart = m_prevPoint + right;
+	Vec2 leftStart = m_prevPoint + leftOrig;
+	Vec2 rightStart = m_prevPoint + rightOrig;
 	
 	int nextIndex = m_vertices.size();
 	
