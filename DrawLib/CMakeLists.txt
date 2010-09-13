@@ -26,7 +26,8 @@ set( DrawLib_src  drwDrawingWidget.cpp
 		drwNetworkThread.cpp
 		drwDisplaySettings.cpp
 		drwEditionState.cpp 
-		drwCommandDispatcher.cpp )
+		drwCommandDispatcher.cpp 
+		drwBitmapExporter.cpp )
 
 set( DrawLib_hdr_moc 	drwDrawingWidget.h 
 			drwWidgetObserver.h
@@ -42,7 +43,8 @@ set( DrawLib_hdr_moc 	drwDrawingWidget.h
 			drwDisplaySettings.h
 			drwEditionState.h 
 			ImageFlippingTool.h
-			drwCommandDispatcher.h )
+			drwCommandDispatcher.h 
+			drwBitmapExporter.h )
 
 set( DrawLib_hdr	drwGlslShader.h
 			Camera.h

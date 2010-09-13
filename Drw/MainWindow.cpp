@@ -10,12 +10,13 @@
 #include "TabletStateWidget.h"
 #include "NetworkInterfaceWidget.h"
 #include "DisplaySettingsWidget.h"
-//#include "ExportToSWFDialog.h"
+#include "ExportDialog.h"
 #include "drwNetworkThread.h"
 #include "drwNetworkInterface.h"
 #include "drwNetworkConnection.h"
 #include "drwEditionState.h"
 #include "drwCommandDispatcher.h"
+#include "drwBitmapExporter.h"
 
 #include <QtGui>
 
@@ -114,7 +115,7 @@ void MainWindow::CreateActions()
 	file->addAction( "Open...", this, SLOT( fileOpen() ), Qt::CTRL + Qt::Key_O );
 	file->addAction( "Save", this, SLOT( fileSave() ), Qt::CTRL + Qt::Key_S );
 	file->addAction( "Save As...", this, SLOT( fileSaveAs() ), Qt::SHIFT + Qt::CTRL + Qt::Key_S );
-	//file->addAction( "Export...", this, SLOT( fileExport() ) );
+	file->addAction( "Export...", this, SLOT( fileExport() ) );
     file->addAction( "&Exit", this, SLOT( close() ) );
 	
 	// Create the Edit menu
@@ -198,7 +199,7 @@ void MainWindow::fileSaveAs()
 
 bool MainWindow::fileExport()
 {
-	/*ExportToSWFDialog dlg( m_exportDefaultPath, m_exportRes.width(), m_exportRes.height() );
+	ExportDialog dlg( m_exportDefaultPath, m_exportRes.width(), m_exportRes.height() );
 	if( dlg.exec() == QDialog::Accepted )
 	{
 		QString path = dlg.GetFileName();
@@ -206,9 +207,25 @@ bool MainWindow::fileExport()
 			return false;
 		m_exportDefaultPath = path;
 		dlg.GetResolution( m_exportRes );
-		m_scene->ExportToSWF( m_exportDefaultPath.toAscii(), m_exportRes.width(), m_exportRes.height() );
+		
+		// Create the exporter and start it
+		drwBitmapExporter * exporter = new drwBitmapExporter;
+		exporter->SetFilename( path );
+		exporter->SetScene( m_scene );
+		exporter->start();
+		
+		// Create the progress dialog, connect it to the exporter and start modal
+		QProgressDialog dialog;
+		dialog.setLabelText("Exporting animation to bitmap");
+		dialog.setRange( 0, 19 );
+		connect( exporter, SIGNAL(WritingFrame(int)), &dialog, SLOT(setValue(int)), Qt::QueuedConnection );
+		dialog.exec();
+		
+		// wait for the exporter thread to terminate
+		exporter->wait();
+		
 		return true;
-	}*/
+	}
 	return false;
 }
 
