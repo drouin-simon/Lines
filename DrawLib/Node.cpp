@@ -1,6 +1,5 @@
 #include "Node.h"
 #include "Primitive.h"
-#include "drwSWFWriter.h"
 #include "drwDrawingContext.h"
 
 GLuint Node::NextId = 1;

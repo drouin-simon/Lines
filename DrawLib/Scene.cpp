@@ -1,6 +1,5 @@
 #include "Scene.h"
 #include "Node.h"
-#include "drwSWFWriter.h"
 #include "ImageSprite.h"
 #include <QImage>
 

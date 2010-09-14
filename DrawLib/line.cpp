@@ -1,6 +1,5 @@
 #include "line.h"
 #include "SVLgl.h"
-#include "drwSWFWriter.h"
 #include "drwDrawingContext.h"
 
 Line::Line() : m_lineWidth( 1.0 )
