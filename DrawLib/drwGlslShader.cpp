@@ -2,6 +2,8 @@
 #include "IncludeGLee.h"
 #include "IncludeGl.h"
 #include <iostream>
+#include <stdio.h>
+#include <stdarg.h>
 
 using namespace std;
 
