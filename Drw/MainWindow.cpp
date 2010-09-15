@@ -202,6 +202,7 @@ bool MainWindow::fileExport()
 	ExportDialog dlg( m_exportDefaultPath, m_exportRes.width(), m_exportRes.height() );
 	if( dlg.exec() == QDialog::Accepted )
 	{
+		// Get params from the dialog
 		QString path = dlg.GetFileName();
 		if( path.isEmpty() )
 			return false;
@@ -212,17 +213,19 @@ bool MainWindow::fileExport()
 		drwBitmapExporter * exporter = new drwBitmapExporter;
 		exporter->SetFilename( path );
 		exporter->SetScene( m_scene );
-		exporter->start();
+		exporter->SetGLWidget( m_glWidget );
+		exporter->SetSize( m_exportRes );
+		exporter->Export();
 		
 		// Create the progress dialog, connect it to the exporter and start modal
-		QProgressDialog dialog;
+		/*QProgressDialog dialog;
 		dialog.setLabelText("Exporting animation to bitmap");
 		dialog.setRange( 0, 19 );
 		connect( exporter, SIGNAL(WritingFrame(int)), &dialog, SLOT(setValue(int)), Qt::QueuedConnection );
 		dialog.exec();
 		
 		// wait for the exporter thread to terminate
-		exporter->wait();
+		exporter->wait();*/
 		
 		return true;
 	}

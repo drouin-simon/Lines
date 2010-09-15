@@ -2,10 +2,12 @@
 #define __drwBitmapExporter_h_
 
 #include <QThread>
+#include <QSize>
 
 class Scene;
+class drwDrawingWidget;
 
-class drwBitmapExporter : public QThread
+class drwBitmapExporter : public QObject//: public QThread
 {
 
 	Q_OBJECT
@@ -16,8 +18,11 @@ public:
 	~drwBitmapExporter();
 	void SetScene( Scene * scene ) { m_scene = scene; }
 	void SetFilename( QString filename ) { m_filename = filename; }
+	void SetGLWidget( drwDrawingWidget * glWidget ) { m_glWidget = glWidget; }
+	void SetSize( const QSize & size );
 	
-	virtual void run();
+	bool Export();
+	//virtual void run();
 	
 signals:
 	
@@ -28,6 +33,8 @@ protected:
 	
 	Scene * m_scene;
 	QString m_filename;
+	QSize m_size;
+	drwDrawingWidget * m_glWidget;
 	
 };
 
