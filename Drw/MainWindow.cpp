@@ -215,19 +215,22 @@ bool MainWindow::fileExport()
 		exporter->SetScene( m_scene );
 		exporter->SetGLWidget( m_glWidget );
 		exporter->SetSize( m_exportRes );
-		exporter->Export();
+		bool res = exporter->StartWriting();
 		
 		// Create the progress dialog, connect it to the exporter and start modal
-		/*QProgressDialog dialog;
-		dialog.setLabelText("Exporting animation to bitmap");
-		dialog.setRange( 0, 19 );
-		connect( exporter, SIGNAL(WritingFrame(int)), &dialog, SLOT(setValue(int)), Qt::QueuedConnection );
-		dialog.exec();
+		if( res )
+		{
+			QProgressDialog dialog;
+			dialog.setLabelText("Exporting animation to bitmap");
+			dialog.setRange( 0, m_scene->GetNumberOfFrames() - 1 );
+			connect( exporter, SIGNAL(WritingFrame(int)), &dialog, SLOT(setValue(int)), Qt::QueuedConnection );
+			dialog.exec();
 		
-		// wait for the exporter thread to terminate
-		exporter->wait();*/
+			// wait for the exporter thread to terminate
+			exporter->wait();
 		
-		return true;
+			return true;
+		}
 	}
 	return false;
 }

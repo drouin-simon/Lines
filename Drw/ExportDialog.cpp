@@ -47,7 +47,7 @@ void ExportDialog::on_browseButton_clicked()
 		currentPath += "untitled.swf";
 	}
 	
-	QString newPath = QFileDialog::getSaveFileName( this, tr("Export to .swf"),  currentPath, tr("SWF Files (*.swf)") );
+	QString newPath = QFileDialog::getSaveFileName( this, tr("Export to bitmap"),  currentPath, tr("PNG Files (*.png)") );
 	if( !newPath.isEmpty() )
 		ui.fileEditBox->setText( newPath );
 }
