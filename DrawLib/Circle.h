@@ -20,9 +20,6 @@ public:
     SetMacro( Angle2, double );
     SetMacro( NumberOfSubdiv, int );
     SetMacro( IntermediatePointOnly, bool);
-	
-	// TODO
-	virtual void ExportToSWF( drwSWFWriter & writer ) {}
 
 protected:
 
