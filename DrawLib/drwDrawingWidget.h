@@ -28,7 +28,6 @@ public:
 	GetMacro( DisplaySettings, drwDisplaySettings* );
 	drwDrawableTexture * GetWorkTexture() { return m_workTexture; }
 	Camera & GetCamera() { return theCamera; }
-	void RequestRedraw();
 	
 	drwCommand::s_ptr CreateMouseCommand( drwMouseCommand::MouseCommandType commandType, QMouseEvent * e );
 	drwCommand::s_ptr CreateMouseCommand( drwMouseCommand::MouseCommandType commandType, QTabletEvent * e );
@@ -36,7 +35,7 @@ public:
 	
 public slots:
 	
-	void SceneModified();
+	void RequestRedraw();
     void CurrentFrameChanged();
 	void PlaybackStartStop( bool isStart );
 	void DisplaySettingsModified();
@@ -49,11 +48,15 @@ protected:
 	void DrawAllFramesHue();
 	void DrawAllFramesRedGreen();
 	void DrawFrame();
+	void DisplayCounter();
 
 	virtual void mousePressEvent(QMouseEvent*);
 	virtual void mouseReleaseEvent(QMouseEvent*);
 	virtual void mouseMoveEvent(QMouseEvent*);
 	virtual void tabletEvent ( QTabletEvent * event );
+	
+	// Manage timer that generates updateGL in playback mode
+	int m_timerId;
 	
 	// Handling of Drag and Drop
 	void dragEnterEvent(QDragEnterEvent *event);

@@ -42,6 +42,7 @@ void drwDrawingWidget::WindowToWorld( double xWin, double yWin, double & xWorld,
 
 drwDrawingWidget::drwDrawingWidget( QWidget * parent ) 
 : QGLWidget( /*QGLFormat(QGL::SampleBuffers),*/ parent )
+, m_timerId(-1)
 , currentMouseX(0)
 , currentMouseY(0)
 , lastMouseX(0)
@@ -61,7 +62,6 @@ drwDrawingWidget::drwDrawingWidget( QWidget * parent )
 	connect( DisplaySettings, SIGNAL(ModifiedSignal()), this, SLOT(DisplaySettingsModified()) );
 	setAcceptDrops(true);
 	setMouseTracking(true);
-	startTimer(0);  // start an idle timer. Generated event are used to check if an update is needed.
 }
 
 void drwDrawingWidget::SetControler( PlaybackControler * controler )
@@ -121,21 +121,23 @@ Node * drwDrawingWidget::Pick( int x, int y )
 void drwDrawingWidget::SetCurrentScene( Scene * cur )
 {
 	CurrentScene = cur;
-	connect( CurrentScene, SIGNAL( Modified() ), SLOT( SceneModified() ), Qt::DirectConnection );
+	connect( CurrentScene, SIGNAL( Modified() ), SLOT( RequestRedraw() ), Qt::DirectConnection );
 }
 
 void drwDrawingWidget::RequestRedraw()
-{
-	updateGL();
-}
-
-void drwDrawingWidget::SceneModified()
 {
 	// If we are in the main thread, repaint as soon as possible. If not, it can wait until the next idle moment
 	if( QApplication::instance()->thread() == QThread::currentThread() )
 		updateGL();
 	else
-		m_needUpdateGL = true;
+	{
+		// post a paint event
+		QPaintEvent * e = new QPaintEvent( rect() );
+		QCoreApplication::postEvent( this, e );
+		//m_needUpdateGL = true;
+		// simtodo: post a message for this widget on the main threads event loop to tell it to render
+		//ScheduleOneIdle();
+	}
 }
 
 void drwDrawingWidget::CurrentFrameChanged()
@@ -146,6 +148,21 @@ void drwDrawingWidget::CurrentFrameChanged()
 
 void drwDrawingWidget::PlaybackStartStop( bool isStarting )
 {
+	// Start/stop generating idle events that are used to make sure we redraw during playback
+	if( isStarting )
+	{
+		if( m_timerId == -1 )
+			m_timerId = startTimer(0);
+	}
+	else
+	{
+		if( m_timerId != -1 )
+		{
+			killTimer( m_timerId );
+			m_timerId = -1;
+		}
+	}
+	
 	DisplaySettings->SetInhibitOnionSkin( isStarting );
 }
 
@@ -240,11 +257,52 @@ void drwDrawingWidget::paintGL()
 		CurrentScene->DrawFrame( Controler->GetCurrentFrame(), mainContext );
 	}
 	
+	// for debugging purpose - display a dot moving every redraw
+	DisplayCounter();
+	
 	// Draw Output frame
 	if( DisplaySettings->GetShowCameraFrame() )
 	{
 		DrawFrame();
 	}
+}
+
+void drwDrawingWidget::DisplayCounter()
+{
+	static int displayCount = 0;
+	
+	glMatrixMode( GL_PROJECTION );
+	glPushMatrix();
+	glLoadIdentity();
+	gluOrtho2D( 0.0, this->width(), 0.0, this->height() );
+	glMatrixMode( GL_MODELVIEW );
+	glPushMatrix();
+	glLoadIdentity();
+	glPushAttrib( GL_CURRENT_BIT );
+	
+	glColor4d( 1.0, 1.0, 0.0, 1.0 );
+	
+	int numberOfSteps = (this->width() - 20) / 10;
+	int pos = displayCount % numberOfSteps;
+	glTranslate( Vec2(pos * 10 + 10, 20) );
+	
+	glBegin( GL_QUADS );
+	{
+		glVertex2d( 0.0, 0.0 );
+		glVertex2d( 5.0, 0.0 );
+		glVertex2d( 5.0, 5.0 );
+		glVertex2d( 0.0, 5.0 );
+	}
+	glEnd();
+	
+	glPopAttrib();
+	glPopMatrix();
+	glMatrixMode( GL_PROJECTION );
+	glPopMatrix();
+	glMatrixMode( GL_MODELVIEW );
+	
+	++displayCount;
+	
 }
 
 void drwDrawingWidget::DrawAllFramesHue()
@@ -446,15 +504,19 @@ void drwDrawingWidget::dragEnterEvent(QDragEnterEvent *event)
 
 bool drwDrawingWidget::event( QEvent * e )
 {
-	bool updateRequested = false;
+	// Give a chance to the controler to change frame. A frame change triggers an updateGL
+	bool controlerUpdated = false;
 	if( Controler )
 	{
-		updateRequested = Controler->Tick();
+		controlerUpdated = Controler->Tick();
 	}
-	if( m_needUpdateGL && !updateRequested )
+	
+	// If an updateGL was requested and the controller didn't produce it, trigger updateGL.
+	if( m_needUpdateGL && !controlerUpdated )
 	{
 		updateGL();
 	}
 	m_needUpdateGL = false;
+	
 	return QGLWidget::event(e);
 }
