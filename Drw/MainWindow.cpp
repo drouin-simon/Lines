@@ -59,18 +59,30 @@ MainWindow::MainWindow()
 	m_toolOptionWidget = new PrimitiveToolOptionWidget( m_controler->GetEditionState(), m_dockToolsOptions );
 	m_dockToolsOptions->setWidget(m_toolOptionWidget);
 	m_viewMenu->addAction(m_dockToolsOptions->toggleViewAction());
+#ifdef Q_WS_X11
+	m_dockToolsOptions->setAllowedAreas( Qt::RightDockWidgetArea );
+	m_dockToolsOptions->setFeatures( QDockWidget::NoDockWidgetFeatures );
+	addDockWidget( Qt::RightDockWidgetArea, m_dockToolsOptions );
+#else
 	m_dockToolsOptions->setFeatures( QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetMovable );
 	m_dockToolsOptions->setFloating(true);
 	m_dockToolsOptions->show();
+#endif
 	
 	// Create the DisplaySettings widget
 	m_dockDisplayOptions = new QDockWidget(tr("Display options"));
 	m_displaySettingsWidget = new DisplaySettingsWidget( m_glWidget->GetDisplaySettings() );
 	m_dockDisplayOptions->setWidget(m_displaySettingsWidget);
 	m_viewMenu->addAction(m_dockDisplayOptions->toggleViewAction());
+#ifdef Q_WS_X11
+	m_dockDisplayOptions->setAllowedAreas( Qt::RightDockWidgetArea );
+	m_dockDisplayOptions->setFeatures( QDockWidget::NoDockWidgetFeatures );
+	addDockWidget( Qt::RightDockWidgetArea, m_dockDisplayOptions );
+#else
 	m_dockDisplayOptions->setFeatures( QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetMovable );
 	m_dockDisplayOptions->setFloating(true);
 	m_dockDisplayOptions->show();
+#endif
 	
 	// Create tablet state dock
 	m_dockTabletState = new QDockWidget(tr("Tablet State"));
@@ -78,7 +90,7 @@ MainWindow::MainWindow()
 	m_dockTabletState->setWidget(m_tabletStateWidget);
 	m_viewMenu->addAction(m_dockTabletState->toggleViewAction());
 	m_dockTabletState->setFeatures( QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetMovable );
-	m_dockTabletState->setFloating(true);
+	//m_dockTabletState->setFloating(true);
 	
 	// Create the network interface dock
 	m_dockNetworkInterface = new QDockWidget(tr("Network"));
