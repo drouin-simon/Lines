@@ -19,23 +19,29 @@ drwLineTool::drwLineTool( int userId, Scene * scene, drwEditionState * editionSt
 	LastXWorld = 0;
 	LastYWorld = 0;
 	LastPressure = 1.0;
+	
+	// simtodo : fix this
+	CurrentScene->SetCursorRadius( 20 );
 }
 
 void drwLineTool::MousePressEvent( drwDrawingWidget * w, QMouseEvent * e )
 {
 	drwCommand::s_ptr command = w->CreateMouseCommand( drwMouseCommand::Press, e );
+	SetCursorPosition( command );
 	ExecuteCommand( command );	
 }
 
 void drwLineTool::MouseReleaseEvent( drwDrawingWidget * w, QMouseEvent * e )
 {
 	drwCommand::s_ptr command = w->CreateMouseCommand( drwMouseCommand::Release, e );
+	SetCursorPosition( command );
 	ExecuteCommand( command );
 }
 
 void drwLineTool::MouseMoveEvent( drwDrawingWidget * w, QMouseEvent * e )
 {
 	drwCommand::s_ptr command = w->CreateMouseCommand( drwMouseCommand::Move, e );
+	SetCursorPosition( command );
 	ExecuteCommand( command );
 }
 
@@ -44,23 +50,26 @@ void drwLineTool::TabletEvent( drwDrawingWidget * w, QTabletEvent * e )
 	if( e->type() == QEvent::TabletPress )
 	{
 		drwCommand::s_ptr command = w->CreateMouseCommand( drwMouseCommand::Press, e );
+		SetCursorPosition( command );
 		ExecuteCommand( command );
 		e->accept();
 	}
 	else if( e->type() == QEvent::TabletRelease )
 	{
 		drwCommand::s_ptr command = w->CreateMouseCommand( drwMouseCommand::Release, e );
+		SetCursorPosition( command );
 		ExecuteCommand( command );
 		e->accept();
 	}
 	else if( e->type() == QEvent::TabletMove )
 	{
 		drwCommand::s_ptr command = w->CreateMouseCommand( drwMouseCommand::Move, e );
+		SetCursorPosition( command );
 		ExecuteCommand( command );
 		e->accept();
 	}
 }
-
+									
 void drwLineTool::ExecuteCommand( drwCommand::s_ptr command )
 {
 	drwMouseCommand * mouseCom = dynamic_cast<drwMouseCommand*>(command.get());
@@ -194,3 +203,12 @@ void drwLineTool::CreateNewNodes( )
 		}	
 	}
 }
+
+
+void drwLineTool::SetCursorPosition( drwCommand::s_ptr command )
+{
+	drwMouseCommand * mouseCom = dynamic_cast<drwMouseCommand*>(command.get());
+	if( mouseCom )
+		CurrentScene->SetCursorPos( mouseCom->X(), mouseCom->Y() );
+}
+

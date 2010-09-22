@@ -132,11 +132,7 @@ void drwDrawingWidget::RequestRedraw()
 	else
 	{
 		// post a paint event
-		QPaintEvent * e = new QPaintEvent( rect() );
-		QCoreApplication::postEvent( this, e );
-		//m_needUpdateGL = true;
-		// simtodo: post a message for this widget on the main threads event loop to tell it to render
-		//ScheduleOneIdle();
+		QMetaObject::invokeMethod(this, "updateGL", Qt::AutoConnection);
 	}
 }
 
@@ -194,7 +190,7 @@ void drwDrawingWidget::initializeGL()
 	format().setSamples( maxSamples );*/
 
 	// Enable vertex arrays: needed by geometry classes
-	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState( GL_VERTEX_ARRAY );
 	glEnableClientState( GL_TEXTURE_COORD_ARRAY );
 	
 	// Default background color
@@ -255,6 +251,13 @@ void drwDrawingWidget::paintGL()
 		}
 		drwDrawingContext mainContext(this);
 		CurrentScene->DrawFrame( Controler->GetCurrentFrame(), mainContext );
+		
+		glDisableClientState( GL_TEXTURE_COORD_ARRAY );
+		glPushAttrib( GL_CURRENT_BIT );
+		glColor4d( 1.0, 0.0, 0.0, 1.0 );
+		CurrentScene->DrawCursor( mainContext );
+		glPopAttrib();
+		glEnableClientState( GL_TEXTURE_COORD_ARRAY );
 	}
 	
 	// for debugging purpose - display a dot moving every redraw

@@ -36,6 +36,7 @@ protected:
 	
 	void CreateNewNodes();
 	Node * CreateNewNode();
+	void SetCursorPosition( drwCommand::s_ptr command );
 	
 	double LastXWorld;
 	double LastYWorld;

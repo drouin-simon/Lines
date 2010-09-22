@@ -8,6 +8,7 @@
 #include "Frame.h"
 
 class ImageSprite;
+class drwCursor;
 
 class Scene : public QObject
 {
@@ -36,6 +37,10 @@ public:
 	
 	ImageSprite * GetImageSprite( const char * filename );
 	
+	void DrawCursor( const drwDrawingContext & context );
+	void SetCursorPos( double x, double y );
+	void SetCursorRadius( double radius );
+	
 signals:
 	
 	void Modified();
@@ -46,6 +51,8 @@ public slots:
 	void InsertFrame( int beforeThisFrame );
 	
 protected:
+	
+	drwCursor * m_cursor;
 	
 	// Part of the scene that is displayed for any frame
 	Frame  AlwaysDisplayed;
