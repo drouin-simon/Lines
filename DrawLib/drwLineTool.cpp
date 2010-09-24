@@ -12,6 +12,7 @@ drwLineTool::drwLineTool( int userId, Scene * scene, drwEditionState * editionSt
 , Color(1.0,1.0,1.0)
 , m_editionState(editionState)
 , m_userId( userId )
+, m_baseWidth( 10.0 )
 {
 	IsDrawing = false;
 	//Type = TypeLine;
@@ -21,7 +22,7 @@ drwLineTool::drwLineTool( int userId, Scene * scene, drwEditionState * editionSt
 	LastPressure = 1.0;
 	
 	// simtodo : fix this
-	CurrentScene->SetCursorRadius( 20 );
+	CurrentScene->SetCursorRadius( m_baseWidth );
 }
 
 void drwLineTool::MousePressEvent( drwDrawingWidget * w, QMouseEvent * e )
@@ -106,18 +107,21 @@ void drwLineTool::ExecuteCommand( drwCommand::s_ptr command )
 		}
 		else if( mouseCom->GetType() == drwMouseCommand::Move )
 		{
-			CurrentNodesCont::iterator it = CurrentNodes.begin();
-			while( it != CurrentNodes.end() )
+			if( IsDrawing )
 			{
-				LinePrimitive * prim = dynamic_cast<LinePrimitive*> (it->second->GetPrimitive());
-				prim->AddPoint( mouseCom->X(), mouseCom->Y(), mouseCom->Pressure() );
-				++it;
+				CurrentNodesCont::iterator it = CurrentNodes.begin();
+				while( it != CurrentNodes.end() )
+				{
+					LinePrimitive * prim = dynamic_cast<LinePrimitive*> (it->second->GetPrimitive());
+					prim->AddPoint( mouseCom->X(), mouseCom->Y(), mouseCom->Pressure() );
+					++it;
+				}
+				CurrentScene->MarkModified();
+				LastXWorld = mouseCom->X();
+				LastYWorld = mouseCom->Y();
+				LastPressure = mouseCom->Pressure();
+				emit CommandExecuted( command );
 			}
-			CurrentScene->MarkModified();
-			LastXWorld = mouseCom->X();
-			LastYWorld = mouseCom->Y();
-			LastPressure = mouseCom->Pressure();
-			emit CommandExecuted( command );
 		}
 	}
 }
@@ -176,7 +180,7 @@ Node * drwLineTool::CreateNewNode()
 		}
 			break;
 		case TypeWideLine:
-			newPrimitive = new WideLine;
+			newPrimitive = new WideLine( m_baseWidth );
 			break;
 		case EndType:
 			break;

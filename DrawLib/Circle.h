@@ -20,6 +20,8 @@ public:
     SetMacro( Angle2, double );
     SetMacro( NumberOfSubdiv, int );
     SetMacro( IntermediatePointOnly, bool);
+	SetMacro( Contour, bool );
+	SetMacro( Fill, bool );
 
 protected:
 
@@ -35,6 +37,8 @@ protected:
     double Angle2;
     int    NumberOfSubdiv;
     bool   IntermediatePointOnly;
+	bool   Contour;
+	bool   Fill;
 
 	// What gets drawn
 	PolygonData m_poly;

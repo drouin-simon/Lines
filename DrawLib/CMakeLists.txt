@@ -3,6 +3,7 @@ project( DrawLib )
 set( LibName Draw )
 
 set( DrawLib_src  drwDrawingWidget.cpp
+		drwDrawingWidgetInteractor.cpp
 		drwToolbox.cpp
 		drwLineTool.cpp
 		drwGlslShader.cpp
@@ -47,7 +48,8 @@ set( DrawLib_hdr_moc 	drwDrawingWidget.h
 			drwCommandDispatcher.h 
 			drwBitmapExporter.h )
 
-set( DrawLib_hdr	drwGlslShader.h
+set( DrawLib_hdr	drwDrawingWidgetInteractor.h
+			drwGlslShader.h
 			Camera.h
 			Frame.h
 			line.h  

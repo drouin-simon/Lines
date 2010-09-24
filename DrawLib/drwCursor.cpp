@@ -6,6 +6,8 @@ drwCursor::drwCursor()
 , m_position( 0.0, 0.0 )
 {
 	m_circle = new Circle;
+	m_circle->SetFill( false );
+	m_circle->SetContour( true );
 }
 
 drwCursor::~drwCursor()

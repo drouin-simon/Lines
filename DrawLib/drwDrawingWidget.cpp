@@ -8,6 +8,40 @@
 #include "drwDisplaySettings.h"
 #include "drwDrawingContext.h"
 #include "drwDrawableTexture.h"
+#include "drwDrawingWidgetInteractor.h"
+
+drwDrawingWidget::drwDrawingWidget( QWidget * parent ) 
+: QGLWidget( parent )
+, m_timerId(-1)
+, Observer(0)
+, CurrentScene(0)
+, Controler(0)
+, DisplaySettings(0)
+, HasDrawn(false)
+, m_needUpdateGL(false)
+{
+	m_interactor = new drwDrawingWidgetInteractor( this );
+	DisplaySettings = new drwDisplaySettings;
+	m_workTexture = new drwDrawableTexture;
+	connect( DisplaySettings, SIGNAL(ModifiedSignal()), this, SLOT(DisplaySettingsModified()) );
+	setAcceptDrops(true);
+	setMouseTracking(true);
+	setCursor( Qt::BlankCursor );
+}
+
+drwDrawingWidget::~drwDrawingWidget()
+{
+	delete m_interactor;
+	delete DisplaySettings;
+	delete m_workTexture;
+}
+
+void drwDrawingWidget::SetControler( PlaybackControler * controler )
+{
+	Controler = controler;
+	connect(Controler, SIGNAL(FrameChanged(int)), SLOT(CurrentFrameChanged()) );
+	connect(Controler, SIGNAL(StartStop(bool)), SLOT(PlaybackStartStop(bool)) );
+}
 
 drwCommand::s_ptr drwDrawingWidget::CreateMouseCommand( drwMouseCommand::MouseCommandType commandType, QMouseEvent * e )
 {
@@ -39,37 +73,6 @@ void drwDrawingWidget::WindowToWorld( double xWin, double yWin, double & xWorld,
 	theCamera.WindowToWorld( xWin, yWin, xWorld, yWorld );
 }
 
-
-drwDrawingWidget::drwDrawingWidget( QWidget * parent ) 
-: QGLWidget( /*QGLFormat(QGL::SampleBuffers),*/ parent )
-, m_timerId(-1)
-, currentMouseX(0)
-, currentMouseY(0)
-, lastMouseX(0)
-, lastMouseY(0)
-, mouseMoving(false)
-, isScaling(false)
-, isPaning(false)
-, Observer(0)
-, CurrentScene(0)
-, Controler(0)
-, DisplaySettings(0)
-, HasDrawn(false)
-, m_needUpdateGL(false)
-{
-	DisplaySettings = new drwDisplaySettings;
-	m_workTexture = new drwDrawableTexture;
-	connect( DisplaySettings, SIGNAL(ModifiedSignal()), this, SLOT(DisplaySettingsModified()) );
-	setAcceptDrops(true);
-	setMouseTracking(true);
-}
-
-void drwDrawingWidget::SetControler( PlaybackControler * controler )
-{
-	Controler = controler;
-	connect(Controler, SIGNAL(FrameChanged(int)), SLOT(CurrentFrameChanged()) );
-	connect(Controler, SIGNAL(StartStop(bool)), SLOT(PlaybackStartStop(bool)) );
-}
 
 #define PICK_BUF_SIZE 512
 GLuint selectBuf[PICK_BUF_SIZE];
@@ -182,12 +185,6 @@ void drwDrawingWidget::initializeGL()
 	glEnable( GL_LINE_SMOOTH );
 	glEnable( GL_BLEND );     
 	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA ); 
-	
-	// Enable global antialiasing
-	/*glEnable(GL_MULTISAMPLE);
-	GLint maxSamples;
-	glGetIntegerv(GL_MAX_SAMPLES_EXT, &maxSamples);
-	format().setSamples( maxSamples );*/
 
 	// Enable vertex arrays: needed by geometry classes
 	glEnableClientState( GL_VERTEX_ARRAY );
@@ -405,83 +402,62 @@ void drwDrawingWidget::DrawFrame()
 
 void drwDrawingWidget::mousePressEvent( QMouseEvent * e )
 {
-	if ( e->button() == Qt::LeftButton )
+	// try the interactor first
+	bool interactorSwallows = m_interactor->mousePressEvent( e );
+	if( interactorSwallows )
+		return;
+	
+	// now send the event to observer ( drawing tools)
+	if( e->button() == Qt::LeftButton && Observer )
 	{
-		mouseMoving = true;
-		currentMouseX  = e->x();
-		currentMouseY  = e->y();
-
-		if( e->modifiers() & Qt::ShiftModifier )
-		{
-			isPaning = true;
-		}
-		else if ( e->modifiers() & Qt::ControlModifier || e->modifiers() & Qt::AltModifier )
-		{
-			isScaling = true;
-		}
-		else if( Observer )
-		{
-			Observer->MousePressEvent( this, e );
-		}
+		Observer->MousePressEvent( this, e );
 	}
 }
 
 
 void drwDrawingWidget::mouseReleaseEvent( QMouseEvent * e )
 {
-	if ( e->button() == Qt::LeftButton )
-	{
-		if( !isPaning && !isScaling )
-			Observer->MouseReleaseEvent( this, e );
-
-		// cancel all operation on view
-		mouseMoving = false;
-		isPaning    = false;
-		isScaling   = false;
-	}
+	// try the interactor first
+	bool interactorSwallows = m_interactor->mouseReleaseEvent( e );
+	if( interactorSwallows )
+		return;
+	
+	if ( e->button() == Qt::LeftButton && Observer )
+		Observer->MouseReleaseEvent( this, e );
 }
 
 
 void drwDrawingWidget::mouseMoveEvent( QMouseEvent * e )
 {
-	lastMouseX = currentMouseX;
-	lastMouseY = currentMouseY;
-	currentMouseX = e->x();
-	currentMouseY = e->y();
-
-	bool selfInducedRedraw = false;
-	if( isScaling )
-	{
-		theCamera.Zoom( 1.0 + (double)(currentMouseY - lastMouseY) / (double)100.0 );
-		selfInducedRedraw = true;
-	}
-	else if( isPaning )
-	{
-		double xPercent = -1.0 * (double)( currentMouseX - lastMouseX ) / (double)( theCamera.GetWindowWidth() );
-		double yPercent = (double)( currentMouseY - lastMouseY ) / (double)( theCamera.GetWindowHeight() );
-		theCamera.Pan( xPercent, yPercent );
-		selfInducedRedraw = true;
-	}
-	else
-	{
-		Observer->MouseMoveEvent( this, e );
-	}
+	// try the interactor first
+	bool interactorSwallows = m_interactor->mouseMoveEvent( e );
+	if( interactorSwallows )
+		return;
 	
-	if( selfInducedRedraw )
-		updateGL();
+	if ( Observer )
+		Observer->MouseMoveEvent( this, e );
 }
 
 void drwDrawingWidget::tabletEvent ( QTabletEvent * e )
 {
-	bool isPress = e->type() == QEvent::TabletPress;
-	bool isModifier = e->modifiers() & Qt::ControlModifier || e->modifiers() & Qt::AltModifier || e->modifiers() & Qt::ShiftModifier;
-	bool viewManipulation = false;
-	viewManipulation |= isPress && isModifier;
-	viewManipulation |= isPaning;
-	viewManipulation |= isScaling;
+	// try the interactor first
+	bool interactorSwallows = m_interactor->tabletEvent( e );
+	if( interactorSwallows )
+		return;
 	
-	if( !viewManipulation )
+	if( Observer )
 		Observer->TabletEvent( this, e );
+}
+
+void drwDrawingWidget::enterEvent( QEvent * e )
+{
+	// This will make the cursor visible next time a mouse event sets the position
+	CurrentScene->SetCursorVisible( true );
+}
+
+void drwDrawingWidget::leaveEvent( QEvent * e )
+{
+	CurrentScene->SetCursorVisible( false );
 }
 
 void drwDrawingWidget::dragEnterEvent(QDragEnterEvent *event)

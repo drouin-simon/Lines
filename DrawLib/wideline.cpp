@@ -7,11 +7,11 @@
 drwGlslShader * WideLine::m_shader = 0;
 
 
-WideLine::WideLine() 
+WideLine::WideLine( double width ) 
 : m_prevPoint( 0, 0 )
 , m_prevPressure( 1.0 )
+, m_width( width )
 {
-    m_width = 8.0;
 }
 
 

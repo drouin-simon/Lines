@@ -41,11 +41,13 @@ protected:
 	double LastXWorld;
 	double LastYWorld;
 	double LastPressure;
+	double BaseWidth;
 	
 	bool IsDrawing;
 	PrimitiveType Type;
 	
 	Vec3 Color;
+	double m_baseWidth;
 	
 	typedef std::map< int, Node* > CurrentNodesCont;
 	CurrentNodesCont CurrentNodes;

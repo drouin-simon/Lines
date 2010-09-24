@@ -7,6 +7,8 @@ Circle::Circle() : Center( Vec2( 0, 0 ) )
     Angle1 = 0;
     Angle2 = 2 * vl_pi;
     IntermediatePointOnly = 0;
+	Contour = false;
+	Fill = true;
 }
 
 
@@ -31,7 +33,10 @@ void Circle::InternDraw( const drwDrawingContext & context )
 	// Generate the polygons if not already done
 	if( m_poly.IsEmpty() )
 	{
-		GeneratePolygonData();
+		if( Fill )
+			GeneratePolygonData();
+		if( Contour )
+			GenerateContour();
 	}
 
 	// Draw the polygons

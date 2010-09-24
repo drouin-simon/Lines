@@ -8,6 +8,7 @@
 #include "drwCommand.h"
 
 class drwWidgetObserver;
+class drwDrawingWidgetInteractor;
 class Node;
 class PlaybackControler;
 class drwDisplaySettings;
@@ -20,6 +21,8 @@ class drwDrawingWidget : public QGLWidget
 public:
 		
 	drwDrawingWidget( QWidget * parent=0 );
+	~drwDrawingWidget();
+	
 	Node * Pick( int x, int y );
 	void SetCurrentScene( Scene * cur );
 	SetMacro( Observer, drwWidgetObserver* );
@@ -58,6 +61,9 @@ protected:
 	// Manage timer that generates updateGL in playback mode
 	int m_timerId;
 	
+	void enterEvent( QEvent * );
+	void leaveEvent( QEvent * );
+	
 	// Handling of Drag and Drop
 	void dragEnterEvent(QDragEnterEvent *event);
 	void dragMoveEvent(QDragMoveEvent *event);
@@ -69,16 +75,8 @@ protected:
   
 private:
 	
-	int currentMouseX;
-	int currentMouseY;
-	int lastMouseX;
-	int lastMouseY;
-		
-	bool mouseMoving;
-	bool isScaling;
-	bool isPaning;
-	
 	Camera theCamera;
+	drwDrawingWidgetInteractor * m_interactor;
 	drwWidgetObserver * Observer;
 	Scene				* CurrentScene;
 	PlaybackControler	* Controler;

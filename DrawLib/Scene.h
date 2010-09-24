@@ -40,6 +40,7 @@ public:
 	void DrawCursor( const drwDrawingContext & context );
 	void SetCursorPos( double x, double y );
 	void SetCursorRadius( double radius );
+	void SetCursorVisible( bool visible );
 	
 signals:
 	
@@ -53,6 +54,8 @@ public slots:
 protected:
 	
 	drwCursor * m_cursor;
+	bool m_cursorVisible;
+	bool m_cursorShouldBecomeVisible;
 	
 	// Part of the scene that is displayed for any frame
 	Frame  AlwaysDisplayed;
