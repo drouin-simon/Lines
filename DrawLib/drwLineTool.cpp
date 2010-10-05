@@ -5,6 +5,7 @@
 #include "Node.h"
 #include "drwEditionState.h"
 #include "drwDrawingWidget.h"
+#include "drwCursor.h"
 #include <QTabletEvent>
 
 drwLineTool::drwLineTool( int userId, Scene * scene, drwEditionState * editionState, QObject * parent ) 
@@ -26,7 +27,7 @@ drwLineTool::drwLineTool( int userId, Scene * scene, drwEditionState * editionSt
 , m_editionState(editionState)
 {	
 	// simtodo : fix this
-	CurrentScene->SetCursorRadius( m_baseWidth );
+	CurrentScene->GetCursor()->SetRadius( m_baseWidth );
 }
 
 void drwLineTool::MousePressEvent( drwDrawingWidget * w, QMouseEvent * e )
@@ -266,7 +267,8 @@ void drwLineTool::SetCursorPosition( drwCommand::s_ptr command )
 			CurrentScene->SetCursorVisible( true );
 			m_cursorShouldAppear = false;
 		}
-		CurrentScene->SetCursorPos( mouseCom->X(), mouseCom->Y() );
+		CurrentScene->GetCursor()->SetPosition( mouseCom->X(), mouseCom->Y() );
+		CurrentScene->MarkModified();
 	}
 }
 
@@ -275,11 +277,15 @@ void drwLineTool::BrushWidthStart( int x, int y )
 	m_lastXWin = x;
 	m_lastYWin = y;
 	m_brushScaling = true;
+	CurrentScene->GetCursor()->SetShowArrow( true );
+	CurrentScene->MarkModified();
 }
 
 void drwLineTool::BrushWidthEnd( int x, int y )
 {
 	m_brushScaling = false;
+	CurrentScene->GetCursor()->SetShowArrow( false );
+	CurrentScene->MarkModified();
 }
 
 void drwLineTool::BrushWidthMove( int x, int y )
@@ -292,7 +298,8 @@ void drwLineTool::BrushWidthMove( int x, int y )
 			m_baseWidth = m_minWidth;
 		if( m_baseWidth > m_maxWidth )
 			m_baseWidth = m_maxWidth;
-		CurrentScene->SetCursorRadius( m_baseWidth );
+		CurrentScene->GetCursor()->SetRadius( m_baseWidth );
+		CurrentScene->MarkModified();
 		m_lastXWin = x;
 		m_lastYWin = y;
 	}

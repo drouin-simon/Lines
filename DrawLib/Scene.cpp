@@ -125,18 +125,6 @@ void Scene::DrawCursor( const drwDrawingContext & context )
 		m_cursor->Draw( context );
 }
 
-void Scene::SetCursorPos( double x, double y ) 
-{ 
-	m_cursor->SetPosition( x, y );
-	MarkModified();
-}
-
-void Scene::SetCursorRadius( double radius ) 
-{ 
-	m_cursor->SetRadius( radius );
-	MarkModified();
-}
-
 void Scene::SetCursorVisible( bool visible ) 
 { 
 	if( visible != m_cursorVisible )

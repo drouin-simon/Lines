@@ -38,9 +38,8 @@ public:
 	ImageSprite * GetImageSprite( const char * filename );
 	
 	void DrawCursor( const drwDrawingContext & context );
-	void SetCursorPos( double x, double y );
-	void SetCursorRadius( double radius );
 	void SetCursorVisible( bool visible );
+	drwCursor * GetCursor() { return m_cursor; }
 	
 signals:
 	
