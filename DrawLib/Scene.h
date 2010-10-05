@@ -55,7 +55,6 @@ protected:
 	
 	drwCursor * m_cursor;
 	bool m_cursorVisible;
-	bool m_cursorShouldBecomeVisible;
 	
 	// Part of the scene that is displayed for any frame
 	Frame  AlwaysDisplayed;

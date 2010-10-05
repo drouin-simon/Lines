@@ -26,6 +26,9 @@ public:
 	virtual void MouseReleaseEvent( drwDrawingWidget * w, QMouseEvent * e );
 	virtual void MouseMoveEvent( drwDrawingWidget * w, QMouseEvent * e );
 	virtual void TabletEvent( drwDrawingWidget * w, QTabletEvent * e );
+	virtual void EnterEvent( drwDrawingWidget * w, QEvent * e );
+	virtual void LeaveEvent( drwDrawingWidget * w, QEvent * e );
+	
 	virtual void ExecuteCommand( drwCommand::s_ptr command );
 	virtual void SetCurrentFrame( int frame );
 	virtual void Reset();
@@ -36,18 +39,28 @@ protected:
 	
 	void CreateNewNodes();
 	Node * CreateNewNode();
+	
 	void SetCursorPosition( drwCommand::s_ptr command );
+	bool m_cursorShouldAppear;
+	
+	void BrushWidthStart( int x, int y );
+	void BrushWidthEnd( int x, int y );
+	void BrushWidthMove( int x, int y );
 	
 	double LastXWorld;
 	double LastYWorld;
 	double LastPressure;
-	double BaseWidth;
 	
 	bool IsDrawing;
 	PrimitiveType Type;
 	
 	Vec3 Color;
 	double m_baseWidth;
+	double m_minWidth;
+	double m_maxWidth;
+	int m_lastXWin;
+	int m_lastYWin;
+	bool m_brushScaling;
 	
 	typedef std::map< int, Node* > CurrentNodesCont;
 	CurrentNodesCont CurrentNodes;

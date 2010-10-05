@@ -2,14 +2,14 @@
 #include "drwDrawingWidget.h"
 
 drwDrawingWidgetInteractor::drwDrawingWidgetInteractor( drwDrawingWidget * widget )
-: m_widget( widget )
-, currentMouseX(0)
+: currentMouseX(0)
 , currentMouseY(0)
 , lastMouseX(0)
 , lastMouseY(0)
 , mouseMoving(false)
 , isScaling(false)
 , isPaning(false)
+, m_widget( widget )
 {
 }
 
@@ -64,7 +64,7 @@ bool drwDrawingWidgetInteractor::Press( int x, int y, Qt::KeyboardModifiers modi
 		isPaning = true;
 		mouseMoving = true;
 	}
-	else if ( modifiers & Qt::ControlModifier || modifiers & Qt::AltModifier )
+	else if ( modifiers & Qt::ControlModifier )
 	{
 		isScaling = true;
 		mouseMoving = true;

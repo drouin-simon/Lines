@@ -24,7 +24,9 @@ public:
 	virtual void MouseReleaseEvent( drwDrawingWidget * w, QMouseEvent * e ) {}
 	virtual void MouseMoveEvent( drwDrawingWidget * w, QMouseEvent * e ) {}
 	virtual void TabletEvent( drwDrawingWidget * w, QTabletEvent * e ) {}
-	virtual void DropEvent( drwDrawingWidget * w, QDropEvent * e ) {};
+	virtual void DropEvent( drwDrawingWidget * w, QDropEvent * e ) {}
+	virtual void EnterEvent( drwDrawingWidget * w, QEvent * e ) {}
+	virtual void LeaveEvent( drwDrawingWidget * w, QEvent * e ) {}
 	
 	virtual void SetCurrentFrame( int frame ) { CurrentFrame = frame; }
 	virtual void Reset() {}

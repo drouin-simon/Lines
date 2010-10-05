@@ -59,6 +59,18 @@ void drwToolbox::DropEvent( drwDrawingWidget * w, QDropEvent * e )
 		Tools[CurrentTool]->DropEvent( w, e );
 }
 
+void drwToolbox::EnterEvent( drwDrawingWidget * w, QEvent * e ) 
+{
+	if( CurrentTool >= 0 && CurrentTool < Tools.size() )
+		Tools[CurrentTool]->EnterEvent( w, e );
+}
+
+void drwToolbox::LeaveEvent( drwDrawingWidget * w, QEvent * e ) 
+{
+	if( CurrentTool >= 0 && CurrentTool < Tools.size() )
+		Tools[CurrentTool]->LeaveEvent( w, e );
+}
+
 void drwToolbox::SetCurrentFrame( int frame )
 {
 	if( CurrentTool >= 0 && CurrentTool < Tools.size() )

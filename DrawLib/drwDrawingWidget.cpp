@@ -451,13 +451,14 @@ void drwDrawingWidget::tabletEvent ( QTabletEvent * e )
 
 void drwDrawingWidget::enterEvent( QEvent * e )
 {
-	// This will make the cursor visible next time a mouse event sets the position
-	CurrentScene->SetCursorVisible( true );
+	if( Observer )
+		Observer->EnterEvent( this, e );
 }
 
 void drwDrawingWidget::leaveEvent( QEvent * e )
 {
-	CurrentScene->SetCursorVisible( false );
+	if( Observer )
+		Observer->LeaveEvent( this, e );
 }
 
 void drwDrawingWidget::dragEnterEvent(QDragEnterEvent *event)

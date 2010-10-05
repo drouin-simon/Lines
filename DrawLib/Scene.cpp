@@ -9,7 +9,6 @@ Scene::Scene( QObject * parent )
 {
 	m_cursor = new drwCursor;
 	m_cursorVisible = false;
-	m_cursorShouldBecomeVisible = false;
 }
 
 Scene::~Scene()
@@ -128,11 +127,6 @@ void Scene::DrawCursor( const drwDrawingContext & context )
 
 void Scene::SetCursorPos( double x, double y ) 
 { 
-	if( m_cursorShouldBecomeVisible )
-	{
-		m_cursorVisible = true;
-		m_cursorShouldBecomeVisible = false;
-	}
 	m_cursor->SetPosition( x, y );
 	MarkModified();
 }
@@ -140,18 +134,14 @@ void Scene::SetCursorPos( double x, double y )
 void Scene::SetCursorRadius( double radius ) 
 { 
 	m_cursor->SetRadius( radius );
+	MarkModified();
 }
 
 void Scene::SetCursorVisible( bool visible ) 
 { 
-	if( visible )
+	if( visible != m_cursorVisible )
 	{
-		m_cursorShouldBecomeVisible = true;
-		m_cursorVisible = false;
-	}
-	else
-	{
-		m_cursorVisible = false;
+		m_cursorVisible = visible;
 		MarkModified();
 	}
 }
