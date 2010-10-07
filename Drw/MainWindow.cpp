@@ -469,6 +469,10 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 			m_scene->InsertFrame( currentFrame + 1 );
 			m_glWidget->GetControler()->NextFrame();
 		}
+		else if( keyEvent->key() == Qt::Key_B )
+		{
+			m_observer->ToggleBrushEraser();
+		}
 	} 
 	if( !handled )
 	{

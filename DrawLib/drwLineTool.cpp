@@ -17,6 +17,7 @@ drwLineTool::drwLineTool( int userId, Scene * scene, drwEditionState * editionSt
 , LastPressure( 1.0 )
 , IsDrawing( false )
 , Type( TypeWideLine )
+, m_isEraser( false )
 , m_baseWidth( 10.0 )
 , m_minWidth( 2.0 )
 , m_maxWidth( 100.0 )
@@ -215,6 +216,16 @@ void drwLineTool::Reset()
 	m_baseWidth = 10.0;
 }
 
+
+void drwLineTool::ToggleBrushEraser()
+{
+	if( m_isEraser )
+		m_isEraser = false;
+	else
+		m_isEraser = true;
+}
+
+
 Node * drwLineTool::CreateNewNode()
 {
 	LinePrimitive * newPrimitive = 0;
@@ -228,7 +239,7 @@ Node * drwLineTool::CreateNewNode()
 		}
 			break;
 		case TypeWideLine:
-			newPrimitive = new WideLine( m_baseWidth );
+			newPrimitive = new WideLine( m_baseWidth, m_isEraser );
 			break;
 		case EndType:
 			break;

@@ -36,6 +36,8 @@ public:
 	
 	void blockSignals( bool block );
 	
+	void ToggleBrushEraser();
+	
 public slots:
 	
 	virtual void SetPersistence( int nbFrames );

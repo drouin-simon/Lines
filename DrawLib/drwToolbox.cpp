@@ -114,6 +114,12 @@ void drwToolbox::blockSignals( bool block )
 		Tools[i]->blockSignals( block );
 }
 
+void drwToolbox::ToggleBrushEraser()
+{
+	if( CurrentTool >= 0 && CurrentTool < Tools.size() )
+		Tools[CurrentTool]->ToggleBrushEraser();
+}
+
 void drwToolbox::NotifyCommandExecuted( drwCommand::s_ptr command )
 {
 	emit CommandExecuted( command );

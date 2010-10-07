@@ -13,7 +13,7 @@ class WideLine : public LinePrimitive
 
 public:
 
-    WideLine( double width );
+    WideLine( double width, bool erase );
     ~WideLine();
     
     virtual void StartPoint( double x, double y, double pressure );
@@ -33,6 +33,8 @@ protected:
 
     // Line width
     double      m_width;
+	
+	bool m_erasing;
 
     // cache previous point computation during editing
     Vec2       m_prevPoint;

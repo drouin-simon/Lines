@@ -32,6 +32,7 @@ public:
 	virtual void ExecuteCommand( drwCommand::s_ptr command );
 	virtual void SetCurrentFrame( int frame );
 	virtual void Reset();
+	virtual void ToggleBrushEraser();
 	
 	SetMacro( Color, Vec3 );
 	
@@ -53,6 +54,7 @@ protected:
 	
 	bool IsDrawing;
 	PrimitiveType Type;
+	bool m_isEraser;
 	
 	Vec3 Color;
 	double m_baseWidth;

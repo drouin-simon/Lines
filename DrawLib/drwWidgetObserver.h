@@ -30,6 +30,7 @@ public:
 	
 	virtual void SetCurrentFrame( int frame ) { CurrentFrame = frame; }
 	virtual void Reset() {}
+	virtual void ToggleBrushEraser() {}
 	
 public slots:
 	

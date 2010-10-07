@@ -7,10 +7,11 @@
 drwGlslShader * WideLine::m_shader = 0;
 
 
-WideLine::WideLine( double width ) 
-: m_prevPoint( 0, 0 )
+WideLine::WideLine( double width, bool erasing ) 
+: m_width( width )
+, m_erasing( erasing )
+, m_prevPoint( 0, 0 )
 , m_prevPressure( 1.0 )
-, m_width( width )
 {
 }
 
@@ -28,13 +29,18 @@ void WideLine::InternDraw( const drwDrawingContext & context )
 		Init();
 	m_shader->UseProgram( true );
 	m_shader->SetVariable( "margin" , float(.5) );
+	m_shader->SetVariable( "erase", m_erasing );
 	
 	if( context.m_isOverridingColor )
 		glColor4d( context.m_colorOverride[0], context.m_colorOverride[1], context.m_colorOverride[2], context.m_opacity );
 	else
 		glColor4d( m_color[0] * context.m_opacity, m_color[1] * context.m_opacity, m_color[2] * context.m_opacity, context.m_opacity );
 		
-	glBlendEquation( GL_MAX );
+	if( !m_erasing )
+		glBlendEquation( GL_MAX );
+	else
+		glBlendEquation( GL_MIN );
+
     glVertexPointer( 2, GL_DOUBLE, 0, m_vertices.GetBuffer() );
 	glTexCoordPointer( 3, GL_DOUBLE, 0, m_texCoord.GetBuffer() );
     glDrawElements( GL_QUADS, m_indices.size(), GL_UNSIGNED_INT, m_indices.GetBuffer() );
@@ -180,6 +186,7 @@ void WideLine::AddPoint( double x, double y, double pressure )
 
 static const char* shaderCode = " \
 uniform float margin; \
+uniform bool erase; \
 \
 void main() \
 { \
@@ -194,10 +201,18 @@ void main() \
 		float exponent = - ( x * x / 0.2 );\
 		float fact = exp( exponent ); \
 		fact = fact * pressure; \
-		gl_FragColor = gl_Color * fact; \
+		if( !erase ) \
+			gl_FragColor = gl_Color * fact; \
+		else \
+			gl_FragColor = 1.0 - (gl_Color * fact ); \
 	} \
 	else \
-		gl_FragColor = gl_Color * pressure; \
+	{ \
+		if( !erase ) \
+			gl_FragColor = gl_Color * pressure; \
+		else \
+			gl_FragColor = 1.0 - ( gl_Color * pressure ); \
+	} \
 }";
 
 
