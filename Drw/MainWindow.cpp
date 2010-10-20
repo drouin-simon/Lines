@@ -8,12 +8,9 @@
 #include "PlaybackControlerWidget.h"
 #include "PrimitiveToolOptionWidget.h"
 #include "TabletStateWidget.h"
-#include "NetworkInterfaceWidget.h"
 #include "DisplaySettingsWidget.h"
 #include "ExportDialog.h"
-#include "drwNetworkThread.h"
-#include "drwNetworkInterface.h"
-#include "drwNetworkConnection.h"
+#include "drwNetworkConnectDialog.h"
 #include "drwEditionState.h"
 #include "drwCommandDispatcher.h"
 #include "drwBitmapExporter.h"
@@ -34,7 +31,6 @@ MainWindow::MainWindow()
 	m_controler = new PlaybackControler(m_scene, this);
 	m_observer = new drwToolbox( 0, m_scene, m_controler->GetEditionState(), this );
 	m_commandDb = new drwCommandDatabase(this);
-	m_networkThread = new drwNetworkThread( m_scene, m_commandDb, this );
 
 	// Create main widget  (just a frame to put the viewing widget and the playback control widget)
 	QWidget * mainWidget = new QWidget(this);
@@ -92,17 +88,9 @@ MainWindow::MainWindow()
 	m_dockTabletState->setFeatures( QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetMovable );
 	//m_dockTabletState->setFloating(true);
 	
-	// Create the network interface dock
-	m_dockNetworkInterface = new QDockWidget(tr("Network"));
-	m_networkInterfaceWidget = new NetworkInterfaceWidget( m_networkThread, this );
-	m_dockNetworkInterface->setWidget( m_networkInterfaceWidget );
-	m_viewMenu->addAction(m_dockNetworkInterface->toggleViewAction());
-	m_dockNetworkInterface->setFeatures( QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetMovable );
-	m_dockNetworkInterface->setFloating(true);
 	
 	// connect objects
 	connect( m_observer, SIGNAL( CommandExecuted(drwCommand::s_ptr) ), m_commandDb, SLOT( PushCommand( drwCommand::s_ptr ) ) );
-	connect( m_observer, SIGNAL( CommandExecuted(drwCommand::s_ptr) ), m_networkThread, SLOT( SendCommand( drwCommand::s_ptr ) ) );
 	connect( m_observer, SIGNAL(StartInteraction()), m_controler, SLOT(StartInteraction()) );
 	connect( m_observer, SIGNAL(EndInteraction()), m_controler, SLOT(EndInteraction()) );
 	
@@ -133,6 +121,11 @@ void MainWindow::CreateActions()
 	// Create the Edit menu
 	m_editMenu = menuBar()->addMenu( "&Edit" );
 	m_editMenu->addAction( "Set Number of Frames", this, SLOT( editSetNumberOfFrames() ), Qt::CTRL + Qt::Key_G );
+	
+	// Create the Network menu
+	m_networkMenu = menuBar()->addMenu( "&Network" );
+	m_networkMenu->addAction( "Share session", this, SLOT( NetShareSession() ), Qt::CTRL + Qt::Key_T );
+	m_networkMenu->addAction( "Connect...", this, SLOT( NetConnect() ) );
 	
 	// Create the View menu
 	m_viewMenu = menuBar()->addMenu( "&View" );
@@ -253,6 +246,16 @@ void MainWindow::editSetNumberOfFrames()
 	m_scene->SetNumberOfFrames( nbFrames );
 }
 
+void MainWindow::NetShareSession()
+{
+}
+
+void MainWindow::NetConnect()
+{
+	drwNetworkConnectDialog * dlg = new drwNetworkConnectDialog( this );
+	dlg->exec();
+}
+
 void MainWindow::viewFullscreen()
 {
 	if( isFullScreen() )
@@ -272,7 +275,6 @@ void MainWindow::closeEvent(QCloseEvent *event)
 	if (maybeSave()) 
 	{
 		writeSettings();
-		m_networkThread->StopNetwork();
 		event->accept();
 	} 
 	else 
@@ -311,27 +313,18 @@ void MainWindow::readSettings()
 	// Compute widgets default sizes
 	QSize hintToolsOptions = m_dockToolsOptions->sizeHint();
 	QSize hintDisplayOptions = m_dockDisplayOptions->sizeHint();
-	QSize hintNetwork = m_dockNetworkInterface->sizeHint();
 	int sideBarWidth = std::max( hintToolsOptions.width(), hintDisplayOptions.width() );
 	int toolsOptionsHeight = hintToolsOptions.height();
-	int displayOptionsHeight = hintDisplayOptions.height();
-	int networkHeight = hintNetwork.height();
 	QRect screenRect( 0, 0, 800, 600 ); // Assuming no screen is smaller than 800x600
 	QDesktopWidget * desktop = QApplication::desktop();
 	if( desktop )
 		screenRect = desktop->availableGeometry( desktop->primaryScreen() );
 	int drawAreaWidth = screenRect.width() - sideBarWidth;
 	int drawAreaHeight = screenRect.height();
-	int displayOptionsYOrigin = screenRect.y() + toolsOptionsHeight;
-	int networkYOrigin = displayOptionsYOrigin + displayOptionsHeight;
-	int networkEnd = networkYOrigin + networkHeight;
-	if( networkEnd > screenRect.bottom() )
-		networkYOrigin = screenRect.bottom() - networkHeight;
 	
 	QRect mainWindowRect( screenRect.topLeft(), QSize( drawAreaWidth, drawAreaHeight ) );
 	QRect toolsOptionsRect( screenRect.x() + drawAreaWidth, screenRect.y(), sideBarWidth, toolsOptionsHeight );
 	QRect displayOptionsRect( screenRect.x() + drawAreaWidth, screenRect.y() + toolsOptionsHeight, sideBarWidth, toolsOptionsHeight );
-	QRect networkRect( screenRect.x() + drawAreaWidth, networkYOrigin, sideBarWidth, networkHeight );
 	
 	// Main window settings
 	QPoint pos = settings.value( "MainWindow_pos", mainWindowRect.topLeft() ).toPoint();
@@ -355,25 +348,13 @@ void MainWindow::readSettings()
 	m_dockDisplayOptions->resize( size );
 	m_dockDisplayOptions->move( pos );
 	
-	// Network dock settings
-	pos = settings.value( "NetworkDock_pos", networkRect.topLeft() ).toPoint();
-	size = settings.value( "NetworkDock_size", networkRect.size() ).toSize();
-	visible = settings.value( "NetworkDock_visibility", false ).toBool();
-	m_dockNetworkInterface->setVisible( visible );
-	m_dockNetworkInterface->resize( size );
-	m_dockNetworkInterface->move( pos );
-	
 	// Save path
 	m_fileDialogStartPath = settings.value( "filedialogstartpath", QDir::homePath() ).toString();
 	
 	// Export settings
 	m_exportDefaultPath = settings.value( "ExportDefaultPath", QDir::homePath() ).toString();
 	m_exportRes = settings.value( "ExportResolution", QSize( 640, 360 ) ).toSize();
-	
-	// Username for networked sessions
-	QString networkUserName = settings.value("NetworkUserName", QString("Unknown") ).toString();
-	m_networkThread->SetUserName( networkUserName );
-	
+		
 }
 
 
@@ -401,19 +382,11 @@ void MainWindow::writeSettings()
 	visible = m_dockDisplayOptions->isVisible();
 	settings.setValue( "DisplayOptionsDock_visibility", visible );
 	
-	// Network dock settings
-	settings.setValue( "NetworkDock_pos", m_dockNetworkInterface->pos() );
-	settings.setValue( "NetworkDock_size", m_dockNetworkInterface->size() );
-	visible = m_dockNetworkInterface->isVisible();
-	settings.setValue( "NetworkDock_visibility", visible );
-	
 	// File dialog settings
 	settings.setValue( "filedialogstartpath", m_fileDialogStartPath );
 	settings.setValue( "ExportDefaultPath", m_exportDefaultPath );
 	settings.setValue( "ExportResolution", m_exportRes );
 	
-	// Username for networked sessions
-	settings.setValue("NetworkUserName", m_networkThread->GetUserName() );
 }
 
 void MainWindow::about()

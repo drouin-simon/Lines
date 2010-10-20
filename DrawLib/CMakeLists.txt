@@ -23,8 +23,11 @@ set( DrawLib_src  drwDrawingWidget.cpp
 		drwCommand.cpp
 		drwCommandDatabase.cpp
 		drwNetworkConnection.cpp
-		drwNetworkInterface.cpp
-		drwNetworkThread.cpp
+		#drwNetworkServer.cpp
+		drwNetworkClient.cpp
+		#drwNetworkManager.cpp
+		drwNetworkServerFinder.cpp
+		drwNetworkConnectDialog.cpp
 		drwDisplaySettings.cpp
 		drwEditionState.cpp 
 		drwCommandDispatcher.cpp 
@@ -40,8 +43,11 @@ set( DrawLib_hdr_moc 	drwDrawingWidget.h
 			drwCommandDatabase.h 
 			Scene.h
 			drwNetworkConnection.h
-			drwNetworkInterface.h
-			drwNetworkThread.h
+			#drwNetworkServer.h
+			drwNetworkClient.h
+			#drwNetworkManager.h
+			drwNetworkServerFinder.h
+			drwNetworkConnectDialog.h
 			drwDisplaySettings.h
 			drwEditionState.h 
 			ImageFlippingTool.h
@@ -70,7 +76,7 @@ set( DrawLib_hdr	drwDrawingWidgetInteractor.h
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 # Create classes from Qt ui files
-set( Drw_ui TabletStateWidget.ui )
+set( Drw_ui TabletStateWidget.ui drwNetworkConnectDialog.ui )
 qt4_wrap_ui( DrawLib_hdr_ui ${Drw_ui} )
 
 # moc Qt source file without a ui file

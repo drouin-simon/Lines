@@ -17,11 +17,7 @@ class drwCommandDatabase;
 class PrimitiveToolOptionWidget;
 class PlaybackControlerWidget;
 class TabletStateWidget;
-class NetworkInterfaceWidget;
 class DisplaySettingsWidget;
-class drwNetworkThread;
-class drwNetworkInterface;
-class drwNetworkConnection;
 class PlaybackControler;
 
 class MainWindow : public QMainWindow
@@ -44,6 +40,9 @@ private slots:
 	bool fileExport();
 	
 	void editSetNumberOfFrames();
+	
+	void NetShareSession();
+	void NetConnect();
 	
 	void viewFullscreen();
 
@@ -75,6 +74,7 @@ private:
 
 	QMenu       * m_viewMenu;
 	QMenu		* m_editMenu;
+	QMenu		* m_networkMenu;
 	
 	PlaybackControlerWidget * m_playbackControlerWidget;
 	
@@ -87,14 +87,10 @@ private:
 	TabletStateWidget * m_tabletStateWidget;
 	QDockWidget * m_dockTabletState;
 	
-	NetworkInterfaceWidget * m_networkInterfaceWidget;
-	QDockWidget * m_dockNetworkInterface;
-	
 	Scene						* m_scene;
 	PlaybackControler			* m_controler;
 	drwToolbox	* m_observer;
 	drwCommandDatabase			* m_commandDb;
-	drwNetworkThread			* m_networkThread;
 
     static const QString m_appName;
 };

@@ -5,14 +5,12 @@ set( ExecName Lines )
 set( Drw_src  main.cpp 
 		MainWindow.cpp 
 		PrimitiveToolOptionWidget.cpp 
-		NetworkInterfaceWidget.cpp 
 		PlaybackControlerWidget.cpp 
 		DisplaySettingsWidget.cpp 
 		ExportDialog.cpp )
 
 set( Drw_hdr MainWindow.h 
 		PrimitiveToolOptionWidget.h 
-		NetworkInterfaceWidget.h 
 		PlaybackControlerWidget.h 
 		DisplaySettingsWidget.h
 		ExportDialog.h )

@@ -1,57 +1,46 @@
 #include "drwNetworkConnection.h"
 #include <QtNetwork>
-#include "drwToolbox.h"
-#include "Scene.h"
 
-drwNetworkConnection::drwNetworkConnection( int userId, QString userName, Scene * scene, QObject *parent, QTcpSocket * socket ) 
+drwNetworkConnection::drwNetworkConnection( QString userName, QTcpSocket * socket, QObject * parent ) 
 : QObject(parent)
-, m_userId( userId )
 , m_socket( socket )
 , m_peerAddress( socket->peerAddress() )
 , m_userName(userName)
 , m_ready(false)
-, m_scene(scene)
-, m_observer(0)
 {
 	m_socket->setSocketOption( QAbstractSocket::LowDelayOption, 1 );  // make sure commands are not buffered before sending
-	connect(m_socket, SIGNAL(readyRead()), this, SLOT(processReadyRead()));
+	connect( m_socket, SIGNAL(readyRead()), this, SLOT(processReadyRead()));
 	connect( m_socket, SIGNAL(disconnected()), this, SLOT(SocketDisconnected()) );
-	CreateToolbox();
 }
 
-drwNetworkConnection::drwNetworkConnection( int userId, QString userName, QString peerUserName, QHostAddress & address, Scene * scene, QObject *parent ) 
+drwNetworkConnection::drwNetworkConnection( QString userName, QString peerUserName, QHostAddress & address, QObject *parent ) 
 : QObject(parent)
-, m_userId( userId )
 , m_socket(0)
 , m_peerUserName( peerUserName )
 , m_peerAddress( address )
 , m_userName( userName )
 , m_ready( false )
-, m_scene(scene)
-, m_observer(0)
 {
 	m_socket = new QTcpSocket(this);
 	m_socket->setSocketOption( QAbstractSocket::LowDelayOption, 1 );  // make sure commands are not buffered before sending
 	connect( m_socket, SIGNAL(connected()), this, SLOT(SocketConnected()) );
 	connect( m_socket, SIGNAL(disconnected()), this, SLOT(SocketDisconnected()) );
 	m_socket->connectToHost( address, ConnectionPort );
-	CreateToolbox();
-}
-
-void drwNetworkConnection::CreateToolbox()
-{
-	m_observer = new drwToolbox( m_userId, m_scene, NULL, this );
-	connect( m_observer, SIGNAL( CommandExecuted(drwCommand::s_ptr) ), this, SLOT( CommandExecuted( drwCommand::s_ptr ) ) );
 }
 
 drwNetworkConnection::~drwNetworkConnection()
 {
+	Disconnect();
 }
 
 void drwNetworkConnection::Disconnect()
 {
-	if( m_socket)
+	if( m_socket )
+	{
 		m_socket->disconnectFromHost();
+		delete m_socket;
+		m_socket = 0;
+	}
 }
 
 void drwNetworkConnection::SendCommand( drwCommand::s_ptr command )
@@ -94,7 +83,7 @@ void drwNetworkConnection::processReadyRead()
 				if( bytesAvailable >= m_pendingCommand->BodySize() )
 				{
 					m_pendingCommand->Read( stream );
-					m_observer->ExecuteCommand( m_pendingCommand );
+					emit CommandReceived( m_pendingCommand );
 					m_pendingCommand.reset();
 				}
 				else
@@ -102,11 +91,6 @@ void drwNetworkConnection::processReadyRead()
 			}
 		}
 	}
-}
-
-void drwNetworkConnection::CommandExecuted( drwCommand::s_ptr command )
-{
-	emit CommandExecutedSignal( command );
 }
 
 void drwNetworkConnection::SocketConnected()
