@@ -19,6 +19,8 @@ class PlaybackControlerWidget;
 class TabletStateWidget;
 class DisplaySettingsWidget;
 class PlaybackControler;
+class drwCommandDispatcher;
+class drwNetworkManager;
 
 class MainWindow : public QMainWindow
 {
@@ -90,7 +92,9 @@ private:
 	Scene						* m_scene;
 	PlaybackControler			* m_controler;
 	drwToolbox	* m_observer;
-	drwCommandDatabase			* m_commandDb;
+    drwCommandDatabase			* m_commandDb;
+    drwCommandDispatcher * m_commandDispatcher;
+    drwNetworkManager * m_networkManager;
 
     static const QString m_appName;
 };

@@ -10,7 +10,6 @@ class QTcpServer;
 class QTimer;
 QT_END_NAMESPACE
 class drwNetworkConnection;
-class drwCommandDispatcher;
 
 class drwNetworkServer : public QObject
 {
@@ -19,7 +18,7 @@ class drwNetworkServer : public QObject
 	
 public:
 	
-	drwNetworkServer( drwCommandDispatcher * dispatcher, QObject * parent = 0 );
+    drwNetworkServer( QObject * parent = 0 );
 	~drwNetworkServer();
 	
 	void Start();
@@ -30,6 +29,7 @@ public:
 signals:
 	
 	void ModifiedSignal();
+    void CommandReceivedSignal( drwCommand::s_ptr );
 	
 public slots:
 	
@@ -41,14 +41,13 @@ private slots:
 	void NewIncomingConnection();
 	void ConnectionReady( drwNetworkConnection * );
 	void ConnectionLost( drwNetworkConnection * );
-	void CommandReceived( drwCommand::s_ptr com );
+    void CommandReceivedSlot( drwCommand::s_ptr com );
 	
 private:
 	
 	void Reset();
 	
 	int m_nextUserId;
-	drwCommandDispatcher * m_dispatcher;
 	QString m_userName;
 	bool m_isOn;
 	

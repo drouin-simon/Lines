@@ -4,6 +4,7 @@
 #include <QThread>
 #include <QObject>
 #include <QMutex>
+#include <QHostAddress>
 
 #include "drwCommand.h"
 
@@ -28,7 +29,9 @@ public:
 	void StopSharing();
 	
 	bool IsConnected();
-	QWidget * CreateConnectionWidget();
+    void Connect( QString username, QHostAddress ip );
+
+    friend class drwInThreadAgent;
 	
 public slots:
 

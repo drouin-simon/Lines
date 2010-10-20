@@ -11,6 +11,11 @@ drwNetworkClient::drwNetworkClient( drwCommandDispatcher * dispatcher, QObject *
 {
 }
 
+drwNetworkClient::~drwNetworkClient()
+{
+
+}
+
 void drwNetworkClient::Connect( QString & peerUserName, QHostAddress & peerAddress )
 {
 	// Create a new connection

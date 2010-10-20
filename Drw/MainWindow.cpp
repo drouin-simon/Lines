@@ -13,6 +13,7 @@
 #include "drwNetworkConnectDialog.h"
 #include "drwEditionState.h"
 #include "drwCommandDispatcher.h"
+#include "drwNetworkManager.h"
 #include "drwBitmapExporter.h"
 
 #include <QtGui>
@@ -31,6 +32,8 @@ MainWindow::MainWindow()
 	m_controler = new PlaybackControler(m_scene, this);
 	m_observer = new drwToolbox( 0, m_scene, m_controler->GetEditionState(), this );
 	m_commandDb = new drwCommandDatabase(this);
+    m_commandDispatcher = new drwCommandDispatcher( m_observer, m_scene, this );
+    m_networkManager = new drwNetworkManager( m_commandDispatcher );
 
 	// Create main widget  (just a frame to put the viewing widget and the playback control widget)
 	QWidget * mainWidget = new QWidget(this);
@@ -248,6 +251,8 @@ void MainWindow::editSetNumberOfFrames()
 
 void MainWindow::NetShareSession()
 {
+    if( !m_networkManager->IsSharing() && !m_networkManager->IsConnected() )
+        m_networkManager->StartSharing();
 }
 
 void MainWindow::NetConnect()

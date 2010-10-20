@@ -23,9 +23,9 @@ set( DrawLib_src  drwDrawingWidget.cpp
 		drwCommand.cpp
 		drwCommandDatabase.cpp
 		drwNetworkConnection.cpp
-		#drwNetworkServer.cpp
+        drwNetworkServer.cpp
 		drwNetworkClient.cpp
-		#drwNetworkManager.cpp
+        drwNetworkManager.cpp
 		drwNetworkServerFinder.cpp
 		drwNetworkConnectDialog.cpp
 		drwDisplaySettings.cpp
@@ -43,9 +43,9 @@ set( DrawLib_hdr_moc 	drwDrawingWidget.h
 			drwCommandDatabase.h 
 			Scene.h
 			drwNetworkConnection.h
-			#drwNetworkServer.h
+            drwNetworkServer.h
 			drwNetworkClient.h
-			#drwNetworkManager.h
+            drwNetworkManager.h
 			drwNetworkServerFinder.h
 			drwNetworkConnectDialog.h
 			drwDisplaySettings.h
