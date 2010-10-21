@@ -10,10 +10,17 @@ drwNetworkManager::drwNetworkManager( drwCommandDispatcher * dispatcher )
 {
 }
 
+drwNetworkManager::~drwNetworkManager()
+{
+	if( isRunning() )
+		quit();
+}
+
 bool drwNetworkManager::IsSharing()
 {
 	if( m_server )
 		return true;
+	return false;
 }
 
 void drwNetworkManager::StartSharing()
@@ -21,23 +28,39 @@ void drwNetworkManager::StartSharing()
 	if( !IsSharing() && !IsConnected() )
 	{
         m_server = new drwNetworkServer();
+		start();
+		if( isRunning() )
+			emit ModifiedSignal();
 	}
 }
 
 void drwNetworkManager::StopSharing()
 {
-	
+	if( isRunning() )
+	{
+		quit();
+		m_server->deleteLater();
+		emit ModifiedSignal();
+	}
 }
 
 bool drwNetworkManager::IsConnected()
 {
 	if( m_client )
 		return true;
+	return false;
 }
 
 
 void drwNetworkManager::Connect( QString username, QHostAddress ip )
 {
+	if( !IsSharing() && !IsConnected() )
+	{
+        m_client = new drwNetworkClient( username, ip );
+		start();
+		if( isRunning() )
+			emit ModifiedSignal();
+	}
 }
 
 void drwNetworkManager::SendCommand( drwCommand::s_ptr command )
@@ -59,6 +82,24 @@ void drwNetworkManager::SendCommand( drwCommand::s_ptr command )
 
 void drwNetworkManager::run()
 {
+	m_inThread = new drwInThreadAgent( this );
+	connect( this, SIGNAL(NewCommandsToSendSignal()), m_inThread, SLOT(NewCommandsToSend()), Qt::QueuedConnection );
+	
+	if( m_server )
+	{
+		m_server->Start();
+	}
+	else if( m_client )
+	{
+		m_client->Connect();
+	}
+	
+	// Start the thread's event loop
+	exec();
+	
+	m_inThread->deleteLater();
+	m_inThread = 0;
+	
 }
 
 void drwInThreadAgent::NewCommandsToSend()

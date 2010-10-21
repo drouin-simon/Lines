@@ -23,6 +23,7 @@ class drwNetworkManager : public QThread
 public:
 	
 	drwNetworkManager( drwCommandDispatcher * dispatcher );
+	~drwNetworkManager();
 
 	bool IsSharing();
 	void StartSharing();
@@ -39,6 +40,7 @@ public slots:
 	
 signals:
 	
+	void ModifiedSignal();
 	void NewCommandsToSendSignal();
 	
 protected:
