@@ -12,6 +12,8 @@ drwNetworkServer::drwNetworkServer( QObject * parent )
 , m_broadcastSocket(0)
 , m_tcpServer(0)
 {
+	m_userName = drwNetworkConnection::ComputeUserName();
+	
 	m_broadcastSocket = new QUdpSocket(this);
 	
 	m_broadcastTimer = new QTimer(this);
@@ -75,7 +77,7 @@ void drwNetworkServer::NewIncomingConnection()
 	while( m_tcpServer->hasPendingConnections() )
 	{
 		QTcpSocket * sock = m_tcpServer->nextPendingConnection();
-        drwNetworkConnection * connection = new drwNetworkConnection( m_userName, sock, this );
+        drwNetworkConnection * connection = new drwNetworkConnection( sock, this );
 		connect( connection, SIGNAL(ConnectionReady(drwNetworkConnection*)), this, SLOT(ConnectionReady(drwNetworkConnection*)) );
 		connect( connection, SIGNAL(ConnectionLost(drwNetworkConnection*)), this, SLOT(ConnectionLost(drwNetworkConnection*)) );
 		m_connections.push_back( connection );

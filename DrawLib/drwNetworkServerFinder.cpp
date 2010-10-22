@@ -30,9 +30,21 @@ void drwNetworkServerFinder::ProcessReceivedBroadcastMessages()
 		if( dataTokens.at(0) == ProgramSignature )
 		{
 			QString peerUserName = dataTokens.at(1);
-			m_serverUsers.push_back( peerUserName );
-			m_serverAddresses.push_back( address );
-			emit ModifiedSignal();
+			TryAddingServer( peerUserName, address );
 		}
     }
+}
+
+void drwNetworkServerFinder::TryAddingServer( QString & user, QHostAddress & address )
+{
+	for( int i = 0; i < m_serverUsers.size(); ++i )
+	{
+		if( m_serverUsers.at( i ) == user && m_serverAddresses.at(i) == address )
+			return;
+	}
+	
+	// Not found -> add it
+	m_serverUsers.push_back( user );
+	m_serverAddresses.push_back( address );
+	emit ModifiedSignal();
 }

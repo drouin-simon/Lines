@@ -40,6 +40,7 @@ void drwNetworkManager::StopSharing()
 	{
 		quit();
 		m_server->deleteLater();
+		m_server = 0;
 		emit ModifiedSignal();
 	}
 }

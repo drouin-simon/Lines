@@ -19,12 +19,14 @@ class drwNetworkConnection : public QObject
     Q_OBJECT
 
 public:
-    drwNetworkConnection( QString userName, QTcpSocket *socket, QObject * parent = 0 );
-	drwNetworkConnection( QString userName, QString peerUserName, QHostAddress & address, QObject *parent = 0 );
+    drwNetworkConnection( QTcpSocket *socket, QObject * parent = 0 );
+	drwNetworkConnection( QString peerUserName, QHostAddress & address, QObject *parent = 0 );
 	~drwNetworkConnection();
 	QString GetPeerUserName() { return m_peerUserName; }
 	QHostAddress GetPeerAddress() { return m_peerAddress; }
 	void Disconnect();
+	
+	static QString ComputeUserName();
 
 signals:
 	void CommandReceived( drwCommand::s_ptr command );

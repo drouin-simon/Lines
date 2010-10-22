@@ -30,6 +30,8 @@ private slots:
 	
 protected:
 	
+	void TryAddingServer( QString & user, QHostAddress & address );
+	
 	QUdpSocket * m_broadcastSocket;
 	
 	QStringList m_serverUsers;

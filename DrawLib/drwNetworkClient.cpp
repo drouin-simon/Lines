@@ -21,7 +21,7 @@ drwNetworkClient::~drwNetworkClient()
 void drwNetworkClient::Connect( )
 {
 	// Create a new connection
-	m_connection = new drwNetworkConnection( m_userName, m_peerUserName, m_peerAddress, this );
+	m_connection = new drwNetworkConnection( m_peerUserName, m_peerAddress, this );
 	connect( m_connection, SIGNAL(ConnectionReady(drwNetworkConnection*)), this, SLOT(ConnectionReady(drwNetworkConnection*)) );
 	connect( m_connection, SIGNAL(ConnectionLost(drwNetworkConnection*)), this, SLOT(ConnectionLost(drwNetworkConnection*)) );
 	emit ModifiedSignal();

@@ -1,24 +1,24 @@
 #include "drwNetworkConnection.h"
 #include <QtNetwork>
+#include <QProcessEnvironment>
 
-drwNetworkConnection::drwNetworkConnection( QString userName, QTcpSocket * socket, QObject * parent ) 
+drwNetworkConnection::drwNetworkConnection( QTcpSocket * socket, QObject * parent ) 
 : QObject(parent)
 , m_socket( socket )
 , m_peerAddress( socket->peerAddress() )
-, m_userName(userName)
 , m_ready(false)
 {
+	m_userName = ComputeUserName();
 	m_socket->setSocketOption( QAbstractSocket::LowDelayOption, 1 );  // make sure commands are not buffered before sending
 	connect( m_socket, SIGNAL(readyRead()), this, SLOT(processReadyRead()));
 	connect( m_socket, SIGNAL(disconnected()), this, SLOT(SocketDisconnected()) );
 }
 
-drwNetworkConnection::drwNetworkConnection( QString userName, QString peerUserName, QHostAddress & address, QObject *parent ) 
+drwNetworkConnection::drwNetworkConnection( QString peerUserName, QHostAddress & address, QObject *parent ) 
 : QObject(parent)
 , m_socket(0)
 , m_peerUserName( peerUserName )
 , m_peerAddress( address )
-, m_userName( userName )
 , m_ready( false )
 {
 	m_socket = new QTcpSocket(this);
@@ -110,6 +110,19 @@ void drwNetworkConnection::SocketConnected()
 void drwNetworkConnection::SocketDisconnected()
 {
 	emit ConnectionLost( this );
+}
+
+QString drwNetworkConnection::ComputeUserName()
+{
+	QProcessEnvironment pe = QProcessEnvironment::systemEnvironment();
+	QString userName;
+	QString machineName = QHostInfo::localHostName();
+	if( pe.contains( QString("USER") ) )
+		userName = pe.value( QString("USER") );
+	else if( pe.contains( QString("USERNAME") ) )
+		userName = pe.value( QString("USERNAME") );
+	QString allUserName = userName + QString("@") + machineName;
+	return allUserName;
 }
 
 void drwNetworkConnection::SendString( const QString & message )

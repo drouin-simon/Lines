@@ -47,8 +47,8 @@ private:
 	
 	void Reset();
 	
-	int m_nextUserId;
 	QString m_userName;
+	int m_nextUserId;
 	bool m_isOn;
 	
 	QTimer     * m_broadcastTimer;

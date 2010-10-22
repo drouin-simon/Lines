@@ -8,6 +8,7 @@ class QPopupMenu;
 class QWorkspace;
 class QPopupMenu;
 class QDockWidget;
+class QAction;
 
 class drwDrawingWidget;
 class Scene;
@@ -45,6 +46,7 @@ private slots:
 	
 	void NetShareSession();
 	void NetConnect();
+	void UpdateNetworkStatus();
 	
 	void viewFullscreen();
 
@@ -77,6 +79,9 @@ private:
 	QMenu       * m_viewMenu;
 	QMenu		* m_editMenu;
 	QMenu		* m_networkMenu;
+	
+	QAction * m_netShareSessionMenuAction;
+	QAction * m_netConnectMenuItem;
 	
 	PlaybackControlerWidget * m_playbackControlerWidget;
 	

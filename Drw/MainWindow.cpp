@@ -127,8 +127,8 @@ void MainWindow::CreateActions()
 	
 	// Create the Network menu
 	m_networkMenu = menuBar()->addMenu( "&Network" );
-	m_networkMenu->addAction( "Share session", this, SLOT( NetShareSession() ), Qt::CTRL + Qt::Key_T );
-	m_networkMenu->addAction( "Connect...", this, SLOT( NetConnect() ) );
+	m_netShareSessionMenuAction = m_networkMenu->addAction( "Share session", this, SLOT( NetShareSession() ), Qt::CTRL + Qt::Key_T );
+	m_netConnectMenuItem = m_networkMenu->addAction( "Connect...", this, SLOT( NetConnect() ) );
 	
 	// Create the View menu
 	m_viewMenu = menuBar()->addMenu( "&View" );
@@ -252,13 +252,46 @@ void MainWindow::editSetNumberOfFrames()
 void MainWindow::NetShareSession()
 {
     if( !m_networkManager->IsSharing() && !m_networkManager->IsConnected() )
+	{
         m_networkManager->StartSharing();
+		UpdateNetworkStatus();
+	}
+	else if( m_networkManager->IsSharing() )
+	{
+		m_networkManager->StopSharing();
+		UpdateNetworkStatus();
+	}
 }
 
 void MainWindow::NetConnect()
 {
 	drwNetworkConnectDialog * dlg = new drwNetworkConnectDialog( this );
 	dlg->exec();
+}
+
+void MainWindow::UpdateNetworkStatus()
+{
+	if( m_networkManager->IsSharing() )
+	{
+		m_netShareSessionMenuAction->setText( tr("Stop Sharing" ) );
+		m_netConnectMenuItem->setEnabled( false );
+	}
+	else 
+	{
+		m_netShareSessionMenuAction->setText( tr("Share Session") );
+		m_netConnectMenuItem->setEnabled( true );
+		if( m_networkManager->IsConnected() )
+		{
+			m_netConnectMenuItem->setText( tr("Disconnect") );
+			m_netShareSessionMenuAction->setEnabled( false );
+		}
+		else 
+		{
+			m_netConnectMenuItem->setText( tr("Connect...") );
+		}
+
+	}
+
 }
 
 void MainWindow::viewFullscreen()
