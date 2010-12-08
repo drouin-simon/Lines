@@ -19,14 +19,17 @@ drwNetworkConnectDialog::~drwNetworkConnectDialog()
     delete ui;
 }
 
-void drwNetworkConnectDialog::on_buttonBox_accepted()
+bool drwNetworkConnectDialog::GetSelectedUserAndAddress( QString & user, QHostAddress & address )
 {
-
-}
-
-void drwNetworkConnectDialog::on_buttonBox_rejected()
-{
-
+	if( m_selectedRow != -1 && m_finder->GetServerUsers().size() > m_selectedRow )
+	{
+		const QStringList & names = m_finder->GetServerUsers();
+		user = names.at( m_selectedRow );
+		const QList<QHostAddress> & addresses = m_finder->GetServerAddresses();
+		address = addresses.at( m_selectedRow );
+		return true;
+	}
+	return false;
 }
 
 void drwNetworkConnectDialog::UpdateUi()

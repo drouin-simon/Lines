@@ -1,39 +1,69 @@
 #include "drwCommandDispatcher.h"
 #include "drwToolbox.h"
+#include "drwCommandDatabase.h"
+#include "drwNetworkManager.h"
 
-drwCommandDispatcher::drwCommandDispatcher( drwToolbox * local, Scene * scene, QObject * parent )
+drwCommandDispatcher::drwCommandDispatcher( drwNetworkManager * net,
+											drwCommandDatabase * db,
+											drwToolbox * local,
+											Scene * scene,
+											QObject * parent )
 : QObject(parent)
 , m_scene( scene )
+, m_db( db )
+, m_netManager( net )
+, m_localToolboxId(0)
 {
-	m_users.push_back( local );
+	connect( local, SIGNAL(CommandExecuted(drwCommand::s_ptr)), this, SLOT(IncomingLocalCommand(drwCommand::s_ptr)));
+	m_toolboxes[ m_localToolboxId ] = local;
 }
 
 drwCommandDispatcher::~drwCommandDispatcher()
 {
-}
-
-void drwCommandDispatcher::ExecuteCommand( drwCommand::s_ptr command )
-{
-	int commandUserId = command->GetUserId();
-	int userIndex = GetUser( commandUserId );
-	if( userIndex == -1 )
-		userIndex = AddUser( commandUserId );
-	m_users[userIndex]->ExecuteCommand( command );
-}
-
-int drwCommandDispatcher::GetUser( int userId )
-{
-	for( unsigned i = 0; i < m_users.size(); ++i )
+	// Delete all toolboxes but the local toolbox
+	drwToolbox * local = m_toolboxes[ m_localToolboxId ];
+	foreach( drwToolbox * current, m_toolboxes )
 	{
-		if( m_users[i]->GetUserId() == userId )
-			return i;
+		if( current != local )
+			delete current;
 	}
-	return -1;
 }
 
-int drwCommandDispatcher::AddUser( int commandUserId )
+void drwCommandDispatcher::IncomingNetCommand( drwCommand::s_ptr command )
+{
+	// Execute the command in the appropriate toolbox
+	int commandUserId = command->GetUserId();
+	drwToolbox * box = m_toolboxes[ commandUserId ];
+	if( !box )
+		box = AddUser( commandUserId );
+	box->ExecuteCommand( command );
+
+	// Store it in the database
+	m_db->PushCommand( command );
+}
+
+void drwCommandDispatcher::IncomingLocalCommand( drwCommand::s_ptr command )
+{
+	// Send it to the network
+	m_netManager->SendCommand( command );
+
+	// Store it in the database
+	m_db->PushCommand( command );
+}
+
+void drwCommandDispatcher::IncomingDbCommand( drwCommand::s_ptr command )
+{
+	// Execute the command in the appropriate toolbox
+	int commandUserId = command->GetUserId();
+	drwToolbox * box = m_toolboxes[ commandUserId ];
+	if( !box )
+		box = AddUser( commandUserId );
+	box->ExecuteCommand( command );
+}
+
+drwToolbox * drwCommandDispatcher::AddUser( int commandUserId )
 {
 	drwToolbox * newUser = new drwToolbox( commandUserId, m_scene, NULL, this );
-	m_users.push_back( newUser );
-	return m_users.size() - 1;
+	m_toolboxes[ commandUserId ] = newUser;
+	return newUser;
 }

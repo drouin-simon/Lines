@@ -8,12 +8,12 @@
 
 #include "drwCommand.h"
 
-class drwCommandDispatcher;
 class drwNetworkClient;
 class drwNetworkServer;
 class QWidget;
 
 class drwInThreadAgent;
+class drwNetState;
 
 class drwNetworkManager : public QThread
 {
@@ -21,13 +21,21 @@ class drwNetworkManager : public QThread
 	Q_OBJECT
 	
 public:
+
+	enum MessageToThread{ ConnectMsg, DisconnectMsg, StartSharingMsg, StopSharingMsg, StartSendingMsg, FinishSendingMsg, ResetMsg };
+	enum MessageFromThread{ ConnectionTimedOutMsg, ConnectionLostMsg, ConnectedMsg, StartReceivingSceneMsg, FinishReceivingSceneMsg, SendSceneMsg };
+	enum NetworkState{ Idle, WaitingForConnection, ConnectionTimedOut, ConnectionLost, ReceivingScene, Connected, Sharing, SendingScene };
 	
-	drwNetworkManager( drwCommandDispatcher * dispatcher );
+	drwNetworkManager();
 	~drwNetworkManager();
+
+	NetworkState GetState() { return m_state; }
 
 	bool IsSharing();
 	void StartSharing();
 	void StopSharing();
+	void StartSendingScene();
+	void FinishSendingScene();
 	
 	bool IsConnected();
     void Connect( QString username, QHostAddress ip );
@@ -37,19 +45,27 @@ public:
 public slots:
 
 	void SendCommand( drwCommand::s_ptr );
+
+private slots:
+
+	void CommandReceivedSlot( drwCommand::s_ptr );
+	void MessageFromThreadSlot( MessageFromThread );
 	
 signals:
 	
-	void ModifiedSignal();
+	// signals for clients
+	void StateChangedSignal();
+	void CommandReceivedSignal( drwCommand::s_ptr );
+
+	// Signals used internally
+	void MessageToThreadSignal( MessageToThread message );
 	void NewCommandsToSendSignal();
 	
 protected:
+
+	void SetState( NetworkState state );
 	
-	drwNetworkClient * m_client;
-	drwNetworkServer * m_server;
-	drwCommandDispatcher * m_dispatcher;
-	
-	// Function called when thread starts
+	// Function called when thread starts. It is started when the class is instanciated
 	void run();
 	
 	// Queued commands to send and mutex to protect it since it is accessed by main and net threads
@@ -58,7 +74,8 @@ protected:
 	CommandContainer m_queuedCommands;
 	
 	drwInThreadAgent * m_inThread;
-	
+
+	NetworkState m_state;
 };
 
 
@@ -70,15 +87,30 @@ class drwInThreadAgent : public QObject
 	
 public:
 	
-	drwInThreadAgent( drwNetworkManager * thread ) : m_thread(thread) {}
+	drwInThreadAgent( drwNetworkManager * man ) : m_manager(man) {}
 	
+	void SetConnectAttributes( QString user, QHostAddress remoteIp );
+
 public slots:
 	
 	void NewCommandsToSend();
+	void MessageToThreadSlot( drwNetworkManager::MessageToThread message );
+
+signals:
+
+	void MessageFromThread( drwNetworkManager::MessageFromThread message );
 	
 private:
+
+	void Reset();
 	
-	drwNetworkManager * m_thread;
+	drwNetworkClient * m_client;
+	QMutex m_attributesMutex;
+	QString m_userName;
+	QHostAddress m_remoteIp;
+
+	drwNetworkServer * m_server;
+	drwNetworkManager * m_manager;
 };
 
 #endif

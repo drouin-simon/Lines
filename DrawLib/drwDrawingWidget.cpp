@@ -217,7 +217,7 @@ void drwDrawingWidget::paintGL()
 	// If first time drawing : position the camera to include frame
 	if( !HasDrawn )
 	{
-		theCamera.FitRectInside( 1920, 1080, .05 );
+		theCamera.FitRectInside( 1920, 1080, .01 );
 		HasDrawn = true;
 	}
 	

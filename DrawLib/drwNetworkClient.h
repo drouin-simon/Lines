@@ -24,6 +24,7 @@ public:
 signals:
 	
 	void ModifiedSignal();
+	void ConnectionTimeoutSignal();
 	void CommandReceivedSignal( drwCommand::s_ptr );
 	
 public slots:
@@ -37,12 +38,16 @@ private slots:
 	void CommandReceivedSlot( drwCommand::s_ptr );
 	
 protected:
+
+	void timerEvent( QTimerEvent * e );
 	
 	drwNetworkConnection * m_connection;
 	
 	QString m_userName;
 	QString m_peerUserName;
 	QHostAddress m_peerAddress;
+
+	int m_timerId; // timer used track failed connections
 };
 
 #endif

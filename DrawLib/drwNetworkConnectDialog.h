@@ -3,6 +3,7 @@
 
 #include <QDialog>
 
+class QHostAddress;
 class drwNetworkServerFinder;
 
 namespace Ui {
@@ -16,6 +17,8 @@ class drwNetworkConnectDialog : public QDialog
 public:
     explicit drwNetworkConnectDialog(QWidget *parent = 0);
     ~drwNetworkConnectDialog();
+	
+	bool GetSelectedUserAndAddress( QString & user, QHostAddress & address );
 
 public slots:
 
@@ -26,9 +29,7 @@ private:
 
 private slots:
     void on_tableWidget_cellPressed(int row, int column);
-    void on_buttonBox_rejected();
-    void on_buttonBox_accepted();
-
+   
 protected:
 
     drwNetworkServerFinder * m_finder;

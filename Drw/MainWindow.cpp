@@ -32,8 +32,8 @@ MainWindow::MainWindow()
 	m_controler = new PlaybackControler(m_scene, this);
 	m_observer = new drwToolbox( 0, m_scene, m_controler->GetEditionState(), this );
 	m_commandDb = new drwCommandDatabase(this);
-    m_commandDispatcher = new drwCommandDispatcher( m_observer, m_scene, this );
-    m_networkManager = new drwNetworkManager( m_commandDispatcher );
+	m_networkManager = new drwNetworkManager();
+	m_commandDispatcher = new drwCommandDispatcher( m_networkManager, m_commandDb, m_observer, m_scene, this );
 
 	// Create main widget  (just a frame to put the viewing widget and the playback control widget)
 	QWidget * mainWidget = new QWidget(this);
@@ -91,9 +91,7 @@ MainWindow::MainWindow()
 	m_dockTabletState->setFeatures( QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetMovable );
 	//m_dockTabletState->setFloating(true);
 	
-	
 	// connect objects
-	connect( m_observer, SIGNAL( CommandExecuted(drwCommand::s_ptr) ), m_commandDb, SLOT( PushCommand( drwCommand::s_ptr ) ) );
 	connect( m_observer, SIGNAL(StartInteraction()), m_controler, SLOT(StartInteraction()) );
 	connect( m_observer, SIGNAL(EndInteraction()), m_controler, SLOT(EndInteraction()) );
 	
@@ -129,6 +127,7 @@ void MainWindow::CreateActions()
 	m_networkMenu = menuBar()->addMenu( "&Network" );
 	m_netShareSessionMenuAction = m_networkMenu->addAction( "Share session", this, SLOT( NetShareSession() ), Qt::CTRL + Qt::Key_T );
 	m_netConnectMenuItem = m_networkMenu->addAction( "Connect...", this, SLOT( NetConnect() ) );
+	connect( m_networkManager, SIGNAL(StateChangedSignal()), this, SLOT(UpdateNetworkStatus()) );
 	
 	// Create the View menu
 	m_viewMenu = menuBar()->addMenu( "&View" );
@@ -173,10 +172,9 @@ void MainWindow::fileOpen()
 	m_observer->blockSignals( true );
 	
 	// Read
-	drwCommandDispatcher * disp = new drwCommandDispatcher( m_observer, m_scene, this );
-	connect( m_commandDb, SIGNAL( CommandRead(drwCommand::s_ptr) ), disp, SLOT( ExecuteCommand( drwCommand::s_ptr ) ) );
+	connect( m_commandDb, SIGNAL( CommandRead(drwCommand::s_ptr) ), m_commandDispatcher, SLOT( IncomingDbCommand( drwCommand::s_ptr ) ) );
 	m_commandDb->Read( m_filename.toAscii() );
-	disp->deleteLater();
+	disconnect( m_commandDb, SIGNAL( CommandRead(drwCommand::s_ptr) ), m_commandDispatcher, SLOT( IncomingDbCommand( drwCommand::s_ptr ) ) );
 	
 	// Re-enable signal transmission
 	m_observer->blockSignals( false );
@@ -266,7 +264,20 @@ void MainWindow::NetShareSession()
 void MainWindow::NetConnect()
 {
 	drwNetworkConnectDialog * dlg = new drwNetworkConnectDialog( this );
-	dlg->exec();
+	int result = dlg->exec();
+	if( result == QDialog::Accepted )
+	{
+		QString name;
+		QHostAddress address;
+		bool isSelValid = dlg->GetSelectedUserAndAddress( name, address );
+		if( isSelValid )
+		{
+			// todo : clear current scene and reset everything file->new
+			m_networkManager->Connect( name, address );
+		}
+	}
+	delete dlg;
+	UpdateNetworkStatus();
 }
 
 void MainWindow::UpdateNetworkStatus()
@@ -289,9 +300,7 @@ void MainWindow::UpdateNetworkStatus()
 		{
 			m_netConnectMenuItem->setText( tr("Connect...") );
 		}
-
 	}
-
 }
 
 void MainWindow::viewFullscreen()
@@ -300,11 +309,15 @@ void MainWindow::viewFullscreen()
 	{
 		showNormal();
 		m_playbackControlerWidget->show();
+		m_dockToolsOptions->show();
+		m_dockDisplayOptions->show();
 	}
 	else
 	{
 		showFullScreen();
 		m_playbackControlerWidget->hide();
+		m_dockToolsOptions->hide();
+		m_dockDisplayOptions->hide();
 	}
 }
 

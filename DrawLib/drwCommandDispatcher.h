@@ -2,11 +2,13 @@
 #define __drwCommandDispatcher_h_
 
 #include <QObject>
-#include <vector>
+#include <QMap>
 #include "drwCommand.h"
 
 class Scene;
 class drwToolbox;
+class drwNetworkManager;
+class drwCommandDatabase;
 
 class drwCommandDispatcher : public QObject
 {
@@ -15,20 +17,26 @@ class drwCommandDispatcher : public QObject
 	
 public:
 	
-	drwCommandDispatcher( drwToolbox * local, Scene * scene, QObject * parent );
+	drwCommandDispatcher( drwNetworkManager * net, drwCommandDatabase * db, drwToolbox * local, Scene * scene, QObject * parent );
 	~drwCommandDispatcher();
 	
 public slots:
 	
-	void ExecuteCommand( drwCommand::s_ptr );
+	void IncomingNetCommand( drwCommand::s_ptr );
+	void IncomingLocalCommand( drwCommand::s_ptr );
+	void IncomingDbCommand( drwCommand::s_ptr command );
 	
 protected:
 	
-	int GetUser( int userId );
-	int AddUser( int commandUserId );
+	drwToolbox * AddUser( int commandUserId );
 	
 	Scene * m_scene;
-	std::vector< drwToolbox* > m_users;
+	drwCommandDatabase * m_db;
+	drwNetworkManager * m_netManager;
+
+	int m_localToolboxId;
+	typedef QMap< int, drwToolbox* > ToolboxContainer;
+	ToolboxContainer m_toolboxes;
 	
 };
 

@@ -3,8 +3,6 @@
 
 #include <SVL.h>
 
-class Vec3;
-class drwSWFWriter;
 class drwDrawingContext;
 
 class Primitive

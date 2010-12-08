@@ -9,6 +9,7 @@ drwNetworkClient::drwNetworkClient( QString & peerUserName, QHostAddress & peerA
 , m_peerUserName( peerUserName )
 , m_peerAddress( peerAddress )
 , m_connection(0)
+, m_timerId(-1)
 {
 }
 
@@ -24,6 +25,7 @@ void drwNetworkClient::Connect( )
 	m_connection = new drwNetworkConnection( m_peerUserName, m_peerAddress, this );
 	connect( m_connection, SIGNAL(ConnectionReady(drwNetworkConnection*)), this, SLOT(ConnectionReady(drwNetworkConnection*)) );
 	connect( m_connection, SIGNAL(ConnectionLost(drwNetworkConnection*)), this, SLOT(ConnectionLost(drwNetworkConnection*)) );
+	m_timerId = startTimer( 3000 );
 	emit ModifiedSignal();
 }
 
@@ -41,6 +43,7 @@ void drwNetworkClient::Disconnect()
 void drwNetworkClient::ConnectionReady( drwNetworkConnection * connection )
 {
 	connect( connection, SIGNAL(CommandReceived(drwCommand::s_ptr)), this, SLOT(CommandReceivedSlot( drwCommand::s_ptr )), Qt::DirectConnection );
+	killTimer( m_timerId );
 	emit ModifiedSignal();
 }
 
@@ -59,4 +62,10 @@ void drwNetworkClient::SendCommand( drwCommand::s_ptr command )
 void drwNetworkClient::CommandReceivedSlot( drwCommand::s_ptr command )
 {
 	emit CommandReceivedSignal( command );
+}
+
+void drwNetworkClient::timerEvent( QTimerEvent * e )
+{
+	killTimer( m_timerId );
+	emit ConnectionTimeoutSignal();
 }
