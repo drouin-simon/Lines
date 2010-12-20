@@ -3,6 +3,8 @@
 #include "drwCommandDatabase.h"
 #include "drwNetworkManager.h"
 
+const int drwCommandDispatcher::m_localToolboxId = 0;
+
 drwCommandDispatcher::drwCommandDispatcher( drwNetworkManager * net,
 											drwCommandDatabase * db,
 											drwToolbox * local,
@@ -12,7 +14,7 @@ drwCommandDispatcher::drwCommandDispatcher( drwNetworkManager * net,
 , m_scene( scene )
 , m_db( db )
 , m_netManager( net )
-, m_localToolboxId(0)
+, m_lastUsedUserId( 0 ) // last used is local
 {
 	connect( local, SIGNAL(CommandExecuted(drwCommand::s_ptr)), this, SLOT(IncomingLocalCommand(drwCommand::s_ptr)));
 	m_toolboxes[ m_localToolboxId ] = local;
@@ -27,6 +29,11 @@ drwCommandDispatcher::~drwCommandDispatcher()
 		if( current != local )
 			delete current;
 	}
+}
+
+int drwCommandDispatcher::RequestNewUserId()
+{
+	return ++m_lastUsedUserId;
 }
 
 void drwCommandDispatcher::IncomingNetCommand( drwCommand::s_ptr command )
@@ -63,7 +70,9 @@ void drwCommandDispatcher::IncomingDbCommand( drwCommand::s_ptr command )
 
 drwToolbox * drwCommandDispatcher::AddUser( int commandUserId )
 {
-	drwToolbox * newUser = new drwToolbox( commandUserId, m_scene, NULL, this );
+	drwToolbox * newUser = new drwToolbox( m_scene, NULL, this );
 	m_toolboxes[ commandUserId ] = newUser;
+	if( m_lastUsedUserId < commandUserId )
+		m_lastUsedUserId = commandUserId;
 	return newUser;
 }

@@ -88,6 +88,17 @@ bool drwCommandDatabase::Write( const char * filename )
 	return true;
 }
 
+void drwCommandDatabase::ExecuteAll()
+{
+	m_commandMutex.lock();
+	container::iterator it = Commands.begin();
+	for( ; it != Commands.end(); ++it )
+	{
+		emit CommandRead( *it );
+	}
+	m_commandMutex.unlock();
+}
+
 void drwCommandDatabase::Clear()
 {
 	m_commandMutex.lock();

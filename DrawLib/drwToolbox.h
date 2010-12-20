@@ -16,11 +16,10 @@ Q_OBJECT
 	
 public:
 	
-	drwToolbox( int userId, Scene * scene, drwEditionState * editionState, QObject * parent );
+	drwToolbox( Scene * scene, drwEditionState * editionState, QObject * parent );
 	virtual ~drwToolbox();
 	
 	void AddTool( drwWidgetObserver * tool );
-	int GetUserId() { return m_userId; }
 	
 	// Implementation of drwWidgetObserver
 	virtual void MousePressEvent( drwDrawingWidget * w, QMouseEvent * e );
@@ -53,8 +52,6 @@ public slots:
 	void ExecuteCommand( drwCommand::s_ptr );
 	
 protected:
-	
-	int m_userId;
 	
 	unsigned CurrentTool;
 	std::vector<drwWidgetObserver*> Tools;

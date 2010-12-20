@@ -8,7 +8,7 @@
 #include "drwCursor.h"
 #include <QTabletEvent>
 
-drwLineTool::drwLineTool( int userId, Scene * scene, drwEditionState * editionState, QObject * parent ) 
+drwLineTool::drwLineTool( Scene * scene, drwEditionState * editionState, QObject * parent )
 : drwWidgetObserver( scene, parent )
 , m_cursorShouldAppear( false )
 , Color(1.0,1.0,1.0)
@@ -24,7 +24,6 @@ drwLineTool::drwLineTool( int userId, Scene * scene, drwEditionState * editionSt
 , m_brushScaling( false )
 , m_lastXWin( 0 )
 , m_lastYWin( 0 )
-, m_userId( userId )
 , m_editionState(editionState)
 {	
 	// simtodo : fix this

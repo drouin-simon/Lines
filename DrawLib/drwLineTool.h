@@ -19,7 +19,7 @@ class drwLineTool : public drwWidgetObserver
 
 public:
 	
-	drwLineTool( int userId, Scene * scene, drwEditionState * editionState, QObject * parent = 0 );
+	drwLineTool( Scene * scene, drwEditionState * editionState, QObject * parent = 0 );
 	virtual ~drwLineTool() {};
 	
 	virtual void MousePressEvent( drwDrawingWidget * w, QMouseEvent * e );
@@ -68,9 +68,6 @@ protected:
 	CurrentNodesCont CurrentNodes;
 	
 	drwEditionState * m_editionState;
-	
-	int m_userId;
-	
 };
 
 #endif

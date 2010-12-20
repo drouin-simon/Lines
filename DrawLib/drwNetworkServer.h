@@ -2,6 +2,7 @@
 #define __drwNetworkServer_h_
 
 #include <QObject>
+#include <QMap>
 #include "drwCommand.h"
 
 QT_BEGIN_NAMESPACE
@@ -10,6 +11,7 @@ class QTcpServer;
 class QTimer;
 QT_END_NAMESPACE
 class drwNetworkConnection;
+class drwCommandDispatcher;
 
 class drwNetworkServer : public QObject
 {
@@ -18,18 +20,12 @@ class drwNetworkServer : public QObject
 	
 public:
 	
-    drwNetworkServer( QObject * parent = 0 );
+	drwNetworkServer( drwCommandDispatcher * dispatcher, QObject * parent = 0 );
 	~drwNetworkServer();
 	
 	void Start();
 	void Stop();
-	bool isOn() { return m_isOn; }
 	void GetConnectionUserNamesAndIps( QStringList & userNameList, QStringList & ipList );
-	
-signals:
-	
-	void ModifiedSignal();
-    void CommandReceivedSignal( drwCommand::s_ptr );
 	
 public slots:
 	
@@ -39,7 +35,7 @@ private slots:
 	
 	void Broadcast();
 	void NewIncomingConnection();
-	void ConnectionReady( drwNetworkConnection * );
+	void ConnectionReadySlot( drwNetworkConnection * );
 	void ConnectionLost( drwNetworkConnection * );
     void CommandReceivedSlot( drwCommand::s_ptr com );
 	
@@ -48,13 +44,15 @@ private:
 	void Reset();
 	
 	QString m_userName;
-	int m_nextUserId;
 	bool m_isOn;
 	
 	QTimer     * m_broadcastTimer;
 	QUdpSocket * m_broadcastSocket;
 	QTcpServer * m_tcpServer;
-	QList<drwNetworkConnection*> m_connections;
+	typedef QMap< drwNetworkConnection*, int > ConnectionsContainer;
+	ConnectionsContainer m_connections;
+
+	drwCommandDispatcher * m_dispatcher;
 	
 };
 

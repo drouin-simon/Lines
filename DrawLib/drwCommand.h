@@ -7,7 +7,7 @@
 class QDataStream;
 class QTextStream;
 
-enum drwCommandId { drwIdSetFrameCommand, drwIdMouseCommand, drwIdSetPersistenceCommand };
+enum drwCommandId { drwIdSetFrameCommand, drwIdMouseCommand, drwIdSetPersistenceCommand, drwIdServerInitialCommand };
 
 class drwCommand
 {
@@ -16,13 +16,14 @@ public:
 	
 	SharedPtrMacro(drwCommand);
 	
-	drwCommand( int userId ) : m_userId(userId) {}
+	drwCommand() : m_userId(m_defaultUserId) {}
 	drwCommand( drwCommand & other ) : m_userId( other.m_userId ) {}
 	virtual ~drwCommand() {}
 	virtual s_ptr Clone() = 0; 
 	
 	virtual drwCommandId GetCommandId() = 0;
 	int GetUserId() { return m_userId; }
+	void SetUserId( int id ) { m_userId = id; }
 	
 	// Reading ( the XXXSize() functions are used by clients to determine if there is enough data in a stream to read commands)
 	static int HeaderSize();
@@ -38,15 +39,14 @@ public:
 	
 protected:
 
-	static s_ptr InstanciateSubclass( drwCommandId id, int userId );
+	static s_ptr InstanciateSubclass( drwCommandId id );
 	virtual bool WriteImpl( QDataStream & stream ) = 0;
 	
 	int m_userId;
 	
 private:
-	
-	drwCommand(); // make sure no one calls the default constructor
-	
+
+	static const int m_defaultUserId;
 };
 
 class drwSetFrameCommand : public drwCommand
@@ -54,7 +54,7 @@ class drwSetFrameCommand : public drwCommand
 	
 public:
 	
-	drwSetFrameCommand( int userId ) : drwCommand( userId ) { NewFrame = 0; }
+	drwSetFrameCommand() { NewFrame = 0; }
 	drwSetFrameCommand( drwSetFrameCommand & other ) : drwCommand( other ), NewFrame(other.NewFrame) {}
 	virtual ~drwSetFrameCommand() {}
 	virtual s_ptr Clone() { s_ptr newCom( new drwSetFrameCommand( *this ) ); return newCom; }
@@ -81,7 +81,7 @@ class drwSetPersistenceCommand : public drwCommand
 	
 public:
 	
-	drwSetPersistenceCommand( int userId ) : drwCommand( userId ) { Persistence = 1; }
+	drwSetPersistenceCommand() : Persistence(0) { }
 	drwSetPersistenceCommand( drwSetPersistenceCommand & other ) : drwCommand( other ), Persistence( other.Persistence ) {}
 	virtual ~drwSetPersistenceCommand() {}
 	virtual s_ptr Clone() { s_ptr newCom( new drwSetPersistenceCommand( *this ) ); return newCom; }
@@ -103,6 +103,33 @@ protected:
 	
 };
 
+class drwServerInitialCommand : public drwCommand
+{
+
+public:
+
+	drwServerInitialCommand( int nbCommands )
+		: NumberOfCommands( nbCommands ){}
+	drwServerInitialCommand( drwServerInitialCommand & other )
+		: drwCommand( other )
+		, NumberOfCommands( other.NumberOfCommands ){}
+	virtual ~drwServerInitialCommand() {}
+	virtual s_ptr Clone() { s_ptr newCom( new drwServerInitialCommand( *this ) ); return newCom; }
+
+	drwCommandId GetCommandId() { return drwIdServerInitialCommand; }
+	int BodySize();
+	void Read( QDataStream & stream );
+	bool WriteImpl( QDataStream & stream );
+	void Write( QTextStream & stream );
+
+	SetMacro(NumberOfCommands,int);
+	GetMacro(NumberOfCommands,int);
+
+protected:
+
+	int NumberOfCommands;
+};
+
 class drwMouseCommand : public drwCommand
 {
 	
@@ -110,8 +137,8 @@ public:
 	
 	enum MouseCommandType { Press, Release, Move };
 	
-	drwMouseCommand( int userId );
-	drwMouseCommand( int userId, MouseCommandType commandType, double x, double y, double z, int xTilt, int yTilt, double pressure, double rotation, double tangentialPressure );
+	drwMouseCommand();
+	drwMouseCommand( MouseCommandType commandType, double x, double y, double z, int xTilt, int yTilt, double pressure, double rotation, double tangentialPressure );
 	drwMouseCommand( drwMouseCommand & );
 	virtual ~drwMouseCommand() {}
 	virtual s_ptr Clone() { s_ptr newCom( new drwMouseCommand( *this ) ); return newCom; }

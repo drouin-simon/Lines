@@ -6,19 +6,21 @@
 // drwCommand Implementation
 //===================================
 
-drwCommand::s_ptr drwCommand::InstanciateSubclass( drwCommandId id, int user )
+const int drwCommand::m_defaultUserId = 0;
+
+drwCommand::s_ptr drwCommand::InstanciateSubclass( drwCommandId id )
 {
 	s_ptr newCommand;
 	switch (id) 
 	{
 		case drwIdSetFrameCommand:
-			newCommand.reset( new drwSetFrameCommand(user) );
+			newCommand.reset( new drwSetFrameCommand );
 			break;
 		case drwIdMouseCommand:
-			newCommand.reset( new drwMouseCommand(user) );
+			newCommand.reset( new drwMouseCommand );
 			break;
 		case drwIdSetPersistenceCommand:
-			newCommand.reset( new drwSetPersistenceCommand(user) );
+			newCommand.reset( new drwSetPersistenceCommand );
 			break;
 	}
 	return newCommand;
@@ -35,7 +37,9 @@ drwCommand::s_ptr drwCommand::ReadHeader( QDataStream & in )
 	in >> id;
 	int user = 0;
 	in >> user;
-	return drwCommand::InstanciateSubclass( (drwCommandId)id, user );
+	drwCommand::s_ptr ret = drwCommand::InstanciateSubclass( (drwCommandId)id );
+	ret->SetUserId( user );
+	return ret;
 }
 
 bool drwCommand::Write( QDataStream & stream )
@@ -119,11 +123,36 @@ bool drwSetPersistenceCommand::Concatenate( drwCommand * other )
 
 
 //===================================
+// drwServerInitialCommand Implementation
+//===================================
+
+int drwServerInitialCommand::BodySize()
+{
+	return sizeof(NumberOfCommands);
+}
+
+void drwServerInitialCommand::Read( QDataStream & stream )
+{
+	stream >> NumberOfCommands;
+}
+
+bool drwServerInitialCommand::WriteImpl( QDataStream & stream )
+{
+	stream << NumberOfCommands;
+	return true;
+}
+
+void drwServerInitialCommand::Write( QTextStream & stream )
+{
+	stream << "ServerInitialCommand: NumberOfCommands = " << NumberOfCommands;
+}
+
+//===================================
 // drwMouseCommand Implementation
 //===================================
 
-drwMouseCommand::drwMouseCommand( int userId )
-: drwCommand(userId)
+drwMouseCommand::drwMouseCommand()
+: drwCommand()
 , m_type( Press )
 , m_x(0.0)
 , m_y(0.0)
@@ -136,11 +165,11 @@ drwMouseCommand::drwMouseCommand( int userId )
 {
 }
 
-drwMouseCommand::drwMouseCommand( int userId, drwMouseCommand::MouseCommandType commandType, 
+drwMouseCommand::drwMouseCommand( drwMouseCommand::MouseCommandType commandType,
 								 double x, double y, double z, int xTilt,
 								 int yTilt, double pressure, double rotation,
 								 double tangentialPressure ) 
-: drwCommand(userId)
+: drwCommand()
 , m_type( commandType )
 , m_x(x)
 , m_y(y)

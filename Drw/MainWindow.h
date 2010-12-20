@@ -9,6 +9,7 @@ class QWorkspace;
 class QPopupMenu;
 class QDockWidget;
 class QAction;
+class QProgressDialog;
 
 class drwDrawingWidget;
 class Scene;
@@ -46,6 +47,7 @@ private slots:
 	
 	void NetShareSession();
 	void NetConnect();
+	void NetConnectProgress();
 	void UpdateNetworkStatus();
 	
 	void viewFullscreen();
@@ -94,12 +96,14 @@ private:
 	TabletStateWidget * m_tabletStateWidget;
 	QDockWidget * m_dockTabletState;
 	
-	Scene						* m_scene;
-	PlaybackControler			* m_controler;
-	drwToolbox	* m_observer;
-    drwCommandDatabase			* m_commandDb;
-    drwCommandDispatcher * m_commandDispatcher;
-    drwNetworkManager * m_networkManager;
+	Scene					* m_scene;
+	PlaybackControler		* m_controler;
+	drwToolbox				* m_localToolbox;
+	drwCommandDatabase		* m_commandDb;
+	drwCommandDispatcher		* m_commandDispatcher;
+	drwNetworkManager		* m_networkManager;
+
+	QProgressDialog * m_progressDialog;
 
     static const QString m_appName;
 };

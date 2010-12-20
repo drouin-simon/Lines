@@ -4,12 +4,15 @@
 #include "drwNetworkConnection.h"
 
 
-drwNetworkClient::drwNetworkClient( QString & peerUserName, QHostAddress & peerAddress, QObject * parent ) 
-: QObject(parent)
-, m_peerUserName( peerUserName )
-, m_peerAddress( peerAddress )
-, m_connection(0)
-, m_timerId(-1)
+drwNetworkClient::drwNetworkClient( QString & peerUserName, QHostAddress & peerAddress, drwCommandDispatcher * dispatcher )
+	: m_connection(0)
+	, m_dispatcher( dispatcher )
+	, m_peerUserName( peerUserName )
+	, m_peerAddress( peerAddress )
+	, m_numberOfCommandsToRead(0)
+	, m_totalNumberOfCommandsToRead(0)
+	, m_state( Init )
+	, m_timerId(-1)
 {
 }
 
@@ -19,14 +22,20 @@ drwNetworkClient::~drwNetworkClient()
 		Disconnect();
 }
 
+double drwNetworkClient::GetPercentRead()
+{
+	double diff = m_totalNumberOfCommandsToRead - m_numberOfCommandsToRead;
+	return diff / m_totalNumberOfCommandsToRead;
+}
+
 void drwNetworkClient::Connect( )
 {
 	// Create a new connection
-	m_connection = new drwNetworkConnection( m_peerUserName, m_peerAddress, this );
-	connect( m_connection, SIGNAL(ConnectionReady(drwNetworkConnection*)), this, SLOT(ConnectionReady(drwNetworkConnection*)) );
-	connect( m_connection, SIGNAL(ConnectionLost(drwNetworkConnection*)), this, SLOT(ConnectionLost(drwNetworkConnection*)) );
+	m_connection = new drwNetworkConnection( m_peerUserName, m_peerAddress );
+	connect( m_connection, SIGNAL(ConnectionLost(drwNetworkConnection*)), this, SLOT(ConnectionLostSlot(drwNetworkConnection*)) );
+	connect( m_connection, SIGNAL(ConnectionReady(drwNetworkConnection*)), this, SLOT(ConnectionReadySlot(drwNetworkConnection*)) );
 	m_timerId = startTimer( 3000 );
-	emit ModifiedSignal();
+	SetState( WaitingForServer );
 }
 
 void drwNetworkClient::Disconnect()
@@ -36,22 +45,23 @@ void drwNetworkClient::Disconnect()
 		m_connection->Disconnect();
 		delete m_connection;
 		m_connection = 0;
-		emit ModifiedSignal();
+		SetState( Init );
 	}
 }
 
-void drwNetworkClient::ConnectionReady( drwNetworkConnection * connection )
+void drwNetworkClient::ConnectionReadySlot( drwNetworkConnection * connection )
 {
 	connect( connection, SIGNAL(CommandReceived(drwCommand::s_ptr)), this, SLOT(CommandReceivedSlot( drwCommand::s_ptr )), Qt::DirectConnection );
 	killTimer( m_timerId );
-	emit ModifiedSignal();
+	m_timerId = -1;
+	SetState( WaitingForNbCommands );
 }
 
-void drwNetworkClient::ConnectionLost( drwNetworkConnection * connection )
+void drwNetworkClient::ConnectionLostSlot( drwNetworkConnection * connection )
 {
 	m_connection->deleteLater();
 	m_connection = 0;
-	emit ModifiedSignal();
+	SetState( ConnectionLost );
 }
 
 void drwNetworkClient::SendCommand( drwCommand::s_ptr command )
@@ -61,11 +71,44 @@ void drwNetworkClient::SendCommand( drwCommand::s_ptr command )
 
 void drwNetworkClient::CommandReceivedSlot( drwCommand::s_ptr command )
 {
-	emit CommandReceivedSignal( command );
+	if( m_state == WaitingForNbCommands )
+	{
+		if( command->GetCommandId() == drwIdServerInitialCommand )
+		{
+			drwServerInitialCommand * serverMsg = dynamic_cast<drwServerInitialCommand*> (command.get());
+			m_totalNumberOfCommandsToRead = serverMsg->GetNumberOfCommands();
+			m_numberOfCommandsToRead = m_totalNumberOfCommandsToRead;
+			SetState( ReceivingScene );
+		}
+	}
+	else
+	{
+		m_dispatcher->IncomingNetCommand( command );
+		if( m_state == ReceivingScene )
+		{
+			if( m_numberOfCommandsToRead == 1 )
+			{
+				SetState( Operating );
+			}
+			m_numberOfCommandsToRead--;
+		}
+	}
+}
+
+void drwNetworkClient::SetState( ClientState state )
+{
+	if( state != m_state )
+	{
+		m_state = state;
+		emit StateChanged();
+	}
 }
 
 void drwNetworkClient::timerEvent( QTimerEvent * e )
 {
 	killTimer( m_timerId );
-	emit ConnectionTimeoutSignal();
+	m_timerId = 0;
+	m_connection->deleteLater();
+	m_connection = 0;
+	SetState( ConnectionTimedOut );
 }

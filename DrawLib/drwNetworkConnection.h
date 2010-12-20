@@ -19,38 +19,48 @@ class drwNetworkConnection : public QObject
     Q_OBJECT
 
 public:
+
+	enum NextRead{ PeerNameSize, PeerName, CommandHeader, CommandBody };
+
     drwNetworkConnection( QTcpSocket *socket, QObject * parent = 0 );
 	drwNetworkConnection( QString peerUserName, QHostAddress & address, QObject *parent = 0 );
 	~drwNetworkConnection();
+
 	QString GetPeerUserName() { return m_peerUserName; }
 	QHostAddress GetPeerAddress() { return m_peerAddress; }
+
 	void Disconnect();
-	
+
 	static QString ComputeUserName();
 
 signals:
+
 	void CommandReceived( drwCommand::s_ptr command );
 	void ConnectionReady( drwNetworkConnection * );
 	void ConnectionLost( drwNetworkConnection * );
 	
 public slots:
+
 	void SendCommand( drwCommand::s_ptr command );
 	void SocketConnected();
 	void SocketDisconnected();
 
 private slots:
+
     void processReadyRead();
 	
 private:
 	
 	void SendString( const QString & msg );
-	QString ReadString();
 	
 	QTcpSocket * m_socket;
 	QString	m_peerUserName;
 	QHostAddress m_peerAddress;
 	QString m_userName;
-	bool m_ready;
+
+	NextRead m_nextRead;
+	int m_nextReadSize;
+
 	drwCommand::s_ptr m_pendingCommand;
 };
 

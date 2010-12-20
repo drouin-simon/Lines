@@ -2,14 +2,13 @@
 #include "drwEditionState.h"
 #include "drwLineTool.h"
 
-drwToolbox::drwToolbox( int userId, Scene * scene, drwEditionState * editionState, QObject * parent ) 
+drwToolbox::drwToolbox( Scene * scene, drwEditionState * editionState, QObject * parent )
 : drwWidgetObserver( scene, parent )
-, m_userId( userId )
 , m_editionState( editionState )
 {
 	if( !m_editionState )
 		m_editionState = new drwEditionState(this);
-	drwLineTool * drawTool = new drwLineTool( userId, CurrentScene, m_editionState, this );
+	drwLineTool * drawTool = new drwLineTool( CurrentScene, m_editionState, this );
 	AddTool( drawTool );
 	CurrentTool = 0;
 }
@@ -79,7 +78,7 @@ void drwToolbox::SetCurrentFrame( int frame )
 	if( m_editionState )
 		m_editionState->SetCurrentFrame( frame );
 	
-	drwSetFrameCommand * com = new drwSetFrameCommand(m_userId);
+	drwSetFrameCommand * com = new drwSetFrameCommand();
 	com->SetNewFrame(frame);
 	drwCommand::s_ptr command( com );
 	emit CommandExecuted( command );
@@ -101,7 +100,7 @@ void drwToolbox::SetPersistence( int persist )
 	if( m_editionState )
 		m_editionState->SetPersistence( persist );
 	
-	drwSetPersistenceCommand * com = new drwSetPersistenceCommand(m_userId);
+	drwSetPersistenceCommand * com = new drwSetPersistenceCommand();
 	com->SetPersistence(persist);
 	drwCommand::s_ptr command( com );
 	emit CommandExecuted( command );

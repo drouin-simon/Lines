@@ -1,16 +1,18 @@
 #include "drwNetworkServer.h"
 #include <QtNetwork>
 #include "drwNetworkConnection.h"
+#include "drwCommandDatabase.h"
+#include "drwCommandDispatcher.h"
 
 const int BroadcastTimeout = 2000;
 
-drwNetworkServer::drwNetworkServer( QObject * parent )
+drwNetworkServer::drwNetworkServer( drwCommandDispatcher * dispatcher, QObject * parent )
 : QObject(parent)
-, m_nextUserId( 1 )
 , m_isOn(false)
 , m_broadcastTimer(0)
 , m_broadcastSocket(0)
 , m_tcpServer(0)
+, m_dispatcher( dispatcher )
 {
 	m_userName = drwNetworkConnection::ComputeUserName();
 	
@@ -25,7 +27,12 @@ drwNetworkServer::drwNetworkServer( QObject * parent )
 
 drwNetworkServer::~drwNetworkServer()
 {
+	delete m_broadcastSocket;
+	delete m_broadcastTimer;
+	delete m_tcpServer;
 
+	// delete all connections
+	Stop();
 }
 
 void drwNetworkServer::Start()
@@ -38,7 +45,6 @@ void drwNetworkServer::Start()
 	m_tcpServer->listen( QHostAddress::Any, ConnectionPort );
 	
 	m_isOn = true;
-	emit ModifiedSignal();
 }
 
 void drwNetworkServer::Stop()
@@ -48,21 +54,29 @@ void drwNetworkServer::Stop()
 		m_broadcastTimer->stop();
 		m_tcpServer->close();
 		m_broadcastSocket->close();
-		while ( m_connections.size() > 0 ) 
+
+		// delete all connections
+		ConnectionsContainer::iterator it = m_connections.begin();
+		while ( it != m_connections.end() )
 		{
-			m_connections.front()->Disconnect();
+			delete it.key();
+			++it;
 		}
+		m_connections.clear();
+
 		m_isOn = false;
-		emit ModifiedSignal();
 	}
 }
 
 void drwNetworkServer::GetConnectionUserNamesAndIps( QStringList & userNameList, QStringList & ipList )
 {
-	for (int i = 0; i < m_connections.size(); ++i) 
+	ConnectionsContainer::iterator it = m_connections.begin();
+	while( it != m_connections.end() )
 	{
-		userNameList.push_back( m_connections.at(i)->GetPeerUserName() );
-		ipList.push_back( m_connections.at(i)->GetPeerAddress().toString() );
+		drwNetworkConnection * connection = it.key();
+		userNameList.push_back( connection->GetPeerUserName() );
+		ipList.push_back( connection->GetPeerAddress().toString() );
+		++it;
 	}
 }
 
@@ -78,53 +92,71 @@ void drwNetworkServer::NewIncomingConnection()
 	{
 		QTcpSocket * sock = m_tcpServer->nextPendingConnection();
         drwNetworkConnection * connection = new drwNetworkConnection( sock, this );
-		connect( connection, SIGNAL(ConnectionReady(drwNetworkConnection*)), this, SLOT(ConnectionReady(drwNetworkConnection*)) );
 		connect( connection, SIGNAL(ConnectionLost(drwNetworkConnection*)), this, SLOT(ConnectionLost(drwNetworkConnection*)) );
-		m_connections.push_back( connection );
+		connect( connection, SIGNAL(ConnectionReady(drwNetworkConnection*)), this, SLOT(ConnectionReadySlot(drwNetworkConnection*)));
+		connect( connection, SIGNAL(CommandReceived(drwCommand::s_ptr)), this, SLOT(CommandReceivedSlot(drwCommand::s_ptr)), Qt::DirectConnection );
+
+		int connectionId = m_dispatcher->RequestNewUserId();
+		m_connections[ connection ] = connectionId;
 	}
 }
 
-void drwNetworkServer::ConnectionReady( drwNetworkConnection * connection )
+void drwNetworkServer::ConnectionReadySlot( drwNetworkConnection * connection )
 {
-	connect( connection, SIGNAL(CommandReceived( drwCommand::s_ptr )), this, SLOT( CommandReceived( drwCommand::s_ptr ) ), Qt::DirectConnection );
-	emit ModifiedSignal();
-}
+	// Send the initial command
+	drwCommandDatabase * db = m_dispatcher->GetDb();
+	drwCommand::s_ptr command( new drwServerInitialCommand( db->GetNumberOfCommands() ) );
+	connection->SendCommand( command );
 
-void drwNetworkServer::CommandReceivedSlot( drwCommand::s_ptr com )
-{
-	// send it to all other connections
-	// todo: check user id and send it to all connections that have a different id
-	
-	// execute it here (including storing in database)
-    emit CommandReceivedSignal( com );
+	// Send all commands in the database.
+	connect( db, SIGNAL(CommandRead(drwCommand::s_ptr)), connection, SLOT(SendCommand(drwCommand::s_ptr)) );
+	db->ExecuteAll();
+	disconnect(db, SIGNAL(CommandRead(drwCommand::s_ptr)), connection, SLOT(SendCommand(drwCommand::s_ptr)) );
 }
 
 void drwNetworkServer::ConnectionLost( drwNetworkConnection * connection )
 {
-	int index = -1;
-	for( int i = 0; i < m_connections.size(); ++i )
+	ConnectionsContainer::iterator itErase = m_connections.find( connection );
+	Q_ASSERT( itErase != m_connections.end() );
+
+	m_connections.erase( itErase );
+	connection->deleteLater();
+}
+
+void drwNetworkServer::CommandReceivedSlot( drwCommand::s_ptr com )
+{
+	drwNetworkConnection * commandSender = dynamic_cast<drwNetworkConnection*>(sender());
+	Q_ASSERT( commandSender );
+
+	// Assign a UserId to the command
+	int userId = m_connections[ commandSender ];
+	com->SetUserId( userId );
+
+	// Send command to all other peers
+	ConnectionsContainer::iterator it = m_connections.begin();
+	while( it != m_connections.end() )
 	{
-		if( m_connections.at(i) == connection )
+		drwNetworkConnection * connection = it.key();
+		if( connection != commandSender )
 		{
-			index = i;
-			break;
+			connection->SendCommand( com );
 		}
+		++it;
 	}
 	
-	if( index != -1 )
-	{
-		m_connections.removeAt( index );
-		connection->deleteLater();
-		emit ModifiedSignal();
-	}
+	// execute it here
+	m_dispatcher->IncomingNetCommand( com );
 }
 
 // Local command, must be sent to all connected clients
 void drwNetworkServer::SendCommand( drwCommand::s_ptr command )
 {
-	for( int i = 0; i < m_connections.size(); ++i )
+	ConnectionsContainer::iterator it = m_connections.begin();
+	while( it != m_connections.end() )
 	{
-		m_connections.at( i )->SendCommand( command );
+		drwNetworkConnection * connection = it.key();
+		connection->SendCommand( command );
+		++it;
 	}
 }
 

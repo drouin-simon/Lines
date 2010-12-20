@@ -8,6 +8,7 @@
 
 #include "drwCommand.h"
 
+class drwCommandDispatcher;
 class drwNetworkClient;
 class drwNetworkServer;
 class QWidget;
@@ -22,20 +23,20 @@ class drwNetworkManager : public QThread
 	
 public:
 
-	enum MessageToThread{ ConnectMsg, DisconnectMsg, StartSharingMsg, StopSharingMsg, StartSendingMsg, FinishSendingMsg, ResetMsg };
-	enum MessageFromThread{ ConnectionTimedOutMsg, ConnectionLostMsg, ConnectedMsg, StartReceivingSceneMsg, FinishReceivingSceneMsg, SendSceneMsg };
-	enum NetworkState{ Idle, WaitingForConnection, ConnectionTimedOut, ConnectionLost, ReceivingScene, Connected, Sharing, SendingScene };
+	enum MessageToThread{ ConnectMsg, DisconnectMsg, StartSharingMsg, StopSharingMsg, ResetMsg };
+	enum MessageFromThread{ ConnectionTimedOutMsg, ConnectionLostMsg, ReceivingSceneMsg, ConnectedMsg };
+	enum NetworkState{ Idle, WaitingForConnection, ConnectionTimedOut, ConnectionLost, ReceivingScene, Connected, Sharing };
 	
 	drwNetworkManager();
 	~drwNetworkManager();
 
+	void SetDispatcher( drwCommandDispatcher * disp ) { m_dispatcher = disp; }
 	NetworkState GetState() { return m_state; }
+	double GetPercentRead();
 
 	bool IsSharing();
 	void StartSharing();
 	void StopSharing();
-	void StartSendingScene();
-	void FinishSendingScene();
 	
 	bool IsConnected();
     void Connect( QString username, QHostAddress ip );
@@ -48,7 +49,6 @@ public slots:
 
 private slots:
 
-	void CommandReceivedSlot( drwCommand::s_ptr );
 	void MessageFromThreadSlot( MessageFromThread );
 	
 signals:
@@ -67,6 +67,8 @@ protected:
 	
 	// Function called when thread starts. It is started when the class is instanciated
 	void run();
+
+	drwCommandDispatcher * m_dispatcher;
 	
 	// Queued commands to send and mutex to protect it since it is accessed by main and net threads
 	QMutex m_queueMutex;
@@ -90,11 +92,16 @@ public:
 	drwInThreadAgent( drwNetworkManager * man ) : m_manager(man) {}
 	
 	void SetConnectAttributes( QString user, QHostAddress remoteIp );
+	double GetPercentRead();
 
 public slots:
 	
 	void NewCommandsToSend();
 	void MessageToThreadSlot( drwNetworkManager::MessageToThread message );
+
+private slots:
+
+	void ClientStateChanged();
 
 signals:
 

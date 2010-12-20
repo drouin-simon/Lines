@@ -4,7 +4,8 @@
 #include "drwCommand.h"
 
 drwNetworkManager::drwNetworkManager()
-	: m_inThread(0)
+	: m_dispatcher(0)
+	, m_inThread(0)
 	, m_state( Idle )
 {
 	// Start the thread
@@ -25,9 +26,18 @@ drwNetworkManager::~drwNetworkManager()
 	}
 }
 
+double drwNetworkManager::GetPercentRead()
+{
+	if( m_state == ReceivingScene )
+	{
+		return m_inThread->GetPercentRead();
+	}
+	return 0.0;
+}
+
 bool drwNetworkManager::IsSharing()
 {
-	return ( m_state == Sharing || m_state == SendingScene );
+	return ( m_state == Sharing );
 }
 
 void drwNetworkManager::StartSharing()
@@ -48,24 +58,11 @@ void drwNetworkManager::StopSharing()
 	}
 }
 
-void drwNetworkManager::StartSendingScene()
-{
-	if( IsSharing() )
-		emit MessageToThreadSignal( StartSendingMsg );
-}
-
-void drwNetworkManager::FinishSendingScene()
-{
-	if( IsSharing() )
-		emit MessageToThreadSignal( FinishSendingMsg );
-}
-
 bool drwNetworkManager::IsConnected()
 {
 	return( m_state == WaitingForConnection ||
 			m_state == ConnectionTimedOut ||
 			m_state == ConnectionLost ||
-			m_state == ReceivingScene ||
 			m_state == Connected );
 }
 
@@ -79,21 +76,16 @@ void drwNetworkManager::Connect( QString username, QHostAddress ip )
 	}
 }
 
-void drwNetworkManager::CommandReceivedSlot( drwCommand::s_ptr com )
-{
-	emit CommandReceivedSignal( com );
-}
-
 void drwNetworkManager::MessageFromThreadSlot( MessageFromThread message )
 {
 	if( message == ConnectionTimedOutMsg )
 		SetState( ConnectionTimedOut );
 	if( message == ConnectionLostMsg )
 		SetState( ConnectionLost );
-	if( message == FinishReceivingSceneMsg )
-		SetState( Connected );
-	if( message == StartReceivingSceneMsg )
+	if( message == ReceivingSceneMsg )
 		SetState( ReceivingScene );
+	if( message == ConnectedMsg )
+		SetState( Connected );
 }
 
 void drwNetworkManager::SendCommand( drwCommand::s_ptr command )
@@ -144,6 +136,15 @@ void drwInThreadAgent::SetConnectAttributes( QString user, QHostAddress remoteIp
 	m_attributesMutex.unlock();
 }
 
+double drwInThreadAgent::GetPercentRead()
+{
+	if( m_client )
+	{
+		return m_client->GetPercentRead();
+	}
+	return 0.0;
+}
+
 void drwInThreadAgent::NewCommandsToSend()
 {
 	m_manager->m_queueMutex.lock();
@@ -166,7 +167,7 @@ void drwInThreadAgent::MessageToThreadSlot( drwNetworkManager::MessageToThread m
 	{
 		if( !m_server )
 		{
-			m_server = new drwNetworkServer();
+			m_server = new drwNetworkServer( m_manager->m_dispatcher );
 			m_server->Start();
 		}
 	}
@@ -179,10 +180,9 @@ void drwInThreadAgent::MessageToThreadSlot( drwNetworkManager::MessageToThread m
 		if( !m_client )
 		{
 			m_attributesMutex.lock();
-			m_client = new drwNetworkClient( m_userName, m_remoteIp );
+			m_client = new drwNetworkClient( m_userName, m_remoteIp, m_manager->m_dispatcher );
 			m_attributesMutex.unlock();
-			connect( m_client, SIGNAL(ConnectionTimeoutSignal()), this, SLOT(ConnectionTimedOut()) );
-			connect( m_client, SIGNAL(CommandReceivedSignal(drwCommand::s_ptr)), m_manager, SLOT(CommandReceivedSlot(drwCommand::s_ptr)), Qt::DirectConnection );
+			connect( m_client, SIGNAL(StateChanged()), this, SLOT(ClientStateChanged()) );
 			m_client->Connect();
 		}
 	}
@@ -194,6 +194,21 @@ void drwInThreadAgent::MessageToThreadSlot( drwNetworkManager::MessageToThread m
 	{
 		Reset();
 	}
+}
+
+void drwInThreadAgent::ClientStateChanged()
+{
+	drwNetworkClient::ClientState state = m_client->GetState();
+	if( state == drwNetworkClient::ConnectionTimedOut )
+		emit MessageFromThread( drwNetworkManager::ConnectionTimedOutMsg );
+	else if( state == drwNetworkClient::ConnectionLost )
+		emit MessageFromThread( drwNetworkManager::ConnectionLostMsg );
+	else if( state == drwNetworkClient::WaitingForServer ||
+			 state == drwNetworkClient::WaitingForNbCommands ||
+			 state == drwNetworkClient::ReceivingScene )
+		emit MessageFromThread( drwNetworkManager::ReceivingSceneMsg );
+	else if( state == drwNetworkClient::Operating )
+		emit MessageFromThread( drwNetworkManager::ConnectedMsg );
 }
 
 void drwInThreadAgent::Reset()

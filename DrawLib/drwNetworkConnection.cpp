@@ -2,11 +2,14 @@
 #include <QtNetwork>
 #include <QProcessEnvironment>
 
+// Server mode connection - socket is already created
+// Server needs to read client user name before starting to send commands
 drwNetworkConnection::drwNetworkConnection( QTcpSocket * socket, QObject * parent ) 
 : QObject(parent)
 , m_socket( socket )
 , m_peerAddress( socket->peerAddress() )
-, m_ready(false)
+, m_nextRead( drwNetworkConnection::PeerNameSize )
+, m_nextReadSize( sizeof(quint16) )
 {
 	m_userName = ComputeUserName();
 	m_socket->setSocketOption( QAbstractSocket::LowDelayOption, 1 );  // make sure commands are not buffered before sending
@@ -14,13 +17,17 @@ drwNetworkConnection::drwNetworkConnection( QTcpSocket * socket, QObject * paren
 	connect( m_socket, SIGNAL(disconnected()), this, SLOT(SocketDisconnected()) );
 }
 
+// Client mode connection - need to create the socket
+// client sends username and starts waiting for commands as soon as the server has accepted request to connect
 drwNetworkConnection::drwNetworkConnection( QString peerUserName, QHostAddress & address, QObject *parent ) 
 : QObject(parent)
 , m_socket(0)
 , m_peerUserName( peerUserName )
 , m_peerAddress( address )
-, m_ready( false )
+, m_nextRead( drwNetworkConnection::CommandHeader )
+, m_nextReadSize( sizeof(int) )
 {
+	m_userName = ComputeUserName();
 	m_socket = new QTcpSocket(this);
 	m_socket->setSocketOption( QAbstractSocket::LowDelayOption, 1 );  // make sure commands are not buffered before sending
 	connect( m_socket, SIGNAL(connected()), this, SLOT(SocketConnected()) );
@@ -45,66 +52,61 @@ void drwNetworkConnection::Disconnect()
 
 void drwNetworkConnection::SendCommand( drwCommand::s_ptr command )
 {
-	if( m_ready )
-	{
-		QDataStream stream( m_socket );
-		command->Write( stream );
-		m_socket->flush();
-	}
+	QDataStream stream( m_socket );
+	command->Write( stream );
+	m_socket->flush();
 }
 
 void drwNetworkConnection::processReadyRead()
 {
-	if( !m_ready )
+	while( m_nextReadSize < m_socket->bytesAvailable() )
 	{
-		// We didn't initiate the connection, we must get the peer's username
-		m_peerUserName = ReadString();
-		m_ready = true;
-		emit( ConnectionReady( this ) );
-	}
-	else 
-	{
-		QDataStream stream( m_socket );
-		bool enoughData = true;
-		while( enoughData )
+		if( m_nextRead == PeerNameSize )
 		{
-			int bytesAvailable = m_socket->bytesAvailable();
-			if( !m_pendingCommand )
-			{
-				// we need to read header
-				if( bytesAvailable >= drwCommand::HeaderSize() )
-					m_pendingCommand = drwCommand::ReadHeader( stream );
-				else 
-					enoughData = false;
-			}
-			else 
-			{
-				// read the body of the command now that we know what size it is
-				if( bytesAvailable >= m_pendingCommand->BodySize() )
-				{
-					m_pendingCommand->Read( stream );
-					emit CommandReceived( m_pendingCommand );
-					m_pendingCommand.reset();
-				}
-				else
-					enoughData = false;
-			}
+			quint16 stringLength;
+			m_socket->read( (char*)(&stringLength), sizeof(quint16) );
+			m_nextReadSize = stringLength;
+			m_nextRead = PeerName;
+		}
+		else if( m_nextRead == PeerName )
+		{
+			QByteArray buffer( m_nextReadSize, '\0' );
+			m_socket->read( buffer.data(), m_nextReadSize );
+			m_peerUserName = buffer;
+			m_nextReadSize = drwCommand::HeaderSize();
+			m_nextRead = CommandHeader;
+			emit ConnectionReady( this );  // server connection is ready
+		}
+		else if( m_nextRead == CommandHeader )
+		{
+			QDataStream stream( m_socket );
+			m_pendingCommand = drwCommand::ReadHeader( stream );
+			m_nextReadSize = m_pendingCommand->BodySize();
+			m_nextRead = CommandBody;
+		}
+		else if( m_nextRead == CommandBody )
+		{
+			QDataStream stream( m_socket );
+			m_pendingCommand->Read( stream );
+			emit CommandReceived( m_pendingCommand );
+			m_pendingCommand.reset();
+			m_nextReadSize = drwCommand::HeaderSize();
+			m_nextRead = CommandHeader;
 		}
 	}
 }
 
+// This is called when the server has accepted the connection. We then send
+// our username and wait for server to send all its info
 void drwNetworkConnection::SocketConnected()
-{
-	m_ready = true;
-	
-	// Listen to what is received through the socket
-	connect( m_socket, SIGNAL(readyRead()), this, SLOT(processReadyRead()) );
-	
+{	
 	// Send username to peer
 	SendString( m_userName );
-	
-	// Tell clients the connection is ready
-	emit(ConnectionReady( this ));
+		
+	// Listen to what is received through the socket
+	connect( m_socket, SIGNAL(readyRead()), this, SLOT(processReadyRead()) );
+
+	emit ConnectionReady( this ); // client connection is ready
 }
 
 void drwNetworkConnection::SocketDisconnected()
@@ -133,16 +135,3 @@ void drwNetworkConnection::SendString( const QString & message )
 	m_socket->write( msg.data(), msgLength );
 }
 
-QString drwNetworkConnection::ReadString()
-{
-	QString res;
-	quint16 stringLength;
-	m_socket->read( (char*)(&stringLength), sizeof(quint16) );
-	if( stringLength != 0 )
-	{
-		QByteArray buffer( stringLength, '\0' );
-		m_socket->read( buffer.data(), stringLength );
-		res = buffer;
-	}
-	return res;
-}

@@ -50,7 +50,7 @@ drwCommand::s_ptr drwDrawingWidget::CreateMouseCommand( drwMouseCommand::MouseCo
 	double xWorld = 0.0;
 	double yWorld = 0.0;
 	theCamera.WindowToWorld( xWin, yWin, xWorld, yWorld );
-	drwCommand::s_ptr command( new drwMouseCommand( 0, commandType, xWorld, yWorld, 0.0, 0, 0, 1.0, 0.0, 0.0 ) );
+	drwCommand::s_ptr command( new drwMouseCommand( commandType, xWorld, yWorld, 0.0, 0, 0, 1.0, 0.0, 0.0 ) );
 	return command;
 }
 
@@ -63,7 +63,7 @@ drwCommand::s_ptr drwDrawingWidget::CreateMouseCommand( drwMouseCommand::MouseCo
 	double xWorld = 0.0;
 	double yWorld = 0.0;
 	theCamera.WindowToWorld( xWin, yWin, xWorld, yWorld );
-	drwCommand::s_ptr command( new drwMouseCommand( 0, commandType, xWorld, yWorld, 0.0, e->xTilt(), e->yTilt(), e->pressure(), e->rotation(), e->tangentialPressure() ) );
+	drwCommand::s_ptr command( new drwMouseCommand( commandType, xWorld, yWorld, 0.0, e->xTilt(), e->yTilt(), e->pressure(), e->rotation(), e->tangentialPressure() ) );
 	return command;
 }
 

@@ -21,6 +21,7 @@
 const QString MainWindow::m_appName( "Lines" );
 
 MainWindow::MainWindow()
+	: m_progressDialog(0)
 {
     setWindowTitle( m_appName );
 
@@ -30,10 +31,11 @@ MainWindow::MainWindow()
 	m_scene = new Scene(this);
 	m_scene->SetNumberOfFrames( 30 );
 	m_controler = new PlaybackControler(m_scene, this);
-	m_observer = new drwToolbox( 0, m_scene, m_controler->GetEditionState(), this );
+	m_localToolbox = new drwToolbox( m_scene, m_controler->GetEditionState(), this );
 	m_commandDb = new drwCommandDatabase(this);
 	m_networkManager = new drwNetworkManager();
-	m_commandDispatcher = new drwCommandDispatcher( m_networkManager, m_commandDb, m_observer, m_scene, this );
+	m_commandDispatcher = new drwCommandDispatcher( m_networkManager, m_commandDb, m_localToolbox, m_scene, this );
+	m_networkManager->SetDispatcher( m_commandDispatcher );
 
 	// Create main widget  (just a frame to put the viewing widget and the playback control widget)
 	QWidget * mainWidget = new QWidget(this);
@@ -45,7 +47,7 @@ MainWindow::MainWindow()
 	m_glWidget = new drwDrawingWidget(mainWidget);
 	m_glWidget->setMinimumSize( 100, 100 );
 	m_glWidget->SetCurrentScene( m_scene );
-	m_glWidget->SetObserver( m_observer );
+	m_glWidget->SetObserver( m_localToolbox );
 	m_glWidget->SetControler( m_controler );
 	mainLayout->addWidget( m_glWidget );
 	
@@ -92,8 +94,8 @@ MainWindow::MainWindow()
 	//m_dockTabletState->setFloating(true);
 	
 	// connect objects
-	connect( m_observer, SIGNAL(StartInteraction()), m_controler, SLOT(StartInteraction()) );
-	connect( m_observer, SIGNAL(EndInteraction()), m_controler, SLOT(EndInteraction()) );
+	connect( m_localToolbox, SIGNAL(StartInteraction()), m_controler, SLOT(StartInteraction()) );
+	connect( m_localToolbox, SIGNAL(EndInteraction()), m_controler, SLOT(EndInteraction()) );
 	
 	// Read Application settings
 	readSettings();
@@ -169,7 +171,7 @@ void MainWindow::fileOpen()
 	
 	// block signal transmission before reading
 	m_scene->blockSignals( true );
-	m_observer->blockSignals( true );
+	m_localToolbox->blockSignals( true );
 	
 	// Read
 	connect( m_commandDb, SIGNAL( CommandRead(drwCommand::s_ptr) ), m_commandDispatcher, SLOT( IncomingDbCommand( drwCommand::s_ptr ) ) );
@@ -177,7 +179,7 @@ void MainWindow::fileOpen()
 	disconnect( m_commandDb, SIGNAL( CommandRead(drwCommand::s_ptr) ), m_commandDispatcher, SLOT( IncomingDbCommand( drwCommand::s_ptr ) ) );
 	
 	// Re-enable signal transmission
-	m_observer->blockSignals( false );
+	m_localToolbox->blockSignals( false );
 	m_scene->blockSignals( false );
 	
 	m_scene->MarkModified();
@@ -263,21 +265,59 @@ void MainWindow::NetShareSession()
 
 void MainWindow::NetConnect()
 {
+	// Get the user to select the server to connect to
 	drwNetworkConnectDialog * dlg = new drwNetworkConnectDialog( this );
 	int result = dlg->exec();
-	if( result == QDialog::Accepted )
+	QString name;
+	QHostAddress address;
+	if( result != QDialog::Accepted || !dlg->GetSelectedUserAndAddress( name, address ) )
 	{
-		QString name;
-		QHostAddress address;
-		bool isSelValid = dlg->GetSelectedUserAndAddress( name, address );
-		if( isSelValid )
-		{
-			// todo : clear current scene and reset everything file->new
-			m_networkManager->Connect( name, address );
-		}
+		delete dlg;
+		UpdateNetworkStatus();
+		return;
 	}
 	delete dlg;
+
+	// Now we have a valid username and ip, try to connect
+	// todo : clear current scene and reset everything file->new
+	m_networkManager->Connect( name, address );
+
+	// Create a timer to update a progress dialog
+	QTimer timer;
+	connect( &timer, SIGNAL(timeout()), this, SLOT(NetConnectProgress()) );
+	timer.start( 200 );
+
+	// Create progress dialog and start it
+	m_progressDialog = new QProgressDialog( "Connecting", "Cancel", 0, 100 );
+	m_progressDialog->exec();
+
+	// todo : If the operation didn't succeed, clear the scene again
+
 	UpdateNetworkStatus();
+}
+
+void MainWindow::NetConnectProgress()
+{
+	drwNetworkManager::NetworkState state = m_networkManager->GetState();
+	if( state == drwNetworkManager::WaitingForConnection )
+	{
+		m_progressDialog->setLabelText("Waiting for server...");
+	}
+	else if( state == drwNetworkManager::ReceivingScene )
+	{
+		// get progress and set it
+		double percent = m_networkManager->GetPercentRead();
+		m_progressDialog->setValue( percent );
+		m_progressDialog->setLabelText("Receiving animation...");
+	}
+	else if( state == drwNetworkManager::Connected )
+	{
+		m_progressDialog->accept();
+	}
+	else
+	{
+		m_progressDialog->cancel();
+	}
 }
 
 void MainWindow::UpdateNetworkStatus()
@@ -495,7 +535,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 		}
 		else if( keyEvent->key() == Qt::Key_B )
 		{
-			m_observer->ToggleBrushEraser();
+			m_localToolbox->ToggleBrushEraser();
 		}
 	} 
 	if( !handled )

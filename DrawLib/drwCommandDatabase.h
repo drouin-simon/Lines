@@ -18,9 +18,11 @@ public:
 	
 	bool Read( const char * filename );
 	bool Write( const char * filename );
+	void ExecuteAll();
 	
 	bool IsModified() { return Modified; }
 	void Clear();
+	int GetNumberOfCommands() { return Commands.size(); }
 	
 signals:
 	

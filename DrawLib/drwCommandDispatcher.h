@@ -19,6 +19,8 @@ public:
 	
 	drwCommandDispatcher( drwNetworkManager * net, drwCommandDatabase * db, drwToolbox * local, Scene * scene, QObject * parent );
 	~drwCommandDispatcher();
+	drwCommandDatabase * GetDb() { return m_db; }
+	int RequestNewUserId();
 	
 public slots:
 	
@@ -34,7 +36,8 @@ protected:
 	drwCommandDatabase * m_db;
 	drwNetworkManager * m_netManager;
 
-	int m_localToolboxId;
+	static const int m_localToolboxId;
+	int m_lastUsedUserId;
 	typedef QMap< int, drwToolbox* > ToolboxContainer;
 	ToolboxContainer m_toolboxes;
 	
