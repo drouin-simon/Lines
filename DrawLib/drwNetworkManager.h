@@ -41,7 +41,8 @@ public:
 	bool IsConnected();
     void Connect( QString username, QHostAddress ip );
 
-    friend class drwInThreadAgent;
+	void SetMessageFromThread( MessageFromThread msg ) { m_messageFromThread = msg; }
+	friend class drwInThreadAgent;
 	
 public slots:
 
@@ -49,16 +50,15 @@ public slots:
 
 private slots:
 
-	void MessageFromThreadSlot( MessageFromThread );
+	void MessageFromThreadSlot();
 	
 signals:
 	
 	// signals for clients
 	void StateChangedSignal();
-	void CommandReceivedSignal( drwCommand::s_ptr );
 
 	// Signals used internally
-	void MessageToThreadSignal( MessageToThread message );
+	void MessageToThreadSignal();
 	void NewCommandsToSendSignal();
 	
 protected:
@@ -76,6 +76,7 @@ protected:
 	CommandContainer m_queuedCommands;
 	
 	drwInThreadAgent * m_inThread;
+	MessageFromThread m_messageFromThread;
 
 	NetworkState m_state;
 };
@@ -89,15 +90,18 @@ class drwInThreadAgent : public QObject
 	
 public:
 	
-	drwInThreadAgent( drwNetworkManager * man ) : m_manager(man) {}
+	drwInThreadAgent( drwNetworkManager * man )
+		: m_manager(man), m_client(0), m_server(0) {}
 	
 	void SetConnectAttributes( QString user, QHostAddress remoteIp );
 	double GetPercentRead();
 
+	void SetMessageToThread( drwNetworkManager::MessageToThread msg ) { m_messageToThread = msg; }
+
 public slots:
 	
 	void NewCommandsToSend();
-	void MessageToThreadSlot( drwNetworkManager::MessageToThread message );
+	void MessageToThreadSlot();
 
 private slots:
 
@@ -105,7 +109,7 @@ private slots:
 
 signals:
 
-	void MessageFromThread( drwNetworkManager::MessageFromThread message );
+	void MessageFromThreadSignal();
 	
 private:
 
@@ -118,6 +122,8 @@ private:
 
 	drwNetworkServer * m_server;
 	drwNetworkManager * m_manager;
+
+	drwNetworkManager::MessageToThread m_messageToThread;
 };
 
 #endif

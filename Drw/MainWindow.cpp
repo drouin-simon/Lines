@@ -36,6 +36,7 @@ MainWindow::MainWindow()
 	m_networkManager = new drwNetworkManager();
 	m_commandDispatcher = new drwCommandDispatcher( m_networkManager, m_commandDb, m_localToolbox, m_scene, this );
 	m_networkManager->SetDispatcher( m_commandDispatcher );
+	connect( m_networkManager, SIGNAL(StateChangedSignal()), this, SLOT(UpdateNetworkStatus()) );
 
 	// Create main widget  (just a frame to put the viewing widget and the playback control widget)
 	QWidget * mainWidget = new QWidget(this);
@@ -129,7 +130,6 @@ void MainWindow::CreateActions()
 	m_networkMenu = menuBar()->addMenu( "&Network" );
 	m_netShareSessionMenuAction = m_networkMenu->addAction( "Share session", this, SLOT( NetShareSession() ), Qt::CTRL + Qt::Key_T );
 	m_netConnectMenuItem = m_networkMenu->addAction( "Connect...", this, SLOT( NetConnect() ) );
-	connect( m_networkManager, SIGNAL(StateChangedSignal()), this, SLOT(UpdateNetworkStatus()) );
 	
 	// Create the View menu
 	m_viewMenu = menuBar()->addMenu( "&View" );

@@ -44,7 +44,8 @@ void drwNetworkManager::StartSharing()
 {
 	if( m_state == Idle )
 	{
-		emit MessageToThreadSignal( StartSharingMsg );
+		m_inThread->SetMessageToThread( StartSharingMsg );
+		emit MessageToThreadSignal();
 		SetState( Sharing );
 	}
 }
@@ -53,7 +54,8 @@ void drwNetworkManager::StopSharing()
 {
 	if( IsSharing() )
 	{
-		emit MessageToThreadSignal( StopSharingMsg );
+		m_inThread->SetMessageToThread( StopSharingMsg );
+		emit MessageToThreadSignal();
 		SetState( Idle );
 	}
 }
@@ -71,20 +73,21 @@ void drwNetworkManager::Connect( QString username, QHostAddress ip )
 	if( m_state == Idle )
 	{
 		m_inThread->SetConnectAttributes( username, ip );
-		emit MessageToThreadSignal( ConnectMsg );
+		m_inThread->SetMessageToThread( ConnectMsg );
+		emit MessageToThreadSignal();
 		m_state = WaitingForConnection;
 	}
 }
 
-void drwNetworkManager::MessageFromThreadSlot( MessageFromThread message )
+void drwNetworkManager::MessageFromThreadSlot()
 {
-	if( message == ConnectionTimedOutMsg )
+	if( m_messageFromThread == ConnectionTimedOutMsg )
 		SetState( ConnectionTimedOut );
-	if( message == ConnectionLostMsg )
+	if( m_messageFromThread == ConnectionLostMsg )
 		SetState( ConnectionLost );
-	if( message == ReceivingSceneMsg )
+	if( m_messageFromThread == ReceivingSceneMsg )
 		SetState( ReceivingScene );
-	if( message == ConnectedMsg )
+	if( m_messageFromThread == ConnectedMsg )
 		SetState( Connected );
 }
 
@@ -109,8 +112,8 @@ void drwNetworkManager::run()
 {
 	m_inThread = new drwInThreadAgent( this );
 	connect( this, SIGNAL(NewCommandsToSendSignal()), m_inThread, SLOT(NewCommandsToSend()), Qt::QueuedConnection );
-	connect( this, SIGNAL(MessageToThreadSignal(MessageToThread)), m_inThread, SLOT(MessageToThreadSlot(drwNetworkManager::MessageToThread)));
-	connect( m_inThread, SIGNAL(MessageFromThread(drwNetworkManager::MessageFromThread)), this, SLOT(MessageFromThreadSlot(MessageFromThread)));
+	connect( this, SIGNAL(MessageToThreadSignal()), m_inThread, SLOT(MessageToThreadSlot()), Qt::QueuedConnection );
+	connect( m_inThread, SIGNAL(MessageFromThreadSignal()), this, SLOT(MessageFromThreadSlot()), Qt::QueuedConnection );
 
 	// Start the thread's event loop
 	exec();
@@ -161,9 +164,9 @@ void drwInThreadAgent::NewCommandsToSend()
 	m_manager->m_queueMutex.unlock();
 }
 
-void drwInThreadAgent::MessageToThreadSlot( drwNetworkManager::MessageToThread message )
+void drwInThreadAgent::MessageToThreadSlot()
 {
-	if( message == drwNetworkManager::StartSharingMsg )
+	if( m_messageToThread == drwNetworkManager::StartSharingMsg )
 	{
 		if( !m_server )
 		{
@@ -171,11 +174,11 @@ void drwInThreadAgent::MessageToThreadSlot( drwNetworkManager::MessageToThread m
 			m_server->Start();
 		}
 	}
-	else if( message == drwNetworkManager::StopSharingMsg )
+	else if( m_messageToThread == drwNetworkManager::StopSharingMsg )
 	{
 		Reset();
 	}
-	else if( message == drwNetworkManager::ConnectMsg )
+	else if( m_messageToThread == drwNetworkManager::ConnectMsg )
 	{
 		if( !m_client )
 		{
@@ -186,11 +189,11 @@ void drwInThreadAgent::MessageToThreadSlot( drwNetworkManager::MessageToThread m
 			m_client->Connect();
 		}
 	}
-	else if( message == drwNetworkManager::DisconnectMsg )
+	else if( m_messageToThread == drwNetworkManager::DisconnectMsg )
 	{
 		Reset();
 	}
-	else if( message == drwNetworkManager::ResetMsg )
+	else if( m_messageToThread == drwNetworkManager::ResetMsg )
 	{
 		Reset();
 	}
@@ -200,15 +203,27 @@ void drwInThreadAgent::ClientStateChanged()
 {
 	drwNetworkClient::ClientState state = m_client->GetState();
 	if( state == drwNetworkClient::ConnectionTimedOut )
-		emit MessageFromThread( drwNetworkManager::ConnectionTimedOutMsg );
+	{
+		m_manager->SetMessageFromThread( drwNetworkManager::ConnectionTimedOutMsg );
+		emit MessageFromThreadSignal();
+	}
 	else if( state == drwNetworkClient::ConnectionLost )
-		emit MessageFromThread( drwNetworkManager::ConnectionLostMsg );
+	{
+		m_manager->SetMessageFromThread( drwNetworkManager::ConnectionLostMsg );
+		emit MessageFromThreadSignal();
+	}
 	else if( state == drwNetworkClient::WaitingForServer ||
 			 state == drwNetworkClient::WaitingForNbCommands ||
 			 state == drwNetworkClient::ReceivingScene )
-		emit MessageFromThread( drwNetworkManager::ReceivingSceneMsg );
+	{
+		m_manager->SetMessageFromThread( drwNetworkManager::ReceivingSceneMsg );
+		emit MessageFromThreadSignal();
+	}
 	else if( state == drwNetworkClient::Operating )
-		emit MessageFromThread( drwNetworkManager::ConnectedMsg );
+	{
+		m_manager->SetMessageFromThread( drwNetworkManager::ConnectedMsg );
+		emit MessageFromThreadSignal();
+	}
 }
 
 void drwInThreadAgent::Reset()
