@@ -108,6 +108,8 @@ class drwServerInitialCommand : public drwCommand
 
 public:
 
+	drwServerInitialCommand()
+		: NumberOfCommands( 0 ){}
 	drwServerInitialCommand( int nbCommands )
 		: NumberOfCommands( nbCommands ){}
 	drwServerInitialCommand( drwServerInitialCommand & other )

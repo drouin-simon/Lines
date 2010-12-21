@@ -13,15 +13,21 @@ drwCommand::s_ptr drwCommand::InstanciateSubclass( drwCommandId id )
 	s_ptr newCommand;
 	switch (id) 
 	{
-		case drwIdSetFrameCommand:
-			newCommand.reset( new drwSetFrameCommand );
-			break;
-		case drwIdMouseCommand:
-			newCommand.reset( new drwMouseCommand );
-			break;
-		case drwIdSetPersistenceCommand:
-			newCommand.reset( new drwSetPersistenceCommand );
-			break;
+	case drwIdSetFrameCommand:
+		newCommand.reset( new drwSetFrameCommand );
+		break;
+	case drwIdMouseCommand:
+		newCommand.reset( new drwMouseCommand );
+		break;
+	case drwIdSetPersistenceCommand:
+		newCommand.reset( new drwSetPersistenceCommand );
+		break;
+	case drwIdServerInitialCommand:
+		newCommand.reset( new drwServerInitialCommand );
+		break;
+	default:
+		Q_ASSERT(0); // If we get here, we try to read a command type that is not yet defined.
+		break;
 	}
 	return newCommand;
 }
