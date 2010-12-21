@@ -59,7 +59,7 @@ void drwNetworkConnection::SendCommand( drwCommand::s_ptr command )
 
 void drwNetworkConnection::processReadyRead()
 {
-	while( m_nextReadSize < m_socket->bytesAvailable() )
+	while( m_nextReadSize <= m_socket->bytesAvailable() )
 	{
 		if( m_nextRead == PeerNameSize )
 		{
