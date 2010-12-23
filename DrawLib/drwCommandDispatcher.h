@@ -21,16 +21,19 @@ public:
 	~drwCommandDispatcher();
 	drwCommandDatabase * GetDb() { return m_db; }
 	int RequestNewUserId();
+	void Reset();
+	
+	void IncomingNetCommand( drwCommand::s_ptr );
 	
 public slots:
 	
-	void IncomingNetCommand( drwCommand::s_ptr );
 	void IncomingLocalCommand( drwCommand::s_ptr );
 	void IncomingDbCommand( drwCommand::s_ptr command );
 	
 protected:
 	
 	drwToolbox * AddUser( int commandUserId );
+	void ClearAllToolboxesButLocal();
 	
 	Scene * m_scene;
 	drwCommandDatabase * m_db;

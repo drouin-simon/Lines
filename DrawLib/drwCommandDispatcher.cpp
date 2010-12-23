@@ -2,6 +2,7 @@
 #include "drwToolbox.h"
 #include "drwCommandDatabase.h"
 #include "drwNetworkManager.h"
+#include "Scene.h"
 
 const int drwCommandDispatcher::m_localToolboxId = 0;
 
@@ -34,6 +35,16 @@ drwCommandDispatcher::~drwCommandDispatcher()
 int drwCommandDispatcher::RequestNewUserId()
 {
 	return ++m_lastUsedUserId;
+}
+
+void drwCommandDispatcher::Reset()
+{
+	m_scene->Clear();
+	m_db->Clear();
+	ClearAllToolboxesButLocal();
+	drwToolbox * local = m_toolboxes[ m_localToolboxId ];
+	local->Reset();
+	m_lastUsedUserId = 0;
 }
 
 void drwCommandDispatcher::IncomingNetCommand( drwCommand::s_ptr command )
@@ -76,3 +87,16 @@ drwToolbox * drwCommandDispatcher::AddUser( int commandUserId )
 		m_lastUsedUserId = commandUserId;
 	return newUser;
 }
+
+void drwCommandDispatcher::ClearAllToolboxesButLocal()
+{
+	drwToolbox * local = m_toolboxes[ m_localToolboxId ];
+	foreach( drwToolbox * current, m_toolboxes )
+	{
+		if( current != local )
+			delete current;
+	}
+	m_toolboxes.clear();
+	m_toolboxes[ m_localToolboxId ] = local;
+}
+

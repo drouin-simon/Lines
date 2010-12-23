@@ -69,6 +69,7 @@ private:
 	bool maybeSave();
 	void readSettings();
 	void writeSettings();
+	void Reset();
 	
 	QString m_filename;
 	QString m_fileDialogStartPath;

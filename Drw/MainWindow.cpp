@@ -151,9 +151,7 @@ void MainWindow::fileNew()
 	if( !maybeSave() )
 		return;
 	
-	m_commandDb->Clear();
-	m_scene->Clear();
-	m_filename = "";
+	Reset();
 }
 
 void MainWindow::fileOpen()
@@ -279,7 +277,8 @@ void MainWindow::NetConnect()
 	delete dlg;
 
 	// Now we have a valid username and ip, try to connect
-	// todo : clear current scene and reset everything file->new
+	Reset();
+	m_scene->blockSignals( true );
 	m_networkManager->Connect( name, address );
 
 	// Create a timer to update a progress dialog
@@ -291,6 +290,8 @@ void MainWindow::NetConnect()
 	m_progressDialog = new QProgressDialog( "Connecting", "Cancel", 0, 100 );
 	m_progressDialog->exec();
 
+	m_scene->blockSignals( false );
+	
 	// todo : If the operation didn't succeed, clear the scene again
 
 	UpdateNetworkStatus();
@@ -478,6 +479,12 @@ void MainWindow::writeSettings()
 	settings.setValue( "ExportDefaultPath", m_exportDefaultPath );
 	settings.setValue( "ExportResolution", m_exportRes );
 	
+}
+
+void MainWindow::Reset()
+{
+	m_commandDispatcher->Reset();
+	m_filename = "";
 }
 
 void MainWindow::about()

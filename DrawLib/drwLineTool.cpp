@@ -209,7 +209,7 @@ void drwLineTool::Reset()
 {
 	Color = Vec3(1.0,1.0,1.0);
 	IsDrawing = false;
-	Type = TypeLine;
+	Type = TypeWideLine;
 	LastXWorld = 0;
 	LastYWorld = 0;
 	m_baseWidth = 10.0;
