@@ -109,7 +109,7 @@ void drwNetworkServer::ConnectionReadySlot( drwNetworkConnection * connection )
 	connection->SendCommand( command );
 
 	// Send all commands in the database.
-	connect( db, SIGNAL(CommandRead(drwCommand::s_ptr)), connection, SLOT(SendCommand(drwCommand::s_ptr)) );
+	connect( db, SIGNAL(CommandRead(drwCommand::s_ptr)), connection, SLOT(SendCommand(drwCommand::s_ptr)), Qt::DirectConnection);
 	db->ExecuteAll();
 	disconnect(db, SIGNAL(CommandRead(drwCommand::s_ptr)), connection, SLOT(SendCommand(drwCommand::s_ptr)) );
 }
