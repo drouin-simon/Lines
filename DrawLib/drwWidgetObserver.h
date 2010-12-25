@@ -32,8 +32,6 @@ public:
 	virtual void Reset() {}
 	virtual void ToggleBrushEraser() {}
 	
-public slots:
-	
 	virtual void ExecuteCommand( drwCommand::s_ptr command ) {}
 	virtual void SetPersistence( int nbFrames ) { Persistence = nbFrames; }
 	

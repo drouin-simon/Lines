@@ -15,6 +15,7 @@ drwNetworkServer::drwNetworkServer( drwCommandDispatcher * dispatcher, QObject *
 , m_dispatcher( dispatcher )
 {
 	m_userName = drwNetworkConnection::ComputeUserName();
+	m_translatedLocalUserId = m_dispatcher->RequestNewUserId();
 	
 	m_broadcastSocket = new QUdpSocket(this);
 	
@@ -151,6 +152,12 @@ void drwNetworkServer::CommandReceivedSlot( drwCommand::s_ptr com )
 // Local command, must be sent to all connected clients
 void drwNetworkServer::SendCommand( drwCommand::s_ptr command )
 {
+	// Translate local command Ids
+	int commandId = command->GetUserId();
+	if( commandId == m_dispatcher->GetLocalUserId() )
+		command->SetUserId( m_translatedLocalUserId );
+	
+	// Send the command to all connections
 	ConnectionsContainer::iterator it = m_connections.begin();
 	while( it != m_connections.end() )
 	{

@@ -21,6 +21,7 @@ public:
 	~drwCommandDispatcher();
 	drwCommandDatabase * GetDb() { return m_db; }
 	int RequestNewUserId();
+	int GetLocalUserId() { return m_localToolboxId; }
 	void Reset();
 	
 	void IncomingNetCommand( drwCommand::s_ptr );

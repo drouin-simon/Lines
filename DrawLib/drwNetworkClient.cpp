@@ -22,10 +22,16 @@ drwNetworkClient::~drwNetworkClient()
 		Disconnect();
 }
 
-double drwNetworkClient::GetPercentRead()
+int drwNetworkClient::GetPercentRead()
 {
-	double diff = m_totalNumberOfCommandsToRead - m_numberOfCommandsToRead;
-	return diff / m_totalNumberOfCommandsToRead;
+	if( m_totalNumberOfCommandsToRead != 0 )
+	{
+		double diff = m_totalNumberOfCommandsToRead - m_numberOfCommandsToRead;
+		double frac = diff / m_totalNumberOfCommandsToRead;
+		int percent = (int)round( frac * 100.0 );
+		return percent;
+	}
+	return 0;
 }
 
 void drwNetworkClient::Connect( )

@@ -23,14 +23,11 @@ public:
 	bool IsModified() { return Modified; }
 	void Clear();
 	int GetNumberOfCommands() { return Commands.size(); }
+	void PushCommand( drwCommand::s_ptr command );
 	
 signals:
 	
 	void CommandRead( drwCommand::s_ptr command );
-	
-public slots:
-	
-	void PushCommand( drwCommand::s_ptr command );
 	
 protected:
 	

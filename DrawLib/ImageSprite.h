@@ -17,9 +17,6 @@ public:
 	ImageSprite();
 	~ImageSprite();
 	void SetImage( QImage & image );
-	
-	// TODO
-	virtual void ExportToSWF( drwSWFWriter & writer ) {}
 		
 protected:
 	

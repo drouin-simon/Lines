@@ -129,14 +129,7 @@ void drwDrawingWidget::SetCurrentScene( Scene * cur )
 
 void drwDrawingWidget::RequestRedraw()
 {
-	// If we are in the main thread, repaint as soon as possible. If not, it can wait until the next idle moment
-	if( QApplication::instance()->thread() == QThread::currentThread() )
-		updateGL();
-	else
-	{
-		// post a paint event
-		QMetaObject::invokeMethod(this, "updateGL", Qt::AutoConnection);
-	}
+	updateGL();
 }
 
 void drwDrawingWidget::CurrentFrameChanged()

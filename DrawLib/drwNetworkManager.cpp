@@ -139,13 +139,13 @@ void drwInThreadAgent::SetConnectAttributes( QString user, QHostAddress remoteIp
 	m_attributesMutex.unlock();
 }
 
-double drwInThreadAgent::GetPercentRead()
+int drwInThreadAgent::GetPercentRead()
 {
 	if( m_client )
 	{
 		return m_client->GetPercentRead();
 	}
-	return 0.0;
+	return 0;
 }
 
 void drwInThreadAgent::NewCommandsToSend()

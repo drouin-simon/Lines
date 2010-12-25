@@ -94,7 +94,7 @@ public:
 		: m_manager(man), m_client(0), m_server(0) {}
 	
 	void SetConnectAttributes( QString user, QHostAddress remoteIp );
-	double GetPercentRead();
+	int GetPercentRead();
 
 	void SetMessageToThread( drwNetworkManager::MessageToThread msg ) { m_messageToThread = msg; }
 

@@ -16,7 +16,7 @@ Q_OBJECT
 	
 public:
 	
-	drwToolbox( Scene * scene, drwEditionState * editionState, QObject * parent );
+	drwToolbox( Scene * scene, drwEditionState * editionState, QObject * parent = 0 );
 	virtual ~drwToolbox();
 	
 	void AddTool( drwWidgetObserver * tool );
@@ -37,19 +37,14 @@ public:
 	
 	void ToggleBrushEraser();
 	
-public slots:
-	
 	virtual void SetPersistence( int nbFrames );
+	void ExecuteCommand( drwCommand::s_ptr );
 	
 private slots:
 	
 	void NotifyCommandExecuted( drwCommand::s_ptr command );
 	void NotifyStartInteraction();
 	void NotifyEndInteraction();
-	
-public slots:
-	
-	void ExecuteCommand( drwCommand::s_ptr );
 	
 protected:
 	

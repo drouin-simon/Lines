@@ -81,7 +81,7 @@ void drwCommandDispatcher::IncomingDbCommand( drwCommand::s_ptr command )
 
 drwToolbox * drwCommandDispatcher::AddUser( int commandUserId )
 {
-	drwToolbox * newUser = new drwToolbox( m_scene, NULL, this );
+	drwToolbox * newUser = new drwToolbox( m_scene, NULL );
 	m_toolboxes[ commandUserId ] = newUser;
 	if( m_lastUsedUserId < commandUserId )
 		m_lastUsedUserId = commandUserId;

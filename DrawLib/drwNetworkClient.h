@@ -20,7 +20,7 @@ public:
 	drwNetworkClient( QString & userName, QHostAddress & address, drwCommandDispatcher * dispatcher );
 	~drwNetworkClient();
 
-	double GetPercentRead();
+	int GetPercentRead();
 
 	ClientState GetState() { return m_state; }
 	

@@ -24,20 +24,26 @@ Scene::~Scene()
 
 void Scene::Clear()
 {
+	m_nodesMutex.lock();
 	for( unsigned i = 0; i < Frames.size(); ++i )
 		Frames[i].Clear();
 	AlwaysDisplayed.Clear();
+	m_nodesMutex.unlock();
 }
 
 void Scene::DrawPersistent( const drwDrawingContext & context )
 {
+	m_nodesMutex.lock();
 	AlwaysDisplayed.Draw( context );
+	m_nodesMutex.unlock();
 }
 
 void Scene::DrawFrame( int frame, const drwDrawingContext & context )
 {
+	m_nodesMutex.lock();
 	if( frame < (int)Frames.size() && frame >= 0 )
 		Frames[ frame ].Draw( context );
+	m_nodesMutex.unlock();
 }
 
 
@@ -69,8 +75,10 @@ Node * Scene::GetNodeById( int frame, GLuint Id )
 
 void Scene::SetNumberOfFrames( int nbFrames )
 {
+	m_nodesMutex.lock();
 	Frames.resize( nbFrames );
 	emit NumberOfFramesChanged( nbFrames );
+	m_nodesMutex.unlock();
 }
 
 void Scene::InsertFrame( int beforeThisFrame )

@@ -52,6 +52,7 @@ private:
 	typedef QMap< drwNetworkConnection*, int > ConnectionsContainer;
 	ConnectionsContainer m_connections;
 
+	int m_translatedLocalUserId;
 	drwCommandDispatcher * m_dispatcher;
 	
 };
