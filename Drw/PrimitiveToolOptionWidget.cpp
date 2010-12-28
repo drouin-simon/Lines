@@ -63,6 +63,7 @@ void PrimitiveToolOptionWidget::SetupUi()
 	setSizePolicy( mainPolicy );
 	
 	mainLayout = new QVBoxLayout();
+	mainLayout->setContentsMargins( 9, 0, 9, 0 );
 	setLayout( mainLayout );
 	{
 		frameChangeModeGroupBox = new QGroupBox(tr("Frame change mode"));

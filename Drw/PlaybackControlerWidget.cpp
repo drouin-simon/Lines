@@ -117,6 +117,7 @@ void PlaybackControlerWidget::SetupUi()
 	setSizePolicy( mainPolicy );
 	
 	mainLayout = new QHBoxLayout(this);
+	mainLayout->setContentsMargins( 9, 9, 9, 0 );
 	
 	// Current frame line edit
 	{

@@ -41,50 +41,35 @@ MainWindow::MainWindow()
 	// Create main widget  (just a frame to put the viewing widget and the playback control widget)
 	QWidget * mainWidget = new QWidget(this);
 	setCentralWidget( mainWidget );
-	QVBoxLayout * mainLayout = new QVBoxLayout(mainWidget);
+	QHBoxLayout * mainLayout = new QHBoxLayout(mainWidget);
 	mainLayout->setContentsMargins( 0, 0, 0, 0 );
+	mainLayout->setSpacing( 0 );
+
+	QVBoxLayout * drawingAreaLayout = new QVBoxLayout(mainWidget);
+	drawingAreaLayout->setContentsMargins( 0, 0, 0, 0 );
+	mainLayout->addLayout( drawingAreaLayout );
+	QVBoxLayout * rightPanelLayout = new QVBoxLayout( mainWidget );
+	drawingAreaLayout->setContentsMargins( 0, 0, 0, 0 );
+	mainLayout->addLayout( rightPanelLayout );
 	
-    // Create Viewing window
+	// Create Drawing window
 	m_glWidget = new drwDrawingWidget(mainWidget);
-	m_glWidget->setMinimumSize( 100, 100 );
+	m_glWidget->setMinimumSize( 400, 300 );
 	m_glWidget->SetCurrentScene( m_scene );
 	m_glWidget->SetObserver( m_localToolbox );
 	m_glWidget->SetControler( m_controler );
-	mainLayout->addWidget( m_glWidget );
+	drawingAreaLayout->addWidget( m_glWidget );
 	
 	// Create playback control widget
 	m_playbackControlerWidget = new PlaybackControlerWidget( m_glWidget->GetControler(), mainWidget );
-	mainLayout->addWidget( m_playbackControlerWidget );
-	
-	// Create the toolbox
-	m_dockToolsOptions = new QDockWidget(tr("Tool Options"));
-	m_toolOptionWidget = new PrimitiveToolOptionWidget( m_controler->GetEditionState(), m_dockToolsOptions );
-	m_dockToolsOptions->setWidget(m_toolOptionWidget);
-	m_viewMenu->addAction(m_dockToolsOptions->toggleViewAction());
-#ifdef Q_WS_X11
-	m_dockToolsOptions->setAllowedAreas( Qt::RightDockWidgetArea );
-	m_dockToolsOptions->setFeatures( QDockWidget::NoDockWidgetFeatures );
-	addDockWidget( Qt::RightDockWidgetArea, m_dockToolsOptions );
-#else
-	m_dockToolsOptions->setFeatures( QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetMovable );
-	m_dockToolsOptions->setFloating(true);
-	m_dockToolsOptions->show();
-#endif
-	
-	// Create the DisplaySettings widget
-	m_dockDisplayOptions = new QDockWidget(tr("Display options"));
-	m_displaySettingsWidget = new DisplaySettingsWidget( m_glWidget->GetDisplaySettings() );
-	m_dockDisplayOptions->setWidget(m_displaySettingsWidget);
-	m_viewMenu->addAction(m_dockDisplayOptions->toggleViewAction());
-#ifdef Q_WS_X11
-	m_dockDisplayOptions->setAllowedAreas( Qt::RightDockWidgetArea );
-	m_dockDisplayOptions->setFeatures( QDockWidget::NoDockWidgetFeatures );
-	addDockWidget( Qt::RightDockWidgetArea, m_dockDisplayOptions );
-#else
-	m_dockDisplayOptions->setFeatures( QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetMovable );
-	m_dockDisplayOptions->setFloating(true);
-	m_dockDisplayOptions->show();
-#endif
+	drawingAreaLayout->addWidget( m_playbackControlerWidget );
+
+	// Alternative right panel
+	m_toolOptionWidget = new PrimitiveToolOptionWidget( m_controler->GetEditionState(), mainWidget );
+	rightPanelLayout->addWidget( m_toolOptionWidget );
+	m_displaySettingsWidget = new DisplaySettingsWidget( m_glWidget->GetDisplaySettings(), mainWidget );
+	rightPanelLayout->addWidget( m_displaySettingsWidget );
+	rightPanelLayout->addStretch();
 	
 	// Create tablet state dock
 	m_dockTabletState = new QDockWidget(tr("Tablet State"));
@@ -92,8 +77,7 @@ MainWindow::MainWindow()
 	m_dockTabletState->setWidget(m_tabletStateWidget);
 	m_viewMenu->addAction(m_dockTabletState->toggleViewAction());
 	m_dockTabletState->setFeatures( QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetMovable );
-	//m_dockTabletState->setFloating(true);
-	
+
 	// connect objects
 	connect( m_localToolbox, SIGNAL(StartInteraction()), m_controler, SLOT(StartInteraction()) );
 	connect( m_localToolbox, SIGNAL(EndInteraction()), m_controler, SLOT(EndInteraction()) );
@@ -351,15 +335,15 @@ void MainWindow::viewFullscreen()
 	{
 		showNormal();
 		m_playbackControlerWidget->show();
-		m_dockToolsOptions->show();
-		m_dockDisplayOptions->show();
+		m_toolOptionWidget->show();
+		m_displaySettingsWidget->show();
 	}
 	else
 	{
 		showFullScreen();
 		m_playbackControlerWidget->hide();
-		m_dockToolsOptions->hide();
-		m_dockDisplayOptions->hide();
+		m_toolOptionWidget->hide();
+		m_displaySettingsWidget->hide();
 	}
 }
 
@@ -402,44 +386,13 @@ bool MainWindow::maybeSave()
 void MainWindow::readSettings()
 {
 	QSettings settings("SD", m_appName.toAscii() );
-	
-	// Compute widgets default sizes
-	QSize hintToolsOptions = m_dockToolsOptions->sizeHint();
-	QSize hintDisplayOptions = m_dockDisplayOptions->sizeHint();
-	int sideBarWidth = std::max( hintToolsOptions.width(), hintDisplayOptions.width() );
-	int toolsOptionsHeight = hintToolsOptions.height();
-	QRect screenRect( 0, 0, 800, 600 ); // Assuming no screen is smaller than 800x600
-	QDesktopWidget * desktop = QApplication::desktop();
-	if( desktop )
-		screenRect = desktop->availableGeometry( desktop->primaryScreen() );
-	int drawAreaWidth = screenRect.width() - sideBarWidth;
-	int drawAreaHeight = screenRect.height();
-	
-	QRect mainWindowRect( screenRect.topLeft(), QSize( drawAreaWidth, drawAreaHeight ) );
-	QRect toolsOptionsRect( screenRect.x() + drawAreaWidth, screenRect.y(), sideBarWidth, toolsOptionsHeight );
-	QRect displayOptionsRect( screenRect.x() + drawAreaWidth, screenRect.y() + toolsOptionsHeight, sideBarWidth, toolsOptionsHeight );
-	
+
 	// Main window settings
+	QRect mainWindowRect( 0, 0, 800, 600 );
 	QPoint pos = settings.value( "MainWindow_pos", mainWindowRect.topLeft() ).toPoint();
 	QSize size = settings.value( "MainWindow_size", mainWindowRect.size() ).toSize();
 	resize( size );
 	move( pos );
-	
-	// Tools options dock settings
-	pos = settings.value( "ToolsOptionsDock_pos", toolsOptionsRect.topLeft() ).toPoint();
-	size = settings.value( "ToolsOptionsDock_size", toolsOptionsRect.size() ).toSize();
-	bool visible = settings.value( "ToolsOptionsDock_visibility", true ).toBool();
-	m_dockToolsOptions->setVisible( visible );
-	m_dockToolsOptions->resize( size );
-	m_dockToolsOptions->move( pos );
-	
-	// Display options dock settings
-	pos = settings.value( "DisplayOptionsDock_pos", displayOptionsRect.topLeft() ).toPoint();
-	size = settings.value( "DisplayOptionsDock_size", displayOptionsRect.size() ).toSize();
-	visible = settings.value( "DisplayOptionsDock_visibility", true ).toBool();
-	m_dockDisplayOptions->setVisible( visible );
-	m_dockDisplayOptions->resize( size );
-	m_dockDisplayOptions->move( pos );
 	
 	// Save path
 	m_fileDialogStartPath = settings.value( "filedialogstartpath", QDir::homePath() ).toString();
@@ -447,7 +400,6 @@ void MainWindow::readSettings()
 	// Export settings
 	m_exportDefaultPath = settings.value( "ExportDefaultPath", QDir::homePath() ).toString();
 	m_exportRes = settings.value( "ExportResolution", QSize( 640, 360 ) ).toSize();
-		
 }
 
 
@@ -462,18 +414,6 @@ void MainWindow::writeSettings()
 	// Main window settings
 	settings.setValue( "MainWindow_pos", pos() );
 	settings.setValue( "MainWindow_size", size() );
-	
-	// Tools options dock settings
-	settings.setValue( "ToolsOptionsDock_pos", m_dockToolsOptions->pos() );
-	settings.setValue( "ToolsOptionsDock_size", m_dockToolsOptions->size() );
-	bool visible = m_dockToolsOptions->isVisible();
-	settings.setValue( "ToolsOptionsDock_visibility", visible );
-	
-	// Display options dock settings
-	settings.setValue( "DisplayOptionsDock_pos", m_dockDisplayOptions->pos() );
-	settings.setValue( "DisplayOptionsDock_size", m_dockDisplayOptions->size() );
-	visible = m_dockDisplayOptions->isVisible();
-	settings.setValue( "DisplayOptionsDock_visibility", visible );
 	
 	// File dialog settings
 	settings.setValue( "filedialogstartpath", m_fileDialogStartPath );

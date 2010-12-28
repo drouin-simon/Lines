@@ -65,6 +65,7 @@ void DisplaySettingsWidget::SetupUi()
 	setSizePolicy( mainPolicy );
 	
 	mainLayout = new QVBoxLayout;
+	mainLayout->setContentsMargins( 9, 0, 9, 0 );
 	setLayout( mainLayout );
 	
 	{

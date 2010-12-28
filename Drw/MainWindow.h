@@ -87,12 +87,8 @@ private:
 	QAction * m_netConnectMenuItem;
 	
 	PlaybackControlerWidget * m_playbackControlerWidget;
-	
 	PrimitiveToolOptionWidget * m_toolOptionWidget;
-	QDockWidget * m_dockToolsOptions;
-	
 	DisplaySettingsWidget * m_displaySettingsWidget;
-	QDockWidget * m_dockDisplayOptions;
 		
 	TabletStateWidget * m_tabletStateWidget;
 	QDockWidget * m_dockTabletState;
