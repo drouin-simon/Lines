@@ -111,7 +111,6 @@ void PlaybackControlerWidget::SetupUi()
 {
 	if( objectName().isEmpty() )
 		setObjectName(QString::fromUtf8("PlaybackControl"));
-	//resize(837, 52);
 	
 	QSizePolicy mainPolicy( QSizePolicy::Minimum, QSizePolicy::Fixed );
 	setSizePolicy( mainPolicy );
@@ -141,7 +140,7 @@ void PlaybackControlerWidget::SetupUi()
 		playPauseButton = new QPushButton( tr("Play"), this );
 		QSizePolicy policy( QSizePolicy::Fixed, QSizePolicy::Fixed );
 		playPauseButton->setSizePolicy( policy );
-		playPauseButton->setMinimumSize( 81, 32 );
+		playPauseButton->setMinimumWidth( 81 );
 	}
 	mainLayout->addWidget(playPauseButton);
 	

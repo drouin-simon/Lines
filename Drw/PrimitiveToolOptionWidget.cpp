@@ -68,6 +68,7 @@ void PrimitiveToolOptionWidget::SetupUi()
 	{
 		frameChangeModeGroupBox = new QGroupBox(tr("Frame change mode"));
 		frameChangeModeLayout = new QVBoxLayout;
+		frameChangeModeLayout->setSpacing( 15 );
 		frameChangeModeGroupBox->setLayout( frameChangeModeLayout );
 		manualFrameChangeRadio = new QRadioButton(tr("Manual"),frameChangeModeGroupBox);
 		frameChangeModeLayout->addWidget( manualFrameChangeRadio );

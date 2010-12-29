@@ -49,7 +49,8 @@ MainWindow::MainWindow()
 	drawingAreaLayout->setContentsMargins( 0, 0, 0, 0 );
 	mainLayout->addLayout( drawingAreaLayout );
 	QVBoxLayout * rightPanelLayout = new QVBoxLayout( mainWidget );
-	drawingAreaLayout->setContentsMargins( 0, 0, 0, 0 );
+	rightPanelLayout->setContentsMargins( 0, 10, 0, 10 );
+	rightPanelLayout->setSpacing( 15 );
 	mainLayout->addLayout( rightPanelLayout );
 	
 	// Create Drawing window
