@@ -16,6 +16,7 @@ set( DrawLib_src  drwDrawingWidget.cpp
 		wideline.cpp
 		Circle.cpp 
 		drwDrawableTexture.cpp
+        drwDrawingContext.cpp
 		TabletStateWidget.cpp
 		PlaybackControler.cpp 
 		ImageSprite.cpp 

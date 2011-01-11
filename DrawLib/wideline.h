@@ -4,6 +4,7 @@
 
 #include "drwDataArray.h"
 #include "LinePrimitive.h"
+#include "Box2d.h"
 
 class drwGlslShader;
 class drwDrawingContext;
@@ -31,10 +32,10 @@ protected:
 	drwVec3Array m_texCoord;
     drwIndexArray m_indices;
 
-    // Line width
-    double      m_width;
-	
+    // Line attributes
+    double m_width;
 	bool m_erasing;
+    Box2d m_boundingBox;
 
     // cache previous point computation during editing
     Vec2       m_prevPoint;

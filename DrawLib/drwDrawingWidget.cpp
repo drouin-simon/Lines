@@ -73,6 +73,10 @@ void drwDrawingWidget::WindowToWorld( double xWin, double yWin, double & xWorld,
 	theCamera.WindowToWorld( xWin, yWin, xWorld, yWorld );
 }
 
+void drwDrawingWidget::WorldToGLWindow( double xworld, double yworld, int & xwin, int & ywin )
+{
+    theCamera.WorldToGLWindow( xworld, yworld, xwin, ywin );
+}
 
 #define PICK_BUF_SIZE 512
 GLuint selectBuf[PICK_BUF_SIZE];

@@ -14,8 +14,10 @@ public:
 	void Release();
 	
 	void DrawToTexture( bool drawTo );
-	void DrawToScreen( int x, int y, int width, int height );
-	
+    void PasteToScreen( int x, int y, int width, int height );
+    void PasteToScreen();
+    void Clear( int x, int y, int width, int height );
+
 protected:
 	
 	unsigned m_texId;

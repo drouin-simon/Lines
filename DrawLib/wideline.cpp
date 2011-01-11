@@ -3,6 +3,7 @@
 #include "math.h"
 #include "drwGlslShader.h"
 #include "drwDrawingContext.h"
+#include "drwDrawableTexture.h"
 
 drwGlslShader * WideLine::m_shader = 0;
 
@@ -10,6 +11,7 @@ drwGlslShader * WideLine::m_shader = 0;
 WideLine::WideLine( double width, bool erasing ) 
 : m_width( width )
 , m_erasing( erasing )
+, m_boundingBox( 0.0, 0.0, 0.0, 0.0 )
 , m_prevPoint( 0, 0 )
 , m_prevPressure( 1.0 )
 {
@@ -25,6 +27,9 @@ void WideLine::InternDraw( const drwDrawingContext & context )
 {
 
 	// Draw line to texture in grayscale
+    drwDrawableTexture * tex = context.GetWorkingTexture();
+    tex->DrawToTexture( true );
+
 	if( !m_shader )
 		Init();
 	m_shader->UseProgram( true );
@@ -47,19 +52,37 @@ void WideLine::InternDraw( const drwDrawingContext & context )
 	glBlendEquation( GL_FUNC_ADD );
 	m_shader->UseProgram( false );
 
+    tex->DrawToTexture( false );
+
 	// Paste the texture to screen with the right color
+    int xWinMin = 0;
+    int yWinMin = 0;
+    context.WorldToGLWindow( m_boundingBox.GetXMin(), m_boundingBox.GetYMin(), xWinMin, yWinMin );
+    int xWinMax = 1;
+    int yWinMax = 1;
+    context.WorldToGLWindow( m_boundingBox.GetXMax(), m_boundingBox.GetYMax(), xWinMax, yWinMax );
+    int width = xWinMax - xWinMin + 1;
+    int height = yWinMax - yWinMin + 1;
+    tex->PasteToScreen( xWinMin, yWinMin, width, height );
+
 	//if( context.m_isOverridingColor )
 		//glColor4d( context.m_colorOverride[0], context.m_colorOverride[1], context.m_colorOverride[2], context.m_opacity );
 	//else
 		//glColor4d( Color[0], Color[1], Color[2], context.m_opacity );
 
 	// Erase trace on work texture
+    tex->DrawToTexture( true );
+    tex->Clear( xWinMin, yWinMin, width, height );
+    tex->DrawToTexture( false );
 }
 
 
 void WideLine::StartPoint( double x, double y, double pressure )
 {
 	double curWidth = m_width * pressure;
+
+    // Init bounding box
+    m_boundingBox.Init( x - curWidth, x + curWidth, y - curWidth, y + curWidth );
 	
 	int nextIndex = m_vertices.size();
 	m_vertices.push_back( Vec2( x, y ) );
@@ -118,6 +141,10 @@ void WideLine::AddPoint( double x, double y, double pressure )
 {
 	double prevWidth = m_width * m_prevPressure;
 	double curWidth = m_width * pressure;
+
+    // add current point bounding box to global bounding box
+    m_boundingBox.IncludePoint( x - curWidth, y - curWidth );
+    m_boundingBox.IncludePoint( x + curWidth, y + curWidth );
 	
 	Vec2 newPoint( x, y );
 	Vec2 direction = newPoint - m_prevPoint;

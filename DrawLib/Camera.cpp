@@ -1,5 +1,6 @@
 #include "Camera.h"
 #include "IncludeGl.h"
+#include "math.h"
 
 Camera::Camera()
 {
@@ -11,7 +12,8 @@ Camera::Camera()
     AdjustFrustum();
 }
 
-
+// WARNING: here, window coord are in window-system coordinate space (y=0 at the top of the window) and
+// world coordinates are in OpenGL space (y=0 at the bottom of the window). WorldToGLWindow (next function) is not the inverse operation.
 void Camera::WindowToWorld( int xwin, int ywin, double & xworld, double & yworld )
 {
     double ratio = (double)m_windowW / (double)m_windowH;
@@ -20,6 +22,14 @@ void Camera::WindowToWorld( int xwin, int ywin, double & xworld, double & yworld
     yworld = m_posY + ( (double)m_windowH/(double)2.0 - (double)ywin ) * m_virtWindowH/m_windowH;
 }
 
+// WARNING: here, window coordinates are in the OpenGL window space (y=0 at the bottom of the window)
+// this is not the inverse of the previous function (WindowToWorld)
+void Camera::WorldToGLWindow( double xworld, double yworld, int & xwin, int & ywin )
+{
+    double scaleFactor = m_windowH / m_virtWindowH;
+    xwin = (int)round( scaleFactor * ( xworld - m_posX ) );
+    ywin = (int)round( scaleFactor * ( yworld - m_posY ) );
+}
 
 void Camera::SetViewportSize( int w, int h )
 {

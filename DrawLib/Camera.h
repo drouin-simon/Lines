@@ -12,6 +12,7 @@ public:
     int GetWindowWidth()  { return m_windowW; }
 
     void WindowToWorld( int xwin, int ywin, double & xworld, double & yworld );
+    void WorldToGLWindow( double xworld, double yworld, int & xwin, int & ywin );
 
     void SetViewportSize( int w, int h );
 

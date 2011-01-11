@@ -78,7 +78,7 @@ void drwDrawableTexture::DrawToTexture( bool drawTo )
 // the texture on the screen, assuming the screen is the
 // same size as the texture. If it is not the case, scaling
 // will happen.
-void drwDrawableTexture::DrawToScreen( int x, int y, int width, int height )
+void drwDrawableTexture::PasteToScreen( int x, int y, int width, int height )
 {
 	glMatrixMode( GL_PROJECTION );
 	glPushMatrix();
@@ -93,8 +93,27 @@ void drwDrawableTexture::DrawToScreen( int x, int y, int width, int height )
 		glTexCoord2i( x + width, y + height );	glVertex2d( x + width, y + height );
 		glTexCoord2i( x, y + height );			glVertex2d( x, y + height );
 	}
+    glEnd();
 	glBindTexture( GL_TEXTURE_RECTANGLE_ARB, 0 );
 
 	glPopMatrix();
 	glMatrixMode( GL_MODELVIEW );
+}
+
+void drwDrawableTexture::Clear( int x, int y, int width, int height )
+{
+    glColor4d( 0.0, 0.0, 0.0, 0.0 );
+    glBegin( GL_QUADS );
+    {
+        glVertex2d( x, y );
+        glVertex2d( x + width, y );
+        glVertex2d( x + width, y + height );
+        glVertex2d( x, y + height );
+    }
+    glEnd();
+}
+
+void drwDrawableTexture::PasteToScreen()
+{
+    PasteToScreen( 0, 0, m_width, m_height );
 }
