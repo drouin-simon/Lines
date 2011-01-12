@@ -52,6 +52,8 @@ void drwDrawableTexture::Resize( int width, int height )
 {
 	if( m_texId && ( m_width != width || m_height != height ) )
 	{
+		m_width = width;
+		m_height = height;
 		glBindTexture( GL_TEXTURE_RECTANGLE_ARB, m_texId );
 		glTexImage2D( GL_TEXTURE_RECTANGLE_ARB, 0, 2, width, height, 0, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, 0 );
 		glBindTexture( GL_TEXTURE_RECTANGLE_ARB, 0 );
