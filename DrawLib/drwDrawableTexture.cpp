@@ -25,8 +25,8 @@ bool drwDrawableTexture::Init( int width, int height )
 	glBindTexture(GL_TEXTURE_RECTANGLE_ARB, m_texId );
 	glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-	glTexImage2D( GL_TEXTURE_RECTANGLE_ARB, 0, 2, width, height, 0, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, 0 );
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+	glTexImage2D( GL_TEXTURE_RECTANGLE_ARB, 0, 4, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0 );
 	glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0 );
 
 	// Init framebuffer
@@ -55,8 +55,13 @@ void drwDrawableTexture::Resize( int width, int height )
 		m_width = width;
 		m_height = height;
 		glBindTexture( GL_TEXTURE_RECTANGLE_ARB, m_texId );
-		glTexImage2D( GL_TEXTURE_RECTANGLE_ARB, 0, 2, width, height, 0, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, 0 );
+		glTexImage2D( GL_TEXTURE_RECTANGLE_ARB, 0, 4, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0 );
 		glBindTexture( GL_TEXTURE_RECTANGLE_ARB, 0 );
+
+		glBindFramebufferEXT( GL_FRAMEBUFFER_EXT, m_fbId );
+		glClearColor( 0.0, 0.0, 0.0, 0.0 );
+		glClear( GL_COLOR_BUFFER_BIT );
+		glBindFramebufferEXT( GL_FRAMEBUFFER_EXT, 0 );
 	}
 }
 

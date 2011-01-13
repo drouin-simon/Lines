@@ -27,8 +27,8 @@ void Camera::WindowToWorld( int xwin, int ywin, double & xworld, double & yworld
 void Camera::WorldToGLWindow( double xworld, double yworld, int & xwin, int & ywin )
 {
     double scaleFactor = m_windowH / m_virtWindowH;
-    xwin = (int)round( scaleFactor * ( xworld - m_posX ) );
-    ywin = (int)round( scaleFactor * ( yworld - m_posY ) );
+	xwin = (int)round( scaleFactor * ( xworld - m_left ) );
+	ywin = (int)round( scaleFactor * ( yworld - m_bottom ) );
 }
 
 void Camera::SetViewportSize( int w, int h )

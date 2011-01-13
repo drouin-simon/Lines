@@ -55,6 +55,7 @@ void WideLine::InternDraw( const drwDrawingContext & context )
     tex->DrawToTexture( false );
 
 	// Paste the texture to screen with the right color
+	glColor4d( 1.0, 0.0, 0.0, 1.0 );
     int xWinMin = 0;
     int yWinMin = 0;
     context.WorldToGLWindow( m_boundingBox.GetXMin(), m_boundingBox.GetYMin(), xWinMin, yWinMin );
