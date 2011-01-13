@@ -175,7 +175,8 @@ void drwDrawingWidget::DisplaySettingsModified()
 void drwDrawingWidget::initializeGL()
 {
 	// Enable texture mapping for sprites
-	glEnable( GL_TEXTURE_2D );
+	//glEnable( GL_TEXTURE_2D );
+	glEnable( GL_TEXTURE_RECTANGLE_ARB );
 	glDisable( GL_DEPTH_TEST );
 	
 	// Enable antialiasing of lines
