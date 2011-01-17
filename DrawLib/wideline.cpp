@@ -25,21 +25,18 @@ WideLine::~WideLine()
 
 void WideLine::InternDraw( const drwDrawingContext & context )
 {
-
 	// Draw line to texture in grayscale
+    glEnable( GL_BLEND );
+
     drwDrawableTexture * tex = context.GetWorkingTexture();
     tex->DrawToTexture( true );
+    glColor4d( 1.0, 1.0, 1.0, 1.0 );
 
 	if( !m_shader )
 		Init();
 	m_shader->UseProgram( true );
 	m_shader->SetVariable( "margin" , float(.5) );
 	m_shader->SetVariable( "erase", m_erasing );
-	
-	if( context.m_isOverridingColor )
-		glColor4d( context.m_colorOverride[0], context.m_colorOverride[1], context.m_colorOverride[2], context.m_opacity );
-	else
-		glColor4d( m_color[0] * context.m_opacity, m_color[1] * context.m_opacity, m_color[2] * context.m_opacity, context.m_opacity );
 		
 	if( !m_erasing )
 		glBlendEquation( GL_MAX );
@@ -55,7 +52,11 @@ void WideLine::InternDraw( const drwDrawingContext & context )
     tex->DrawToTexture( false );
 
 	// Paste the texture to screen with the right color
-	glColor4d( 1.0, 0.0, 0.0, 1.0 );
+    if( context.m_isOverridingColor )
+        glColor4d( context.m_colorOverride[0], context.m_colorOverride[1], context.m_colorOverride[2], 1.0 );
+    else
+        glColor4d( m_color[0] * context.m_opacity, m_color[1] * context.m_opacity, m_color[2] * context.m_opacity, 1.0 );
+
     int xWinMin = 0;
     int yWinMin = 0;
     context.WorldToGLWindow( m_boundingBox.GetXMin(), m_boundingBox.GetYMin(), xWinMin, yWinMin );
@@ -65,11 +66,6 @@ void WideLine::InternDraw( const drwDrawingContext & context )
     int width = xWinMax - xWinMin + 1;
     int height = yWinMax - yWinMin + 1;
     tex->PasteToScreen( xWinMin, yWinMin, width, height );
-
-	//if( context.m_isOverridingColor )
-		//glColor4d( context.m_colorOverride[0], context.m_colorOverride[1], context.m_colorOverride[2], context.m_opacity );
-	//else
-		//glColor4d( Color[0], Color[1], Color[2], context.m_opacity );
 
 	// Erase trace on work texture
     tex->DrawToTexture( true );
@@ -218,6 +214,7 @@ uniform bool erase; \
 \
 void main() \
 { \
+    gl_FragColor = gl_Color; \
 	float s = gl_TexCoord[0].x; \
 	float t = gl_TexCoord[0].y; \
 	float pressure = gl_TexCoord[0].z; \
@@ -230,16 +227,16 @@ void main() \
 		float fact = exp( exponent ); \
 		fact = fact * pressure; \
 		if( !erase ) \
-			gl_FragColor = gl_Color * fact; \
+            gl_FragColor[3] = fact; \
 		else \
-			gl_FragColor = 1.0 - (gl_Color * fact ); \
+            gl_FragColor[3] = 1.0 - fact; \
 	} \
 	else \
 	{ \
 		if( !erase ) \
-			gl_FragColor = gl_Color * pressure; \
+            gl_FragColor[3] = pressure; \
 		else \
-			gl_FragColor = 1.0 - ( gl_Color * pressure ); \
+            gl_FragColor[3] = 1.0 - pressure; \
 	} \
 }";
 

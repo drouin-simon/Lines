@@ -25,7 +25,7 @@ bool drwDrawableTexture::Init( int width, int height )
 	glBindTexture(GL_TEXTURE_RECTANGLE_ARB, m_texId );
 	glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 	glTexImage2D( GL_TEXTURE_RECTANGLE_ARB, 0, 4, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0 );
 	glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0 );
 
@@ -109,6 +109,12 @@ void drwDrawableTexture::PasteToScreen( int x, int y, int width, int height )
 
 void drwDrawableTexture::Clear( int x, int y, int width, int height )
 {
+    glDisable( GL_BLEND );
+    glMatrixMode( GL_PROJECTION );
+    glPushMatrix();
+    glLoadIdentity();
+    gluOrtho2D( 0, m_width, 0, m_height );
+
     glColor4d( 0.0, 0.0, 0.0, 0.0 );
     glBegin( GL_QUADS );
     {
@@ -118,6 +124,10 @@ void drwDrawableTexture::Clear( int x, int y, int width, int height )
         glVertex2d( x, y + height );
     }
     glEnd();
+
+    glPopMatrix();
+    glMatrixMode( GL_MODELVIEW );
+    glEnable( GL_BLEND );
 }
 
 void drwDrawableTexture::PasteToScreen()
