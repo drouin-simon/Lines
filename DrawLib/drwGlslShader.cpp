@@ -9,6 +9,7 @@ using namespace std;
 
 drwGlslShader::drwGlslShader() 
 	: m_glslShader(0)
+	, m_glslVertexShader(0)
 	, m_glslProg(0)
 	, m_init( false )
 {
@@ -29,66 +30,99 @@ void drwGlslShader::AddShaderMemSource( const char * src )
 	m_memSources.push_back( std::string( src ) );
 }
 
+void drwGlslShader::AddVertexShaderFilename( const char * filename )
+{
+	m_vertexShaderFilenames.push_back( std::string( filename ) );
+}
+
+void drwGlslShader::AddVertexShaderMemSource( const char * src )
+{
+	m_vertexMemSources.push_back( std::string( src ) );
+}
+
 bool drwGlslShader::Init()
 {
-	GLint success = 0;
-
 	// Fresh start
 	Clear();
-
-	// Add sources from files to m_memSources vector
-	for( unsigned i = 0; i < m_shaderFilenames.size(); ++i )
-	{
-		std::string newSource;
-		if( !LoadOneShaderSource( m_shaderFilenames[i].c_str(), newSource ) )
+	
+	// Load and try compiling vertex shader
+	if( m_vertexMemSources.size() != 0 || m_vertexShaderFilenames.size() != 0 )
+		if( !CreateAndCompileShader( GL_VERTEX_SHADER, m_glslVertexShader, m_vertexShaderFilenames, m_vertexMemSources ) )
 			return false;
-		m_memSources.push_back( newSource );
-	}
 	
-	// put all the sources in an array of const GLchar*
-	const GLchar ** shaderStringPtr = new const GLchar*[ m_memSources.size() ];
-	for( unsigned i = 0; i < m_memSources.size(); ++i )
-	{
-		shaderStringPtr[i] = m_memSources[i].c_str();
-	}
+	// Load and try compiling pixel shader
+	if( m_memSources.size() != 0 || m_shaderFilenames.size() != 0 )
+		if( !CreateAndCompileShader( GL_FRAGMENT_SHADER, m_glslShader, m_shaderFilenames, m_memSources ) )
+			return false;
 	
-	// Create the shader and set its source
-	m_glslShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(m_glslShader, m_memSources.size(), shaderStringPtr, NULL);
-
-	// Compile the shader
-	glCompileShader(m_glslShader);
-    glGetShaderiv(m_glslShader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-		GLint logLength = 0;
-		glGetShaderiv(	m_glslShader, GL_INFO_LOG_LENGTH, &logLength );
-        GLchar * infoLog = new GLchar[logLength+1];
-        glGetShaderInfoLog( m_glslShader, logLength, NULL, infoLog);
-		ReportError( "Error in fragment shader complilation: \n %s\n", infoLog );
-		delete [] infoLog;
-        return false;
-    }
+	// Check that at least one of the shaders have been compiled
+	if( m_glslVertexShader == 0 && m_glslShader == 0 )
+		return false;
 
 	// Create program object and attach shader
 	m_glslProg = glCreateProgram();
-	glAttachShader( m_glslProg, m_glslShader );
+	if( m_glslVertexShader )
+		glAttachShader( m_glslProg, m_glslVertexShader );
+	if( m_glslShader )
+		glAttachShader( m_glslProg, m_glslShader );
 
-	// Link program
+	// Create program and link shaders
     glLinkProgram( m_glslProg );
-    glGetProgramiv( m_glslProg, GL_LINK_STATUS, &success);
+	GLint success = 0;
+    glGetProgramiv( m_glslProg, GL_LINK_STATUS, &success );
     if (!success)
     {
 		GLint logLength = 0;
 		glGetProgramiv(	m_glslProg, GL_INFO_LOG_LENGTH, &logLength );
-		GLchar * infoLog = new GLchar[logLength+1];
-        glGetProgramInfoLog(m_glslProg, logLength, NULL, infoLog);
+		GLchar * infoLog = new GLchar[ logLength + 1 ];
+        glGetProgramInfoLog( m_glslProg, logLength, NULL, infoLog );
 		ReportError( "Error in glsl program linking: \n %s\n", infoLog );
 		delete [] infoLog;
 		return false;
     }
 
 	m_init = true;
+	return true;
+}
+
+bool drwGlslShader::CreateAndCompileShader( unsigned shaderType, unsigned & shaderId, std::vector< std::string > & files, std::vector< std::string > & memSources )
+{
+	// Add sources from files to m_memSources vector
+	for( unsigned i = 0; i < files.size(); ++i )
+	{
+		std::string newSource;
+		if( !LoadOneShaderSource( files[i].c_str(), newSource ) )
+			return false;
+		memSources.push_back( newSource );
+	}
+	
+	// put all the sources in an array of const GLchar*
+	const GLchar ** shaderStringPtr = new const GLchar*[ memSources.size() ];
+	for( unsigned i = 0; i < memSources.size(); ++i )
+	{
+		shaderStringPtr[i] = memSources[i].c_str();
+	}
+	
+	// Create the shader and set its source
+	shaderId = glCreateShader( shaderType );
+    glShaderSource( shaderId, memSources.size(), shaderStringPtr, NULL);
+	
+	delete [] shaderStringPtr;
+	
+	// Compile the shader
+	GLint success = 0;
+	glCompileShader( shaderId );
+    glGetShaderiv( shaderId, GL_COMPILE_STATUS, &success );
+    if (!success)
+    {
+		GLint logLength = 0;
+		glGetShaderiv( shaderId, GL_INFO_LOG_LENGTH, &logLength );
+        GLchar * infoLog = new GLchar[logLength+1];
+        glGetShaderInfoLog( shaderId, logLength, NULL, infoLog);
+		ReportError( "Error in shader complilation: \n %s\n", infoLog );
+		delete [] infoLog;
+        return false;
+    }
 	return true;
 }
 
@@ -161,6 +195,11 @@ bool drwGlslShader::LoadOneShaderSource( const char * filename, std::string & sh
 
 void drwGlslShader::Clear()
 {
+	if( m_glslVertexShader != 0 )
+	{
+		glDeleteShader( m_glslVertexShader );
+		m_glslVertexShader = 0;
+	}
 	if( m_glslShader != 0 )
 	{
 		glDeleteShader( m_glslShader );
