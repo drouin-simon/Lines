@@ -9,17 +9,24 @@ int winX = 50;
 int winY = 50;
 const char appName[] = "Glut Template";
 drwGlslShader shaderProgram;
+float lineRadius = 1.0;
 
 void display(void)
 {
 	glClear( GL_COLOR_BUFFER_BIT );
 	
+	shaderProgram.UseProgram( true );
+	shaderProgram.SetVariable( "line_radius", lineRadius );
+	
 	glColor4d( 1.0, 0.0, 0.0, 0.0 );
-	glBegin( GL_TRIANGLES );
-	glVertex2d( 50, 50 );
-	glVertex2d( 100, 50 );
-	glVertex2d( 100, 100 );
+	glBegin( GL_QUADS );
+	glNormal3f( -.7071, .7071, 0 ); glVertex2d( 50, 50 );
+	glNormal3f( .7071, -.7071, 0 ); glVertex2d( 50, 50 );
+	glNormal3f( .7071, -.7071, 0 ); glVertex2d( 300, 300 );
+	glNormal3f( -.7071, .7071, 0 ); glVertex2d( 300, 300 );
 	glEnd();
+	
+	shaderProgram.UseProgram( false );
 
     glutSwapBuffers();
 }
@@ -58,9 +65,14 @@ void main() \
 }";
 
 static const char * vertexShaderCode = " \
+uniform float line_radius; \
 void main() \
 { \
-	gl_Position = ftransform(); \
+	vec4 scaled_normal = vec4( 0.0, 0.0, 0.0, 0.0 ); \
+	scaled_normal.xyz = gl_Normal; \
+	scaled_normal *= line_radius; \
+	vec4 newVertex = gl_Vertex + scaled_normal; \
+	gl_Position = gl_ModelViewProjectionMatrix * newVertex; \
 	gl_FrontColor = gl_Color; \
 }";
 
@@ -72,13 +84,15 @@ void init(void)
 	if( !shaderInit )
 		exit( -1 );
 	shaderProgram.UseProgram( true );
+	shaderProgram.SetVariable( "line_radius", lineRadius );
+	shaderProgram.UseProgram( false );
 	
 	glClearColor ( 0.0f, 0.0f, 0.0f, 0.0f);
    //glShadeModel ( GL_SMOOTH );
    glShadeModel ( GL_FLAT );
 
    // enable texturing
-   glEnable( GL_TEXTURE_2D );
+   //glEnable( GL_TEXTURE_2D );
 }
 
 
@@ -119,12 +133,17 @@ void special(int key, int x, int y)
     switch (key) 
     {
     case GLUT_KEY_UP:
+			lineRadius += 1;
+			glutPostRedisplay();
         break;
     case GLUT_KEY_LEFT:
 		break;
     case GLUT_KEY_RIGHT:
         break;
     case GLUT_KEY_DOWN:
+			if( lineRadius > 1 )
+				lineRadius -= 1;
+			glutPostRedisplay();
         break;
     }
 }
@@ -146,9 +165,9 @@ void special_up(int key, int x, int y)
 }
 
 
-void Idle(void)
-{
-}
+//void Idle(void)
+//{
+//}
    
 int main(int argc, char** argv)
 {
@@ -162,7 +181,7 @@ int main(int argc, char** argv)
 	glutReshapeFunc(reshape); 
 	glutMouseFunc(mouse);
 	glutKeyboardFunc(keyboard);
-	glutIdleFunc(Idle);
+	//glutIdleFunc(Idle);
     glutSpecialFunc( special );
     glutSpecialUpFunc( special_up );
 	//glutFullScreen();
