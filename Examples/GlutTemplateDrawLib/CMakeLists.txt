@@ -12,9 +12,9 @@ endif(GLUT_FOUND)
 # Include dir for DrawLib
 include_directories(${DRAWLIB_INCLUDE_DIR})
 
-add_dependencies( ${ExecName} svl Draw )
-
 SET( theProject_SRC main.cpp )
 
 ADD_EXECUTABLE( ${theProjectName} ${theProject_SRC} )
 TARGET_LINK_LIBRARIES( ${theProjectName} svl Draw ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY} ${GLUT_LIBRARIES}  )
+
+add_dependencies( ${theProjectName} svl Draw )
