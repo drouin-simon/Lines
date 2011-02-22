@@ -14,12 +14,16 @@ class WideLine : public LinePrimitive
 
 public:
 
-    WideLine( double width, bool erase );
+	WideLine( double width );
     ~WideLine();
     
     virtual void StartPoint( double x, double y, double pressure );
     virtual void EndPoint( double x, double y, double pressure );
     virtual void AddPoint( double x, double y, double pressure );
+
+	void SetPressureWidth( bool w ) { m_pressureWidth = w; }
+	void SetPressureOpacity( bool o ) { m_pressureOpacity = o; }
+	void SetFill( bool f ) { m_fill = f; }
 	
 	static void Init();
 
@@ -34,7 +38,9 @@ protected:
 
     // Line attributes
     double m_width;
-	bool m_erasing;
+	bool m_pressureWidth;
+	bool m_pressureOpacity;
+	bool m_fill;
     Box2d m_boundingBox;
 
     // cache previous point computation during editing

@@ -115,8 +115,7 @@ void drwCommandDatabase::PushCommand( drwCommand::s_ptr command )
 		// Copy the command for thread safety
 		drwCommand::s_ptr commandCopy = command->Clone();
 		Modified = true;
-		if( Commands.size() == 0 || !Commands.back()->Concatenate( commandCopy.get() ) )
-			Commands.push_back( commandCopy);
+		Commands.push_back( commandCopy);
 	}
 	m_commandMutex.unlock();
 }

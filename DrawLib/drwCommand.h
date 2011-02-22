@@ -3,11 +3,12 @@
 
 #include "macros.h"
 #include "SharedPtrMacro.h"
+#include <SVL.h>
 
 class QDataStream;
 class QTextStream;
 
-enum drwCommandId { drwIdSetFrameCommand, drwIdMouseCommand, drwIdSetPersistenceCommand, drwIdServerInitialCommand };
+enum drwCommandId { drwIdSetFrameCommand, drwIdMouseCommand, drwIdLineToolParamsCommand, drwIdServerInitialCommand };
 
 class drwCommand
 {
@@ -24,6 +25,7 @@ public:
 	virtual drwCommandId GetCommandId() = 0;
 	int GetUserId() { return m_userId; }
 	void SetUserId( int id ) { m_userId = id; }
+	virtual bool IsStateCommand() { return false; }
 	
 	// Reading ( the XXXSize() functions are used by clients to determine if there is enough data in a stream to read commands)
 	static int HeaderSize();
@@ -60,6 +62,7 @@ public:
 	virtual s_ptr Clone() { s_ptr newCom( new drwSetFrameCommand( *this ) ); return newCom; }
 
 	drwCommandId GetCommandId() { return drwIdSetFrameCommand; }
+	virtual bool IsStateCommand() { return true; }
 	int BodySize();
 	void Read( QDataStream & stream );
 	bool WriteImpl( QDataStream & stream );
@@ -76,31 +79,46 @@ protected:
 	
 };
 
-class drwSetPersistenceCommand : public drwCommand
+class drwLineToolParamsCommand : public drwCommand
 {
 	
 public:
 	
-	drwSetPersistenceCommand() : Persistence(0) { }
-	drwSetPersistenceCommand( drwSetPersistenceCommand & other ) : drwCommand( other ), Persistence( other.Persistence ) {}
-	virtual ~drwSetPersistenceCommand() {}
-	virtual s_ptr Clone() { s_ptr newCom( new drwSetPersistenceCommand( *this ) ); return newCom; }
+	drwLineToolParamsCommand();
+	drwLineToolParamsCommand( drwLineToolParamsCommand & other );
+	virtual ~drwLineToolParamsCommand() {}
+	virtual s_ptr Clone() { s_ptr newCom( new drwLineToolParamsCommand( *this ) ); return newCom; }
 	
-	drwCommandId GetCommandId() { return drwIdSetPersistenceCommand; }
+	drwCommandId GetCommandId() { return drwIdLineToolParamsCommand; }
+	virtual bool IsStateCommand() { return true; }
 	int BodySize();
 	void Read( QDataStream & stream );
 	bool WriteImpl( QDataStream & stream );
 	void Write( QTextStream & stream );
 	
+	SetMacro(Color,Vec4);
+	GetMacro(Color,Vec4);
+	SetMacro(BaseWidth,int);
+	GetMacro(BaseWidth,int);
+	SetMacro(PressureWidth,bool);
+	GetMacro(PressureWidth,bool);
+	SetMacro(PressureOpacity,bool);
+	GetMacro(PressureOpacity,bool);
+	SetMacro(Fill,bool);
+	GetMacro(Fill,bool);
 	SetMacro(Persistence,int);
-	GetMacro(Persistence,int);
-	
+	GetMacro(Persistence,bool);
+
 	virtual bool Concatenate( drwCommand * other );
 	
 protected:
 	
+	Vec4 Color;
+	double BaseWidth;
+	bool PressureWidth;
+	bool PressureOpacity;
+	bool Fill;
 	int Persistence;
-	
 };
 
 class drwServerInitialCommand : public drwCommand
@@ -119,6 +137,7 @@ public:
 	virtual s_ptr Clone() { s_ptr newCom( new drwServerInitialCommand( *this ) ); return newCom; }
 
 	drwCommandId GetCommandId() { return drwIdServerInitialCommand; }
+	virtual bool IsStateCommand() { return false; }
 	int BodySize();
 	void Read( QDataStream & stream );
 	bool WriteImpl( QDataStream & stream );
@@ -146,6 +165,7 @@ public:
 	virtual s_ptr Clone() { s_ptr newCom( new drwMouseCommand( *this ) ); return newCom; }
 	
 	virtual drwCommandId GetCommandId() { return drwIdMouseCommand; }
+	virtual bool IsStateCommand() { return false; }
 	int BodySize();
 	void Read( QDataStream & stream );
 	bool WriteImpl( QDataStream & stream );

@@ -18,8 +18,6 @@ public:
 	
 	int GetCurrentFrame() { return m_currentFrame; }
 	void SetCurrentFrame(int);
-	int GetPersistence() { return m_persistence; }
-	void SetPersistence(int);
 	drwFrameChangeMode GetFrameChangeMode() { return m_frameChangeMode; }
 	void SetFrameChangeMode( drwFrameChangeMode mode );
 	void Reset();
@@ -33,7 +31,6 @@ private:
 	
 	int m_currentFrame;
 	int m_currentLayer;
-	int m_persistence;
 	drwFrameChangeMode m_frameChangeMode;
 };
 

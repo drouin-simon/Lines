@@ -32,12 +32,28 @@ public:
 	virtual void ExecuteCommand( drwCommand::s_ptr command );
 	virtual void SetCurrentFrame( int frame );
 	virtual void Reset();
-	virtual void ToggleBrushEraser();
-	
-	SetMacro( Color, Vec3 );
+
+	// Get/Set brush properties - will all generate a line tool attribute command
+	bool GetPressureWidth() { return m_pressureWidth; }
+	void SetPressureWidth( bool w );
+	bool GetPressureOpacity() { return m_pressureOpacity; }
+	void SetPressureOpacity( bool o );
+	bool GetFill() { return m_fill; }
+	void SetFill( bool f );
+	GetMacro( Color, Vec4 );
+	void SetColor( Vec4 & c );
+	int GetPersistence() { return m_persistence; }
+	void SetPersistence( int p );
+
+signals:
+
+	void ParametersChangedSignal();
 	
 protected:
 	
+	void ExecuteLineToolParamCommand( drwCommand::s_ptr command );
+	void ExecuteMouseCommand( drwCommand::s_ptr command );
+	void ParametersChanged();
 	void CreateNewNodes();
 	Node * CreateNewNode();
 	
@@ -51,17 +67,22 @@ protected:
 	double LastXWorld;
 	double LastYWorld;
 	double LastPressure;
-	
-	bool IsDrawing;
-	PrimitiveType Type;
-	bool m_isEraser;
-	
-	Vec3 Color;
-	double m_baseWidth;
-	double m_minWidth;
-	double m_maxWidth;
 	int m_lastXWin;
 	int m_lastYWin;
+	
+	bool IsDrawing;
+	
+	// configurable params
+	Vec4 Color;
+	PrimitiveType Type;
+	double m_baseWidth;
+	bool m_pressureWidth;
+	bool m_pressureOpacity;
+	bool m_fill;
+	int m_persistence;
+
+	double m_minWidth;
+	double m_maxWidth;
 	bool m_brushScaling;
 	
 	typedef std::map< int, Node* > CurrentNodesCont;

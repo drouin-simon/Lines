@@ -3,7 +3,6 @@
 drwEditionState::drwEditionState( QObject * parent )
 : QObject( parent )
 , m_currentFrame(0)
-, m_persistence(0)
 , m_frameChangeMode( Manual )
 {
 }
@@ -18,12 +17,6 @@ void drwEditionState::SetCurrentFrame( int frame )
 	emit CurrentFrameChanged( frame );
 }
 
-void drwEditionState::SetPersistence( int nbFrames )
-{
-	m_persistence = nbFrames;
-	emit ModifiedSignal();
-}
-
 void drwEditionState::SetFrameChangeMode( drwFrameChangeMode mode )
 {
 	m_frameChangeMode = mode;
@@ -33,6 +26,5 @@ void drwEditionState::SetFrameChangeMode( drwFrameChangeMode mode )
 void drwEditionState::Reset()
 {
 	m_currentFrame = 0;
-	m_persistence = 0;
 	m_frameChangeMode = Manual;
 }

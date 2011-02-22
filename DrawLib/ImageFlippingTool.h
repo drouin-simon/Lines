@@ -54,8 +54,8 @@ protected:
 	Vec2 MovingOffset;
 
 	static const unsigned InvalidPointIndex;
-	static const Vec3 PointColor;
-	static const Vec3 SelectedPointColor;
+	static const Vec4 PointColor;
+	static const Vec4 SelectedPointColor;
 
 };
 

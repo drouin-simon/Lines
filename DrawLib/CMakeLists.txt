@@ -33,7 +33,8 @@ set( DrawLib_src  drwDrawingWidget.cpp
 		drwEditionState.cpp 
 		drwCommandDispatcher.cpp 
 		drwBitmapExporter.cpp
-		drwCursor.cpp )
+		drwCursor.cpp 
+		drwGradientWidget.cpp )
 
 set( DrawLib_hdr_moc 	drwDrawingWidget.h 
 			drwWidgetObserver.h
@@ -53,7 +54,8 @@ set( DrawLib_hdr_moc 	drwDrawingWidget.h
 			drwEditionState.h 
 			ImageFlippingTool.h
 			drwCommandDispatcher.h 
-			drwBitmapExporter.h )
+			drwBitmapExporter.h
+			drwGradientWidget.h )
 
 set( DrawLib_hdr	drwDrawingWidgetInteractor.h
 			drwGlslShader.h

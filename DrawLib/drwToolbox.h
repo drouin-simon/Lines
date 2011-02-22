@@ -20,6 +20,7 @@ public:
 	virtual ~drwToolbox();
 	
 	void AddTool( drwWidgetObserver * tool );
+	drwWidgetObserver * GetTool( int index );
 	
 	// Implementation of drwWidgetObserver
 	virtual void MousePressEvent( drwDrawingWidget * w, QMouseEvent * e );
@@ -35,9 +36,6 @@ public:
 	
 	void blockSignals( bool block );
 	
-	void ToggleBrushEraser();
-	
-	virtual void SetPersistence( int nbFrames );
 	void ExecuteCommand( drwCommand::s_ptr );
 	
 private slots:

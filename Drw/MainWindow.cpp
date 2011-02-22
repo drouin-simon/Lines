@@ -66,7 +66,9 @@ MainWindow::MainWindow()
 	drawingAreaLayout->addWidget( m_playbackControlerWidget );
 
 	// Alternative right panel
-	m_toolOptionWidget = new PrimitiveToolOptionWidget( m_controler->GetEditionState(), mainWidget );
+	drwLineTool * lineTool = dynamic_cast<drwLineTool*>(m_localToolbox->GetTool( 0 ));
+	Q_ASSERT(lineTool);
+	m_toolOptionWidget = new PrimitiveToolOptionWidget( m_controler->GetEditionState(), lineTool, mainWidget );
 	rightPanelLayout->addWidget( m_toolOptionWidget );
 	m_displaySettingsWidget = new DisplaySettingsWidget( m_glWidget->GetDisplaySettings(), mainWidget );
 	rightPanelLayout->addWidget( m_displaySettingsWidget );

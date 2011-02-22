@@ -40,6 +40,10 @@ protected:
 	drwCommandDatabase * m_db;
 	drwNetworkManager * m_netManager;
 
+	// Container to cache state commands until an effective command comes
+	typedef QList< drwCommand::s_ptr > CommandContainer;
+	CommandContainer m_cachedStateCommands;
+
 	static const int m_localToolboxId;
 	int m_lastUsedUserId;
 	typedef QMap< int, drwToolbox* > ToolboxContainer;

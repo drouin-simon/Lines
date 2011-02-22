@@ -10,8 +10,8 @@
 #include <QUrl>
 
 const unsigned ImageFlippingTool::InvalidPointIndex = unsigned(-1);
-const Vec3 ImageFlippingTool::PointColor( 1.0, 1.0, 1.0 );
-const Vec3 ImageFlippingTool::SelectedPointColor( 1.0, 0.0, 0.0 );
+const Vec4 ImageFlippingTool::PointColor( 1.0, 1.0, 1.0, 1.0 );
+const Vec4 ImageFlippingTool::SelectedPointColor( 1.0, 0.0, 0.0, 1.0 );
 
 ImageFlippingTool::ImageFlippingTool( Scene * scene, QObject * parent ) 
 : drwWidgetObserver( scene, parent )

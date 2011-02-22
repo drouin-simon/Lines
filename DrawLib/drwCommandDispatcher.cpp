@@ -45,6 +45,7 @@ void drwCommandDispatcher::Reset()
 	drwToolbox * local = m_toolboxes[ m_localToolboxId ];
 	local->Reset();
 	m_lastUsedUserId = 0;
+	m_cachedStateCommands.clear();
 }
 
 void drwCommandDispatcher::IncomingNetCommand( drwCommand::s_ptr command )
@@ -62,11 +63,41 @@ void drwCommandDispatcher::IncomingNetCommand( drwCommand::s_ptr command )
 
 void drwCommandDispatcher::IncomingLocalCommand( drwCommand::s_ptr command )
 {
-	// Send it to the network
-	m_netManager->SendCommand( command );
+	if( command->IsStateCommand() )
+	{
+		// state command, we cache it for later
 
-	// Store it in the database
-	m_db->PushCommand( command );
+		// try to concatenate the command with another one in the stack
+		bool found = false;
+		for( int i = 0; i < m_cachedStateCommands.size(); ++i )
+		{
+			if( m_cachedStateCommands[i]->Concatenate(command.get()) )
+			{
+				found = true;
+				break;
+			}
+		}
+
+		// if no command of the same type is in the stack, push_back
+		if( !found )
+			m_cachedStateCommands.push_back( command );
+	}
+	else
+	{
+		// Send state commands on the stack
+		for( int i = 0; i < m_cachedStateCommands.size(); ++i )
+		{
+			m_netManager->SendCommand( m_cachedStateCommands[i] );
+			m_db->PushCommand( m_cachedStateCommands[i] );
+		}
+		m_cachedStateCommands.clear();
+
+		// Send it to the network
+		m_netManager->SendCommand( command );
+
+		// Store it in the database
+		m_db->PushCommand( command );
+	}
 }
 
 void drwCommandDispatcher::IncomingDbCommand( drwCommand::s_ptr command )

@@ -19,8 +19,8 @@ drwCommand::s_ptr drwCommand::InstanciateSubclass( drwCommandId id )
 	case drwIdMouseCommand:
 		newCommand.reset( new drwMouseCommand );
 		break;
-	case drwIdSetPersistenceCommand:
-		newCommand.reset( new drwSetPersistenceCommand );
+	case drwIdLineToolParamsCommand:
+		newCommand.reset( new drwLineToolParamsCommand );
 		break;
 	case drwIdServerInitialCommand:
 		newCommand.reset( new drwServerInitialCommand );
@@ -96,32 +96,83 @@ bool drwSetFrameCommand::Concatenate( drwCommand * other )
 // drwSetPersistenceCommand Implementation
 //===================================
 
-int drwSetPersistenceCommand::BodySize()
+drwLineToolParamsCommand::drwLineToolParamsCommand()
+	: Color( Vec4(1.0,1.0,1.0,1.0) )
+	, BaseWidth( 1.0 )
+	, PressureWidth( false )
+	, PressureOpacity( false )
+	, Fill( false )
+	, Persistence(0)
 {
-	return sizeof(Persistence);
 }
 
-void drwSetPersistenceCommand::Read( QDataStream & stream )
+drwLineToolParamsCommand::drwLineToolParamsCommand( drwLineToolParamsCommand & other )
+	: drwCommand( other )
+	, Color( other.Color )
+	, BaseWidth( other.BaseWidth )
+	, PressureWidth( other.PressureWidth )
+	, PressureOpacity( other.PressureOpacity )
+	, Fill( other.Fill )
+	, Persistence( other.Persistence )
 {
+}
+
+
+int drwLineToolParamsCommand::BodySize()
+{
+	return (4 * sizeof(double) + sizeof(BaseWidth) + sizeof(PressureWidth) + sizeof(PressureOpacity) + sizeof(Fill) + sizeof(Persistence) );
+}
+
+void drwLineToolParamsCommand::Read( QDataStream & stream )
+{
+	stream >> Color[0];
+	stream >> Color[1];
+	stream >> Color[2];
+	stream >> Color[3];
+	stream >> BaseWidth;
+	stream >> PressureWidth;
+	stream >> PressureOpacity;
+	stream >> Fill;
 	stream >> Persistence;
 }
 
-bool drwSetPersistenceCommand::WriteImpl( QDataStream & stream )
+bool drwLineToolParamsCommand::WriteImpl( QDataStream & stream )
 {
+	stream << Color[0];
+	stream << Color[1];
+	stream << Color[2];
+	stream << Color[3];
+	stream << BaseWidth;
+	stream << PressureWidth;
+	stream << PressureOpacity;
+	stream << Fill;
 	stream << Persistence;
 	return true;
 }
 
-void drwSetPersistenceCommand::Write( QTextStream & stream )
+void drwLineToolParamsCommand::Write( QTextStream & stream )
 {
-	stream << "SetPersistence: persistence = " << Persistence;
+	stream << "Line tool params: ";
+	stream << "Color = ( " << Color[0] << ", " << Color[1] << ", " << Color[2] << ", " << Color[3] << "  ";
+	stream << "BaseWidth = " << BaseWidth << "  ";
+	stream << "PressureWidth = " << PressureWidth << "  ";
+	stream << "PressureOpactity = " << PressureOpacity << "  ";
+	stream << "Fill = " << Fill << "  ";
+	stream << "Persistence = " << Persistence << "  ";
 }
 
-bool drwSetPersistenceCommand::Concatenate( drwCommand * other )
+bool drwLineToolParamsCommand::Concatenate( drwCommand * other )
 {
-	if( other->GetCommandId() == drwIdSetPersistenceCommand )
+	if( other->GetCommandId() == drwIdLineToolParamsCommand )
 	{
-		Persistence = ((drwSetPersistenceCommand*)other)->Persistence;
+		drwLineToolParamsCommand * o = dynamic_cast<drwLineToolParamsCommand*>( other );
+		Q_ASSERT(o);
+		Color = o->Color;
+		BaseWidth = o->BaseWidth;
+		PressureWidth = o->PressureWidth;
+		PressureOpacity = o->PressureOpacity;
+		Fill = o->Fill;
+		Persistence = o->Persistence;
 		return true;
 	}
 	return false;

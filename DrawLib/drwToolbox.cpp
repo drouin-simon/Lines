@@ -27,6 +27,13 @@ void drwToolbox::AddTool( drwWidgetObserver * tool )
 	Tools.push_back( tool );
 }
 
+drwWidgetObserver * drwToolbox::GetTool( int index )
+{
+	if( index >= 0 && index < Tools.size() )
+		return Tools[ index ];
+	return 0;
+}
+
 // Implementation of drwWidgetObserver
 void drwToolbox::MousePressEvent( drwDrawingWidget * w, QMouseEvent * e )
 {
@@ -92,31 +99,11 @@ void drwToolbox::Reset()
 	m_editionState->Reset();
 }
 
-void drwToolbox::SetPersistence( int persist )
-{
-	if( CurrentTool >= 0 && CurrentTool < Tools.size() )
-		Tools[CurrentTool]->SetPersistence( persist );
-	
-	if( m_editionState )
-		m_editionState->SetPersistence( persist );
-	
-	drwSetPersistenceCommand * com = new drwSetPersistenceCommand();
-	com->SetPersistence(persist);
-	drwCommand::s_ptr command( com );
-	emit CommandExecuted( command );
-}
-
 void drwToolbox::blockSignals( bool block )
 {
 	QObject::blockSignals( block );
 	for( unsigned i = 0; i < Tools.size(); ++i )
 		Tools[i]->blockSignals( block );
-}
-
-void drwToolbox::ToggleBrushEraser()
-{
-	if( CurrentTool >= 0 && CurrentTool < Tools.size() )
-		Tools[CurrentTool]->ToggleBrushEraser();
 }
 
 void drwToolbox::NotifyCommandExecuted( drwCommand::s_ptr command )
@@ -140,11 +127,6 @@ void drwToolbox::ExecuteCommand( drwCommand::s_ptr command )
 	{
 		drwSetFrameCommand * setFrameCom = dynamic_cast<drwSetFrameCommand*> (command.get());
 		SetCurrentFrame( setFrameCom->GetNewFrame() );
-	}
-	else if( command->GetCommandId() == drwIdSetPersistenceCommand )
-	{
-		drwSetPersistenceCommand * setPersistCom = dynamic_cast<drwSetPersistenceCommand*> (command.get());
-		SetPersistence( setPersistCom->GetPersistence() );
 	}
 	else if( CurrentTool >= 0 && CurrentTool < Tools.size() )
 		Tools[CurrentTool]->ExecuteCommand( command );

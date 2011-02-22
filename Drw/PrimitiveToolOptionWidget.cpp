@@ -5,21 +5,57 @@
 #include <QSpinBox>
 #include <QGroupBox>
 #include <QRadioButton>
+#include <QCheckBox>
 #include "drwEditionState.h"
+#include "drwLineTool.h"
+#include "drwGradientWidget.h"
 
-PrimitiveToolOptionWidget::PrimitiveToolOptionWidget( drwEditionState * editionState, QWidget * parent )
+PrimitiveToolOptionWidget::PrimitiveToolOptionWidget( drwEditionState * editionState, drwLineTool * lineTool, QWidget * parent )
 : m_timerId(-1)
 , m_updating(false)
 , m_editionState(editionState)
+, m_lineTool(lineTool)
 {
 	SetupUi();
 	UpdateUi();
 	
+	connect( m_lineTool, SIGNAL(ParametersChangedSignal()), this, SLOT( ToolModified() ) );
 	connect( m_editionState, SIGNAL(ModifiedSignal()), this, SLOT(ToolModified()) );
 }
 
 PrimitiveToolOptionWidget::~PrimitiveToolOptionWidget()
 {
+}
+
+void PrimitiveToolOptionWidget::OnColorSliderValueChanged( double newSliderValue )
+{
+	if( !m_updating )
+	{
+		Vec4 newColor( newSliderValue, newSliderValue, newSliderValue, 1.0 );
+		m_lineTool->SetColor( newColor );
+	}
+}
+
+void PrimitiveToolOptionWidget::pressureWidthCheckBoxStateChanged( int state )
+{
+	if( !m_updating )
+	{
+		if( state == Qt::Unchecked )
+			m_lineTool->SetPressureWidth( false );
+		else if( state == Qt::Checked )
+			m_lineTool->SetPressureWidth( true );
+	}
+}
+
+void PrimitiveToolOptionWidget::pressureOpacityCheckBoxStateChanged( int state )
+{
+	if( !m_updating )
+	{
+		if( state == Qt::Unchecked )
+			m_lineTool->SetPressureOpacity( false );
+		else if( state == Qt::Checked )
+			m_lineTool->SetPressureOpacity( true );
+	}
 }
 
 void PrimitiveToolOptionWidget::FrameChangeRadioToggled( bool isOn )
@@ -40,7 +76,7 @@ void PrimitiveToolOptionWidget::OnPersistenceSpinBoxValueChanged( int value )
 {
 	if( !m_updating )
 	{
-		m_editionState->SetPersistence( value );
+		m_lineTool->SetPersistence( value );
 	}
 }
 
@@ -65,8 +101,35 @@ void PrimitiveToolOptionWidget::SetupUi()
 	mainLayout = new QVBoxLayout();
 	mainLayout->setContentsMargins( 9, 0, 9, 0 );
 	setLayout( mainLayout );
+
+	gradientWidget = new drwGradientWidget();
+	QSizePolicy gradientPolicy( QSizePolicy::Minimum, QSizePolicy::Fixed );
+	gradientWidget->setSizePolicy( gradientPolicy );
+	gradientWidget->setMinimumHeight( 40 );
+	connect( gradientWidget, SIGNAL(sliderValueChanged(double)), this, SLOT(OnColorSliderValueChanged(double) ) );
+	mainLayout->addWidget( gradientWidget );
+	mainLayout->addSpacing( 10 );
+
 	{
-		frameChangeModeGroupBox = new QGroupBox(tr("Frame change mode"));
+		QGroupBox * pressureGroupBox = new QGroupBox(tr("Pressure"));
+		QVBoxLayout * pressureLayout = new QVBoxLayout;
+		pressureLayout->setSpacing( 15 );
+		pressureGroupBox->setLayout( pressureLayout );
+		pressureWidthCheckBox = new QCheckBox(tr("Width"));
+		pressureLayout->addWidget( pressureWidthCheckBox );
+		connect( pressureWidthCheckBox, SIGNAL(stateChanged(int)), this, SLOT(pressureWidthCheckBoxStateChanged(int)) );
+		pressureOpacityCheckBox = new QCheckBox(tr("Opacity"));
+		pressureLayout->addWidget( pressureOpacityCheckBox );
+		connect( pressureOpacityCheckBox, SIGNAL(stateChanged(int)), this, SLOT(pressureOpacityCheckBoxStateChanged(int)) );
+		mainLayout->addWidget( pressureGroupBox );
+		mainLayout->addSpacing( 10 );
+		
+		fillCheckBox = new QCheckBox(tr("Fill lines"));
+		connect( fillCheckBox, SIGNAL(stateChanged(int)), this, SLOT(fillCheckBoxStateChanged(int)) );
+		mainLayout->addWidget( fillCheckBox );
+		mainLayout->addSpacing( 10 );
+		
+		frameChangeModeGroupBox = new QGroupBox(tr("Frame Change"));
 		frameChangeModeLayout = new QVBoxLayout;
 		frameChangeModeLayout->setSpacing( 15 );
 		frameChangeModeGroupBox->setLayout( frameChangeModeLayout );
@@ -79,8 +142,9 @@ void PrimitiveToolOptionWidget::SetupUi()
 		playFrameChangeRadio = new QRadioButton(tr("Play"),frameChangeModeGroupBox);
 		frameChangeModeLayout->addWidget( playFrameChangeRadio );
 		connect( playFrameChangeRadio, SIGNAL(toggled(bool)), this, SLOT(FrameChangeRadioToggled(bool)) );
+		
+		mainLayout->addWidget( frameChangeModeGroupBox );
 	}
-	mainLayout->addWidget( frameChangeModeGroupBox );
 	
 	{
 		persistenceLayout = new QHBoxLayout;
@@ -97,6 +161,9 @@ void PrimitiveToolOptionWidget::SetupUi()
 void PrimitiveToolOptionWidget::UpdateUi()
 {
 	m_updating = true;
+
+	Vec4 color = m_lineTool->GetColor();
+	gradientWidget->setSliderValue( color[0] );
 	
 	if( m_editionState->GetFrameChangeMode() == Manual )
 		manualFrameChangeRadio->setChecked( true );
@@ -105,7 +172,10 @@ void PrimitiveToolOptionWidget::UpdateUi()
 	else if( m_editionState->GetFrameChangeMode() == Play )
 		playFrameChangeRadio->setChecked( true );
 	
-	persistenceSpinBox->setValue( m_editionState->GetPersistence() );
+	pressureWidthCheckBox->setChecked( m_lineTool->GetPressureWidth() );
+	pressureOpacityCheckBox->setChecked( m_lineTool->GetPressureOpacity() );
+	fillCheckBox->setChecked( m_lineTool->GetFill() );
+	persistenceSpinBox->setValue( m_lineTool->GetPersistence() );
 	
 	m_updating = false;
 }

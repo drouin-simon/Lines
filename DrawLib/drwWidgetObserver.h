@@ -17,7 +17,7 @@ class drwWidgetObserver : public QObject
 
 public:
 	
-	drwWidgetObserver( Scene * scene, QObject * parent = 0 ) : QObject(parent) { CurrentScene = scene; CurrentFrame = 0; Persistence = 1; }
+	drwWidgetObserver( Scene * scene, QObject * parent = 0 ) : QObject(parent) { CurrentScene = scene; CurrentFrame = 0; }
 	virtual ~drwWidgetObserver() {};
 	
 	virtual void MousePressEvent( drwDrawingWidget * w, QMouseEvent * e ) {}
@@ -33,7 +33,6 @@ public:
 	virtual void ToggleBrushEraser() {}
 	
 	virtual void ExecuteCommand( drwCommand::s_ptr command ) {}
-	virtual void SetPersistence( int nbFrames ) { Persistence = nbFrames; }
 	
 signals:
 	
@@ -45,8 +44,6 @@ protected:
 	
 	Scene * CurrentScene;
 	int CurrentFrame;
-	int Persistence;
-	
 };
 
 #endif

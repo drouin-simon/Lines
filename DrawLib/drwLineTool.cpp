@@ -11,21 +11,27 @@
 drwLineTool::drwLineTool( Scene * scene, drwEditionState * editionState, QObject * parent )
 : drwWidgetObserver( scene, parent )
 , m_cursorShouldAppear( false )
-, Color(1.0,1.0,1.0)
 , LastXWorld( 0.0 )
 , LastYWorld( 0.0 )
 , LastPressure( 1.0 )
+, m_lastXWin( 0 )
+, m_lastYWin( 0 )
 , IsDrawing( false )
+, Color(1.0,1.0,1.0,1.0)
 , Type( TypeWideLine )
-, m_isEraser( false )
 , m_baseWidth( 10.0 )
+, m_pressureWidth(true)
+, m_pressureOpacity(true)
+, m_fill(false)
+, m_persistence( 0 )
 , m_minWidth( 2.0 )
 , m_maxWidth( 100.0 )
 , m_brushScaling( false )
-, m_lastXWin( 0 )
-, m_lastYWin( 0 )
 , m_editionState(editionState)
 {	
+	// Make sure the Reset function is the only one driving initial param values
+	Reset();
+
 	// simtodo : fix this
 	CurrentScene->GetCursor()->SetRadius( m_baseWidth );
 }
@@ -117,58 +123,76 @@ void drwLineTool::LeaveEvent( drwDrawingWidget * w, QEvent * e )
 		CurrentScene->SetCursorVisible( false );
 }
 
-									
 void drwLineTool::ExecuteCommand( drwCommand::s_ptr command )
 {
+	if( command->GetCommandId() == drwIdMouseCommand )
+		ExecuteMouseCommand( command );
+	else if( command->GetCommandId() == drwIdLineToolParamsCommand )
+		ExecuteLineToolParamCommand( command );
+}
+
+void drwLineTool::ExecuteLineToolParamCommand( drwCommand::s_ptr command )
+{
+	drwLineToolParamsCommand * paramCom = dynamic_cast<drwLineToolParamsCommand*>(command.get());
+	Q_ASSERT( paramCom );
+	Color = paramCom->GetColor();
+	m_baseWidth = paramCom->GetBaseWidth();
+	m_pressureWidth = paramCom->GetPressureWidth();
+	m_pressureOpacity = paramCom->GetPressureOpacity();
+	m_fill = paramCom->GetFill();
+	m_persistence = paramCom->GetPersistence();
+}
+
+void drwLineTool::ExecuteMouseCommand( drwCommand::s_ptr command )
+{
 	drwMouseCommand * mouseCom = dynamic_cast<drwMouseCommand*>(command.get());
-	if( mouseCom )
+	Q_ASSERT( mouseCom );
+
+	if( mouseCom->GetType() == drwMouseCommand::Press )
 	{
-		if( mouseCom->GetType() == drwMouseCommand::Press )
+		IsDrawing = true;
+		LastXWorld = mouseCom->X();
+		LastYWorld = mouseCom->Y();
+		LastPressure = mouseCom->Pressure();
+		CreateNewNodes();
+		emit CommandExecuted( command );
+		emit StartInteraction();
+	}
+	else if( mouseCom->GetType() == drwMouseCommand::Release )
+	{
+		CurrentNodesCont::iterator it = CurrentNodes.begin();
+		while( it != CurrentNodes.end() )
 		{
-			IsDrawing = true;
-			LastXWorld = mouseCom->X();
-			LastYWorld = mouseCom->Y();
-			LastPressure = mouseCom->Pressure();
-			CreateNewNodes();
-			emit CommandExecuted( command );
-			emit StartInteraction();
+			LinePrimitive * prim = dynamic_cast<LinePrimitive*> (it->second->GetPrimitive());
+			prim->EndPoint( mouseCom->X(), mouseCom->Y(), mouseCom->Pressure() );
+			++it;
 		}
-		else if( mouseCom->GetType() == drwMouseCommand::Release )
+		CurrentNodes.clear();
+		CurrentScene->MarkModified();
+		IsDrawing = false;
+
+		LastXWorld = mouseCom->X();
+		LastYWorld = mouseCom->Y();
+		LastPressure = mouseCom->Pressure();
+		emit CommandExecuted( command );
+		emit EndInteraction();
+	}
+	else if( mouseCom->GetType() == drwMouseCommand::Move )
+	{
+		if( IsDrawing )
 		{
 			CurrentNodesCont::iterator it = CurrentNodes.begin();
 			while( it != CurrentNodes.end() )
 			{
 				LinePrimitive * prim = dynamic_cast<LinePrimitive*> (it->second->GetPrimitive());
-				prim->EndPoint( mouseCom->X(), mouseCom->Y(), mouseCom->Pressure() );
+				prim->AddPoint( mouseCom->X(), mouseCom->Y(), mouseCom->Pressure() );
 				++it;
 			}
-			CurrentNodes.clear();
 			CurrentScene->MarkModified();
-			IsDrawing = false;
-			
 			LastXWorld = mouseCom->X();
 			LastYWorld = mouseCom->Y();
 			LastPressure = mouseCom->Pressure();
 			emit CommandExecuted( command );
-			emit EndInteraction();
-		}
-		else if( mouseCom->GetType() == drwMouseCommand::Move )
-		{
-			if( IsDrawing )
-			{
-				CurrentNodesCont::iterator it = CurrentNodes.begin();
-				while( it != CurrentNodes.end() )
-				{
-					LinePrimitive * prim = dynamic_cast<LinePrimitive*> (it->second->GetPrimitive());
-					prim->AddPoint( mouseCom->X(), mouseCom->Y(), mouseCom->Pressure() );
-					++it;
-				}
-				CurrentScene->MarkModified();
-				LastXWorld = mouseCom->X();
-				LastYWorld = mouseCom->Y();
-				LastPressure = mouseCom->Pressure();
-				emit CommandExecuted( command );
-			}
 		}
 	}
 }
@@ -181,7 +205,7 @@ void drwLineTool::SetCurrentFrame( int frame )
 		// Terminate line on previous frames that are not active anymore
 		int newInterval[2];
 		newInterval[0] = m_editionState->GetCurrentFrame();
-		newInterval[1] = m_editionState->GetCurrentFrame() + m_editionState->GetPersistence();
+		newInterval[1] = m_editionState->GetCurrentFrame() + m_persistence;
 		CurrentNodesCont::iterator it = CurrentNodes.begin();
 		while( it != CurrentNodes.end() )
 		{
@@ -207,23 +231,65 @@ void drwLineTool::SetCurrentFrame( int frame )
 
 void drwLineTool::Reset()
 {
-	Color = Vec3(1.0,1.0,1.0);
+	LastXWorld = 0.0;
+	LastYWorld = 0.0;
+	LastPressure = 1.0;
+	m_lastXWin = 0;
+	m_lastYWin = 0;
 	IsDrawing = false;
+	Color = Vec4(1.0,1.0,1.0,1.0);
 	Type = TypeWideLine;
-	LastXWorld = 0;
-	LastYWorld = 0;
 	m_baseWidth = 10.0;
+	m_pressureWidth = true;
+	m_pressureOpacity = true;
+	m_fill = false;
+	m_persistence = 0;
+	m_brushScaling = false;
 }
 
-
-void drwLineTool::ToggleBrushEraser()
+void drwLineTool::SetPressureWidth( bool w )
 {
-	if( m_isEraser )
-		m_isEraser = false;
-	else
-		m_isEraser = true;
+	m_pressureWidth = w;
+	ParametersChanged();
 }
 
+void drwLineTool::SetPressureOpacity( bool o )
+{
+	m_pressureOpacity = o;
+	ParametersChanged();
+}
+
+void drwLineTool::SetFill( bool f )
+{
+	m_fill = f;
+	ParametersChanged();
+}
+
+void drwLineTool::SetColor( Vec4 & c )
+{
+	Color = c;
+	ParametersChanged();
+}
+
+void drwLineTool::SetPersistence( int p )
+{
+	m_persistence = p;
+	ParametersChanged();
+}
+
+void drwLineTool::ParametersChanged()
+{
+	drwLineToolParamsCommand * c = new drwLineToolParamsCommand();
+	c->SetColor( Color );
+	c->SetBaseWidth( m_baseWidth );
+	c->SetPressureWidth( m_pressureWidth );
+	c->SetPressureOpacity( m_pressureOpacity );
+	c->SetFill( m_fill );
+	c->SetPersistence( m_persistence );
+	drwCommand::s_ptr command( c );
+	emit CommandExecuted( command );
+	emit ParametersChangedSignal();
+}
 
 Node * drwLineTool::CreateNewNode()
 {
@@ -238,7 +304,12 @@ Node * drwLineTool::CreateNewNode()
 		}
 			break;
 		case TypeWideLine:
-			newPrimitive = new WideLine( m_baseWidth, m_isEraser );
+		{
+			WideLine * newWideLine = new WideLine( m_baseWidth );
+			newWideLine->SetPressureWidth( m_pressureWidth );
+			newWideLine->SetPressureOpacity( m_pressureOpacity );
+			newPrimitive = newWideLine;
+		}
 			break;
 		case EndType:
 			break;
@@ -253,7 +324,7 @@ Node * drwLineTool::CreateNewNode()
 
 void drwLineTool::CreateNewNodes( )
 {
-	int lastFrame = m_editionState->GetCurrentFrame() + m_editionState->GetPersistence();
+	int lastFrame = m_editionState->GetCurrentFrame() + m_persistence;
 	for( int frame = m_editionState->GetCurrentFrame(); frame <= lastFrame; ++frame )
 	{
 		CurrentNodesCont::iterator it = CurrentNodes.find( frame );
@@ -312,6 +383,7 @@ void drwLineTool::BrushWidthMove( int x, int y )
 		CurrentScene->MarkModified();
 		m_lastXWin = x;
 		m_lastYWin = y;
+		ParametersChanged();
 	}
 }
 
