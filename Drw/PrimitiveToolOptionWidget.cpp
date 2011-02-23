@@ -58,6 +58,14 @@ void PrimitiveToolOptionWidget::pressureOpacityCheckBoxStateChanged( int state )
 	}
 }
 
+void PrimitiveToolOptionWidget::fillCheckBoxStateChanged( int state )
+{
+	if( state == Qt::Unchecked )
+		m_lineTool->SetFill( false );
+	else if( state == Qt::Checked )
+		m_lineTool->SetFill( true );
+}
+
 void PrimitiveToolOptionWidget::FrameChangeRadioToggled( bool isOn )
 {
 	if( isOn && !m_updating )

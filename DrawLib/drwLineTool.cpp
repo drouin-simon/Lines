@@ -308,6 +308,7 @@ Node * drwLineTool::CreateNewNode()
 			WideLine * newWideLine = new WideLine( m_baseWidth );
 			newWideLine->SetPressureWidth( m_pressureWidth );
 			newWideLine->SetPressureOpacity( m_pressureOpacity );
+			newWideLine->SetFill( m_fill );
 			newPrimitive = newWideLine;
 		}
 			break;

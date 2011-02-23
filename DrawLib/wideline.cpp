@@ -10,9 +10,13 @@ drwGlslShader * WideLine::m_shader = 0;
 
 WideLine::WideLine( double width )
 : m_width( width )
+, m_pressureWidth( true )
+, m_pressureOpacity( true )
+, m_fill( false )
 , m_boundingBox( 0.0, 0.0, 0.0, 0.0 )
 , m_prevPoint( 0, 0 )
 , m_prevPressure( 1.0 )
+, m_doneAddingPoints( false )
 {
 }
 
@@ -24,12 +28,26 @@ WideLine::~WideLine()
 
 void WideLine::InternDraw( const drwDrawingContext & context )
 {
-	// Draw line to texture in grayscale
-    glEnable( GL_BLEND );
-
+	// Draw mask to texture
     drwDrawableTexture * tex = context.GetWorkingTexture();
     tex->DrawToTexture( true );
     glColor4d( 1.0, 1.0, 1.0, 1.0 );
+
+	// 1 - fill if needed
+	if( m_fill && m_doneAddingPoints && m_fillIndices.size() > 3 )
+	{
+		glDisable( GL_BLEND );
+		glEnable( GL_COLOR_LOGIC_OP );
+		glLogicOp( GL_INVERT );
+		glVertexPointer( 2, GL_DOUBLE, 0, m_fillVertices.GetBuffer() );
+		glDisableClientState( GL_TEXTURE_COORD_ARRAY );
+		glDrawElements( GL_TRIANGLE_FAN, m_fillIndices.size(), GL_UNSIGNED_INT, m_fillIndices.GetBuffer() );
+
+		glDisable( GL_COLOR_LOGIC_OP );
+	}
+
+	// 2 - draw wideline
+	glEnable( GL_BLEND );
 
 	if( !m_shader )
 		Init();
@@ -39,8 +57,10 @@ void WideLine::InternDraw( const drwDrawingContext & context )
 	glBlendEquation( GL_MAX );
 
     glVertexPointer( 2, GL_DOUBLE, 0, m_vertices.GetBuffer() );
+	glEnableClientState( GL_TEXTURE_COORD_ARRAY );
 	glTexCoordPointer( 3, GL_DOUBLE, 0, m_texCoord.GetBuffer() );
     glDrawElements( GL_QUADS, m_indices.size(), GL_UNSIGNED_INT, m_indices.GetBuffer() );
+
 	glBlendEquation( GL_FUNC_ADD );
 	m_shader->UseProgram( false );
 
@@ -122,7 +142,11 @@ void WideLine::StartPoint( double x, double y, double pressure )
 	m_indices.push_back( nextIndex + 1 );
 	m_indices.push_back( nextIndex + 8 );
 	m_indices.push_back( nextIndex + 7 );
-	
+
+	// Fill
+	if( m_fill )
+		AddFillPoint( x, y );
+
     m_prevPoint[0] = x;
     m_prevPoint[1] = y;
 	m_prevPressure = pressure;
@@ -132,10 +156,22 @@ void WideLine::StartPoint( double x, double y, double pressure )
 void WideLine::EndPoint( double x, double y, double pressure )
 {
     AddPoint( x, y, pressure );
+	if( m_fill )
+	{
+		AddLinePoint( m_fillVertices.at(0)[0], m_fillVertices.at(0)[1], pressure );
+		m_fillIndices.push_back( 0 );
+		m_doneAddingPoints = true;
+	}
 }
 
-
 void WideLine::AddPoint( double x, double y, double pressure )
+{
+	AddLinePoint( x, y, pressure );
+	if( m_fill )
+		AddFillPoint( x, y );
+}
+
+void WideLine::AddLinePoint( double x, double y, double pressure )
 {
 	double prevWidth = m_width;
 	if( m_pressureWidth )
@@ -219,6 +255,13 @@ void WideLine::AddPoint( double x, double y, double pressure )
     // cache information for next AddPoint
     m_prevPoint = newPoint;
 	m_prevPressure = pressure;
+}
+
+void WideLine::AddFillPoint( double x, double y )
+{
+	m_fillVertices.push_back( Vec2( x, y ) );
+	int lastIndex = m_fillVertices.size() - 1;
+	m_fillIndices.push_back( lastIndex );
 }
 
 static const char* shaderCode = " \

@@ -29,6 +29,7 @@ private slots:
 	void OnColorSliderValueChanged( double );
 	void pressureWidthCheckBoxStateChanged(int);
 	void pressureOpacityCheckBoxStateChanged(int);
+	void fillCheckBoxStateChanged(int);
 	void FrameChangeRadioToggled(bool);
 	void OnPersistenceSpinBoxValueChanged(int);
 	void ToolModified();

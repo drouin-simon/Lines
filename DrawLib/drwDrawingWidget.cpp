@@ -186,7 +186,6 @@ void drwDrawingWidget::initializeGL()
 
 	// Enable vertex arrays: needed by geometry classes
 	glEnableClientState( GL_VERTEX_ARRAY );
-	glEnableClientState( GL_TEXTURE_COORD_ARRAY );
 	
 	// Default background color
 	glClearColor( 1.0f, 0.0f, 0.0f, 1.0f );

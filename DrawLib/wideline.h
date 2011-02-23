@@ -30,11 +30,17 @@ public:
 protected:
 	
 	virtual void InternDraw( const drwDrawingContext & context );
+	void AddLinePoint( double x, double y, double pressure );
+	void AddFillPoint( double x, double y );
 
-    // Complete description of the polygons
+	// WideLine
     drwVec2Array m_vertices;
 	drwVec3Array m_texCoord;
     drwIndexArray m_indices;
+
+	// Fill
+	drwVec2Array m_fillVertices;
+	drwIndexArray m_fillIndices;
 
     // Line attributes
     double m_width;
@@ -46,6 +52,7 @@ protected:
     // cache previous point computation during editing
     Vec2       m_prevPoint;
 	double	   m_prevPressure;
+	bool m_doneAddingPoints;
 	
 	static drwGlslShader * m_shader;
 };
