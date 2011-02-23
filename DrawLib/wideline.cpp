@@ -6,7 +6,7 @@
 #include "drwDrawableTexture.h"
 
 drwGlslShader * WideLine::m_shader = 0;
-
+static const double squareRootOfTwo = sqrt(2.0);
 
 WideLine::WideLine( double width )
 : m_width( width )
@@ -189,8 +189,9 @@ void WideLine::AddLinePoint( double x, double y, double pressure )
 	}
 
     // add current point bounding box to global bounding box
-    m_boundingBox.IncludePoint( x - curWidth, y - curWidth );
-    m_boundingBox.IncludePoint( x + curWidth, y + curWidth );
+	double boxOffset = curWidth * squareRootOfTwo;
+	m_boundingBox.IncludePoint( x - boxOffset, y - boxOffset );
+	m_boundingBox.IncludePoint( x + boxOffset, y + boxOffset );
 	
 	Vec2 newPoint( x, y );
 	Vec2 direction = newPoint - m_prevPoint;
