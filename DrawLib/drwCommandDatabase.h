@@ -18,16 +18,15 @@ public:
 	
 	bool Read( const char * filename );
 	bool Write( const char * filename );
-	void ExecuteAll();
 	
 	bool IsModified() { return Modified; }
 	void Clear();
-	int GetNumberOfCommands() { return Commands.size(); }
 	void PushCommand( drwCommand::s_ptr command );
-	
-signals:
-	
-	void CommandRead( drwCommand::s_ptr command );
+
+    // Client access to the commands in the db
+    void LockDb( bool l );
+    int GetNumberOfCommands() { return Commands.size(); }
+    drwCommand::s_ptr GetCommand( int index );
 	
 protected:
 	

@@ -106,13 +106,26 @@ void drwNetworkServer::ConnectionReadySlot( drwNetworkConnection * connection )
 {
 	// Send the initial command
 	drwCommandDatabase * db = m_dispatcher->GetDb();
-	drwCommand::s_ptr command( new drwServerInitialCommand( db->GetNumberOfCommands() ) );
+    drwCommand::s_ptr command( new drwServerInitialCommand( db->GetNumberOfCommands() ) );
 	connection->SendCommand( command );
 
 	// Send all commands in the database.
-	connect( db, SIGNAL(CommandRead(drwCommand::s_ptr)), connection, SLOT(SendCommand(drwCommand::s_ptr)), Qt::DirectConnection);
-	db->ExecuteAll();
-	disconnect(db, SIGNAL(CommandRead(drwCommand::s_ptr)), connection, SLOT(SendCommand(drwCommand::s_ptr)) );
+    db->LockDb( true );
+    int nbCommands = db->GetNumberOfCommands();
+    for( int i = 0; i < nbCommands; ++i )
+    {
+        // Get a copy of the next command
+        drwCommand::s_ptr com = db->GetCommand( i );
+
+        // Translate local user id if needed
+        int commandId = com->GetUserId();
+        if( commandId == m_dispatcher->GetLocalUserId() )
+            com->SetUserId( m_translatedLocalUserId );
+
+        // Send
+        connection->SendCommand( com );
+    }
+    db->LockDb( false );
 }
 
 void drwNetworkServer::ConnectionLost( drwNetworkConnection * connection )

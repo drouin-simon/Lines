@@ -47,14 +47,12 @@ bool drwCommandDatabase::Read( const char * filename )
 			return false;
 		}
 		Commands.push_back( command );
-		emit CommandRead( command );
 	}
 	Modifiable = true;
 	m_commandMutex.unlock();
 	
 	file.close();
 	return true;
-	
 }
 
 
@@ -88,17 +86,6 @@ bool drwCommandDatabase::Write( const char * filename )
 	return true;
 }
 
-void drwCommandDatabase::ExecuteAll()
-{
-	m_commandMutex.lock();
-	container::iterator it = Commands.begin();
-	for( ; it != Commands.end(); ++it )
-	{
-		emit CommandRead( *it );
-	}
-	m_commandMutex.unlock();
-}
-
 void drwCommandDatabase::Clear()
 {
 	m_commandMutex.lock();
@@ -115,7 +102,20 @@ void drwCommandDatabase::PushCommand( drwCommand::s_ptr command )
 		// Copy the command for thread safety
 		drwCommand::s_ptr commandCopy = command->Clone();
 		Modified = true;
-		Commands.push_back( commandCopy);
+        Commands.push_back( commandCopy );
 	}
 	m_commandMutex.unlock();
+}
+
+void drwCommandDatabase::LockDb( bool l )
+{
+    if( l )
+        m_commandMutex.lock();
+    else
+        m_commandMutex.unlock();
+}
+
+drwCommand::s_ptr drwCommandDatabase::GetCommand( int index )
+{
+    drwCommand::s_ptr com = Commands[index]->Clone();
 }

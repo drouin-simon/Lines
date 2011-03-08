@@ -158,11 +158,15 @@ void MainWindow::fileOpen()
 	m_scene->blockSignals( true );
 	m_localToolbox->blockSignals( true );
 	
-	// Read
-	connect( m_commandDb, SIGNAL( CommandRead(drwCommand::s_ptr) ), m_commandDispatcher, SLOT( IncomingDbCommand( drwCommand::s_ptr ) ) );
+    // Read commands from the file
 	m_commandDb->Read( m_filename.toAscii() );
-	disconnect( m_commandDb, SIGNAL( CommandRead(drwCommand::s_ptr) ), m_commandDispatcher, SLOT( IncomingDbCommand( drwCommand::s_ptr ) ) );
-	
+
+    // Dispatch commands
+    m_commandDb->LockDb( true );
+    for( int i = 0; i < m_commandDb->GetNumberOfCommands(); ++i )
+        m_commandDispatcher->IncomingDbCommand( m_commandDb->GetCommand( i ) );
+    m_commandDb->LockDb( false );
+
 	// Re-enable signal transmission
 	m_localToolbox->blockSignals( false );
 	m_scene->blockSignals( false );
