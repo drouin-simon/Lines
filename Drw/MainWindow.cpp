@@ -164,7 +164,10 @@ void MainWindow::fileOpen()
     // Dispatch commands
     m_commandDb->LockDb( true );
     for( int i = 0; i < m_commandDb->GetNumberOfCommands(); ++i )
-        m_commandDispatcher->IncomingDbCommand( m_commandDb->GetCommand( i ) );
+    {
+        drwCommand::s_ptr com = m_commandDb->GetCommand( i );
+        m_commandDispatcher->IncomingDbCommand( com );
+    }
     m_commandDb->LockDb( false );
 
 	// Re-enable signal transmission

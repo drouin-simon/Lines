@@ -118,4 +118,5 @@ void drwCommandDatabase::LockDb( bool l )
 drwCommand::s_ptr drwCommandDatabase::GetCommand( int index )
 {
     drwCommand::s_ptr com = Commands[index]->Clone();
+    return com;
 }
