@@ -35,7 +35,6 @@ protected:
 	container Commands;
 	
 	bool Modified;
-	bool Modifiable;
 	
 	static const quint32 MagicNumber;
 	

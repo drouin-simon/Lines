@@ -14,10 +14,8 @@ Line::~Line()
 
 void Line::InternDraw( const drwDrawingContext & context )
 {
-	if( context.m_isOverridingColor )
-		glColor4d( context.m_colorOverride[0], context.m_colorOverride[1], context.m_colorOverride[2], context.m_opacity );
-	else
-		glColor4d( m_color[0], m_color[1], m_color[2], context.m_opacity );
+    Vec4 color = m_color * context.m_colorMultiplier;
+    glColor4d( color[0], color[1], color[2], color[3] );
 
 	glLineWidth( m_lineWidth );
     glVertexPointer( 2, GL_DOUBLE, 0, m_pointTable.GetBuffer() );

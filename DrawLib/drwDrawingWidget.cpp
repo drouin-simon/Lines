@@ -235,14 +235,44 @@ void drwDrawingWidget::paintGL()
 		else if( !DisplaySettings->GetInhibitOnionSkin() )
 		{
 			drwDrawingContext c(this);
-			c.m_opacity = .4;
-			for( int i = 0; i < DisplaySettings->GetOnionSkinBefore(); ++i )
-				if( Controler->GetCurrentFrame() - i - 1 >= 0 )
-					CurrentScene->DrawFrame( Controler->GetCurrentFrame() - i - 1, c );
-			for( int i = 0; i < DisplaySettings->GetOnionSkinAfter(); ++i )
-				if( Controler->GetCurrentFrame() + i + 1 < CurrentScene->GetNumberOfFrames() - 1 )
-					CurrentScene->DrawFrame( Controler->GetCurrentFrame() + i + 1, c );
-		}
+
+            if( DisplaySettings->GetOnionSkinBefore() > 0 )
+            {
+                Vec4 onionSkinColor( 1.0, 0.90, 0.90, 1.0 );
+                int nbOnionSkinBefore = DisplaySettings->GetOnionSkinBefore();
+                for( int i = 0; i < nbOnionSkinBefore; ++i )
+                {
+                    int frameToDraw = Controler->GetCurrentFrame() - nbOnionSkinBefore + i;
+                    if( frameToDraw >= 0 )
+                    {
+                        double halfDiff = (double)( Controler->GetCurrentFrame() - frameToDraw ) * .2;
+                        double onionSkinOpacity = 1 / exp( halfDiff );
+                        c.m_colorMultiplier = onionSkinOpacity * onionSkinColor;
+                        c.m_colorMultiplier[3] = 1.0;
+                        CurrentScene->DrawFrame( frameToDraw, c );
+                    }
+                }
+            }
+
+            if( DisplaySettings->GetOnionSkinAfter() )
+            {
+                Vec4 onionSkinColor( .90, .90, 1.0, 1.0 );
+                int nbOnionSkinAfter = DisplaySettings->GetOnionSkinAfter();
+                for( int i = 0; i < nbOnionSkinAfter; ++i )
+                {
+                    int frameToDraw = Controler->GetCurrentFrame() + nbOnionSkinAfter - i;
+                    if( frameToDraw < CurrentScene->GetNumberOfFrames() - 1 )
+                    {
+                        double halfDiff = (double)( frameToDraw - Controler->GetCurrentFrame() ) * .2;
+                        double onionSkinOpacity = 1 / exp( halfDiff );
+                        c.m_colorMultiplier = onionSkinOpacity * onionSkinColor;
+                        c.m_colorMultiplier[3] = 1.0;
+                        CurrentScene->DrawFrame( frameToDraw, c );
+                    }
+                }
+            }
+        }
+
 		drwDrawingContext mainContext(this);
 		CurrentScene->DrawFrame( Controler->GetCurrentFrame(), mainContext );
 		
@@ -255,7 +285,7 @@ void drwDrawingWidget::paintGL()
 	}
 	
 	// for debugging purpose - display a dot moving every redraw
-	DisplayCounter();
+    //DisplayCounter();
 	
 	// Draw Output frame
 	if( DisplaySettings->GetShowCameraFrame() )
@@ -305,7 +335,6 @@ void drwDrawingWidget::DisplayCounter()
 void drwDrawingWidget::DrawAllFramesHue()
 {
 	drwDrawingContext c(this);
-	c.m_isOverridingColor = true;
 	double interval = 1.0;
 	if( CurrentScene->GetNumberOfFrames() > 0 )
 		interval = 1.0 / CurrentScene->GetNumberOfFrames();
@@ -313,12 +342,13 @@ void drwDrawingWidget::DrawAllFramesHue()
 	{
 		if( i != Controler->GetCurrentFrame() )
 		{
-			double hue = interval * i;
-			QColor color = QColor::fromHslF( hue, 1.0, .5 );
-			c.m_colorOverride[0] = color.redF();
-			c.m_colorOverride[1] = color.greenF();
-			c.m_colorOverride[2] = color.blueF();
-			CurrentScene->DrawFrame( i, c );
+            double hue = interval * i;
+            QColor color = QColor::fromHslF( hue, 1.0, .5 );
+            c.m_colorMultiplier[0] = color.redF();
+            c.m_colorMultiplier[1] = color.greenF();
+            c.m_colorMultiplier[2] = color.blueF();
+            c.m_colorMultiplier[3] = 1.0;
+            CurrentScene->DrawFrame( i, c );
 		}
 	}
 }
@@ -331,13 +361,12 @@ void drwDrawingWidget::DrawAllFramesRedGreen()
 	{
 		double interval = .7 / currentFrame;
 		drwDrawingContext c(this);
-		c.m_isOverridingColor = true;
-		c.m_colorOverride[0] = 1.0;
-		c.m_colorOverride[1] = 0.0;
-		c.m_colorOverride[2] = 0.0;
+        c.m_colorMultiplier[0] = 1.0;
+        c.m_colorMultiplier[1] = 0.0;
+        c.m_colorMultiplier[2] = 0.0;
 		for( int i = 0; i < currentFrame; ++i )
 		{
-			c.m_opacity = .2 + i * interval;
+            c.m_colorMultiplier[0] = .2 + i * interval;
 			CurrentScene->DrawFrame( i, c ); 
 		}
 	}
@@ -346,14 +375,13 @@ void drwDrawingWidget::DrawAllFramesRedGreen()
 	{
 		double interval = .7 / framesAfter;
 		drwDrawingContext c(this);
-		c.m_isOverridingColor = true;
-		c.m_colorOverride[0] = 0.0;
-		c.m_colorOverride[1] = 1.0;
-		c.m_colorOverride[2] = 0.0;
+        c.m_colorMultiplier[0] = 0.0;
+        c.m_colorMultiplier[1] = 1.0;
+        c.m_colorMultiplier[2] = 0.0;
 		for( int i = 1; i < framesAfter; ++i )
 		{
-			c.m_opacity = .9 - i * interval;
-			CurrentScene->DrawFrame( i + currentFrame, c );
+            c.m_colorMultiplier[1] = .9 - i * interval;
+            CurrentScene->DrawFrame( i + currentFrame, c );
 		}
 	}
 }

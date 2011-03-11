@@ -5,10 +5,9 @@
 const quint32 drwCommandDatabase::MagicNumber = (quint32)0x44524157;  // "DRAW"
 
 drwCommandDatabase::drwCommandDatabase( QObject * parent )
-: QObject( parent )
+    : QObject( parent )
+    , Modified( false )
 {
-	Modified = false;
-	Modifiable = true;
 }
 
 bool drwCommandDatabase::Read( const char * filename )
@@ -33,7 +32,6 @@ bool drwCommandDatabase::Read( const char * filename )
 	}
 	
 	// read all commands
-	Modifiable = false;
 	while( !in.atEnd() ) 
 	{
 		drwCommand::s_ptr command = drwCommand::ReadHeader( in );
@@ -48,7 +46,6 @@ bool drwCommandDatabase::Read( const char * filename )
 		}
 		Commands.push_back( command );
 	}
-	Modifiable = true;
 	m_commandMutex.unlock();
 	
 	file.close();
@@ -97,13 +94,12 @@ void drwCommandDatabase::Clear()
 void drwCommandDatabase::PushCommand( drwCommand::s_ptr command )
 {
 	m_commandMutex.lock();
-	if( Modifiable )
-	{
-		// Copy the command for thread safety
-		drwCommand::s_ptr commandCopy = command->Clone();
-		Modified = true;
-        Commands.push_back( commandCopy );
-	}
+
+    // Copy the command for thread safety
+    drwCommand::s_ptr commandCopy = command->Clone();
+    Modified = true;
+    Commands.push_back( commandCopy );
+
 	m_commandMutex.unlock();
 }
 

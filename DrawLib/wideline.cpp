@@ -67,10 +67,8 @@ void WideLine::InternDraw( const drwDrawingContext & context )
     tex->DrawToTexture( false );
 
 	// Paste the texture to screen with the right color
-    if( context.m_isOverridingColor )
-        glColor4d( context.m_colorOverride[0], context.m_colorOverride[1], context.m_colorOverride[2], 1.0 );
-    else
-        glColor4d( m_color[0] * context.m_opacity, m_color[1] * context.m_opacity, m_color[2] * context.m_opacity, 1.0 );
+    Vec4 color = m_color * context.m_colorMultiplier;
+    glColor4d( color[0], color[1], color[2], color[3] );
 
     int xWinMin = 0;
     int yWinMin = 0;
