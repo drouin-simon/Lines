@@ -1,4 +1,4 @@
-#include <glut.h>
+#include <IncludeGlut.h>
 #include <stdlib.h>
 #include "drwGlslShader.h"
 

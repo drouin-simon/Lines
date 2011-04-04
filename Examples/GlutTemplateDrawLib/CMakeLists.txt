@@ -15,6 +15,10 @@ include_directories(${DRAWLIB_INCLUDE_DIR})
 SET( theProject_SRC main.cpp )
 
 ADD_EXECUTABLE( ${theProjectName} ${theProject_SRC} )
-TARGET_LINK_LIBRARIES( ${theProjectName} svl Draw ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY} ${GLUT_LIBRARIES}  )
+target_link_libraries( ${theProjectName} svl Draw ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY} ${GLUT_LIBRARIES}  )
+
+if( NOT APPLE )
+    target_link_libraries( ${theProjectName} GLee )
+endif( NOT APPLE )
 
 add_dependencies( ${theProjectName} svl Draw )
