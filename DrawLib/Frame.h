@@ -4,8 +4,7 @@
 #include "macros.h"
 #include <vector>
 #include "Node.h"
-
-class drwSWFWriter;
+#include <QReadWriteLock>
 
 class Frame
 {
@@ -18,13 +17,17 @@ public:
 	void Clear();
 		
 	void Draw( const drwDrawingContext & context );
-	void AddNode( Node * node );
+    int AddNode( Node * node );
 	Node * GetNodeById( unsigned Id );
+
+    Node * LockNode( int nodeIndex );
+    void UnlockNode( int nodeIndex );
 		
 protected:
 		
-	typedef std::vector<Node::s_ptr> NodeCont;
+    typedef std::vector<Node*> NodeCont;
 	NodeCont Nodes;
+    QReadWriteLock m_nodesLock;
 		
 };
 

@@ -11,9 +11,9 @@
 drwLineTool::drwLineTool( Scene * scene, drwEditionState * editionState, QObject * parent )
 : drwWidgetObserver( scene, parent )
 , m_cursorShouldAppear( false )
-, LastXWorld( 0.0 )
-, LastYWorld( 0.0 )
-, LastPressure( 1.0 )
+, m_lastXWorld( 0.0 )
+, m_lastYWorld( 0.0 )
+, m_lastPressure( 1.0 )
 , m_lastXWin( 0 )
 , m_lastYWin( 0 )
 , IsDrawing( false )
@@ -151,9 +151,9 @@ void drwLineTool::ExecuteMouseCommand( drwCommand::s_ptr command )
 	if( mouseCom->GetType() == drwMouseCommand::Press )
 	{
 		IsDrawing = true;
-		LastXWorld = mouseCom->X();
-		LastYWorld = mouseCom->Y();
-		LastPressure = mouseCom->Pressure();
+        m_lastXWorld = mouseCom->X();
+        m_lastYWorld = mouseCom->Y();
+        m_lastPressure = mouseCom->Pressure();
 		CreateNewNodes();
 		emit CommandExecuted( command );
 		emit StartInteraction();
@@ -163,17 +163,24 @@ void drwLineTool::ExecuteMouseCommand( drwCommand::s_ptr command )
 		CurrentNodesCont::iterator it = CurrentNodes.begin();
 		while( it != CurrentNodes.end() )
 		{
-			LinePrimitive * prim = dynamic_cast<LinePrimitive*> (it->second->GetPrimitive());
+            int nodeId = it->second;
+            int frameIndex = it->first;
+
+            Node * n = CurrentScene->LockNode( frameIndex, nodeId );
+            LinePrimitive * prim = dynamic_cast<LinePrimitive*> (n->GetPrimitive());
+            Q_ASSERT( prim );
 			prim->EndPoint( mouseCom->X(), mouseCom->Y(), mouseCom->Pressure() );
+            CurrentScene->UnlockNode( frameIndex, nodeId );
+
 			++it;
 		}
 		CurrentNodes.clear();
 		CurrentScene->MarkModified();
 		IsDrawing = false;
 
-		LastXWorld = mouseCom->X();
-		LastYWorld = mouseCom->Y();
-		LastPressure = mouseCom->Pressure();
+        m_lastXWorld = mouseCom->X();
+        m_lastYWorld = mouseCom->Y();
+        m_lastPressure = mouseCom->Pressure();
 		emit CommandExecuted( command );
 		emit EndInteraction();
 	}
@@ -184,14 +191,21 @@ void drwLineTool::ExecuteMouseCommand( drwCommand::s_ptr command )
 			CurrentNodesCont::iterator it = CurrentNodes.begin();
 			while( it != CurrentNodes.end() )
 			{
-				LinePrimitive * prim = dynamic_cast<LinePrimitive*> (it->second->GetPrimitive());
+                int nodeId = it->second;
+                int frameIndex = it->first;
+
+                Node * n = CurrentScene->LockNode( frameIndex, nodeId );
+                LinePrimitive * prim = dynamic_cast<LinePrimitive*> (n->GetPrimitive());
+                Q_ASSERT( prim );
 				prim->AddPoint( mouseCom->X(), mouseCom->Y(), mouseCom->Pressure() );
+                CurrentScene->UnlockNode( frameIndex, nodeId );
+
 				++it;
 			}
 			CurrentScene->MarkModified();
-			LastXWorld = mouseCom->X();
-			LastYWorld = mouseCom->Y();
-			LastPressure = mouseCom->Pressure();
+            m_lastXWorld = mouseCom->X();
+            m_lastYWorld = mouseCom->Y();
+            m_lastPressure = mouseCom->Pressure();
 			emit CommandExecuted( command );
 		}
 	}
@@ -216,9 +230,16 @@ void drwLineTool::SetCurrentFrame( int frame )
 			}
 			else
 			{
-				LinePrimitive * prim = dynamic_cast<LinePrimitive*> (it->second->GetPrimitive());
-				prim->EndPoint( LastXWorld, LastYWorld, LastPressure );
-				CurrentNodesCont::iterator temp = it;
+                int nodeId = it->second;
+
+                // Lock node and make changes
+                Node * n = CurrentScene->LockNode( frame, nodeId );
+                LinePrimitive * prim = dynamic_cast<LinePrimitive*> (n->GetPrimitive());
+                Q_ASSERT( prim );
+                prim->EndPoint( m_lastXWorld, m_lastYWorld, m_lastPressure );
+                CurrentScene->UnlockNode( frame, nodeId );
+
+                CurrentNodesCont::iterator temp = it;
 				++it;
 				CurrentNodes.erase( temp );
 			}
@@ -231,9 +252,9 @@ void drwLineTool::SetCurrentFrame( int frame )
 
 void drwLineTool::Reset()
 {
-	LastXWorld = 0.0;
-	LastYWorld = 0.0;
-	LastPressure = 1.0;
+    m_lastXWorld = 0.0;
+    m_lastYWorld = 0.0;
+    m_lastPressure = 1.0;
 	m_lastXWin = 0;
 	m_lastYWin = 0;
 	IsDrawing = false;
@@ -245,6 +266,7 @@ void drwLineTool::Reset()
 	m_fill = false;
 	m_persistence = 0;
 	m_brushScaling = false;
+    CurrentNodes.clear();
 }
 
 void drwLineTool::SetPressureWidth( bool w )
@@ -316,7 +338,7 @@ Node * drwLineTool::CreateNewNode()
 			break;
 	}
 	newPrimitive->SetColor( Color );
-	newPrimitive->StartPoint( LastXWorld, LastYWorld, LastPressure );
+    newPrimitive->StartPoint( m_lastXWorld, m_lastYWorld, m_lastPressure );
 	Node * CurrentNode = new Node;
 	CurrentNode->SetPrimitive( newPrimitive );
 	return CurrentNode;
@@ -332,8 +354,8 @@ void drwLineTool::CreateNewNodes( )
 		if( it == CurrentNodes.end() )
 		{
 			Node * newNode = CreateNewNode();
-			CurrentScene->AddNodeToFrame( newNode, frame );
-			CurrentNodes[frame] = newNode;
+            int nodeId = CurrentScene->AddNodeToFrame( newNode, frame );
+            CurrentNodes[frame] = nodeId;
 		}	
 	}
 }

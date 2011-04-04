@@ -186,10 +186,10 @@ void ImageFlippingTool::DropEvent( drwDrawingWidget * w, QDropEvent * e )
 				newNode.PointNode = new Node;
 				newNode.PointNode->SetPrimitive( PointGeometry );
 				newNode.PointNode->SetPosition( Vec2( xWorld, yWorld ) );
-				CurrentScene->AddNode(newNode.PointNode);
+                CurrentScene->AddNodeToFrame(newNode.PointNode, 0 );
 				newNode.SpriteNode = new Node;
 				newNode.SpriteNode->SetPrimitive( sprite );
-				CurrentScene->AddNode(newNode.SpriteNode);
+                CurrentScene->AddNodeToFrame(newNode.SpriteNode, 0 );
 				Nodes.push_back( newNode );
 			}
 		}

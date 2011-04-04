@@ -225,8 +225,6 @@ void drwDrawingWidget::paintGL()
 	if( CurrentScene )
 	{
 		// Draw the Scene
-		drwDrawingContext persistentContext(this);
-		CurrentScene->DrawPersistent( persistentContext );
 		if( DisplaySettings->GetShowAllFrames() )
 		{
 			//DrawAllFramesHue();

@@ -64,9 +64,9 @@ protected:
 	void BrushWidthEnd( int x, int y );
 	void BrushWidthMove( int x, int y );
 	
-	double LastXWorld;
-	double LastYWorld;
-	double LastPressure;
+    double m_lastXWorld;
+    double m_lastYWorld;
+    double m_lastPressure;
 	int m_lastXWin;
 	int m_lastYWin;
 	
@@ -85,7 +85,7 @@ protected:
 	double m_maxWidth;
 	bool m_brushScaling;
 	
-	typedef std::map< int, Node* > CurrentNodesCont;
+    typedef std::map< int, int > CurrentNodesCont;  // ( frame, nodeId )
 	CurrentNodesCont CurrentNodes;
 	
 	drwEditionState * m_editionState;

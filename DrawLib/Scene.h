@@ -4,7 +4,7 @@
 #include "macros.h"
 #include <vector>
 #include <QObject>
-#include <QMutex>
+#include <QReadWriteLock>
 #include "Frame.h"
 
 class ImageSprite;
@@ -22,12 +22,14 @@ public:
 	
 	void Clear();
 	
-	void DrawPersistent( const drwDrawingContext & context );
 	void DrawFrame( int frame, const drwDrawingContext & context );
 	
-	void AddNode( Node * node );
-	void AddNodeToFrame( Node * node, int frame );
+    int AddNodeToFrame( Node * node, int frame );
 	Node * GetNodeById( int frame, unsigned Id );
+
+    // Lock a node in a frame for writing
+    Node * LockNode( int frameIndex, int nodeIndex );
+    void UnlockNode( int frameIndex, int nodeIndex );
 	
 	void SetNumberOfFrames( int nbFrames );
 	int GetNumberOfFrames() { return Frames.size(); }
@@ -55,12 +57,9 @@ protected:
 	drwCursor * m_cursor;
 	bool m_cursorVisible;
 	
-	// Part of the scene that is displayed for any frame
-	Frame  AlwaysDisplayed;
-	
-	// Only one at a time is displayed
-	QMutex m_nodesMutex;
-	std::vector<Frame> Frames;
+    QReadWriteLock m_framesLock;
+    typedef std::vector<Frame*> FrameCont;
+    FrameCont Frames;
 	
 	// Database of images used throughout the scene
 	struct ImageInfo
