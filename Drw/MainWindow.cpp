@@ -15,6 +15,7 @@
 #include "drwCommandDispatcher.h"
 #include "drwNetworkManager.h"
 #include "drwBitmapExporter.h"
+#include "drwLineToolViewportWidget.h"
 
 #include <QtGui>
 
@@ -60,14 +61,18 @@ MainWindow::MainWindow()
 	m_glWidget->SetObserver( m_localToolbox );
 	m_glWidget->SetControler( m_controler );
 	drawingAreaLayout->addWidget( m_glWidget );
+
+    // Create special widget to go inside drawing widget
+    drwLineTool * lineTool = dynamic_cast<drwLineTool*>(m_localToolbox->GetTool( 0 ));
+    Q_ASSERT(lineTool);
+    m_viewportWidget = new drwLineToolViewportWidget( m_glWidget, lineTool );
+    m_glWidget->SetViewportWidget( m_viewportWidget );
 	
 	// Create playback control widget
 	m_playbackControlerWidget = new PlaybackControlerWidget( m_glWidget->GetControler(), mainWidget );
 	drawingAreaLayout->addWidget( m_playbackControlerWidget );
 
 	// Alternative right panel
-	drwLineTool * lineTool = dynamic_cast<drwLineTool*>(m_localToolbox->GetTool( 0 ));
-	Q_ASSERT(lineTool);
 	m_toolOptionWidget = new PrimitiveToolOptionWidget( m_controler->GetEditionState(), lineTool, mainWidget );
 	rightPanelLayout->addWidget( m_toolOptionWidget );
 	m_displaySettingsWidget = new DisplaySettingsWidget( m_glWidget->GetDisplaySettings(), mainWidget );
@@ -96,6 +101,7 @@ MainWindow::MainWindow()
 
 MainWindow::~MainWindow()
 {
+    delete m_viewportWidget;
 }
 
 void MainWindow::CreateActions()

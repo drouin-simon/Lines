@@ -23,6 +23,7 @@ class DisplaySettingsWidget;
 class PlaybackControler;
 class drwCommandDispatcher;
 class drwNetworkManager;
+class drwLineToolViewportWidget;
 
 class MainWindow : public QMainWindow
 {
@@ -99,6 +100,7 @@ private:
 	drwCommandDatabase		* m_commandDb;
 	drwCommandDispatcher		* m_commandDispatcher;
 	drwNetworkManager		* m_networkManager;
+    drwLineToolViewportWidget * m_viewportWidget;
 
 	QProgressDialog * m_progressDialog;
 

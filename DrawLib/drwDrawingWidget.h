@@ -34,6 +34,7 @@ public:
 	GetMacro( DisplaySettings, drwDisplaySettings* );
 	drwDrawableTexture * GetWorkTexture() { return m_workTexture; }
 	Camera & GetCamera() { return theCamera; }
+    void SetViewportWidget( drwLineToolViewportWidget * w );
 	
 	drwCommand::s_ptr CreateMouseCommand( drwMouseCommand::MouseCommandType commandType, QMouseEvent * e );
 	drwCommand::s_ptr CreateMouseCommand( drwMouseCommand::MouseCommandType commandType, QTabletEvent * e );

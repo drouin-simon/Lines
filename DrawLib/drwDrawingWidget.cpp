@@ -46,6 +46,11 @@ void drwDrawingWidget::SetControler( PlaybackControler * controler )
 	connect(Controler, SIGNAL(StartStop(bool)), SLOT(PlaybackStartStop(bool)) );
 }
 
+void drwDrawingWidget::SetViewportWidget( drwLineToolViewportWidget * w )
+{
+    m_viewportWidget = w;
+}
+
 drwCommand::s_ptr drwDrawingWidget::CreateMouseCommand( drwMouseCommand::MouseCommandType commandType, QMouseEvent * e )
 {
 	double xWin = (double)e->x();
@@ -490,7 +495,7 @@ void drwDrawingWidget::keyPressEvent( QKeyEvent * event )
 	if( event->key() == Qt::Key_Alt )
 	{
 		QPoint p = this->mapFromGlobal(QCursor::pos());
-		m_viewportWidget = new drwLineToolViewportWidget( this, p.x(), p.y() );
+        m_viewportWidget->Activate( p.x(), p.y() );
 		updateGL();
 	}
 	else
@@ -501,8 +506,7 @@ void drwDrawingWidget::keyReleaseEvent( QKeyEvent * event )
 {
 	if( event->key() == Qt::Key_Alt && m_viewportWidget )
 	{
-		delete m_viewportWidget;
-		m_viewportWidget = 0;
+        m_viewportWidget->Deactivate();
 		updateGL();
 	}
 	else
@@ -519,6 +523,9 @@ void drwDrawingWidget::leaveEvent( QEvent * e )
 {
 	if( Observer )
 		Observer->LeaveEvent( this, e );
+    if( m_viewportWidget )
+        m_viewportWidget->Deactivate();
+    updateGL();
 }
 
 void drwDrawingWidget::dragEnterEvent(QDragEnterEvent *event)
