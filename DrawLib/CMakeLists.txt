@@ -34,7 +34,8 @@ set( DrawLib_src  drwDrawingWidget.cpp
 		drwCommandDispatcher.cpp 
 		drwBitmapExporter.cpp
 		drwCursor.cpp 
-		drwGradientWidget.cpp )
+		drwGradientWidget.cpp
+		drwLineToolViewportWidget.cpp )
 
 set( DrawLib_hdr_moc 	drwDrawingWidget.h 
 			drwWidgetObserver.h
@@ -73,7 +74,8 @@ set( DrawLib_hdr	drwDrawingWidgetInteractor.h
 			drwCommand.h
 			drwDataArray.h
 			PolygonData.h
-			drwCursor.h )
+			drwCursor.h 
+			drwLineToolViewportWidget.h)
 
 # Include bin directory for ui_ files
 include_directories(${CMAKE_CURRENT_BINARY_DIR})

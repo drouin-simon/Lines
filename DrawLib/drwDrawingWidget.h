@@ -13,6 +13,9 @@ class Node;
 class PlaybackControler;
 class drwDisplaySettings;
 class drwDrawableTexture;
+class drwLineToolViewportWidget;
+
+class QPushButton;
 
 class drwDrawingWidget : public QGLWidget
 {
@@ -58,6 +61,8 @@ protected:
 	virtual void mouseReleaseEvent(QMouseEvent*);
 	virtual void mouseMoveEvent(QMouseEvent*);
 	virtual void tabletEvent ( QTabletEvent * event );
+	virtual void keyPressEvent ( QKeyEvent * event );
+	virtual void keyReleaseEvent( QKeyEvent * event );
 	
 	// Manage timer that generates updateGL in playback mode
 	int m_timerId;
@@ -83,6 +88,7 @@ private:
 	PlaybackControler	* Controler;
 	drwDisplaySettings	* DisplaySettings;
 	drwDrawableTexture * m_workTexture;
+	drwLineToolViewportWidget * m_viewportWidget;
 	
 	bool HasDrawn;
 	bool m_needUpdateGL;

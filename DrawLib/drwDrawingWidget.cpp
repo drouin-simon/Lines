@@ -9,6 +9,7 @@
 #include "drwDrawingContext.h"
 #include "drwDrawableTexture.h"
 #include "drwDrawingWidgetInteractor.h"
+#include "drwLineToolViewportWidget.h"
 
 drwDrawingWidget::drwDrawingWidget( QWidget * parent ) 
 : QGLWidget( parent )
@@ -19,6 +20,7 @@ drwDrawingWidget::drwDrawingWidget( QWidget * parent )
 , DisplaySettings(0)
 , HasDrawn(false)
 , m_needUpdateGL(false)
+, m_viewportWidget(0)
 {
 	m_interactor = new drwDrawingWidgetInteractor( this );
 	DisplaySettings = new drwDisplaySettings;
@@ -27,6 +29,7 @@ drwDrawingWidget::drwDrawingWidget( QWidget * parent )
 	setAcceptDrops(true);
 	setMouseTracking(true);
 	setCursor( Qt::BlankCursor );
+	setFocusPolicy(Qt::StrongFocus);
 }
 
 drwDrawingWidget::~drwDrawingWidget()
@@ -211,6 +214,11 @@ void drwDrawingWidget::paintGL()
 	glClearColor( 0.0, 0.0, 0.0, 1.0 );
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	
+	// needed by line drawing code. simtodo : should not be here.
+	glEnable( GL_TEXTURE_RECTANGLE_ARB );
+	glEnable( GL_BLEND );     
+	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA ); 
+	
 	// If first time drawing : position the camera to include frame
 	if( !HasDrawn )
 	{
@@ -289,6 +297,11 @@ void drwDrawingWidget::paintGL()
 	if( DisplaySettings->GetShowCameraFrame() )
 	{
 		DrawFrame();
+	}
+	
+	if( m_viewportWidget )
+	{
+		m_viewportWidget->Draw();
 	}
 }
 
@@ -470,6 +483,30 @@ void drwDrawingWidget::tabletEvent ( QTabletEvent * e )
 	
 	if( Observer )
 		Observer->TabletEvent( this, e );
+}
+
+void drwDrawingWidget::keyPressEvent( QKeyEvent * event )
+{
+	if( event->key() == Qt::Key_Alt )
+	{
+		QPoint p = this->mapFromGlobal(QCursor::pos());
+		m_viewportWidget = new drwLineToolViewportWidget( this, p.x(), p.y() );
+		updateGL();
+	}
+	else
+		QGLWidget::keyPressEvent( event );
+}
+
+void drwDrawingWidget::keyReleaseEvent( QKeyEvent * event )
+{
+	if( event->key() == Qt::Key_Alt && m_viewportWidget )
+	{
+		delete m_viewportWidget;
+		m_viewportWidget = 0;
+		updateGL();
+	}
+	else
+		QGLWidget::keyReleaseEvent( event );
 }
 
 void drwDrawingWidget::enterEvent( QEvent * e )
