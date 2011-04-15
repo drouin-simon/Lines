@@ -479,21 +479,10 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 			m_glWidget->GetControler()->GotoStart();
 			handled = true;
 		}
-		else if( keyEvent->key() == Qt::Key_Comma )
-		{
-			int currentFrame = m_glWidget->GetControler()->GetCurrentFrame();
-			m_scene->InsertFrame( currentFrame );
-			m_glWidget->RequestRedraw();
-		}
-		else if( keyEvent->key() == Qt::Key_Period )
-		{
-			int currentFrame = m_glWidget->GetControler()->GetCurrentFrame();
-			m_scene->InsertFrame( currentFrame + 1 );
-			m_glWidget->GetControler()->NextFrame();
-		}
 		else if( keyEvent->key() == Qt::Key_B )
 		{
 			m_localToolbox->ToggleBrushEraser();
+			handled = true;
 		}
 	} 
 	if( !handled )
