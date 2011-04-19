@@ -13,6 +13,7 @@ public:
 
     void WindowToWorld( int xwin, int ywin, double & xworld, double & yworld );
     void WorldToGLWindow( double xworld, double yworld, int & xwin, int & ywin );
+    double PixelsPerUnit() { return m_windowH / m_virtWindowH; }
 
     void SetViewportSize( int w, int h );
 

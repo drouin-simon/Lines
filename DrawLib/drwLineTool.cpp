@@ -5,17 +5,13 @@
 #include "Node.h"
 #include "drwEditionState.h"
 #include "drwDrawingWidget.h"
-#include "drwCursor.h"
 #include <QTabletEvent>
 
 drwLineTool::drwLineTool( Scene * scene, drwEditionState * editionState, QObject * parent )
 : drwWidgetObserver( scene, parent )
-, m_cursorShouldAppear( false )
 , m_lastXWorld( 0.0 )
 , m_lastYWorld( 0.0 )
 , m_lastPressure( 1.0 )
-, m_lastXWin( 0 )
-, m_lastYWin( 0 )
 , IsDrawing( false )
 , Color(1.0,1.0,1.0,1.0)
 , Type( TypeWideLine )
@@ -26,101 +22,50 @@ drwLineTool::drwLineTool( Scene * scene, drwEditionState * editionState, QObject
 , m_persistence( 0 )
 , m_minWidth( 2.0 )
 , m_maxWidth( 100.0 )
-, m_brushScaling( false )
 , m_editionState(editionState)
 {	
 	// Make sure the Reset function is the only one driving initial param values
 	Reset();
-
-	// simtodo : fix this
-	CurrentScene->GetCursor()->SetRadius( m_baseWidth );
 }
 
 void drwLineTool::MousePressEvent( drwDrawingWidget * w, QMouseEvent * e )
 {
-	if( e->modifiers() & Qt::AltModifier )
-		BrushWidthStart( e->x(), e->y() );
-	else 
-	{
-		drwCommand::s_ptr command = w->CreateMouseCommand( drwMouseCommand::Press, e );
-		SetCursorPosition( command );
-		ExecuteCommand( command );
-	}
+    drwCommand::s_ptr command = w->CreateMouseCommand( drwMouseCommand::Press, e );
+    ExecuteCommand( command );
 }
 
 void drwLineTool::MouseReleaseEvent( drwDrawingWidget * w, QMouseEvent * e )
 {
-	if( m_brushScaling )
-		BrushWidthEnd( e->x(), e->y() );
-	else 
-	{
-		drwCommand::s_ptr command = w->CreateMouseCommand( drwMouseCommand::Release, e );
-		SetCursorPosition( command );
-		ExecuteCommand( command );
-	}
+    drwCommand::s_ptr command = w->CreateMouseCommand( drwMouseCommand::Release, e );
+    ExecuteCommand( command );
 }
 
 void drwLineTool::MouseMoveEvent( drwDrawingWidget * w, QMouseEvent * e )
 {
-	if( m_brushScaling )
-		BrushWidthMove( e->x(), e->y() );
-	else 
-	{
-		drwCommand::s_ptr command = w->CreateMouseCommand( drwMouseCommand::Move, e );
-		SetCursorPosition( command );
-		ExecuteCommand( command );
-	}
+    drwCommand::s_ptr command = w->CreateMouseCommand( drwMouseCommand::Move, e );
+    ExecuteCommand( command );
 }
 
 void drwLineTool::TabletEvent( drwDrawingWidget * w, QTabletEvent * e )
 {
-	if( e->modifiers() & Qt::AltModifier && e->type() == QEvent::TabletPress )
-		BrushWidthStart( e->x(), e->y() );
-	else if( m_brushScaling )
-	{
-		if( e->type() == QEvent::TabletRelease )
-			BrushWidthEnd( e->x(), e->y() );
-		else if( e->type() == QEvent::TabletMove )
-			BrushWidthMove( e->x(), e->y() );
-	}
-	else 
-	{
-		if( e->type() == QEvent::TabletPress )
-		{
-			drwCommand::s_ptr command = w->CreateMouseCommand( drwMouseCommand::Press, e );
-			SetCursorPosition( command );
-			ExecuteCommand( command );
-			e->accept();
-		}
-		else if( e->type() == QEvent::TabletRelease )
-		{
-			drwCommand::s_ptr command = w->CreateMouseCommand( drwMouseCommand::Release, e );
-			SetCursorPosition( command );
-			ExecuteCommand( command );
-			e->accept();
-		}
-		else if( e->type() == QEvent::TabletMove )
-		{
-			drwCommand::s_ptr command = w->CreateMouseCommand( drwMouseCommand::Move, e );
-			SetCursorPosition( command );
-			ExecuteCommand( command );
-			e->accept();
-		}
-	}
-}
-
-void drwLineTool::EnterEvent( drwDrawingWidget * w, QEvent * e ) 
-{
-	m_cursorShouldAppear = true;
-}
-
-
-void drwLineTool::LeaveEvent( drwDrawingWidget * w, QEvent * e ) 
-{
-	if( m_cursorShouldAppear )
-		m_cursorShouldAppear = false;
-	if( !m_brushScaling )
-		CurrentScene->SetCursorVisible( false );
+    if( e->type() == QEvent::TabletPress )
+    {
+        drwCommand::s_ptr command = w->CreateMouseCommand( drwMouseCommand::Press, e );
+        ExecuteCommand( command );
+        e->accept();
+    }
+    else if( e->type() == QEvent::TabletRelease )
+    {
+        drwCommand::s_ptr command = w->CreateMouseCommand( drwMouseCommand::Release, e );
+        ExecuteCommand( command );
+        e->accept();
+    }
+    else if( e->type() == QEvent::TabletMove )
+    {
+        drwCommand::s_ptr command = w->CreateMouseCommand( drwMouseCommand::Move, e );
+        ExecuteCommand( command );
+        e->accept();
+    }
 }
 
 void drwLineTool::ExecuteCommand( drwCommand::s_ptr command )
@@ -255,8 +200,6 @@ void drwLineTool::Reset()
     m_lastXWorld = 0.0;
     m_lastYWorld = 0.0;
     m_lastPressure = 1.0;
-	m_lastXWin = 0;
-	m_lastYWin = 0;
 	IsDrawing = false;
 	Color = Vec4(1.0,1.0,1.0,1.0);
 	Type = TypeWideLine;
@@ -265,7 +208,6 @@ void drwLineTool::Reset()
 	m_pressureOpacity = true;
 	m_fill = false;
 	m_persistence = 0;
-	m_brushScaling = false;
     CurrentNodes.clear();
 }
 
@@ -297,6 +239,16 @@ void drwLineTool::SetPersistence( int p )
 {
 	m_persistence = p;
 	ParametersChanged();
+}
+
+void drwLineTool::SetBaseWidth( double newBaseWidth )
+{
+    m_baseWidth = newBaseWidth;
+    if( m_baseWidth < m_minWidth )
+        m_baseWidth = m_minWidth;
+    if( m_baseWidth > m_maxWidth )
+        m_baseWidth = m_maxWidth;
+    ParametersChanged();
 }
 
 void drwLineTool::ParametersChanged()
@@ -360,53 +312,4 @@ void drwLineTool::CreateNewNodes( )
 	}
 }
 
-
-void drwLineTool::SetCursorPosition( drwCommand::s_ptr command )
-{
-	drwMouseCommand * mouseCom = dynamic_cast<drwMouseCommand*>(command.get());
-	if( mouseCom )
-	{
-		if( m_cursorShouldAppear )
-		{
-			CurrentScene->SetCursorVisible( true );
-			m_cursorShouldAppear = false;
-		}
-		CurrentScene->GetCursor()->SetPosition( mouseCom->X(), mouseCom->Y() );
-		CurrentScene->MarkModified();
-	}
-}
-
-void drwLineTool::BrushWidthStart( int x, int y )
-{
-	m_lastXWin = x;
-	m_lastYWin = y;
-	m_brushScaling = true;
-	CurrentScene->GetCursor()->SetShowArrow( true );
-	CurrentScene->MarkModified();
-}
-
-void drwLineTool::BrushWidthEnd( int x, int y )
-{
-	m_brushScaling = false;
-	CurrentScene->GetCursor()->SetShowArrow( false );
-	CurrentScene->MarkModified();
-}
-
-void drwLineTool::BrushWidthMove( int x, int y )
-{
-	if( m_brushScaling )
-	{
-		double diffY = y - m_lastYWin;
-		m_baseWidth += diffY * -0.2;
-		if( m_baseWidth < m_minWidth )
-			m_baseWidth = m_minWidth;
-		if( m_baseWidth > m_maxWidth )
-			m_baseWidth = m_maxWidth;
-		CurrentScene->GetCursor()->SetRadius( m_baseWidth );
-		CurrentScene->MarkModified();
-		m_lastXWin = x;
-		m_lastYWin = y;
-		ParametersChanged();
-	}
-}
 

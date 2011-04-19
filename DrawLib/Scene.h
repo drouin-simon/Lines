@@ -39,10 +39,6 @@ public:
 	
 	ImageSprite * GetImageSprite( const char * filename );
 	
-	void DrawCursor( const drwDrawingContext & context );
-	void SetCursorVisible( bool visible );
-	drwCursor * GetCursor() { return m_cursor; }
-	
 signals:
 	
 	void Modified();
@@ -53,9 +49,6 @@ public slots:
 	void InsertFrame( int beforeThisFrame );
 	
 protected:
-	
-	drwCursor * m_cursor;
-	bool m_cursorVisible;
 	
     QReadWriteLock m_framesLock;
     typedef std::vector<Frame*> FrameCont;

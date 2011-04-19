@@ -1,14 +1,11 @@
 #include "Scene.h"
 #include "Node.h"
 #include "ImageSprite.h"
-#include "drwCursor.h"
 #include <QImage>
 
 Scene::Scene( QObject * parent )
 : QObject( parent )
 {
-	m_cursor = new drwCursor;
-	m_cursorVisible = false;
 }
 
 Scene::~Scene()
@@ -25,7 +22,6 @@ Scene::~Scene()
 		delete m_imageDb[i].Sprite;
 	}
 	m_imageDb.clear();
-	delete m_cursor;
 }
 
 void Scene::Clear()
@@ -152,17 +148,3 @@ ImageSprite * Scene::GetImageSprite( const char * filename )
 	return info.Sprite;
 }
 
-void Scene::DrawCursor( const drwDrawingContext & context )
-{
-	if( m_cursorVisible )
-		m_cursor->Draw( context );
-}
-
-void Scene::SetCursorVisible( bool visible ) 
-{ 
-	if( visible != m_cursorVisible )
-	{
-		m_cursorVisible = visible;
-		MarkModified();
-	}
-}

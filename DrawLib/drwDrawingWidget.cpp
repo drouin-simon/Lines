@@ -10,17 +10,19 @@
 #include "drwDrawableTexture.h"
 #include "drwDrawingWidgetInteractor.h"
 #include "drwLineToolViewportWidget.h"
+#include "drwCursor.h"
 
 drwDrawingWidget::drwDrawingWidget( QWidget * parent ) 
-: QGLWidget( parent )
+: QGLWidget( QGLFormat(QGL::SampleBuffers), parent )
 , m_timerId(-1)
 , Observer(0)
 , CurrentScene(0)
 , Controler(0)
 , DisplaySettings(0)
-, HasDrawn(false)
-, m_needUpdateGL(false)
 , m_viewportWidget(0)
+, m_cursor(0)
+, m_showCursor(false)
+, HasDrawn(false)
 {
 	m_interactor = new drwDrawingWidgetInteractor( this );
 	DisplaySettings = new drwDisplaySettings;
@@ -30,6 +32,7 @@ drwDrawingWidget::drwDrawingWidget( QWidget * parent )
 	setMouseTracking(true);
 	setCursor( Qt::BlankCursor );
 	setFocusPolicy(Qt::StrongFocus);
+	setAutoFillBackground(false);
 }
 
 drwDrawingWidget::~drwDrawingWidget()
@@ -49,6 +52,11 @@ void drwDrawingWidget::SetControler( PlaybackControler * controler )
 void drwDrawingWidget::SetViewportWidget( drwLineToolViewportWidget * w )
 {
     m_viewportWidget = w;
+}
+
+void drwDrawingWidget::SetCursor( drwCursor * cursor )
+{
+    m_cursor = cursor;
 }
 
 drwCommand::s_ptr drwDrawingWidget::CreateMouseCommand( drwMouseCommand::MouseCommandType commandType, QMouseEvent * e )
@@ -141,12 +149,12 @@ void drwDrawingWidget::SetCurrentScene( Scene * cur )
 
 void drwDrawingWidget::RequestRedraw()
 {
-	updateGL();
+	update();
 }
 
 void drwDrawingWidget::CurrentFrameChanged()
 {
-	updateGL();
+	update();
 	Observer->SetCurrentFrame( Controler->GetCurrentFrame() );
 }
 
@@ -172,7 +180,7 @@ void drwDrawingWidget::PlaybackStartStop( bool isStarting )
 
 void drwDrawingWidget::DisplaySettingsModified()
 {
-	updateGL();
+	update();
 }
 
 
@@ -213,9 +221,10 @@ void drwDrawingWidget::resizeGL( int w, int h )
 	m_workTexture->Resize( w, h );
 }
 
-
-void drwDrawingWidget::paintGL()
+void drwDrawingWidget::paintEvent( QPaintEvent * /*event*/ )
 {
+	makeCurrent();
+	
 	glClearColor( 0.0, 0.0, 0.0, 1.0 );
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	
@@ -286,13 +295,6 @@ void drwDrawingWidget::paintGL()
 
 		drwDrawingContext mainContext(this);
 		CurrentScene->DrawFrame( Controler->GetCurrentFrame(), mainContext );
-		
-		glDisableClientState( GL_TEXTURE_COORD_ARRAY );
-		glPushAttrib( GL_CURRENT_BIT );
-		glColor4d( 1.0, 0.0, 0.0, 1.0 );
-		CurrentScene->DrawCursor( mainContext );
-		glPopAttrib();
-		glEnableClientState( GL_TEXTURE_COORD_ARRAY );
 	}
 	
 	// for debugging purpose - display a dot moving every redraw
@@ -304,10 +306,24 @@ void drwDrawingWidget::paintGL()
 		DrawFrame();
 	}
 	
+	QPainter painter;
+	painter.begin( this );
+	painter.setRenderHint(QPainter::Antialiasing);
+	painter.setRenderHint(QPainter::TextAntialiasing);
+	
+    // Draw the viewport widget if needed
 	if( m_viewportWidget )
 	{
-		m_viewportWidget->Draw();
+		m_viewportWidget->Draw( painter );
 	}
+
+    // draw the cursor if needed
+    if( m_cursor && m_showCursor )
+    {
+        m_cursor->Draw( painter );
+    }
+	
+	painter.end();
 }
 
 void drwDrawingWidget::DisplayCounter()
@@ -346,6 +362,11 @@ void drwDrawingWidget::DisplayCounter()
 	
 	++displayCount;
 	
+}
+
+void drwDrawingWidget::UpdatePosition( int x, int y )
+{
+    m_cursor->SetPosition( x, y );
 }
 
 void drwDrawingWidget::DrawAllFramesHue()
@@ -443,7 +464,15 @@ void drwDrawingWidget::DrawFrame()
 
 void drwDrawingWidget::mousePressEvent( QMouseEvent * e )
 {
-	// try the interactor first
+    // update the cursor position and all that stuff
+    UpdatePosition( e->x(), e->y() );
+
+	// Try the widget
+	bool widgetSwallows = m_viewportWidget->MousePress( e->x(), e->y() );
+	if( widgetSwallows )
+		return;
+	
+	// try the interactor
 	bool interactorSwallows = m_interactor->mousePressEvent( e );
 	if( interactorSwallows )
 		return;
@@ -453,23 +482,43 @@ void drwDrawingWidget::mousePressEvent( QMouseEvent * e )
 	{
 		Observer->MousePressEvent( this, e );
 	}
+
+    update();
 }
 
 
 void drwDrawingWidget::mouseReleaseEvent( QMouseEvent * e )
 {
-	// try the interactor first
+    // update the cursor position and all that stuff
+    UpdatePosition( e->x(), e->y() );
+
+	// Try the widget
+	bool widgetSwallows = m_viewportWidget->MouseRelease( e->x(), e->y() );
+	if( widgetSwallows )
+		return;
+	
+	// try the interactor
 	bool interactorSwallows = m_interactor->mouseReleaseEvent( e );
 	if( interactorSwallows )
 		return;
 	
 	if ( e->button() == Qt::LeftButton && Observer )
 		Observer->MouseReleaseEvent( this, e );
+
+    update();
 }
 
 
 void drwDrawingWidget::mouseMoveEvent( QMouseEvent * e )
 {
+    // update the cursor position and all that stuff
+    UpdatePosition( e->x(), e->y() );
+
+	// Try the widget
+	bool widgetSwallows = m_viewportWidget->MouseMove( e->x(), e->y() );
+	if( widgetSwallows )
+		return;
+	
 	// try the interactor first
 	bool interactorSwallows = m_interactor->mouseMoveEvent( e );
 	if( interactorSwallows )
@@ -477,10 +526,15 @@ void drwDrawingWidget::mouseMoveEvent( QMouseEvent * e )
 	
 	if ( Observer )
 		Observer->MouseMoveEvent( this, e );
+
+    update();
 }
 
 void drwDrawingWidget::tabletEvent ( QTabletEvent * e )
 {
+    // update the cursor position and all that stuff
+    UpdatePosition( e->x(), e->y() );
+
 	// try the interactor first
 	bool interactorSwallows = m_interactor->tabletEvent( e );
 	if( interactorSwallows )
@@ -488,6 +542,8 @@ void drwDrawingWidget::tabletEvent ( QTabletEvent * e )
 	
 	if( Observer )
 		Observer->TabletEvent( this, e );
+
+    update();
 }
 
 void drwDrawingWidget::keyPressEvent( QKeyEvent * event )
@@ -496,7 +552,7 @@ void drwDrawingWidget::keyPressEvent( QKeyEvent * event )
 	{
 		QPoint p = this->mapFromGlobal(QCursor::pos());
         m_viewportWidget->Activate( p.x(), p.y() );
-		updateGL();
+		update();
 	}
 	else
 		QGLWidget::keyPressEvent( event );
@@ -507,7 +563,7 @@ void drwDrawingWidget::keyReleaseEvent( QKeyEvent * event )
 	if( event->key() == Qt::Key_Alt && m_viewportWidget )
 	{
         m_viewportWidget->Deactivate();
-		updateGL();
+		update();
 	}
 	else
 		QGLWidget::keyReleaseEvent( event );
@@ -515,17 +571,15 @@ void drwDrawingWidget::keyReleaseEvent( QKeyEvent * event )
 
 void drwDrawingWidget::enterEvent( QEvent * e )
 {
-	if( Observer )
-		Observer->EnterEvent( this, e );
+    m_showCursor = true;
 }
 
 void drwDrawingWidget::leaveEvent( QEvent * e )
 {
-	if( Observer )
-		Observer->LeaveEvent( this, e );
+    m_showCursor = false;
     if( m_viewportWidget )
         m_viewportWidget->Deactivate();
-    updateGL();
+	update();
 }
 
 void drwDrawingWidget::dragEnterEvent(QDragEnterEvent *event)
@@ -557,13 +611,6 @@ bool drwDrawingWidget::event( QEvent * e )
 	{
 		controlerUpdated = Controler->Tick();
 	}
-	
-	// If an updateGL was requested and the controller didn't produce it, trigger updateGL.
-	if( m_needUpdateGL && !controlerUpdated )
-	{
-		updateGL();
-	}
-	m_needUpdateGL = false;
 	
 	return QGLWidget::event(e);
 }

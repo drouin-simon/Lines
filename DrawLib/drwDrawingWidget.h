@@ -35,6 +35,7 @@ public:
 	drwDrawableTexture * GetWorkTexture() { return m_workTexture; }
 	Camera & GetCamera() { return theCamera; }
     void SetViewportWidget( drwLineToolViewportWidget * w );
+    void SetCursor( drwCursor * cursor );
 	
 	drwCommand::s_ptr CreateMouseCommand( drwMouseCommand::MouseCommandType commandType, QMouseEvent * e );
 	drwCommand::s_ptr CreateMouseCommand( drwMouseCommand::MouseCommandType commandType, QTabletEvent * e );
@@ -52,11 +53,13 @@ protected:
 		
 	virtual void initializeGL();
 	virtual void resizeGL( int width, int height );
-	virtual void paintGL();
+	//virtual void paintGL();
+	virtual void paintEvent( QPaintEvent * /*event*/ );
 	void DrawAllFramesHue();
 	void DrawAllFramesRedGreen();
 	void DrawFrame();
 	void DisplayCounter();
+    void UpdatePosition( int x, int y );
 
 	virtual void mousePressEvent(QMouseEvent*);
 	virtual void mouseReleaseEvent(QMouseEvent*);
@@ -90,10 +93,10 @@ private:
 	drwDisplaySettings	* DisplaySettings;
 	drwDrawableTexture * m_workTexture;
 	drwLineToolViewportWidget * m_viewportWidget;
-	
+    drwCursor * m_cursor;
+    bool m_showCursor;
+
 	bool HasDrawn;
-	bool m_needUpdateGL;
-	
 }; 
 
 #endif

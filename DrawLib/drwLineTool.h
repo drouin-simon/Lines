@@ -26,8 +26,6 @@ public:
 	virtual void MouseReleaseEvent( drwDrawingWidget * w, QMouseEvent * e );
 	virtual void MouseMoveEvent( drwDrawingWidget * w, QMouseEvent * e );
 	virtual void TabletEvent( drwDrawingWidget * w, QTabletEvent * e );
-	virtual void EnterEvent( drwDrawingWidget * w, QEvent * e );
-	virtual void LeaveEvent( drwDrawingWidget * w, QEvent * e );
 	
 	virtual void ExecuteCommand( drwCommand::s_ptr command );
 	virtual void SetCurrentFrame( int frame );
@@ -44,6 +42,8 @@ public:
 	void SetColor( Vec4 & c );
 	int GetPersistence() { return m_persistence; }
 	void SetPersistence( int p );
+    void SetBaseWidth( double bw );
+    double GetBaseWidth() { return m_baseWidth; }
 
 signals:
 
@@ -57,18 +57,9 @@ protected:
 	void CreateNewNodes();
 	Node * CreateNewNode();
 	
-	void SetCursorPosition( drwCommand::s_ptr command );
-	bool m_cursorShouldAppear;
-	
-	void BrushWidthStart( int x, int y );
-	void BrushWidthEnd( int x, int y );
-	void BrushWidthMove( int x, int y );
-	
     double m_lastXWorld;
     double m_lastYWorld;
     double m_lastPressure;
-	int m_lastXWin;
-	int m_lastYWin;
 	
 	bool IsDrawing;
 	
@@ -83,7 +74,6 @@ protected:
 
 	double m_minWidth;
 	double m_maxWidth;
-	bool m_brushScaling;
 	
     typedef std::map< int, int > CurrentNodesCont;  // ( frame, nodeId )
 	CurrentNodesCont CurrentNodes;

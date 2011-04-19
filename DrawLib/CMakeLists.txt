@@ -35,7 +35,7 @@ set( DrawLib_src  drwDrawingWidget.cpp
 		drwBitmapExporter.cpp
 		drwCursor.cpp 
 		drwGradientWidget.cpp
-		drwLineToolViewportWidget.cpp )
+        drwLineToolViewportWidget.cpp )
 
 set( DrawLib_hdr_moc 	drwDrawingWidget.h 
 			drwWidgetObserver.h
