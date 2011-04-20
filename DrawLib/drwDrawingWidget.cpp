@@ -212,6 +212,8 @@ void drwDrawingWidget::initializeGL()
 
 	// Initialize the working texture (used to draw widelines, among others)
 	m_workTexture->Init( 1, 1 );
+
+    EnableVSync(true);
 }
 
 
@@ -367,6 +369,21 @@ void drwDrawingWidget::DisplayCounter()
 void drwDrawingWidget::UpdatePosition( int x, int y )
 {
     m_cursor->SetPosition( x, y );
+}
+
+#ifdef Q_WS_MAC
+#import <OpenGL/OpenGL.h>
+#endif
+
+void drwDrawingWidget::EnableVSync( bool enable )
+{
+#ifdef Q_WS_MAC
+    int swap_interval = 1;
+    if( !enable )
+        swap_interval = 0;
+    CGLContextObj cgl_context = CGLGetCurrentContext();
+    CGLSetParameter( cgl_context, kCGLCPSwapInterval, &swap_interval );
+#endif
 }
 
 void drwDrawingWidget::DrawAllFramesHue()

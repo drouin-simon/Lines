@@ -60,6 +60,7 @@ protected:
 	void DrawFrame();
 	void DisplayCounter();
     void UpdatePosition( int x, int y );
+    void EnableVSync( bool enable );
 
 	virtual void mousePressEvent(QMouseEvent*);
 	virtual void mouseReleaseEvent(QMouseEvent*);
