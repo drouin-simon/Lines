@@ -34,19 +34,85 @@ void display(void)
 	
 	shaderProgram.UseProgram( true );
 	shaderProgram.SetVariable( "line_radius", lineRadius );
-    shaderProgram.SetVariable( "min_line_radius", float(.5) );
+    shaderProgram.SetVariable( "min_line_radius", float(4.0) );
+    shaderProgram.SetVariable( "pix_margin", float(4.0) );
 
     Vec2 diff = point2 - point1;
     diff.Normalise();
+    Vec2 front = diff;
+    Vec2 back = -1 * diff;
     Vec2 left( -diff[1], diff[0] );
     Vec2 right = -1.0 * left;
+    Vec2 backRight = back + right;
+    Vec2 backLeft = back + left;
+    Vec2 frontRight = front + right;
+    Vec2 frontLeft = front + left;
 	
+    glEnable( GL_BLEND );
+    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 	glColor4d( 1.0, 0.0, 0.0, 0.0 );
 	glBegin( GL_QUADS );
-    glNormal3f( left[0], left[1], 0 ); glVertex2d( point1[0], point1[1] );
-    glNormal3f( right[0], right[1], 0 ); glVertex2d( point1[0], point1[1] );
-    glNormal3f( right[0], right[1], 0 ); glVertex2d( point2[0], point2[1] );
-    glNormal3f( left[0], left[1], 0 ); glVertex2d( point2[0], point2[1] );
+    {
+        // Start right
+        glTexCoord3f( 0, 1.0, 1.0 );
+        glNormal3f( back[0], back[1], 0 );              glVertex2d( point1[0], point1[1] );
+        glTexCoord3f( 1.0, 1.0, 1.0 );
+        glNormal3f( backRight[0], backRight[1], 0 );    glVertex2d( point1[0], point1[1] );
+        glTexCoord3f( 1.0, 0.0, 1.0 );
+        glNormal3f( right[0], right[1], 0 );            glVertex2d( point1[0], point1[1] );
+        glTexCoord3f( 0, 0.0, 1.0 );
+        glNormal3f( 0, 0, 0 );                          glVertex2d( point1[0], point1[1] );
+
+        // Start left
+        glTexCoord3f( 0.0, 1.0, 1.0 );
+        glNormal3f( back[0], back[1], 0 );              glVertex2d( point1[0], point1[1] );
+        glTexCoord3f( 0.0, 0.0, 1.0 );
+        glNormal3f( 0, 0, 0 );                          glVertex2d( point1[0], point1[1] );
+        glTexCoord3f( 1.0, 0.0, 1.0 );
+        glNormal3f( left[0], left[1], 0 );              glVertex2d( point1[0], point1[1] );
+        glTexCoord3f( 1.0, 1.0, 1.0 );
+        glNormal3f( backLeft[0], backLeft[1], 0 );      glVertex2d( point1[0], point1[1] );
+
+        // Center right
+        glTexCoord3f( 0.0, 0.0, 1.0 );
+        glNormal3f( 0, 0, 0 );                          glVertex2d( point1[0], point1[1] );
+        glTexCoord3f( 1.0, 0.0, 1.0 );
+        glNormal3f( right[0], right[1], 0 );            glVertex2d( point1[0], point1[1] );
+        glTexCoord3f( 1.0, 0.0, 1.0 );
+        glNormal3f( right[0], right[1], 0 );            glVertex2d( point2[0], point2[1] );
+        glTexCoord3f( 0, 0.0, 1.0 );
+        glNormal3f( 0, 0, 0 );                          glVertex2d( point2[0], point2[1] );
+
+        // Center left
+        glTexCoord3f( 1.0, 0.0, 1.0 );
+        glNormal3f( left[0], left[1], 0 );              glVertex2d( point1[0], point1[1] );
+        glTexCoord3f( 0.0, 0.0, 1.0 );
+        glNormal3f( 0, 0, 0 );                          glVertex2d( point1[0], point1[1] );
+        glTexCoord3f( 0, 0.0, 1.0 );
+        glNormal3f( 0, 0, 0 );                          glVertex2d( point2[0], point2[1] );
+        glTexCoord3f( 1.0, 0.0, 1.0 );
+        glNormal3f( left[0], left[1], 0 );              glVertex2d( point2[0], point2[1] );
+
+        // end right
+        glTexCoord3f( 0, 0.0, 1.0 );
+        glNormal3f( 0, 0, 0 );                          glVertex2d( point2[0], point2[1] );
+        glTexCoord3f( 1.0, 0.0, 1.0 );
+        glNormal3f( right[0], right[1], 0 );            glVertex2d( point2[0], point2[1] );
+        glTexCoord3f( 1.0, 1.0, 1.0 );
+        glNormal3f( frontRight[0], frontRight[1], 0 );  glVertex2d( point2[0], point2[1] );
+        glTexCoord3f( 0.0, 1.0, 1.0 );
+        glNormal3f( front[0], front[1], 0 );            glVertex2d( point2[0], point2[1] );
+
+        // end left
+        glTexCoord3f( 0, 0.0, 1.0 );
+        glNormal3f( 0, 0, 0 );                          glVertex2d( point2[0], point2[1] );
+        glTexCoord3f( 0, 1.0, 1.0 );
+        glNormal3f( front[0], front[1], 0 );            glVertex2d( point2[0], point2[1] );
+        glTexCoord3f( 1.0, 1.0, 1.0 );
+        glNormal3f( frontLeft[0], frontLeft[1], 0 );    glVertex2d( point2[0], point2[1] );
+        glTexCoord3f( 1.0, 0.0, 1.0 );
+        glNormal3f( left[0], left[1], 0 );              glVertex2d( point2[0], point2[1] );
+    }
 	glEnd();
 	
 	shaderProgram.UseProgram( false );
@@ -60,8 +126,7 @@ void display(void)
 
 
 static const char * pixelShaderCode = " \
-uniform float margin; \
-uniform bool erase; \
+varying float margin; \
 \
 void main() \
 { \
@@ -77,23 +142,19 @@ void main() \
 		float exponent = - ( x * x / 0.2 );\
 		float fact = exp( exponent ); \
 		fact = fact * pressure; \
-		if( !erase ) \
-			gl_FragColor[3] = fact; \
-		else \
-			gl_FragColor[3] = 1.0 - fact; \
+        gl_FragColor[3] = fact; \
 	} \
 	else \
 	{ \
-		if( !erase ) \
-			gl_FragColor[3] = pressure; \
-		else \
-			gl_FragColor[3] = 1.0 - pressure; \
+        gl_FragColor[3] = pressure; \
 	} \
 }";
 
 static const char * vertexShaderCode = " \
 uniform float line_radius; \
 uniform float min_line_radius; \
+uniform float pix_margin; \
+varying float margin; \
 void main() \
 { \
 	vec4 scaled_normal = vec4( 0.0, 0.0, 0.0, 0.0 ); \
@@ -105,15 +166,18 @@ void main() \
         radius = min_line_radius; \
         damp_factor = line_radius / min_line_radius; \
     } \
+    margin = pix_margin / radius; \
     scaled_normal *= radius; \
 	vec4 newVertex = gl_Vertex + scaled_normal; \
 	gl_Position = gl_ModelViewProjectionMatrix * newVertex; \
     gl_FrontColor = gl_Color * damp_factor; \
+    gl_TexCoord[0] = gl_MultiTexCoord0; \
 }";
 
 
 void init(void) 
 {
+    shaderProgram.AddShaderMemSource( pixelShaderCode );
 	shaderProgram.AddVertexShaderMemSource( vertexShaderCode );
 	bool shaderInit = shaderProgram.Init();
 	if( !shaderInit )
@@ -121,6 +185,7 @@ void init(void)
 	shaderProgram.UseProgram( true );
 	shaderProgram.SetVariable( "line_radius", lineRadius );
     shaderProgram.SetVariable( "min_line_radius", float(.5) );
+    shaderProgram.SetVariable( "pix_margin", float(2.0) );
 	shaderProgram.UseProgram( false );
 	
 	glClearColor ( 0.0f, 0.0f, 0.0f, 0.0f);
@@ -129,6 +194,7 @@ void init(void)
 
    // enable texturing
    //glEnable( GL_TEXTURE_2D );
+
 }
 
 
