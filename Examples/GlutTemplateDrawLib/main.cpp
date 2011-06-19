@@ -33,9 +33,12 @@ void display(void)
 	glClear( GL_COLOR_BUFFER_BIT );
 	
 	shaderProgram.UseProgram( true );
-	shaderProgram.SetVariable( "line_radius", lineRadius );
-    shaderProgram.SetVariable( "min_line_radius", float(4.0) );
+    shaderProgram.SetVariable( "base_width", lineRadius );
+    shaderProgram.SetVariable( "pix_per_unit", float(1.0) );
     shaderProgram.SetVariable( "pix_margin", float(4.0) );
+    shaderProgram.SetVariable( "pix_damp_width", float(1.0) );
+    shaderProgram.SetVariable( "sigma_large", float(0.4) );
+    shaderProgram.SetVariable( "sigma_small", float(0.1) );
 
     Vec2 diff = point2 - point1;
     diff.Normalise();
@@ -127,6 +130,7 @@ void display(void)
 
 static const char * pixelShaderCode = " \
 varying float margin; \
+varying float sigma; \
 \
 void main() \
 { \
@@ -139,7 +143,7 @@ void main() \
 	if( invR < margin ) \
 	{ \
 		float x = 1.0 - invR / margin; \
-		float exponent = - ( x * x / 0.2 );\
+        float exponent = - ( x * x / sigma );\
 		float fact = exp( exponent ); \
 		fact = fact * pressure; \
         gl_FragColor[3] = fact; \
@@ -151,23 +155,42 @@ void main() \
 }";
 
 static const char * vertexShaderCode = " \
-uniform float line_radius; \
-uniform float min_line_radius; \
+uniform float base_width; \
+uniform float pix_per_unit; \
 uniform float pix_margin; \
+uniform float pix_damp_width; \
+uniform float sigma_large; \
+uniform float sigma_small; \
 varying float margin; \
+varying float sigma; \
 void main() \
 { \
+    float pix_width = base_width * pix_per_unit; \
+    sigma = sigma_large; \
+    float damp_factor = 1.0; \
+    margin = pix_margin / pix_width; \
+    \
+    if( pix_width < pix_margin )  \
+    { \
+        margin = 1.0; \
+        if( pix_width < pix_damp_width ) \
+        { \
+            sigma = sigma_small; \
+            damp_factor = pix_width / pix_damp_width; \
+        } \
+        else \
+        { \
+            float ratio = ( pix_width - pix_damp_width ) / ( pix_margin - pix_damp_width ); \
+            sigma = sigma_small + ratio * ( sigma_large - sigma_small ); \
+        } \
+        \
+        pix_width = pix_margin; \
+    } \
+    \
+    float width = pix_width / pix_per_unit; \
 	vec4 scaled_normal = vec4( 0.0, 0.0, 0.0, 0.0 ); \
 	scaled_normal.xyz = gl_Normal; \
-    float radius = line_radius; \
-    float damp_factor = 1.0; \
-    if( radius < min_line_radius ) \
-    { \
-        radius = min_line_radius; \
-        damp_factor = line_radius / min_line_radius; \
-    } \
-    margin = pix_margin / radius; \
-    scaled_normal *= radius; \
+    scaled_normal *= width; \
 	vec4 newVertex = gl_Vertex + scaled_normal; \
 	gl_Position = gl_ModelViewProjectionMatrix * newVertex; \
     gl_FrontColor = gl_Color * damp_factor; \
