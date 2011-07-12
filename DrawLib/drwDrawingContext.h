@@ -18,6 +18,7 @@ public:
 
     drwDrawableTexture * GetWorkingTexture() const;
     void WorldToGLWindow( double xworld, double yworld, int & xwin, int & ywin ) const;
+    double PixelsPerUnit() const;
 
     Vec4 m_colorMultiplier;
 	bool m_isPicking;

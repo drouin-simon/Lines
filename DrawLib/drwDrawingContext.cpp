@@ -10,3 +10,8 @@ void drwDrawingContext::WorldToGLWindow( double xworld, double yworld, int & xwi
 {
     m_widget->WorldToGLWindow( xworld, yworld, xwin, ywin );
 }
+
+double drwDrawingContext::PixelsPerUnit() const
+{
+    return m_widget->PixelsPerUnit();
+}

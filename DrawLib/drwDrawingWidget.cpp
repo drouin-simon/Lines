@@ -94,6 +94,11 @@ void drwDrawingWidget::WorldToGLWindow( double xworld, double yworld, int & xwin
     theCamera.WorldToGLWindow( xworld, yworld, xwin, ywin );
 }
 
+double drwDrawingWidget::PixelsPerUnit()
+{
+    return theCamera.PixelsPerUnit();
+}
+
 #define PICK_BUF_SIZE 512
 GLuint selectBuf[PICK_BUF_SIZE];
 

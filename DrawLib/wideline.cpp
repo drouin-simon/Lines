@@ -51,16 +51,26 @@ void WideLine::InternDraw( const drwDrawingContext & context )
 
 	if( !m_shader )
 		Init();
+
 	m_shader->UseProgram( true );
-	m_shader->SetVariable( "margin" , float(.5) );
+    m_shader->SetVariable( "base_width", float(m_width) );
+    m_shader->SetVariable( "pix_per_unit", float(context.PixelsPerUnit()) );
+    m_shader->SetVariable( "pix_margin", float(4.0) );
+    m_shader->SetVariable( "pix_damp_width", float(1.0) );
+    m_shader->SetVariable( "sigma_large", float(0.4) );
+    m_shader->SetVariable( "sigma_small", float(0.1) );
 		
 	glBlendEquation( GL_MAX );
 
     glVertexPointer( 2, GL_DOUBLE, 0, m_vertices.GetBuffer() );
 	glEnableClientState( GL_TEXTURE_COORD_ARRAY );
 	glTexCoordPointer( 3, GL_DOUBLE, 0, m_texCoord.GetBuffer() );
+    glEnableClientState( GL_NORMAL_ARRAY );
+    glNormalPointer( GL_DOUBLE, 0, m_normals.GetBuffer() );
     glDrawElements( GL_QUADS, m_indices.size(), GL_UNSIGNED_INT, m_indices.GetBuffer() );
 
+    glDisableClientState( GL_TEXTURE_COORD_ARRAY );
+    glDisableClientState( GL_NORMAL_ARRAY );
 	glBlendEquation( GL_FUNC_ADD );
 	m_shader->UseProgram( false );
 
@@ -89,57 +99,79 @@ void WideLine::InternDraw( const drwDrawingContext & context )
 
 void WideLine::StartPoint( double x, double y, double pressure )
 {
-	double curWidth = m_width;
-	if( m_pressureWidth )
-		curWidth *= pressure;
-
-	double opacity = 1.0;
-	if( m_pressureOpacity )
-		opacity *= pressure;
+    double curWidth = m_width;
+    if( m_pressureWidth )
+        curWidth *= pressure;
 
     // Init bounding box
     m_boundingBox.Init( x - curWidth, x + curWidth, y - curWidth, y + curWidth );
+
+    Vec2 newPoint( x, y );
+
+    // top left (0)
+    m_texCoord.push_back( Vec3( 1.0, 1.0, pressure ) );
+    m_normals.push_back( Vec3( -1.0, 1.0, 0 ) );
+    m_vertices.push_back( newPoint );
+
+    // top center (1)
+    m_texCoord.push_back( Vec3( 0.0, 1.0, pressure ) );
+    m_normals.push_back( Vec3( 0.0, 1.0, 0 ) );
+    m_vertices.push_back( newPoint );
+
+    // top right (2)
+    m_texCoord.push_back( Vec3( 1.0, 1.0, pressure ) );
+    m_normals.push_back( Vec3( 1.0, 1.0, 0 ) );
+    m_vertices.push_back( newPoint );
+
+    // middle left (3)
+    m_texCoord.push_back( Vec3( 1.0, 0.0, pressure ) );
+    m_normals.push_back( Vec3( -1.0, 0.0, 0 ) );
+    m_vertices.push_back( newPoint );
+
+    // middle center (4)
+    m_texCoord.push_back( Vec3( 0.0, 0.0, pressure ) );
+    m_normals.push_back( Vec3( 0.0, 0.0, 0 ) );
+    m_vertices.push_back( newPoint );
+
+    // middle right (5)
+    m_texCoord.push_back( Vec3( 1.0, 0.0, pressure ) );
+    m_normals.push_back( Vec3( 1.0, 0.0, 0 ) );
+    m_vertices.push_back( newPoint );
+
+    // bottom left (6)
+    m_texCoord.push_back( Vec3( 1.0, 1.0, pressure ) );
+    m_normals.push_back( Vec3( -1.0, -1.0, 0 ) );
+    m_vertices.push_back( newPoint );
+
+    // bottom middle (7)
+    m_texCoord.push_back( Vec3( 0.0, 1.0, pressure ) );
+    m_normals.push_back( Vec3( 0.0, -1.0, 0 ) );
+    m_vertices.push_back( newPoint );
+
+    // bottom right (8)
+    m_texCoord.push_back( Vec3( 1.0, 1.0, pressure ) );
+    m_normals.push_back( Vec3( 1.0, -1.0, 0 ) );
+    m_vertices.push_back( newPoint );
 	
-	int nextIndex = m_vertices.size();
-	m_vertices.push_back( Vec2( x, y ) );
-	m_vertices.push_back( Vec2( x, y + curWidth ) );
-	m_vertices.push_back( Vec2( x + curWidth, y + curWidth ) );
-	m_vertices.push_back( Vec2( x + curWidth, y ) );
-	m_vertices.push_back( Vec2( x + curWidth, y - curWidth ) );
-	m_vertices.push_back( Vec2( x, y - curWidth ) );
-	m_vertices.push_back( Vec2( x - curWidth, y - curWidth ) );
-	m_vertices.push_back( Vec2( x - curWidth, y ) );
-	m_vertices.push_back( Vec2( x - curWidth, y + curWidth ) );
+    m_indices.push_back( 4 );
+    m_indices.push_back( 5 );
+    m_indices.push_back( 2 );
+    m_indices.push_back( 1 );
 	
-	m_texCoord.push_back( Vec3( 0.0, 0.0, opacity ) );
-	m_texCoord.push_back( Vec3( 0.0, 1.0, opacity ) );
-	m_texCoord.push_back( Vec3( 1.0, 1.0, opacity ) );
-	m_texCoord.push_back( Vec3( 1.0, 0.0, opacity ) );
-	m_texCoord.push_back( Vec3( 1.0, 1.0, opacity ) );
-	m_texCoord.push_back( Vec3( 0.0, 1.0, opacity ) );
-	m_texCoord.push_back( Vec3( 1.0, 1.0, opacity ) );
-	m_texCoord.push_back( Vec3( 1.0, 0.0, opacity ) );
-	m_texCoord.push_back( Vec3( 1.0, 1.0, opacity ) );
+    m_indices.push_back( 3 );
+    m_indices.push_back( 4 );
+    m_indices.push_back( 1 );
+    m_indices.push_back( 0 );
 	
-	m_indices.push_back( nextIndex );
-	m_indices.push_back( nextIndex + 3 );
-	m_indices.push_back( nextIndex + 2 );
-	m_indices.push_back( nextIndex + 1 );
+    m_indices.push_back( 7 );
+    m_indices.push_back( 8 );
+    m_indices.push_back( 5 );
+    m_indices.push_back( 4 );
 	
-	m_indices.push_back( nextIndex );
-	m_indices.push_back( nextIndex + 5 );
-	m_indices.push_back( nextIndex + 4 );
-	m_indices.push_back( nextIndex + 3 );
-	
-	m_indices.push_back( nextIndex );
-	m_indices.push_back( nextIndex + 7 );
-	m_indices.push_back( nextIndex + 6 );
-	m_indices.push_back( nextIndex + 5 );
-	
-	m_indices.push_back( nextIndex );
-	m_indices.push_back( nextIndex + 1 );
-	m_indices.push_back( nextIndex + 8 );
-	m_indices.push_back( nextIndex + 7 );
+    m_indices.push_back( 6 );
+    m_indices.push_back( 7 );
+    m_indices.push_back( 4 );
+    m_indices.push_back( 3 );
 
 	// Fill
 	if( m_fill )
@@ -171,20 +203,9 @@ void WideLine::AddPoint( double x, double y, double pressure )
 
 void WideLine::AddLinePoint( double x, double y, double pressure )
 {
-	double prevWidth = m_width;
-	if( m_pressureWidth )
-		prevWidth *= m_prevPressure;
 	double curWidth = m_width;
 	if( m_pressureWidth )
 		curWidth *= pressure;
-
-	double opacity = 1.0;
-	double prevOpacity = 1.0;
-	if( m_pressureOpacity )
-	{
-		opacity *= pressure;
-		prevOpacity *= m_prevPressure;
-	}
 
     // add current point bounding box to global bounding box
 	double boxOffset = curWidth * squareRootOfTwo;
@@ -192,64 +213,80 @@ void WideLine::AddLinePoint( double x, double y, double pressure )
 	m_boundingBox.IncludePoint( x + boxOffset, y + boxOffset );
 	
 	Vec2 newPoint( x, y );
-	Vec2 direction = newPoint - m_prevPoint;
-	direction.Normalise();
-	Vec2 left( -direction[1], direction[0] );
-	Vec2 leftOrig = left * prevWidth;
-	Vec2 leftEnd = left * curWidth;
-	Vec2 rightOrig( leftOrig * -1 );
-	Vec2 rightEnd( leftEnd * -1 );
-	
-	Vec2 newPointLeft = newPoint + leftEnd;
-	Vec2 newPointRight = newPoint + rightEnd;
-	
-	Vec2 midCap = newPoint + direction * curWidth;
-	Vec2 leftCap = midCap + leftEnd;
-	Vec2 rightCap = midCap + rightEnd;
-	
-	Vec2 leftStart = m_prevPoint + leftOrig;
-	Vec2 rightStart = m_prevPoint + rightOrig;
-	
 	int nextIndex = m_vertices.size();
-	
-	m_vertices.push_back( m_prevPoint );
-	m_texCoord.push_back( Vec3( 0.0, 0.0, prevOpacity ) );
-	m_vertices.push_back( newPoint );
-	m_texCoord.push_back( Vec3( 0.0, 0.0, opacity ) );
-	m_vertices.push_back( newPointRight );
-	m_texCoord.push_back( Vec3( 1.0, 0.0, opacity ) );
-	m_vertices.push_back( rightStart );
-	m_texCoord.push_back( Vec3( 1.0, 0.0, prevOpacity ) );
-	m_vertices.push_back( newPointLeft );
-	m_texCoord.push_back( Vec3( 1.0, 0.0, opacity ) );
-	m_vertices.push_back( leftStart );
-	m_texCoord.push_back( Vec3( 1.0, 0.0, prevOpacity ) );
-	m_vertices.push_back( rightCap );
-	m_texCoord.push_back( Vec3( 1.0, 1.0, opacity ) );
-	m_vertices.push_back( midCap );
-	m_texCoord.push_back( Vec3( 0.0, 1.0, opacity ) );
-	m_vertices.push_back( leftCap );
-	m_texCoord.push_back( Vec3( 1.0, 1.0, opacity ) );
+
+    Vec2 diff = newPoint - m_prevPoint;
+    diff.Normalise();
+    Vec2 front = diff;
+    Vec2 left( -diff[1], diff[0] );
+    Vec2 right = -1.0 * left;
+    Vec2 frontRight = front + right;
+    Vec2 frontLeft = front + left;
+
+    // start middle (0)
+    m_texCoord.push_back( Vec3( 0.0, 0.0, m_prevPressure ) );
+    m_normals.push_back( Vec3( 0, 0, 0 ) );
+    m_vertices.push_back( m_prevPoint );
+
+    // start right (1)
+    m_texCoord.push_back( Vec3( 1.0, 0.0, m_prevPressure ) );
+    m_normals.push_back( Vec3( right[0], right[1], 0 ) );
+    m_vertices.push_back( m_prevPoint );
+
+    // end right (2)
+    m_texCoord.push_back( Vec3( 1.0, 0.0, pressure ) );
+    m_normals.push_back( Vec3( right[0], right[1], 0 ) );
+    m_vertices.push_back( newPoint );
+
+    // end middle (3)
+    m_texCoord.push_back( Vec3( 0, 0.0, pressure ) );
+    m_normals.push_back( Vec3( 0, 0, 0 ) );
+    m_vertices.push_back( newPoint );
+
+    // start left (4)
+    m_texCoord.push_back( Vec3( 1.0, 0.0, m_prevPressure ) );
+    m_normals.push_back( Vec3( left[0], left[1], 0 ) );
+    m_vertices.push_back( m_prevPoint );
+
+    // end left (5)
+    m_texCoord.push_back( Vec3( 1.0, 0.0, pressure ) );
+    m_normals.push_back( Vec3( left[0], left[1], 0 ) );
+    m_vertices.push_back( newPoint );
+
+    // cap right (6)
+    m_texCoord.push_back( Vec3( 1.0, 1.0, pressure ) );
+    m_normals.push_back( Vec3( frontRight[0], frontRight[1], 0 ) );
+    m_vertices.push_back( newPoint );
+
+    // cap middle (7)
+    m_texCoord.push_back( Vec3( 0.0, 1.0, pressure ) );
+    m_normals.push_back( Vec3( front[0], front[1], 0 ) );
+    m_vertices.push_back( newPoint );
+
+    // cap left (8)
+    m_texCoord.push_back( Vec3( 1.0, 1.0, pressure ) );
+    m_normals.push_back( Vec3( frontLeft[0], frontLeft[1], 0 ) );
+    m_vertices.push_back( newPoint );
 	
 	m_indices.push_back( nextIndex );
-	m_indices.push_back( nextIndex + 3 );
-	m_indices.push_back( nextIndex + 2 );
-	m_indices.push_back( nextIndex + 1 );
+    m_indices.push_back( nextIndex + 1 );
+    m_indices.push_back( nextIndex + 2 );
+    m_indices.push_back( nextIndex + 3 );
 	
 	m_indices.push_back( nextIndex );
-	m_indices.push_back( nextIndex + 1 );
-	m_indices.push_back( nextIndex + 4 );
-	m_indices.push_back( nextIndex + 5 );
+    m_indices.push_back( nextIndex + 3 );
+    m_indices.push_back( nextIndex + 5 );
+    m_indices.push_back( nextIndex + 4 );
 	
-	m_indices.push_back( nextIndex + 1);
+    m_indices.push_back( nextIndex + 3 );
 	m_indices.push_back( nextIndex + 2 );
 	m_indices.push_back( nextIndex + 6 );
 	m_indices.push_back( nextIndex + 7 );
 	
-	m_indices.push_back( nextIndex + 1);
-	m_indices.push_back( nextIndex + 7 );
+    m_indices.push_back( nextIndex + 3);
+    m_indices.push_back( nextIndex + 7 );
 	m_indices.push_back( nextIndex + 8 );
-	m_indices.push_back( nextIndex + 4 );
+    m_indices.push_back( nextIndex + 5 );
 
     // cache information for next AddPoint
     m_prevPoint = newPoint;
@@ -263,7 +300,7 @@ void WideLine::AddFillPoint( double x, double y )
 	m_fillIndices.push_back( lastIndex );
 }
 
-static const char* shaderCode = " \
+/*static const char* shaderCode = " \
 uniform float margin; \
 \
 void main() \
@@ -286,7 +323,77 @@ void main() \
 	{ \
 		gl_FragColor[3] = pressure; \
 	} \
+}"; */
+
+static const char * pixelShaderCode = " \
+varying float margin; \
+varying float sigma; \
+\
+void main() \
+{ \
+    gl_FragColor = gl_Color; \
+    float s = gl_TexCoord[0].x; \
+    float t = gl_TexCoord[0].y; \
+    float pressure = gl_TexCoord[0].z; \
+    float r = sqrt( s*s + t*t ); \
+    float invR = 1.0 - r; \
+    if( invR < margin ) \
+    { \
+        float x = 1.0 - invR / margin; \
+        float exponent = - ( x * x / sigma );\
+        float fact = exp( exponent ); \
+        fact = fact * pressure; \
+        gl_FragColor[3] = fact; \
+    } \
+    else \
+    { \
+        gl_FragColor[3] = pressure; \
+    } \
 }";
+
+static const char * vertexShaderCode = " \
+uniform float base_width; \
+uniform float pix_per_unit; \
+uniform float pix_margin; \
+uniform float pix_damp_width; \
+uniform float sigma_large; \
+uniform float sigma_small; \
+varying float margin; \
+varying float sigma; \
+void main() \
+{ \
+    float pix_width = base_width * pix_per_unit; \
+    sigma = sigma_large; \
+    float damp_factor = 1.0; \
+    margin = pix_margin / pix_width; \
+    \
+    if( pix_width < pix_margin )  \
+    { \
+        margin = 1.0; \
+        if( pix_width < pix_damp_width ) \
+        { \
+            sigma = sigma_small; \
+            damp_factor = pix_width / pix_damp_width; \
+        } \
+        else \
+        { \
+            float ratio = ( pix_width - pix_damp_width ) / ( pix_margin - pix_damp_width ); \
+            sigma = sigma_small + ratio * ( sigma_large - sigma_small ); \
+        } \
+        \
+        pix_width = pix_margin; \
+    } \
+    \
+    float width = pix_width / pix_per_unit; \
+    vec4 scaled_normal = vec4( 0.0, 0.0, 0.0, 0.0 ); \
+    scaled_normal.xyz = gl_Normal; \
+    scaled_normal *= width; \
+    vec4 newVertex = gl_Vertex + scaled_normal; \
+    gl_Position = gl_ModelViewProjectionMatrix * newVertex; \
+    gl_FrontColor = gl_Color * damp_factor; \
+    gl_TexCoord[0] = gl_MultiTexCoord0; \
+}";
+
 
 
 void WideLine::Init()
@@ -294,7 +401,8 @@ void WideLine::Init()
 	if( !m_shader)
 	{
 		m_shader = new drwGlslShader;
-		m_shader->AddShaderMemSource( shaderCode );
+        m_shader->AddShaderMemSource( pixelShaderCode );
+        m_shader->AddVertexShaderMemSource( vertexShaderCode );
 		m_shader->Init();
 	}
 }

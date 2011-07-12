@@ -36,6 +36,7 @@ protected:
 	// WideLine
     drwVec2Array m_vertices;
 	drwVec3Array m_texCoord;
+    drwVec3Array m_normals;
     drwIndexArray m_indices;
 
 	// Fill

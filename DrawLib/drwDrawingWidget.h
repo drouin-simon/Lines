@@ -41,6 +41,7 @@ public:
 	drwCommand::s_ptr CreateMouseCommand( drwMouseCommand::MouseCommandType commandType, QTabletEvent * e );
 	void WindowToWorld( double xWin, double yWin, double & xWorld, double & yWorld );
     void WorldToGLWindow( double xworld, double yworld, int & xwin, int & ywin );
+    double PixelsPerUnit();
 	
 public slots:
 	
