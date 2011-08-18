@@ -43,6 +43,7 @@ public:
     void WorldToGLWindow( double xworld, double yworld, int & xwin, int & ywin );
     double PixelsPerUnit();
     void ShowFullFrame( bool show );
+    void ActivateViewportWidget( bool active );
 	
 public slots:
 	
@@ -68,8 +69,6 @@ protected:
 	virtual void mouseReleaseEvent(QMouseEvent*);
 	virtual void mouseMoveEvent(QMouseEvent*);
 	virtual void tabletEvent ( QTabletEvent * event );
-	virtual void keyPressEvent ( QKeyEvent * event );
-	virtual void keyReleaseEvent( QKeyEvent * event );
 	
 	// Manage timer that generates updateGL in playback mode
 	int m_timerId;

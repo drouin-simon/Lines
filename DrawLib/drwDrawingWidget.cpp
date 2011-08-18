@@ -587,27 +587,19 @@ void drwDrawingWidget::tabletEvent ( QTabletEvent * e )
     update();
 }
 
-void drwDrawingWidget::keyPressEvent( QKeyEvent * event )
+void drwDrawingWidget::ActivateViewportWidget( bool active )
 {
-	if( event->key() == Qt::Key_Alt )
-	{
-		QPoint p = this->mapFromGlobal(QCursor::pos());
+    if( active )
+    {
+        QPoint p = this->mapFromGlobal(QCursor::pos());
         m_viewportWidget->Activate( p.x(), p.y() );
-		update();
-	}
-	else
-		QGLWidget::keyPressEvent( event );
-}
-
-void drwDrawingWidget::keyReleaseEvent( QKeyEvent * event )
-{
-	if( event->key() == Qt::Key_Alt && m_viewportWidget )
-	{
+        update();
+    }
+    else
+    {
         m_viewportWidget->Deactivate();
-		update();
-	}
-	else
-		QGLWidget::keyReleaseEvent( event );
+        update();
+    }
 }
 
 void drwDrawingWidget::enterEvent( QEvent * e )

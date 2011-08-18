@@ -499,7 +499,19 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
             m_glWidget->ShowFullFrame( true );
             handled = true;
         }
+        else if( keyEvent->key() == Qt::Key_Alt )
+        {
+            m_glWidget->ActivateViewportWidget( true );
+        }
 	} 
+    else if( event->type() == QEvent::KeyRelease )
+    {
+        QKeyEvent * keyEvent = static_cast<QKeyEvent *>(event);
+        if( keyEvent->key() == Qt::Key_Alt )
+        {
+            m_glWidget->ActivateViewportWidget( false );
+        }
+    }
 	if( !handled )
 	{
 		// standard event processing
