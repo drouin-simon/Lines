@@ -53,6 +53,8 @@ void WideLine::InternDraw( const drwDrawingContext & context )
 		Init();
 
 	m_shader->UseProgram( true );
+    m_shader->SetVariable( "pressure_width", m_pressureWidth );
+    m_shader->SetVariable( "pressure_opacity", m_pressureOpacity );
     m_shader->SetVariable( "base_width", float(m_width) );
     m_shader->SetVariable( "pix_per_unit", float(context.PixelsPerUnit()) );
     m_shader->SetVariable( "pix_margin", float(4.0) );
@@ -300,31 +302,6 @@ void WideLine::AddFillPoint( double x, double y )
 	m_fillIndices.push_back( lastIndex );
 }
 
-/*static const char* shaderCode = " \
-uniform float margin; \
-\
-void main() \
-{ \
-    gl_FragColor = gl_Color; \
-	float s = gl_TexCoord[0].x; \
-	float t = gl_TexCoord[0].y; \
-	float pressure = gl_TexCoord[0].z; \
-	float r = sqrt( s*s + t*t ); \
-	float invR = 1.0 - r; \
-	if( invR < margin ) \
-	{ \
-		float x = 1.0 - invR / margin; \
-		float exponent = - ( x * x / 0.2 );\
-		float fact = exp( exponent ); \
-		fact = fact * pressure; \
-		gl_FragColor[3] = fact; \
-	} \
-	else \
-	{ \
-		gl_FragColor[3] = pressure; \
-	} \
-}"; */
-
 static const char * pixelShaderCode = " \
 varying float margin; \
 varying float sigma; \
@@ -334,7 +311,6 @@ void main() \
     gl_FragColor = gl_Color; \
     float s = gl_TexCoord[0].x; \
     float t = gl_TexCoord[0].y; \
-    float pressure = gl_TexCoord[0].z; \
     float r = sqrt( s*s + t*t ); \
     float invR = 1.0 - r; \
     if( invR < margin ) \
@@ -342,16 +318,13 @@ void main() \
         float x = 1.0 - invR / margin; \
         float exponent = - ( x * x / sigma );\
         float fact = exp( exponent ); \
-        fact = fact * pressure; \
-        gl_FragColor[3] = fact; \
-    } \
-    else \
-    { \
-        gl_FragColor[3] = pressure; \
+        gl_FragColor[3] *= fact; \
     } \
 }";
 
 static const char * vertexShaderCode = " \
+uniform bool pressure_width; \
+uniform bool pressure_opacity; \
 uniform float base_width; \
 uniform float pix_per_unit; \
 uniform float pix_margin; \
@@ -362,7 +335,11 @@ varying float margin; \
 varying float sigma; \
 void main() \
 { \
-    float pix_width = base_width * pix_per_unit; \
+    float pressure = gl_MultiTexCoord0[2]; \
+    float base_width_pressure = base_width; \
+    if( pressure_width ) \
+        base_width_pressure *= pressure; \
+    float pix_width = base_width_pressure * pix_per_unit; \
     sigma = sigma_large; \
     float damp_factor = 1.0; \
     margin = pix_margin / pix_width; \
@@ -390,7 +367,10 @@ void main() \
     scaled_normal *= width; \
     vec4 newVertex = gl_Vertex + scaled_normal; \
     gl_Position = gl_ModelViewProjectionMatrix * newVertex; \
-    gl_FrontColor = gl_Color * damp_factor; \
+    gl_FrontColor = gl_Color; \
+    if( pressure_opacity ) \
+        gl_FrontColor[3] *= pressure; \
+    gl_FrontColor[3] *= damp_factor; \
     gl_TexCoord[0] = gl_MultiTexCoord0; \
 }";
 
