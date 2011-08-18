@@ -33,7 +33,6 @@ void Camera::WorldToGLWindow( double xworld, double yworld, int & xwin, int & yw
 
 void Camera::SetViewportSize( int w, int h )
 {
-    //m_virtWindowH *= (double)h / (double) m_windowH;
     m_windowW = w;
     m_windowH = h;
     glViewport( 0, 0, (GLint)w, (GLint)h );

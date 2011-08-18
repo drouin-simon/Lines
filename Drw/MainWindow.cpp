@@ -494,6 +494,11 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 			m_localToolbox->ToggleBrushEraser();
 			handled = true;
 		}
+        else if( keyEvent->key() == Qt::Key_R )
+        {
+            m_glWidget->ShowFullFrame( true );
+            handled = true;
+        }
 	} 
 	if( !handled )
 	{

@@ -97,6 +97,7 @@ bool drwDrawingWidgetInteractor::Move( int x, int y )
 	if( isScaling )
 	{
 		cam.Zoom( 1.0 + (double)(currentMouseY - lastMouseY) / (double)100.0 );
+        m_widget->ShowFullFrame( false );
 		selfInducedRedraw = true;
 	}
 	else if( isPaning )
@@ -104,6 +105,7 @@ bool drwDrawingWidgetInteractor::Move( int x, int y )
 		double xPercent = -1.0 * (double)( currentMouseX - lastMouseX ) / (double)( cam.GetWindowWidth() );
 		double yPercent = (double)( currentMouseY - lastMouseY ) / (double)( cam.GetWindowHeight() );
 		cam.Pan( xPercent, yPercent );
+        m_widget->ShowFullFrame( false );
 		selfInducedRedraw = true;
 	}
 	if( selfInducedRedraw )

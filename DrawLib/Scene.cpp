@@ -5,6 +5,8 @@
 
 Scene::Scene( QObject * parent )
 : QObject( parent )
+, m_frameWidth( 1920.0 )
+, m_frameHeight( 1080.0 )
 {
 }
 

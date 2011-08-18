@@ -33,6 +33,8 @@ public:
 	
 	void SetNumberOfFrames( int nbFrames );
 	int GetNumberOfFrames() { return Frames.size(); }
+    double GetFrameWidth() { return m_frameWidth; }
+    double GetFrameHeight() { return m_frameHeight; }
 	
 	// used by other classes to mark end of modification and notify clients they can re-render
 	void MarkModified();
@@ -53,6 +55,9 @@ protected:
     QReadWriteLock m_framesLock;
     typedef std::vector<Frame*> FrameCont;
     FrameCont Frames;
+
+    double m_frameWidth;
+    double m_frameHeight;
 	
 	// Database of images used throughout the scene
 	struct ImageInfo

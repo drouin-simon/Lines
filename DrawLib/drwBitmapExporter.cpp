@@ -61,7 +61,7 @@ void drwBitmapExporter::run()
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
-		gluOrtho2D( 0.0, 1920.0, 0.0, 1080.0 );
+        gluOrtho2D( 0.0, m_scene->GetFrameWidth(), 0.0, m_scene->GetFrameHeight() );
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
 		

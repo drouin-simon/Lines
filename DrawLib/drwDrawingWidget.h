@@ -42,6 +42,7 @@ public:
 	void WindowToWorld( double xWin, double yWin, double & xWorld, double & yWorld );
     void WorldToGLWindow( double xworld, double yworld, int & xwin, int & ywin );
     double PixelsPerUnit();
+    void ShowFullFrame( bool show );
 	
 public slots:
 	
@@ -97,8 +98,8 @@ private:
 	drwLineToolViewportWidget * m_viewportWidget;
     drwCursor * m_cursor;
     bool m_showCursor;
-
-	bool HasDrawn;
+    bool m_showFullFrame;
+    double m_framePadding;
 }; 
 
 #endif

@@ -22,7 +22,8 @@ drwDrawingWidget::drwDrawingWidget( QWidget * parent )
 , m_viewportWidget(0)
 , m_cursor(0)
 , m_showCursor(false)
-, HasDrawn(false)
+, m_showFullFrame(true)
+, m_framePadding(0.0)
 {
 	m_interactor = new drwDrawingWidgetInteractor( this );
 	DisplaySettings = new drwDisplaySettings;
@@ -97,6 +98,14 @@ void drwDrawingWidget::WorldToGLWindow( double xworld, double yworld, int & xwin
 double drwDrawingWidget::PixelsPerUnit()
 {
     return theCamera.PixelsPerUnit();
+}
+
+void drwDrawingWidget::ShowFullFrame( bool show )
+{
+    m_showFullFrame = show;
+    if( m_showFullFrame )
+        theCamera.FitRectInside( CurrentScene->GetFrameWidth(), CurrentScene->GetFrameHeight(), m_framePadding );
+    update();
 }
 
 #define PICK_BUF_SIZE 512
@@ -225,6 +234,8 @@ void drwDrawingWidget::initializeGL()
 void drwDrawingWidget::resizeGL( int w, int h )
 {
 	theCamera.SetViewportSize( w, h );
+    if( m_showFullFrame )
+        theCamera.FitRectInside( CurrentScene->GetFrameWidth(), CurrentScene->GetFrameHeight(), m_framePadding );
 	m_workTexture->Resize( w, h );
 }
 
@@ -239,13 +250,6 @@ void drwDrawingWidget::paintEvent( QPaintEvent * /*event*/ )
 	glEnable( GL_TEXTURE_RECTANGLE_ARB );
 	glEnable( GL_BLEND );     
 	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA ); 
-	
-	// If first time drawing : position the camera to include frame
-	if( !HasDrawn )
-	{
-		theCamera.FitRectInside( 1920, 1080, .01 );
-		HasDrawn = true;
-	}
 	
 	// Place virtual camera
 	theCamera.PlaceCamera();
@@ -454,8 +458,12 @@ void drwDrawingWidget::DrawFrame()
 	double bottomRight[2] = {0.0,0.0};
 	theCamera.WindowToWorld( winSize.width(), winSize.height(), bottomRight[0], bottomRight[1] );
 	
-	double frameTopLeft[2] = { 0.0, 1080.0 };
-	double frameBottomRight[2] = { 1920.0, 0.0 };
+    double frameTopLeft[2];
+    frameTopLeft[0] = 0.0;
+    frameTopLeft[1] = CurrentScene->GetFrameHeight();
+    double frameBottomRight[2];
+    frameBottomRight[0] = CurrentScene->GetFrameWidth();
+    frameBottomRight[1] = 0.0;
 	
 	glColor4d( .3, .3, .3, .6 );
 	glBegin( GL_QUADS );
@@ -557,7 +565,18 @@ void drwDrawingWidget::tabletEvent ( QTabletEvent * e )
     // update the cursor position and all that stuff
     UpdatePosition( e->x(), e->y() );
 
-	// try the interactor first
+    // Try the widget
+    bool widgetSwallows = false;
+    if( e->type() == QEvent::TabletPress )
+        widgetSwallows = m_viewportWidget->MousePress( e->x(), e->y() );
+    else if( e->type() == QEvent::TabletRelease )
+        widgetSwallows = m_viewportWidget->MouseRelease( e->x(), e->y() );
+    else if( e->type() == QEvent::TabletMove )
+        widgetSwallows = m_viewportWidget->MouseMove( e->x(), e->y() );
+    if( widgetSwallows )
+        return;
+
+    // try the interactor
 	bool interactorSwallows = m_interactor->tabletEvent( e );
 	if( interactorSwallows )
 		return;
