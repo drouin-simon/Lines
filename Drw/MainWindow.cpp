@@ -17,6 +17,7 @@
 #include "drwBitmapExporter.h"
 #include "drwLineToolViewportWidget.h"
 #include "drwCursor.h"
+#include "drwDrawingEngine.h"
 
 #include <QtGui>
 
@@ -70,6 +71,10 @@ MainWindow::MainWindow()
     m_glWidget->SetViewportWidget( m_viewportWidget );
     m_cursor = new drwCursor( lineTool, m_glWidget );
     m_glWidget->SetCursor( m_cursor );
+
+    // Create Drawing engine (for testing only for now)
+    m_drawingEngine = new drwDrawingEngine;
+    m_drawingEngine->SetLineTool( lineTool );
 	
 	// Create playback control widget
 	m_playbackControlerWidget = new PlaybackControlerWidget( m_glWidget->GetControler(), mainWidget );
@@ -106,6 +111,7 @@ MainWindow::~MainWindow()
 {
     delete m_viewportWidget;
     delete m_cursor;
+    delete m_drawingEngine;
 }
 
 void MainWindow::CreateActions()
@@ -497,6 +503,21 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
         else if( keyEvent->key() == Qt::Key_R )
         {
             m_glWidget->ShowFullFrame( true );
+            handled = true;
+        }
+        else if( keyEvent->key() == Qt::Key_E )
+        {
+            if( m_glWidget->GetDrawingEngine() )
+            {
+                m_glWidget->StopDrawingEngine();
+                m_glWidget->SetDrawingEngine( 0 );
+            }
+            else
+            {
+                m_glWidget->SetDrawingEngine( m_drawingEngine );
+                m_glWidget->StartDrawingEngine();
+            }
+            m_glWidget->ToggleComputeFps();
             handled = true;
         }
         else if( keyEvent->key() == Qt::Key_Alt )

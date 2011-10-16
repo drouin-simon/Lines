@@ -28,6 +28,24 @@ drwLineTool::drwLineTool( Scene * scene, drwEditionState * editionState, QObject
 	Reset();
 }
 
+void drwLineTool::StartLine( double xWorld, double yWorld )
+{
+    drwCommand::s_ptr command( new drwMouseCommand( drwMouseCommand::Press, xWorld, yWorld, 0.0, 0, 0, 1.0, 0.0, 0.0 ) );
+    ExecuteCommand( command );
+}
+
+void drwLineTool::AddPoint( double xWorld, double yWorld )
+{
+    drwCommand::s_ptr command( new drwMouseCommand( drwMouseCommand::Move, xWorld, yWorld, 0.0, 0, 0, 1.0, 0.0, 0.0 ) );
+    ExecuteCommand( command );
+}
+
+void drwLineTool::EndLine( double xWorld, double yWorld )
+{
+    drwCommand::s_ptr command( new drwMouseCommand( drwMouseCommand::Release, xWorld, yWorld, 0.0, 0, 0, 1.0, 0.0, 0.0 ) );
+    ExecuteCommand( command );
+}
+
 void drwLineTool::MousePressEvent( drwDrawingWidget * w, QMouseEvent * e )
 {
     drwCommand::s_ptr command = w->CreateMouseCommand( drwMouseCommand::Press, e );
@@ -300,6 +318,8 @@ Node * drwLineTool::CreateNewNode()
 void drwLineTool::CreateNewNodes( )
 {
 	int lastFrame = m_editionState->GetCurrentFrame() + m_persistence;
+    if( lastFrame >= CurrentScene->GetNumberOfFrames() )
+        lastFrame = CurrentScene->GetNumberOfFrames() - 1;
 	for( int frame = m_editionState->GetCurrentFrame(); frame <= lastFrame; ++frame )
 	{
 		CurrentNodesCont::iterator it = CurrentNodes.find( frame );

@@ -25,6 +25,7 @@ class drwCommandDispatcher;
 class drwNetworkManager;
 class drwLineToolViewportWidget;
 class drwCursor;
+class drwDrawingEngine;
 
 class MainWindow : public QMainWindow
 {
@@ -103,6 +104,7 @@ private:
 	drwNetworkManager		* m_networkManager;
     drwLineToolViewportWidget * m_viewportWidget;
     drwCursor              * m_cursor;
+    drwDrawingEngine       * m_drawingEngine;
 
 	QProgressDialog * m_progressDialog;
 

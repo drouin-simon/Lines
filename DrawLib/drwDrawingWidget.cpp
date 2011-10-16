@@ -11,6 +11,8 @@
 #include "drwDrawingWidgetInteractor.h"
 #include "drwLineToolViewportWidget.h"
 #include "drwCursor.h"
+#include "drwFpsCounter.h"
+#include "drwDrawingEngine.h"
 
 drwDrawingWidget::drwDrawingWidget( QWidget * parent ) 
 : QGLWidget( QGLFormat(QGL::SampleBuffers), parent )
@@ -18,9 +20,11 @@ drwDrawingWidget::drwDrawingWidget( QWidget * parent )
 , Observer(0)
 , CurrentScene(0)
 , Controler(0)
+, m_fpsCounter(0)
 , DisplaySettings(0)
 , m_viewportWidget(0)
 , m_cursor(0)
+, m_drawingEngine(0)
 , m_showCursor(false)
 , m_showFullFrame(true)
 , m_framePadding(0.0)
@@ -58,6 +62,33 @@ void drwDrawingWidget::SetViewportWidget( drwLineToolViewportWidget * w )
 void drwDrawingWidget::SetCursor( drwCursor * cursor )
 {
     m_cursor = cursor;
+}
+
+void drwDrawingWidget::ToggleComputeFps()
+{
+    if( m_fpsCounter )
+    {
+        delete m_fpsCounter;
+        m_fpsCounter = 0;
+    }
+    else
+    {
+        m_fpsCounter = new drwFpsCounter;
+        m_fpsCounter->Start();
+    }
+}
+
+void drwDrawingWidget::StartDrawingEngine()
+{
+    if( m_timerId == -1 )
+        m_timerId = startTimer(0);
+}
+
+void drwDrawingWidget::StopDrawingEngine()
+{
+    if( m_timerId != -1 )
+        killTimer( m_timerId );
+    m_timerId = -1;
 }
 
 drwCommand::s_ptr drwDrawingWidget::CreateMouseCommand( drwMouseCommand::MouseCommandType commandType, QMouseEvent * e )
@@ -328,6 +359,14 @@ void drwDrawingWidget::paintEvent( QPaintEvent * /*event*/ )
 		m_viewportWidget->Draw( painter );
 	}
 
+    // Draw fps counter if needed
+    if( m_fpsCounter && m_fpsCounter->IsRunning() )
+    {
+        m_fpsCounter->Tick();
+        QString text = QString("fps: %1").arg( m_fpsCounter->GetFps() );
+        painter.drawText( 5, this->height() - 5, text );
+    }
+
     // draw the cursor if needed
     if( m_cursor && m_showCursor )
     {
@@ -335,6 +374,14 @@ void drwDrawingWidget::paintEvent( QPaintEvent * /*event*/ )
     }
 	
 	painter.end();
+}
+
+void drwDrawingWidget::timerEvent( QTimerEvent * event )
+{
+    if( m_drawingEngine )
+    {
+        m_drawingEngine->Tick();
+    }
 }
 
 void drwDrawingWidget::DisplayCounter()

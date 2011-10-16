@@ -21,6 +21,11 @@ public:
 	
 	drwLineTool( Scene * scene, drwEditionState * editionState, QObject * parent = 0 );
 	virtual ~drwLineTool() {};
+
+    // convenience functions used to automatically create lines
+    void StartLine( double xWorld, double yWorld );
+    void AddPoint( double xWorld, double yWorld );
+    void EndLine( double xWorld, double yWorld );
 	
 	virtual void MousePressEvent( drwDrawingWidget * w, QMouseEvent * e );
 	virtual void MouseReleaseEvent( drwDrawingWidget * w, QMouseEvent * e );
