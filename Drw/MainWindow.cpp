@@ -507,16 +507,10 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
         }
         else if( keyEvent->key() == Qt::Key_E )
         {
-            if( m_glWidget->GetDrawingEngine() )
-            {
-                m_glWidget->StopDrawingEngine();
-                m_glWidget->SetDrawingEngine( 0 );
-            }
+            if( m_drawingEngine->IsRunning() )
+                m_drawingEngine->Stop();
             else
-            {
-                m_glWidget->SetDrawingEngine( m_drawingEngine );
-                m_glWidget->StartDrawingEngine();
-            }
+                m_drawingEngine->Start();
             m_glWidget->ToggleComputeFps();
             handled = true;
         }

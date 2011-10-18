@@ -3,9 +3,12 @@
 
 const double drwDrawingEngine::m_maxAngularAcceleration = 0.005;
 const double drwDrawingEngine::m_stepSize = 10.0;
+const int drwDrawingEngine::m_minNumberOfPoints = 5;
+const int drwDrawingEngine::m_maxNumberOfPoints = 50;
 
 drwDrawingEngine::drwDrawingEngine()
-    : m_nbPointsInSegment( 0 )
+    : m_timerId( -1 )
+    , m_nbPointsInSegment( 0 )
     , m_lastPoint( Vec2( 0, 0 ) )
     , m_lastAngle( 0.0 )
     , m_lastAngularSpeed( 0.0 )
@@ -15,20 +18,26 @@ drwDrawingEngine::drwDrawingEngine()
 
 void drwDrawingEngine::Start()
 {
-
+    if( m_timerId == -1 )
+        m_timerId = startTimer( 0 );
 }
 
 void drwDrawingEngine::Stop()
 {
-
+    if( m_timerId != -1 )
+    {
+        killTimer( m_timerId );
+        m_timerId = -1;
+        m_lineTool->EndLine( m_lastPoint[0], m_lastPoint[1] );
+    }
 }
 
-void drwDrawingEngine::Tick()
+void drwDrawingEngine::timerEvent( QTimerEvent * event )
 {
     // Start a new segment if needed
     if( --m_nbPointsInSegment < 0 )
     {
-        m_nbPointsInSegment = RandomInt( 5, 1000 );
+        m_nbPointsInSegment = RandomInt( m_minNumberOfPoints, m_maxNumberOfPoints );
         m_lastPoint = Vec2( RandomDouble(200, 1800), RandomDouble(200, 800) );
         m_lastAngle = RandomDouble( 0, 2 * vl_pi );
         m_lastAngularSpeed = 0.0;
@@ -55,7 +64,6 @@ void drwDrawingEngine::Tick()
         {
             m_lineTool->EndLine( m_lastPoint[0], m_lastPoint[1] );
         }
-
     }
 }
 

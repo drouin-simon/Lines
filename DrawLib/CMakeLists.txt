@@ -58,7 +58,8 @@ set( DrawLib_hdr_moc 	drwDrawingWidget.h
 			ImageFlippingTool.h
 			drwCommandDispatcher.h 
 			drwBitmapExporter.h
-			drwGradientWidget.h )
+            drwGradientWidget.h
+            drwDrawingEngine.h )
 
 set( DrawLib_hdr	drwDrawingWidgetInteractor.h
 			drwGlslShader.h
@@ -78,8 +79,7 @@ set( DrawLib_hdr	drwDrawingWidgetInteractor.h
 			PolygonData.h
 			drwCursor.h 
             drwLineToolViewportWidget.h
-            drwFpsCounter.h
-            drwDrawingEngine.h )
+            drwFpsCounter.h )
 
 # Include bin directory for ui_ files
 include_directories(${CMAKE_CURRENT_BINARY_DIR})

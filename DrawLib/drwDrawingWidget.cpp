@@ -12,7 +12,6 @@
 #include "drwLineToolViewportWidget.h"
 #include "drwCursor.h"
 #include "drwFpsCounter.h"
-#include "drwDrawingEngine.h"
 
 drwDrawingWidget::drwDrawingWidget( QWidget * parent ) 
 : QGLWidget( QGLFormat(QGL::SampleBuffers), parent )
@@ -24,7 +23,6 @@ drwDrawingWidget::drwDrawingWidget( QWidget * parent )
 , DisplaySettings(0)
 , m_viewportWidget(0)
 , m_cursor(0)
-, m_drawingEngine(0)
 , m_showCursor(false)
 , m_showFullFrame(true)
 , m_framePadding(0.0)
@@ -76,19 +74,6 @@ void drwDrawingWidget::ToggleComputeFps()
         m_fpsCounter = new drwFpsCounter;
         m_fpsCounter->Start();
     }
-}
-
-void drwDrawingWidget::StartDrawingEngine()
-{
-    if( m_timerId == -1 )
-        m_timerId = startTimer(0);
-}
-
-void drwDrawingWidget::StopDrawingEngine()
-{
-    if( m_timerId != -1 )
-        killTimer( m_timerId );
-    m_timerId = -1;
 }
 
 drwCommand::s_ptr drwDrawingWidget::CreateMouseCommand( drwMouseCommand::MouseCommandType commandType, QMouseEvent * e )
@@ -374,14 +359,6 @@ void drwDrawingWidget::paintEvent( QPaintEvent * /*event*/ )
     }
 	
 	painter.end();
-}
-
-void drwDrawingWidget::timerEvent( QTimerEvent * event )
-{
-    if( m_drawingEngine )
-    {
-        m_drawingEngine->Tick();
-    }
 }
 
 void drwDrawingWidget::DisplayCounter()

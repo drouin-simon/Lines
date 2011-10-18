@@ -15,7 +15,6 @@ class drwDisplaySettings;
 class drwDrawableTexture;
 class drwLineToolViewportWidget;
 class drwFpsCounter;
-class drwDrawingEngine;
 
 class QPushButton;
 
@@ -39,10 +38,6 @@ public:
     void SetViewportWidget( drwLineToolViewportWidget * w );
     void SetCursor( drwCursor * cursor );
     void ToggleComputeFps();
-    drwDrawingEngine * GetDrawingEngine() { return m_drawingEngine; }
-    void SetDrawingEngine( drwDrawingEngine * engine ) { m_drawingEngine = engine; }
-    void StartDrawingEngine();
-    void StopDrawingEngine();
 	
 	drwCommand::s_ptr CreateMouseCommand( drwMouseCommand::MouseCommandType commandType, QMouseEvent * e );
 	drwCommand::s_ptr CreateMouseCommand( drwMouseCommand::MouseCommandType commandType, QTabletEvent * e );
@@ -64,7 +59,7 @@ protected:
 	virtual void initializeGL();
 	virtual void resizeGL( int width, int height );
 	virtual void paintEvent( QPaintEvent * /*event*/ );
-    virtual void timerEvent( QTimerEvent * event );
+
 	void DrawAllFramesHue();
 	void DrawAllFramesRedGreen();
 	void DrawFrame();
@@ -104,7 +99,6 @@ private:
 	drwDrawableTexture * m_workTexture;
 	drwLineToolViewportWidget * m_viewportWidget;
     drwCursor * m_cursor;
-    drwDrawingEngine * m_drawingEngine;
     bool m_showCursor;
     bool m_showFullFrame;
     double m_framePadding;

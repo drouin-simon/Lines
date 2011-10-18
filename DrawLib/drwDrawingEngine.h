@@ -2,11 +2,14 @@
 #define __drwDrawingEngine_h_
 
 #include "SVL.h"
+#include <QObject>
 
 class drwLineTool;
 
-class drwDrawingEngine
+class drwDrawingEngine : public QObject
 {
+
+    Q_OBJECT
 
 public:
 
@@ -16,13 +19,17 @@ public:
 
     void Start();
     void Stop();
-    void Tick();
+    bool IsRunning() { return m_timerId != -1; }
 
 protected:
+
+    virtual void timerEvent( QTimerEvent * event );
 
     double RandomDouble( double min, double max );
     double RandomDouble();
     int RandomInt( int min, int max );
+
+    int m_timerId;
 
     drwLineTool * m_lineTool;
 
@@ -35,6 +42,8 @@ protected:
 
     static const double m_stepSize;
     static const double m_maxAngularAcceleration;
+    static const int m_minNumberOfPoints;
+    static const int m_maxNumberOfPoints;
 
 };
 

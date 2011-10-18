@@ -40,7 +40,8 @@ double drwFpsCounter::GetFps()
         int time2 = m_timeStamps[ m_timeStamps.size() - i - 1 ];
         sumDiff += time2 - time1;
     }
-    double fps = (double)sumDiff / (numberOfSamples - 1);
+    double averageIntervalms = (double)sumDiff / (numberOfSamples - 1);
+    double fps = 1000.0 / averageIntervalms;
     return fps;
 }
 
