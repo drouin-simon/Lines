@@ -5,6 +5,7 @@
 #include <QObject>
 
 class drwLineTool;
+class drwDrawingWidget;
 
 class drwDrawingEngine : public QObject
 {
@@ -16,22 +17,26 @@ public:
     drwDrawingEngine();
 
     void SetLineTool( drwLineTool * tool ) { m_lineTool = tool; }
+    void SetDrawingWidget( drwDrawingWidget * widget ) { m_drawingWidget = widget; }
 
     void Start();
     void Stop();
-    bool IsRunning() { return m_timerId != -1; }
+    bool IsRunning() { return m_isRunning; }
+
+public slots:
+
+    void Tick();
 
 protected:
-
-    virtual void timerEvent( QTimerEvent * event );
 
     double RandomDouble( double min, double max );
     double RandomDouble();
     int RandomInt( int min, int max );
 
-    int m_timerId;
-
     drwLineTool * m_lineTool;
+    drwDrawingWidget * m_drawingWidget;
+
+    bool m_isRunning;
 
     int m_nbPointsInSegment;
     double m_segmentColor;

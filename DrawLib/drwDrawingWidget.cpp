@@ -359,6 +359,8 @@ void drwDrawingWidget::paintEvent( QPaintEvent * /*event*/ )
     }
 	
 	painter.end();
+
+    emit FinishedPainting();
 }
 
 void drwDrawingWidget::DisplayCounter()

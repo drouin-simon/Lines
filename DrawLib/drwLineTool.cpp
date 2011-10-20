@@ -118,6 +118,7 @@ void drwLineTool::ExecuteMouseCommand( drwCommand::s_ptr command )
         m_lastYWorld = mouseCom->Y();
         m_lastPressure = mouseCom->Pressure();
 		CreateNewNodes();
+        CurrentScene->MarkModified();
 		emit CommandExecuted( command );
 		emit StartInteraction();
 	}

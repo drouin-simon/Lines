@@ -1,5 +1,6 @@
 #include "drwDrawingEngine.h"
 #include "drwLineTool.h"
+#include "drwDrawingWidget.h"
 
 const double drwDrawingEngine::m_maxAngularAcceleration = 0.005;
 const double drwDrawingEngine::m_stepSize = 10.0;
@@ -7,7 +8,7 @@ const int drwDrawingEngine::m_minNumberOfPoints = 5;
 const int drwDrawingEngine::m_maxNumberOfPoints = 50;
 
 drwDrawingEngine::drwDrawingEngine()
-    : m_timerId( -1 )
+    : m_isRunning( false )
     , m_nbPointsInSegment( 0 )
     , m_lastPoint( Vec2( 0, 0 ) )
     , m_lastAngle( 0.0 )
@@ -18,21 +19,25 @@ drwDrawingEngine::drwDrawingEngine()
 
 void drwDrawingEngine::Start()
 {
-    if( m_timerId == -1 )
-        m_timerId = startTimer( 0 );
+    if( !m_isRunning )
+    {
+        connect( m_drawingWidget, SIGNAL(FinishedPainting()), this, SLOT(Tick()), Qt::QueuedConnection );
+        m_isRunning = true;
+        Tick();
+    }
 }
 
 void drwDrawingEngine::Stop()
 {
-    if( m_timerId != -1 )
+    if( m_isRunning )
     {
-        killTimer( m_timerId );
-        m_timerId = -1;
+        disconnect( m_drawingWidget, SIGNAL(FinishedPainting()), this, SLOT(Tick()) );
         m_lineTool->EndLine( m_lastPoint[0], m_lastPoint[1] );
+        m_isRunning = false;
     }
 }
 
-void drwDrawingEngine::timerEvent( QTimerEvent * event )
+void drwDrawingEngine::Tick()
 {
     // Start a new segment if needed
     if( --m_nbPointsInSegment < 0 )

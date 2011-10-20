@@ -75,6 +75,7 @@ MainWindow::MainWindow()
     // Create Drawing engine (for testing only for now)
     m_drawingEngine = new drwDrawingEngine;
     m_drawingEngine->SetLineTool( lineTool );
+    m_drawingEngine->SetDrawingWidget( m_glWidget );
 	
 	// Create playback control widget
 	m_playbackControlerWidget = new PlaybackControlerWidget( m_glWidget->GetControler(), mainWidget );
