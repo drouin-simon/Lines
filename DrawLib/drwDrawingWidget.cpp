@@ -255,9 +255,16 @@ void drwDrawingWidget::resizeGL( int w, int h )
 	m_workTexture->Resize( w, h );
 }
 
-void drwDrawingWidget::paintEvent( QPaintEvent * /*event*/ )
+void drwDrawingWidget::paintEvent( QPaintEvent * event )
 {
 	makeCurrent();
+    
+    QRect paintArea = event->rect();
+    int paintAreaW = paintArea.width();
+    int paintAreaH = paintArea.height();
+    int paintAreaX = paintArea.bottomLeft().x();
+    int paintAreaY = height() - paintArea.bottomLeft().y() - 1;
+    glViewport( paintAreaX, paintAreaY , paintAreaW, paintAreaH );
 	
 	glClearColor( 0.0, 0.0, 0.0, 1.0 );
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
