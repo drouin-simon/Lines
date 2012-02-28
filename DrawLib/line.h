@@ -15,9 +15,9 @@ public:
     Line();
     ~Line();
 
-    virtual void StartPoint( double x, double y, double pressure );
-    virtual void EndPoint( double x, double y, double pressure );
-    virtual void AddPoint( double x, double y, double pressure );
+    virtual void StartPoint( double x, double y, double pressure, Box2d & modifBox );
+    virtual void EndPoint( double x, double y, double pressure, Box2d & modifBox );
+    virtual void AddPoint( double x, double y, double pressure, Box2d & modifBox );
 	
 	void SetWidth( double width ) { m_lineWidth = width; }
 

@@ -99,7 +99,7 @@ void WideLine::InternDraw( const drwDrawingContext & context )
 }
 
 
-void WideLine::StartPoint( double x, double y, double pressure )
+void WideLine::StartPoint( double x, double y, double pressure, Box2d & modifBox )
 {
     double curWidth = m_width;
     if( m_pressureWidth )
@@ -107,6 +107,8 @@ void WideLine::StartPoint( double x, double y, double pressure )
 
     // Init bounding box
     m_boundingBox.Init( x - curWidth, x + curWidth, y - curWidth, y + curWidth );
+    modifBox.IncludePoint( x - curWidth, y - curWidth );
+    modifBox.IncludePoint( x + curWidth, y + curWidth );
 
     Vec2 newPoint( x, y );
 
@@ -185,25 +187,25 @@ void WideLine::StartPoint( double x, double y, double pressure )
 }
 
 
-void WideLine::EndPoint( double x, double y, double pressure )
+void WideLine::EndPoint( double x, double y, double pressure, Box2d & modifBox )
 {
-    AddPoint( x, y, pressure );
+    AddPoint( x, y, pressure, modifBox );
 	if( m_fill )
 	{
-		AddLinePoint( m_fillVertices.at(0)[0], m_fillVertices.at(0)[1], pressure );
+        AddLinePoint( m_fillVertices.at(0)[0], m_fillVertices.at(0)[1], pressure, modifBox );
 		m_fillIndices.push_back( 0 );
 		m_doneAddingPoints = true;
 	}
 }
 
-void WideLine::AddPoint( double x, double y, double pressure )
+void WideLine::AddPoint( double x, double y, double pressure, Box2d & modifBox )
 {
-	AddLinePoint( x, y, pressure );
+    AddLinePoint( x, y, pressure, modifBox );
 	if( m_fill )
 		AddFillPoint( x, y );
 }
 
-void WideLine::AddLinePoint( double x, double y, double pressure )
+void WideLine::AddLinePoint( double x, double y, double pressure, Box2d & modifBox )
 {
 	double curWidth = m_width;
 	if( m_pressureWidth )
@@ -213,6 +215,16 @@ void WideLine::AddLinePoint( double x, double y, double pressure )
 	double boxOffset = curWidth * squareRootOfTwo;
 	m_boundingBox.IncludePoint( x - boxOffset, y - boxOffset );
 	m_boundingBox.IncludePoint( x + boxOffset, y + boxOffset );
+
+    // Compute part of space affected by the new segment
+    double prevWidth = m_width;
+    if( m_pressureWidth )
+        prevWidth *= m_prevPressure;
+    double prevBoxOffset = prevWidth * squareRootOfTwo;
+    modifBox.IncludePoint( m_prevPoint[0] - prevBoxOffset, m_prevPoint[1] - prevBoxOffset );
+    modifBox.IncludePoint( m_prevPoint[0] + prevBoxOffset, m_prevPoint[1] + prevBoxOffset );
+    modifBox.IncludePoint( x - boxOffset, y - boxOffset );
+    modifBox.IncludePoint( x + boxOffset, y + boxOffset );
 	
 	Vec2 newPoint( x, y );
 	int nextIndex = m_vertices.size();

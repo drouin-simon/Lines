@@ -9,6 +9,7 @@
 
 class ImageSprite;
 class drwCursor;
+class Box2d;
 
 class Scene : public QObject
 {
@@ -38,12 +39,14 @@ public:
 	
 	// used by other classes to mark end of modification and notify clients they can re-render
 	void MarkModified();
+    void MarkModified( int frame, Box2d & modifiedArea );
 	
 	ImageSprite * GetImageSprite( const char * filename );
 	
 signals:
 	
 	void Modified();
+    void Modified( int, Box2d & );
 	void NumberOfFramesChanged(int);
 	
 public slots:

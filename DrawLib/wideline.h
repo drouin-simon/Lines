@@ -17,9 +17,9 @@ public:
 	WideLine( double width );
     ~WideLine();
     
-    virtual void StartPoint( double x, double y, double pressure );
-    virtual void EndPoint( double x, double y, double pressure );
-    virtual void AddPoint( double x, double y, double pressure );
+    virtual void StartPoint( double x, double y, double pressure, Box2d & modifBox );
+    virtual void EndPoint( double x, double y, double pressure, Box2d & modifBox );
+    virtual void AddPoint( double x, double y, double pressure, Box2d & modifBox );
 
 	void SetPressureWidth( bool w ) { m_pressureWidth = w; }
 	void SetPressureOpacity( bool o ) { m_pressureOpacity = o; }
@@ -30,7 +30,7 @@ public:
 protected:
 	
 	virtual void InternDraw( const drwDrawingContext & context );
-	void AddLinePoint( double x, double y, double pressure );
+    void AddLinePoint( double x, double y, double pressure, Box2d & modifBox );
 	void AddFillPoint( double x, double y );
 
 	// WideLine

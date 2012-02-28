@@ -23,19 +23,19 @@ void Line::InternDraw( const drwDrawingContext & context )
 }
 
 
-void Line::StartPoint( double x, double y, double pressure )
+void Line::StartPoint( double x, double y, double pressure, Box2d & modifBox )
 {
-    Line::AddPoint( x, y, pressure );
+    Line::AddPoint( x, y, pressure, modifBox );
 }
 
 
-void Line::EndPoint( double x, double y, double pressure )
+void Line::EndPoint( double x, double y, double pressure, Box2d & modifBox )
 {
-    Line::AddPoint( x, y, pressure );
+    Line::AddPoint( x, y, pressure, modifBox );
 }
 
 
-void Line::AddPoint( double x, double y, double pressure )
+void Line::AddPoint( double x, double y, double pressure, Box2d & /*modifBox*/ )
 {
     m_pointTable.push_back( Vec2( x, y ) );
     m_pointIndex.push_back( m_pointIndex.size() );
