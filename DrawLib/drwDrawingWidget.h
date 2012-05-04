@@ -50,6 +50,7 @@ public:
 public slots:
 	
 	void RequestRedraw();
+    void RequestRedraw( int frame, Box2d & modifiedArea );
     void CurrentFrameChanged();
 	void PlaybackStartStop( bool isStart );
 	void DisplaySettingsModified();
@@ -61,7 +62,7 @@ protected:
 		
 	virtual void initializeGL();
 	virtual void resizeGL( int width, int height );
-	virtual void paintEvent( QPaintEvent * /*event*/ );
+    virtual void paintEvent( QPaintEvent * event );
 
 	void DrawAllFramesHue();
 	void DrawAllFramesRedGreen();

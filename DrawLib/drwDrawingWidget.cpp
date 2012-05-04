@@ -175,11 +175,39 @@ void drwDrawingWidget::SetCurrentScene( Scene * cur )
 {
 	CurrentScene = cur;
 	connect( CurrentScene, SIGNAL( Modified() ), SLOT( RequestRedraw() ), Qt::DirectConnection );
+    connect( CurrentScene, SIGNAL(Modified(int,Box2d&)), SLOT(RequestRedraw(int,Box2d&)), Qt::DirectConnection );
 }
 
 void drwDrawingWidget::RequestRedraw()
 {
 	update();
+}
+
+#include "Box2d.h"
+
+void drwDrawingWidget::RequestRedraw( int frame, Box2d & modifiedArea )
+{
+    // check if the modified frame is displayed (otherwise, no need to render)
+    bool needRender = false;
+    int firstDisplayFrame = Controler->GetCurrentFrame();
+    int lastDisplayFrame = firstDisplayFrame;
+    if( !DisplaySettings->GetInhibitOnionSkin() )
+    {
+        lastDisplayFrame += DisplaySettings->GetOnionSkinAfter();
+        firstDisplayFrame -= DisplaySettings->GetOnionSkinBefore();
+    }
+    if( frame > lastDisplayFrame || frame < firstDisplayFrame )
+        return;
+
+    // convert the modified area from world space to image space
+    int pointMin[2];
+    this->WorldToGLWindow( modifiedArea.GetXMin(), modifiedArea.GetYMin(), pointMin[0], pointMin[1] );
+    int pointMax[2];
+    this->WorldToGLWindow( modifiedArea.GetXMax(), modifiedArea.GetYMax(), pointMax[0], pointMax[1] );
+
+    // update the box
+    QRect updateRect( QPoint( pointMin[0], pointMin[1] ), QPoint( pointMax[0], pointMax[1] ) );
+    this->update( updateRect );
 }
 
 void drwDrawingWidget::CurrentFrameChanged()
@@ -546,7 +574,7 @@ void drwDrawingWidget::mousePressEvent( QMouseEvent * e )
 		Observer->MousePressEvent( this, e );
 	}
 
-    update();
+    //update();
 }
 
 
@@ -568,7 +596,7 @@ void drwDrawingWidget::mouseReleaseEvent( QMouseEvent * e )
 	if ( e->button() == Qt::LeftButton && Observer )
 		Observer->MouseReleaseEvent( this, e );
 
-    update();
+    //update();
 }
 
 
@@ -590,7 +618,7 @@ void drwDrawingWidget::mouseMoveEvent( QMouseEvent * e )
 	if ( Observer )
 		Observer->MouseMoveEvent( this, e );
 
-    update();
+    //update();
 }
 
 void drwDrawingWidget::tabletEvent ( QTabletEvent * e )
@@ -617,7 +645,7 @@ void drwDrawingWidget::tabletEvent ( QTabletEvent * e )
 	if( Observer )
 		Observer->TabletEvent( this, e );
 
-    update();
+    //update();
 }
 
 void drwDrawingWidget::ActivateViewportWidget( bool active )

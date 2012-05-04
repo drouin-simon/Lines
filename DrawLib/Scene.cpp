@@ -126,7 +126,7 @@ void Scene::MarkModified()
 
 void Scene::MarkModified( int frame, Box2d & modifiedArea )
 {
-    this->MarkModified();
+    emit Modified( frame, modifiedArea );
 }
 
 ImageSprite * Scene::GetImageSprite( const char * filename )
