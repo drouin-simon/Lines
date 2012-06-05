@@ -1,12 +1,16 @@
 #ifndef __drwCursor_h_
 #define __drwCursor_h_
 
+#include <QObject>
+#include <QRect>
+
 class drwLineTool;
 class drwDrawingWidget;
 class QPainter;
 
-class drwCursor
+class drwCursor : public QObject
 {
+    Q_OBJECT
 	
 public:
 	
@@ -15,6 +19,10 @@ public:
 	
     void SetPosition( int x, int y );
     void Draw( QPainter & painter );
+
+signals:
+
+    void Modified( QRect modifiedArea );
 	
 protected:
 	

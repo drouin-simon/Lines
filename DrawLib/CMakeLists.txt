@@ -47,6 +47,7 @@ set( DrawLib_hdr_moc 	drwDrawingWidget.h
 			PlaybackControler.h
 			drwCommandDatabase.h 
 			Scene.h
+                        drwCursor.h
 			drwNetworkConnection.h
             drwNetworkServer.h
 			drwNetworkClient.h
@@ -77,7 +78,6 @@ set( DrawLib_hdr	drwDrawingWidgetInteractor.h
 			drwCommand.h
 			drwDataArray.h
 			PolygonData.h
-			drwCursor.h 
             drwLineToolViewportWidget.h
             drwFpsCounter.h )
 

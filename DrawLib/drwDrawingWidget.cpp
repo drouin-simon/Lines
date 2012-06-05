@@ -60,6 +60,7 @@ void drwDrawingWidget::SetViewportWidget( drwLineToolViewportWidget * w )
 void drwDrawingWidget::SetCursor( drwCursor * cursor )
 {
     m_cursor = cursor;
+    connect( m_cursor, SIGNAL(Modified(QRect)), this, SLOT(RequestRedraw(QRect)) );
 }
 
 void drwDrawingWidget::ToggleComputeFps()
@@ -210,6 +211,11 @@ void drwDrawingWidget::RequestRedraw( int frame, Box2d & modifiedArea )
     this->update( updateRect );
 }
 
+void drwDrawingWidget::RequestRedraw( QRect modifiedArea )
+{
+    this->update( modifiedArea );
+}
+
 void drwDrawingWidget::CurrentFrameChanged()
 {
 	update();
@@ -293,6 +299,8 @@ void drwDrawingWidget::paintEvent( QPaintEvent * event )
     int paintAreaX = paintArea.bottomLeft().x();
     int paintAreaY = height() - paintArea.bottomLeft().y() - 1;
     glViewport( paintAreaX, paintAreaY , paintAreaW, paintAreaH );
+
+    std::cout << "x: " << paintAreaX << "y: " << paintAreaY << "w: " << paintAreaW << "h: " << paintAreaH << std::endl;
 	
 	glClearColor( 0.0, 0.0, 0.0, 1.0 );
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
