@@ -20,6 +20,7 @@ drwLineTool::drwLineTool( Scene * scene, drwEditionState * editionState, QObject
 , m_pressureOpacity(true)
 , m_fill(false)
 , m_persistence( 0 )
+, m_minDistanceBetweenPoints( 4.0 )
 , m_minWidth( 2.0 )
 , m_maxWidth( 100.0 )
 , m_editionState(editionState)
@@ -30,19 +31,19 @@ drwLineTool::drwLineTool( Scene * scene, drwEditionState * editionState, QObject
 
 void drwLineTool::StartLine( double xWorld, double yWorld )
 {
-    drwCommand::s_ptr command( new drwMouseCommand( drwMouseCommand::Press, xWorld, yWorld, 0.0, 0, 0, 1.0, 0.0, 0.0 ) );
+    drwCommand::s_ptr command( new drwMouseCommand( drwMouseCommand::Press, xWorld, yWorld, (int)xWorld, (int)yWorld, 0.0, 0, 0, 1.0, 0.0, 0.0 ) );
     ExecuteCommand( command );
 }
 
 void drwLineTool::AddPoint( double xWorld, double yWorld )
 {
-    drwCommand::s_ptr command( new drwMouseCommand( drwMouseCommand::Move, xWorld, yWorld, 0.0, 0, 0, 1.0, 0.0, 0.0 ) );
+    drwCommand::s_ptr command( new drwMouseCommand( drwMouseCommand::Move, xWorld, yWorld, (int)xWorld, (int)yWorld, 0.0, 0, 0, 1.0, 0.0, 0.0 ) );
     ExecuteCommand( command );
 }
 
 void drwLineTool::EndLine( double xWorld, double yWorld )
 {
-    drwCommand::s_ptr command( new drwMouseCommand( drwMouseCommand::Release, xWorld, yWorld, 0.0, 0, 0, 1.0, 0.0, 0.0 ) );
+    drwCommand::s_ptr command( new drwMouseCommand( drwMouseCommand::Release, xWorld, yWorld, (int)xWorld, (int)yWorld, 0.0, 0, 0, 1.0, 0.0, 0.0 ) );
     ExecuteCommand( command );
 }
 
@@ -119,6 +120,8 @@ void drwLineTool::ExecuteMouseCommand( drwCommand::s_ptr command )
         m_lastXWorld = mouseCom->X();
         m_lastYWorld = mouseCom->Y();
         m_lastPressure = mouseCom->Pressure();
+        m_lastXPix = mouseCom->XPix();
+        m_lastYPix = mouseCom->YPix();
 		CreateNewNodes();
         CurrentScene->MarkModified( m_editionState->GetCurrentFrame(), m_lastModifBox );
 		emit CommandExecuted( command );
@@ -154,25 +157,34 @@ void drwLineTool::ExecuteMouseCommand( drwCommand::s_ptr command )
 	{
 		if( IsDrawing )
 		{
-			CurrentNodesCont::iterator it = CurrentNodes.begin();
-			while( it != CurrentNodes.end() )
-			{
-                int nodeId = it->second;
-                int frameIndex = it->first;
+            double diffX = (double)( mouseCom->XPix() - m_lastXPix );
+            double diffY = (double)( mouseCom->YPix() - m_lastYPix );
+            double distWithLast = sqrt( diffX*diffX + diffY*diffY );
+            if( distWithLast  > m_minDistanceBetweenPoints )
+            {
 
-                Node * n = CurrentScene->LockNode( frameIndex, nodeId );
-                LinePrimitive * prim = dynamic_cast<LinePrimitive*> (n->GetPrimitive());
-                Q_ASSERT( prim );
-                prim->AddPoint( mouseCom->X(), mouseCom->Y(), mouseCom->Pressure(), m_lastModifBox );
-                CurrentScene->UnlockNode( frameIndex, nodeId );
+                CurrentNodesCont::iterator it = CurrentNodes.begin();
+                while( it != CurrentNodes.end() )
+                {
+                    int nodeId = it->second;
+                    int frameIndex = it->first;
 
-				++it;
-			}
-            CurrentScene->MarkModified( m_editionState->GetCurrentFrame(), m_lastModifBox );
-            m_lastXWorld = mouseCom->X();
-            m_lastYWorld = mouseCom->Y();
-            m_lastPressure = mouseCom->Pressure();
-			emit CommandExecuted( command );
+                    Node * n = CurrentScene->LockNode( frameIndex, nodeId );
+                    LinePrimitive * prim = dynamic_cast<LinePrimitive*> (n->GetPrimitive());
+                    Q_ASSERT( prim );
+                    prim->AddPoint( mouseCom->X(), mouseCom->Y(), mouseCom->Pressure(), m_lastModifBox );
+                    CurrentScene->UnlockNode( frameIndex, nodeId );
+
+                    ++it;
+                }
+                CurrentScene->MarkModified( m_editionState->GetCurrentFrame(), m_lastModifBox );
+                m_lastXWorld = mouseCom->X();
+                m_lastYWorld = mouseCom->Y();
+                m_lastPressure = mouseCom->Pressure();
+                m_lastXPix = mouseCom->XPix();
+                m_lastYPix = mouseCom->YPix();
+                emit CommandExecuted( command );
+            }
 		}
 	}
 }

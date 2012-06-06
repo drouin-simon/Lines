@@ -214,6 +214,8 @@ drwMouseCommand::drwMouseCommand()
 , m_x(0.0)
 , m_y(0.0)
 , m_z(0.0)
+, m_xPixel( 0 )
+, m_yPixel( 0 )
 , m_xTilt(0)
 , m_yTilt(0)
 , m_pressure(1.0)
@@ -223,7 +225,7 @@ drwMouseCommand::drwMouseCommand()
 }
 
 drwMouseCommand::drwMouseCommand( drwMouseCommand::MouseCommandType commandType,
-								 double x, double y, double z, int xTilt,
+                                 double x, double y, double z, int xPix, int yPix, int xTilt,
 								 int yTilt, double pressure, double rotation,
 								 double tangentialPressure ) 
 : drwCommand()
@@ -231,6 +233,8 @@ drwMouseCommand::drwMouseCommand( drwMouseCommand::MouseCommandType commandType,
 , m_x(x)
 , m_y(y)
 , m_z(z)
+, m_xPixel( xPix )
+, m_yPixel( yPix )
 , m_xTilt(xTilt)
 , m_yTilt(yTilt)
 , m_pressure(pressure)
@@ -244,6 +248,8 @@ drwMouseCommand::drwMouseCommand( drwMouseCommand & other )
 , m_x( other.m_x )
 , m_y( other.m_y )
 , m_z( other.m_z )
+, m_xPixel( other.m_xPixel )
+, m_yPixel( other.m_yPixel )
 , m_xTilt( other.m_xTilt )
 , m_yTilt( other.m_yTilt )
 , m_pressure( other.m_pressure )
@@ -255,8 +261,9 @@ drwMouseCommand::drwMouseCommand( drwMouseCommand & other )
 int drwMouseCommand::BodySize()
 {
 	return sizeof(m_type) + sizeof(m_x) + sizeof(m_y) + sizeof(m_z) \
-		+ sizeof(m_xTilt) + sizeof( m_yTilt ) + sizeof(m_pressure) \
-		+ sizeof(m_rotation) + sizeof( m_tangentialPressure );
+            + sizeof( m_xPixel ) + sizeof( m_yPixel ) \
+            + sizeof(m_xTilt) + sizeof( m_yTilt ) + sizeof(m_pressure) \
+            + sizeof(m_rotation) + sizeof( m_tangentialPressure );
 }
 
 void drwMouseCommand::Read( QDataStream & stream )
@@ -267,6 +274,8 @@ void drwMouseCommand::Read( QDataStream & stream )
 	stream >> m_x;
 	stream >> m_y;
 	stream >> m_z;
+    stream >> m_xPixel;
+    stream >> m_yPixel;
 	stream >> m_xTilt;
 	stream >> m_yTilt;
 	stream >> m_pressure;
@@ -280,6 +289,8 @@ bool drwMouseCommand::WriteImpl( QDataStream & stream )
 	stream << m_x;
 	stream << m_y;
 	stream << m_z;
+    stream << m_xPixel;
+    stream << m_yPixel;
 	stream << m_xTilt;
 	stream << m_yTilt;
 	stream << m_pressure;
@@ -290,6 +301,6 @@ bool drwMouseCommand::WriteImpl( QDataStream & stream )
 
 void drwMouseCommand::Write( QTextStream & stream )
 {
-	stream << "Pos = (" << m_x << ", " << m_y << ", " << m_z << ")   Tilt = (" << m_xTilt << ", " << m_yTilt 
+    stream << "Pos = (" << m_x << ", " << m_y << ", " << m_z << ") Screen Pos = ( " << m_xPixel << ", " <<  m_yPixel << ") Tilt = (" << m_xTilt << ", " << m_yTilt
 	<< ")  Pressure = " << m_pressure << "   Rotation = " << m_rotation << "  Tang pressure = " << m_tangentialPressure; 
 }

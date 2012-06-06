@@ -66,6 +66,8 @@ protected:
     double m_lastXWorld;
     double m_lastYWorld;
     double m_lastPressure;
+    int m_lastXPix;
+    int m_lastYPix;
 	
 	bool IsDrawing;
     Box2d m_lastModifBox;
@@ -79,6 +81,7 @@ protected:
 	bool m_fill;
 	int m_persistence;
 
+    double m_minDistanceBetweenPoints;
 	double m_minWidth;
 	double m_maxWidth;
 	

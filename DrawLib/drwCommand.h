@@ -159,7 +159,7 @@ public:
 	enum MouseCommandType { Press, Release, Move };
 	
 	drwMouseCommand();
-	drwMouseCommand( MouseCommandType commandType, double x, double y, double z, int xTilt, int yTilt, double pressure, double rotation, double tangentialPressure );
+    drwMouseCommand( MouseCommandType commandType, double x, double y, double z, int xPix, int yPix, int xTilt, int yTilt, double pressure, double rotation, double tangentialPressure );
 	drwMouseCommand( drwMouseCommand & );
 	virtual ~drwMouseCommand() {}
 	virtual s_ptr Clone() { s_ptr newCom( new drwMouseCommand( *this ) ); return newCom; }
@@ -174,6 +174,8 @@ public:
 	double X() { return m_x; }
 	double Y() { return m_y; }
 	double Z() { return m_z; }
+    int XPix() { return m_xPixel; }
+    int YPix() { return m_yPixel; }
 	int XTilt() { return m_xTilt; }
 	int YTilt() { return m_yTilt; }
 	double Pressure() { return m_pressure; }
@@ -188,6 +190,8 @@ protected:
 	double m_x;
 	double m_y;
 	double m_z;
+    int m_xPixel;
+    int m_yPixel;
 	int m_xTilt;
 	int m_yTilt;
 	double m_pressure;
