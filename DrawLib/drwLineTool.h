@@ -42,12 +42,15 @@ public:
 	void SetPressureWidth( bool w );
 	bool GetPressureOpacity() { return m_pressureOpacity; }
 	void SetPressureOpacity( bool o );
+    bool IsPerssureWidthAndOpacityEnabled();
 	bool GetFill() { return m_fill; }
 	void SetFill( bool f );
 	GetMacro( Color, Vec4 );
 	void SetColor( Vec4 & c );
 	int GetPersistence() { return m_persistence; }
 	void SetPersistence( int p );
+    bool IsPersistenceEnabled();
+    void SetPersistenceEnabled( bool on );
     void SetBaseWidth( double bw );
     double GetBaseWidth() { return m_baseWidth; }
 

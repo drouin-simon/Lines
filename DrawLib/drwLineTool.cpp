@@ -257,6 +257,11 @@ void drwLineTool::SetPressureOpacity( bool o )
 	ParametersChanged();
 }
 
+bool drwLineTool::IsPerssureWidthAndOpacityEnabled()
+{
+    return !GetFill();
+}
+
 void drwLineTool::SetFill( bool f )
 {
 	m_fill = f;
@@ -273,6 +278,11 @@ void drwLineTool::SetPersistence( int p )
 {
 	m_persistence = p;
 	ParametersChanged();
+}
+
+bool drwLineTool::IsPersistenceEnabled()
+{
+    return ( m_editionState->GetFrameChangeMode() == Play );
 }
 
 void drwLineTool::SetBaseWidth( double newBaseWidth )
@@ -314,8 +324,16 @@ Node * drwLineTool::CreateNewNode()
 		case TypeWideLine:
 		{
 			WideLine * newWideLine = new WideLine( m_baseWidth );
-			newWideLine->SetPressureWidth( m_pressureWidth );
-			newWideLine->SetPressureOpacity( m_pressureOpacity );
+            if( IsPerssureWidthAndOpacityEnabled() )
+            {
+                newWideLine->SetPressureWidth( m_pressureWidth );
+                newWideLine->SetPressureOpacity( m_pressureOpacity );
+            }
+            else
+            {
+                newWideLine->SetPressureWidth( false );
+                newWideLine->SetPressureOpacity( false );
+            }
 			newWideLine->SetFill( m_fill );
 			newPrimitive = newWideLine;
 		}
@@ -333,7 +351,9 @@ Node * drwLineTool::CreateNewNode()
 
 void drwLineTool::CreateNewNodes( )
 {
-	int lastFrame = m_editionState->GetCurrentFrame() + m_persistence;
+    int lastFrame = m_editionState->GetCurrentFrame();
+    if( this->IsPersistenceEnabled() )
+        lastFrame += m_persistence;
     if( lastFrame >= CurrentScene->GetNumberOfFrames() )
         lastFrame = CurrentScene->GetNumberOfFrames() - 1;
 	for( int frame = m_editionState->GetCurrentFrame(); frame <= lastFrame; ++frame )

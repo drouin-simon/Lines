@@ -64,6 +64,7 @@ void PrimitiveToolOptionWidget::fillCheckBoxStateChanged( int state )
 		m_lineTool->SetFill( false );
 	else if( state == Qt::Checked )
 		m_lineTool->SetFill( true );
+    UpdateUi();
 }
 
 void PrimitiveToolOptionWidget::FrameChangeRadioToggled( bool isOn )
@@ -77,6 +78,7 @@ void PrimitiveToolOptionWidget::FrameChangeRadioToggled( bool isOn )
 			m_editionState->SetFrameChangeMode( AfterIntervention );
 		else 
 			m_editionState->SetFrameChangeMode( Play );
+        UpdateUi();
 	}
 }
 
@@ -183,9 +185,12 @@ void PrimitiveToolOptionWidget::UpdateUi()
 		playFrameChangeRadio->setChecked( true );
 	
 	pressureWidthCheckBox->setChecked( m_lineTool->GetPressureWidth() );
+    pressureWidthCheckBox->setEnabled( m_lineTool->IsPerssureWidthAndOpacityEnabled() );
 	pressureOpacityCheckBox->setChecked( m_lineTool->GetPressureOpacity() );
+    pressureOpacityCheckBox->setEnabled( m_lineTool->IsPerssureWidthAndOpacityEnabled() );
 	fillCheckBox->setChecked( m_lineTool->GetFill() );
 	persistenceSpinBox->setValue( m_lineTool->GetPersistence() );
+    persistenceSpinBox->setEnabled( m_lineTool->IsPersistenceEnabled() );
 	
 	m_updating = false;
 }
