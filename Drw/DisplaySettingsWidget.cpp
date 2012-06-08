@@ -77,6 +77,8 @@ void DisplaySettingsWidget::SetupUi()
 			framesBeforeLabel = new QLabel(tr("Before:"),onionSkinGroupBox);
 			framesBeforeLayout->addWidget( framesBeforeLabel );
 			framesBeforeSpinBox = new QSpinBox(this);
+            framesBeforeSpinBox->setFocusPolicy( Qt::NoFocus );
+            framesBeforeSpinBox->setFrame( false );
 			framesBeforeLayout->addWidget( framesBeforeSpinBox );
 			connect( framesBeforeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnFramesBeforeValueChanged(int)) );
 		}
@@ -86,6 +88,8 @@ void DisplaySettingsWidget::SetupUi()
 			framesAfterLabel = new QLabel(tr("After:"),onionSkinGroupBox);
 			framesAfterLayout->addWidget( framesAfterLabel );
 			framesAfterSpinBox = new QSpinBox(onionSkinGroupBox);
+            framesAfterSpinBox->setFocusPolicy( Qt::NoFocus );
+            framesAfterSpinBox->setFrame( false );
 			framesAfterLayout->addWidget( framesAfterSpinBox );
 			connect( framesAfterSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnFramesAfterValueChanged(int)) );
 		}

@@ -7,7 +7,7 @@ PlaybackControler::PlaybackControler( Scene * scene, QObject * parent )
 , m_scene(scene)
 , frameInterval(83)  // number of miliseconds between frames
 , isPlaying(false)
-, loop(false)
+, loop(true)
 , interactionStartFrame(0)
 , insertFrameMode(false)
 {

@@ -229,6 +229,7 @@ void drwDrawingWidget::PlaybackStartStop( bool isStarting )
 	{
 		if( m_timerId == -1 )
 			m_timerId = startTimer(0);
+        EnableVSync( true );
 	}
 	else
 	{
@@ -237,6 +238,7 @@ void drwDrawingWidget::PlaybackStartStop( bool isStarting )
 			killTimer( m_timerId );
 			m_timerId = -1;
 		}
+        EnableVSync( false );
 	}
 	
 	DisplaySettings->SetInhibitOnionSkin( isStarting );
@@ -277,7 +279,7 @@ void drwDrawingWidget::initializeGL()
 	// Initialize the working texture (used to draw widelines, among others)
 	m_workTexture->Init( 1, 1 );
 
-    EnableVSync(true);
+    //EnableVSync(true);
 }
 
 
@@ -328,7 +330,7 @@ void drwDrawingWidget::paintEvent( QPaintEvent * event )
 
             if( DisplaySettings->GetOnionSkinBefore() > 0 )
             {
-                Vec4 onionSkinColor( 1.0, 0.90, 0.90, 1.0 );
+                Vec4 onionSkinColor( 1.0, 0.40, 0.40, 1.0 );
                 int nbOnionSkinBefore = DisplaySettings->GetOnionSkinBefore();
                 for( int i = 0; i < nbOnionSkinBefore; ++i )
                 {
@@ -346,7 +348,7 @@ void drwDrawingWidget::paintEvent( QPaintEvent * event )
 
             if( DisplaySettings->GetOnionSkinAfter() )
             {
-                Vec4 onionSkinColor( .90, .90, 1.0, 1.0 );
+                Vec4 onionSkinColor( 0.0, 0.85, 1.0, 1.0 );
                 int nbOnionSkinAfter = DisplaySettings->GetOnionSkinAfter();
                 for( int i = 0; i < nbOnionSkinAfter; ++i )
                 {
@@ -493,12 +495,12 @@ void drwDrawingWidget::DrawAllFramesRedGreen()
 	{
 		double interval = .7 / currentFrame;
 		drwDrawingContext c(this);
-        c.m_colorMultiplier[0] = 1.0;
-        c.m_colorMultiplier[1] = 0.0;
-        c.m_colorMultiplier[2] = 0.0;
+        Vec4 onionSkinColor( 1.0, 0.40, 0.40, 1.0 );
 		for( int i = 0; i < currentFrame; ++i )
 		{
-            c.m_colorMultiplier[0] = .2 + i * interval;
+            double factor = .2 + i * interval;
+            c.m_colorMultiplier = onionSkinColor * factor;
+            c.m_colorMultiplier[3] = 1.0;
 			CurrentScene->DrawFrame( i, c ); 
 		}
 	}
@@ -507,12 +509,12 @@ void drwDrawingWidget::DrawAllFramesRedGreen()
 	{
 		double interval = .7 / framesAfter;
 		drwDrawingContext c(this);
-        c.m_colorMultiplier[0] = 0.0;
-        c.m_colorMultiplier[1] = 1.0;
-        c.m_colorMultiplier[2] = 0.0;
+        Vec4 onionSkinColor( 0.0, 0.85, 1.0, 1.0 );
 		for( int i = 1; i < framesAfter; ++i )
 		{
-            c.m_colorMultiplier[1] = .9 - i * interval;
+            double factor = .9 - i * interval;
+            c.m_colorMultiplier = onionSkinColor * factor;
+            c.m_colorMultiplier[3] = 1.0;
             CurrentScene->DrawFrame( i + currentFrame, c );
 		}
 	}
@@ -534,7 +536,7 @@ void drwDrawingWidget::DrawFrame()
     frameBottomRight[0] = CurrentScene->GetFrameWidth();
     frameBottomRight[1] = 0.0;
 	
-	glColor4d( .3, .3, .3, .6 );
+    glColor4d( .7, .7, .7, .6 );
 	glBegin( GL_QUADS );
 	{
 		// Top

@@ -159,7 +159,9 @@ void PrimitiveToolOptionWidget::SetupUi()
 		persistenceLabel = new QLabel(tr("Persistence:"),this);
 		persistenceLayout->addWidget(persistenceLabel);
 		persistenceSpinBox = new QSpinBox(this);
-		connect(persistenceSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnPersistenceSpinBoxValueChanged(int)) );
+        persistenceSpinBox->setFocusPolicy( Qt::NoFocus );  // so that it doesn't steal focus?
+        persistenceSpinBox->setFrame( false );
+        connect(persistenceSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnPersistenceSpinBoxValueChanged(int)) );
 		persistenceLayout->addWidget(persistenceSpinBox);
 	}
 	mainLayout->addLayout(persistenceLayout);
