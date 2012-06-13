@@ -26,6 +26,11 @@ drwNetworkManager::~drwNetworkManager()
 	}
 }
 
+void drwNetworkManager::ResetState()
+{
+    SetState( Idle );
+}
+
 double drwNetworkManager::GetPercentRead()
 {
 	if( m_state == ReceivingScene )
@@ -63,8 +68,7 @@ void drwNetworkManager::StopSharing()
 bool drwNetworkManager::IsConnected()
 {
 	return( m_state == WaitingForConnection ||
-			m_state == ConnectionTimedOut ||
-			m_state == ConnectionLost ||
+            m_state == ConnectionTimedOut ||
 			m_state == Connected );
 }
 
@@ -75,8 +79,22 @@ void drwNetworkManager::Connect( QString username, QHostAddress ip )
 		m_inThread->SetConnectAttributes( username, ip );
 		m_inThread->SetMessageToThread( ConnectMsg );
 		emit MessageToThreadSignal();
-		m_state = WaitingForConnection;
+        SetState( WaitingForConnection );
 	}
+}
+
+void drwNetworkManager::Disconnect()
+{
+    if( m_state == Connected )
+    {
+        m_inThread->SetMessageToThread( DisconnectMsg );
+        emit MessageToThreadSignal();
+    }
+}
+
+QString drwNetworkManager::GetServerUserName()
+{
+    return m_inThread->GetServerUserName();
 }
 
 void drwNetworkManager::MessageFromThreadSlot()
@@ -137,6 +155,13 @@ void drwInThreadAgent::SetConnectAttributes( QString user, QHostAddress remoteIp
 	m_userName = user;
 	m_remoteIp = remoteIp;
 	m_attributesMutex.unlock();
+}
+
+QString drwInThreadAgent::GetServerUserName()
+{
+    if( m_client )
+        return m_client->GetPeerUserName();
+    return QString("");
 }
 
 int drwInThreadAgent::GetPercentRead()

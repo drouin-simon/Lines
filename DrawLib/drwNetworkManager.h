@@ -32,6 +32,7 @@ public:
 
 	void SetDispatcher( drwCommandDispatcher * disp ) { m_dispatcher = disp; }
 	NetworkState GetState() { return m_state; }
+    void ResetState();
 	double GetPercentRead();
 
 	bool IsSharing();
@@ -40,6 +41,8 @@ public:
 	
 	bool IsConnected();
     void Connect( QString username, QHostAddress ip );
+    void Disconnect();
+    QString GetServerUserName();
 
 	void SetMessageFromThread( MessageFromThread msg ) { m_messageFromThread = msg; }
 	friend class drwInThreadAgent;
@@ -94,6 +97,7 @@ public:
 		: m_manager(man), m_client(0), m_server(0) {}
 	
 	void SetConnectAttributes( QString user, QHostAddress remoteIp );
+    QString GetServerUserName();
 	int GetPercentRead();
 
 	void SetMessageToThread( drwNetworkManager::MessageToThread msg ) { m_messageToThread = msg; }

@@ -39,7 +39,7 @@ MainWindow::MainWindow()
 	m_networkManager = new drwNetworkManager();
 	m_commandDispatcher = new drwCommandDispatcher( m_networkManager, m_commandDb, m_localToolbox, m_scene, this );
 	m_networkManager->SetDispatcher( m_commandDispatcher );
-	connect( m_networkManager, SIGNAL(StateChangedSignal()), this, SLOT(UpdateNetworkStatus()) );
+    connect( m_networkManager, SIGNAL(StateChangedSignal()), this, SLOT(NetStateChanged()) );
 
 	// Create main widget  (just a frame to put the viewing widget and the playback control widget)
 	QWidget * mainWidget = new QWidget(this);
@@ -86,6 +86,21 @@ MainWindow::MainWindow()
 	rightPanelLayout->addWidget( m_toolOptionWidget );
 	m_displaySettingsWidget = new DisplaySettingsWidget( m_glWidget->GetDisplaySettings(), mainWidget );
 	rightPanelLayout->addWidget( m_displaySettingsWidget );
+
+    QHBoxLayout * networkStateLayout = new QHBoxLayout( mainWidget );
+    rightPanelLayout->addLayout( networkStateLayout );
+    networkStateLayout->setContentsMargins ( 5, 5, 5, 5 );
+
+    m_networkStateLabel = new QLabel( mainWidget );
+    m_networkStateLabel->setText( "Not Connected" );
+    m_networkStateLabel->setWordWrap( true );
+    m_networkStateLabel->setFrameShape( QLabel::Box );
+    m_networkStateLabel->setFrameShadow( QLabel::Plain );
+    m_networkStateLabel->setAlignment( Qt::AlignCenter  );
+    m_networkStateLabel->setMaximumWidth( 150 );
+    m_networkStateLabel->setStyleSheet("background-color: #6e6e6e");
+    networkStateLayout->addWidget( m_networkStateLabel );
+
 	rightPanelLayout->addStretch();
 	
 	// Create tablet state dock
@@ -274,39 +289,43 @@ void MainWindow::NetShareSession()
 
 void MainWindow::NetConnect()
 {
-	// Get the user to select the server to connect to
-	drwNetworkConnectDialog * dlg = new drwNetworkConnectDialog( this );
-	int result = dlg->exec();
-	QString name;
-	QHostAddress address;
-	if( result != QDialog::Accepted || !dlg->GetSelectedUserAndAddress( name, address ) )
-	{
-		delete dlg;
-		UpdateNetworkStatus();
-		return;
-	}
-	delete dlg;
+    if( m_networkManager->IsConnected() )
+    {
+        m_networkManager->Disconnect();
+    }
+    else
+    {
+        // Get the user to select the server to connect to
+        drwNetworkConnectDialog * dlg = new drwNetworkConnectDialog( this );
+        int result = dlg->exec();
+        QString name;
+        QHostAddress address;
+        if( result != QDialog::Accepted || !dlg->GetSelectedUserAndAddress( name, address ) )
+        {
+            delete dlg;
+            return;
+        }
+        delete dlg;
 
-	// Now we have a valid username and ip, try to connect
-	Reset();
-	m_scene->blockSignals( true );
-	m_networkManager->Connect( name, address );
+        // Now we have a valid username and ip, try to connect
+        Reset();
+        m_scene->blockSignals( true );
+        m_networkManager->Connect( name, address );
 
-	// Create a timer to update a progress dialog
-	QTimer timer;
-	connect( &timer, SIGNAL(timeout()), this, SLOT(NetConnectProgress()) );
-	timer.start( 200 );
+        // Create a timer to update a progress dialog
+        QTimer timer;
+        connect( &timer, SIGNAL(timeout()), this, SLOT(NetConnectProgress()) );
+        timer.start( 200 );
 
-	// Create progress dialog and start it
-	m_progressDialog = new QProgressDialog( "Connecting", "Cancel", 0, 100 );
-	m_progressDialog->setAttribute( Qt::WA_DeleteOnClose );
-	m_progressDialog->exec();
+        // Create progress dialog and start it
+        m_progressDialog = new QProgressDialog( "Connecting", "Cancel", 0, 100 );
+        m_progressDialog->setAttribute( Qt::WA_DeleteOnClose );
+        m_progressDialog->exec();
 
-	m_scene->blockSignals( false );
-	
-	// todo : If the operation didn't succeed, clear the scene again
+        m_scene->blockSignals( false );
 
-	UpdateNetworkStatus();
+        // todo : If the operation didn't succeed, clear the scene again
+    }
 }
 
 void MainWindow::NetConnectProgress()
@@ -339,21 +358,39 @@ void MainWindow::UpdateNetworkStatus()
 	{
 		m_netShareSessionMenuAction->setText( tr("Stop Sharing" ) );
 		m_netConnectMenuItem->setEnabled( false );
+        m_networkStateLabel->setText( tr("Sharing") );
+        m_networkStateLabel->setStyleSheet("background-color: #b16b2c");
 	}
 	else 
 	{
-		m_netShareSessionMenuAction->setText( tr("Share Session") );
+        m_netShareSessionMenuAction->setText( tr("Share Session") );
 		m_netConnectMenuItem->setEnabled( true );
 		if( m_networkManager->IsConnected() )
 		{
 			m_netConnectMenuItem->setText( tr("Disconnect") );
 			m_netShareSessionMenuAction->setEnabled( false );
+
+            QString serverUserName = m_networkManager->GetServerUserName();
+            m_networkStateLabel->setText( tr("Connected to: \n") + serverUserName );
+            m_networkStateLabel->setStyleSheet("background-color: #526b2c");
 		}
 		else 
 		{
+            m_netShareSessionMenuAction->setEnabled( true );
 			m_netConnectMenuItem->setText( tr("Connect...") );
+            m_networkStateLabel->setText( tr("Not Connected") );
+            m_networkStateLabel->setStyleSheet("background-color: #6e6e6e");
 		}
 	}
+}
+
+void MainWindow::NetStateChanged()
+{
+    if( m_networkManager->GetState() == drwNetworkManager::ConnectionLost )
+    {
+        m_networkManager->ResetState();
+    }
+    UpdateNetworkStatus();
 }
 
 void MainWindow::viewFullscreen()

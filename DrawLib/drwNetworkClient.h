@@ -23,6 +23,7 @@ public:
 	int GetPercentRead();
 
 	ClientState GetState() { return m_state; }
+    QString GetPeerUserName() { return m_peerUserName; }
 	
 	void Connect();
 	void Disconnect();

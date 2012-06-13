@@ -10,6 +10,7 @@ class QPopupMenu;
 class QDockWidget;
 class QAction;
 class QProgressDialog;
+class QLabel;
 
 class drwDrawingWidget;
 class Scene;
@@ -51,6 +52,7 @@ private slots:
 	void NetShareSession();
 	void NetConnect();
 	void NetConnectProgress();
+    void NetStateChanged();
 	void UpdateNetworkStatus();
 	
 	void viewFullscreen();
@@ -92,7 +94,8 @@ private:
 	PlaybackControlerWidget * m_playbackControlerWidget;
 	PrimitiveToolOptionWidget * m_toolOptionWidget;
 	DisplaySettingsWidget * m_displaySettingsWidget;
-		
+    QLabel * m_networkStateLabel;
+
 	TabletStateWidget * m_tabletStateWidget;
 	QDockWidget * m_dockTabletState;
 	
