@@ -44,10 +44,11 @@ void drwBitmapExporter::run()
     pixBuffer.makeCurrent();
 	
     QGLFramebufferObject fb( m_size );
-    fb.bind();
+    bool res = fb.bind();
 
     drwGLRenderer ren;
     ren.SetCurrentScene( m_scene );
+    ren.SetRenderSize( m_size.width(), m_size.height() );
 	
 	int numberOfDigits = QString::number( m_scene->GetNumberOfFrames() ).size();
 	
