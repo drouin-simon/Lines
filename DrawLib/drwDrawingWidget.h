@@ -7,16 +7,14 @@
 #include "Scene.h"
 #include "drwCommand.h"
 
+class QPushButton;
+class drwGLRenderer;
 class drwWidgetObserver;
-class drwDrawingWidgetInteractor;
-class Node;
-class PlaybackControler;
 class drwDisplaySettings;
-class drwDrawableTexture;
 class drwLineToolViewportWidget;
 class drwFpsCounter;
-
-class QPushButton;
+class PlaybackControler;
+class drwDrawingWidgetInteractor;
 
 class drwDrawingWidget : public QGLWidget
 {
@@ -26,26 +24,24 @@ public:
 		
 	drwDrawingWidget( QWidget * parent=0 );
 	~drwDrawingWidget();
-	
-	Node * Pick( int x, int y );
-	void SetCurrentScene( Scene * cur );
-	SetMacro( Observer, drwWidgetObserver* );
-	void SetControler( PlaybackControler * controler );
-	GetMacro( Controler, PlaybackControler* );
-	GetMacro( DisplaySettings, drwDisplaySettings* );
-	drwDrawableTexture * GetWorkTexture() { return m_workTexture; }
-	Camera & GetCamera() { return theCamera; }
+
+    void SetCurrentScene( Scene * scene );
+    SetMacro( Observer, drwWidgetObserver* );
+    GetMacro( DisplaySettings, drwDisplaySettings* );
+    void SetControler( PlaybackControler * controler );
+    GetMacro( Controler, PlaybackControler* );
     void SetViewportWidget( drwLineToolViewportWidget * w );
     void SetCursor( drwCursor * cursor );
+    void UpdatePosition( int x, int y );
     void ToggleComputeFps();
-	
+    void ActivateViewportWidget( bool active );
+    Camera * GetCamera();
+    void ShowFullFrame( bool );
+    Node * Pick( int x, int y );
+    void WindowToWorld( double xWin, double yWin, double & xWorld, double & yWorld );
+
 	drwCommand::s_ptr CreateMouseCommand( drwMouseCommand::MouseCommandType commandType, QMouseEvent * e );
 	drwCommand::s_ptr CreateMouseCommand( drwMouseCommand::MouseCommandType commandType, QTabletEvent * e );
-	void WindowToWorld( double xWin, double yWin, double & xWorld, double & yWorld );
-    void WorldToGLWindow( double xworld, double yworld, int & xwin, int & ywin );
-    double PixelsPerUnit();
-    void ShowFullFrame( bool show );
-    void ActivateViewportWidget( bool active );
 	
 public slots:
 	
@@ -57,6 +53,7 @@ public slots:
 	void DisplaySettingsModified();
 
 signals:
+
     void FinishedPainting();
 		
 protected:
@@ -64,14 +61,6 @@ protected:
 	virtual void initializeGL();
 	virtual void resizeGL( int width, int height );
     virtual void paintEvent( QPaintEvent * event );
-
-	void DrawAllFramesHue();
-	void DrawAllFramesRedGreen();
-	void DrawFrame();
-	void DisplayCounter();
-    void UpdatePosition( int x, int y );
-    void EnableVSync( bool enable );
-
 	virtual void mousePressEvent(QMouseEvent*);
 	virtual void mouseReleaseEvent(QMouseEvent*);
 	virtual void mouseMoveEvent(QMouseEvent*);
@@ -91,22 +80,20 @@ protected:
 	
 	// stuff to do for all events
 	bool event ( QEvent * event );
+
+    void EnableVSync( bool enable );
   
 private:
 	
-	Camera theCamera;
-	drwDrawingWidgetInteractor * m_interactor;
-	drwWidgetObserver * Observer;
-	Scene				* CurrentScene;
-	PlaybackControler	* Controler;
+    drwGLRenderer * m_renderer;
+    PlaybackControler * Controler;
+    drwDrawingWidgetInteractor * m_interactor;
+    drwWidgetObserver * Observer;
+    drwDisplaySettings	* DisplaySettings;
+    drwLineToolViewportWidget * m_viewportWidget;
     drwFpsCounter * m_fpsCounter;
-	drwDisplaySettings	* DisplaySettings;
-	drwDrawableTexture * m_workTexture;
-	drwLineToolViewportWidget * m_viewportWidget;
     drwCursor * m_cursor;
     bool m_showCursor;
-    bool m_showFullFrame;
-    double m_framePadding;
 }; 
 
 #endif

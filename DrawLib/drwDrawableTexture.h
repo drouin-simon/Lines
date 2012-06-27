@@ -9,7 +9,6 @@ public:
 	drwDrawableTexture();
 	~drwDrawableTexture();
 	
-	bool Init( int width, int height );
 	void Resize( int width, int height );
 	void Release();
 	
@@ -20,8 +19,10 @@ public:
 
 protected:
 	
+    bool m_isDrawingInTexture;
 	unsigned m_texId;
 	unsigned m_fbId;
+    int m_backupFbId;
 	int m_width;
 	int m_height;
 };

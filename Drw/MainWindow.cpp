@@ -244,8 +244,7 @@ bool MainWindow::fileExport()
 		// Create the exporter and start it
 		drwBitmapExporter * exporter = new drwBitmapExporter;
 		exporter->SetFilename( path );
-		exporter->SetScene( m_scene );
-		exporter->SetGLWidget( m_glWidget );
+        exporter->SetScene( m_scene );
 		exporter->SetSize( m_exportRes );
 		bool res = exporter->StartWriting();
 		
@@ -259,10 +258,10 @@ bool MainWindow::fileExport()
 			dialog.exec();
 		
 			// wait for the exporter thread to terminate
-			exporter->wait();
-		
-			return true;
+            exporter->wait();
 		}
+
+        return res;
 	}
 	return false;
 }

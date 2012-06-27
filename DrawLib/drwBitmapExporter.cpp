@@ -1,13 +1,13 @@
 #include "drwBitmapExporter.h"
-#include "drwDrawingWidget.h"
-#include "drwDrawingContext.h"
+#include "drwGLRenderer.h"
+#include "Scene.h"
 #include <QGLFramebufferObject>
+#include <QGLPixelBuffer>
 #include <QFileInfo>
 #include <QDir>
 
 drwBitmapExporter::drwBitmapExporter()
 : m_scene(0)
-, m_glWidget(0)
 {
 }
 
@@ -22,9 +22,7 @@ void drwBitmapExporter::SetSize( const QSize & size )
 
 bool drwBitmapExporter::StartWriting()
 {
-	// make sure we have a scene and widget
-	if( !m_glWidget || !m_scene )
-		return false;
+    Q_ASSERT( m_scene );
 	
 	// Check validity of the filename
 	QFileInfo fileInfo( m_filename );
@@ -42,13 +40,14 @@ bool drwBitmapExporter::StartWriting()
 
 void drwBitmapExporter::run()
 {
-	m_glWidget->makeCurrent();
+    QGLPixelBuffer pixBuffer( m_size );
+    pixBuffer.makeCurrent();
 	
-	m_fb = new QGLFramebufferObject( m_size );
-	m_fb->bind();
-	
-	// Save drawing window's viewport
-	glPushAttrib( GL_VIEWPORT_BIT );
+    QGLFramebufferObject fb( m_size );
+    fb.bind();
+
+    drwGLRenderer ren;
+    ren.SetCurrentScene( m_scene );
 	
 	int numberOfDigits = QString::number( m_scene->GetNumberOfFrames() ).size();
 	
@@ -56,34 +55,14 @@ void drwBitmapExporter::run()
 	{
 		emit WritingFrame( i );
 		
-		// Setup basic rendering stuff. Need more generic.
-		glClearColor( 0.0, 0.0, 0.0, 1.0 );
-		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-        gluOrtho2D( 0.0, m_scene->GetFrameWidth(), 0.0, m_scene->GetFrameHeight() );
-		glMatrixMode(GL_MODELVIEW);
-		glLoadIdentity();
-		
-		glViewport( 0, 0, m_size.width(), m_size.height() );
-		
-		drwDrawingContext context(m_glWidget);
-		m_scene->DrawFrame( i, context );
+        ren.Render( i, 0, 0 );
 	
-		QImage im = m_fb->toImage();
+        QImage im = fb.toImage();
 		QString model( m_baseFilename );
 		model.append( "%1." ).append( m_fileExtension );
 		QString name = model.arg( i, numberOfDigits, 10, QChar('0') );
 		im.save( name );
-	}
+    }
 	
-	// retrieve drawing window's viewport
-	glPopAttrib();
-	
-	m_fb->release();
-	delete m_fb;
-	m_fb = 0;
-	
-	m_glWidget->doneCurrent();
-
+    pixBuffer.doneCurrent();
 }

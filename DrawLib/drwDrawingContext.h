@@ -3,7 +3,7 @@
 
 #include "SVL.h"
 
-class drwDrawingWidget;
+class drwGLRenderer;
 class drwDrawableTexture;
 
 class drwDrawingContext
@@ -11,10 +11,10 @@ class drwDrawingContext
 
 public:
 
-	drwDrawingContext( drwDrawingWidget * widget )
+    drwDrawingContext( drwGLRenderer * renderer )
         : m_colorMultiplier( 1.0, 1.0, 1.0, 1.0 )
         , m_isPicking(false)
-        , m_widget(widget) {}
+        , m_renderer(renderer) {}
 
     drwDrawableTexture * GetWorkingTexture() const;
     void WorldToGLWindow( double xworld, double yworld, int & xwin, int & ywin ) const;
@@ -22,7 +22,7 @@ public:
 
     Vec4 m_colorMultiplier;
 	bool m_isPicking;
-	drwDrawingWidget * m_widget;
+    drwGLRenderer * m_renderer;
 };
 
 

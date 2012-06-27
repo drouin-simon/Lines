@@ -5,7 +5,7 @@
 #include <QSize>
 
 class Scene;
-class drwDrawingWidget;
+class drwGLRenderer;
 class QGLFramebufferObject;
 
 class drwBitmapExporter : public QThread
@@ -19,7 +19,6 @@ public:
 	~drwBitmapExporter();
 	void SetScene( Scene * scene ) { m_scene = scene; }
 	void SetFilename( QString filename ) { m_filename = filename; }
-	void SetGLWidget( drwDrawingWidget * glWidget ) { m_glWidget = glWidget; }
 	void SetSize( const QSize & size );
 	
 	bool StartWriting();
@@ -30,7 +29,6 @@ signals:
 	
 	void WritingFrame( int frame );
 	
-	
 protected:
 	
 	Scene * m_scene;
@@ -38,8 +36,7 @@ protected:
 	QString m_baseFilename;
 	QString m_fileExtension;
 	QSize m_size;
-	drwDrawingWidget * m_glWidget;
-	QGLFramebufferObject * m_fb;
 	
 };
+
 #endif

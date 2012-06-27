@@ -1,10 +1,13 @@
 #include "drwDrawableTexture.h"
 #include "IncludeGLee.h"
 #include "IncludeGl.h"
+#include <assert.h>
 
 drwDrawableTexture::drwDrawableTexture()
-	: m_texId(0)
+    : m_isDrawingInTexture( false )
+    , m_texId(0)
 	, m_fbId(0)
+    , m_backupFbId(0)
 	, m_width(1)
 	, m_height(1)
 {
@@ -15,49 +18,37 @@ drwDrawableTexture::~drwDrawableTexture()
 	Release();
 }
 
-bool drwDrawableTexture::Init( int width, int height )
-{
-	m_width = width;
-	m_height = height;
-
-	// init texture
-	glGenTextures( 1, &m_texId );
-	glBindTexture(GL_TEXTURE_RECTANGLE_ARB, m_texId );
-	glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
-	glTexImage2D( GL_TEXTURE_RECTANGLE_ARB, 0, 4, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0 );
-	glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0 );
-
-	// Init framebuffer
-	bool success = true;
-	glGenFramebuffersEXT( 1, &m_fbId );
-	glBindFramebufferEXT( GL_FRAMEBUFFER_EXT, m_fbId );
-	glFramebufferTexture2DEXT( GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_RECTANGLE_ARB, m_texId, 0 );
-
-	GLenum ret = glCheckFramebufferStatusEXT( GL_FRAMEBUFFER_EXT );
-	if( ret != GL_FRAMEBUFFER_COMPLETE_EXT )
-		success = false;
-
-	// clear the texture
-	glClearColor( 0.0, 0.0, 0.0, 0.0 );
-	glClear( GL_COLOR_BUFFER_BIT );
-
-	glBindFramebufferEXT( GL_FRAMEBUFFER_EXT, 0 );
-
-	return success;
-}
-
 void drwDrawableTexture::Resize( int width, int height )
 {
-	if( m_texId && ( m_width != width || m_height != height ) )
+    // Init texture and fbo if needed
+    if( !m_texId )
+    {
+        glGenTextures( 1, &m_texId );
+        glBindTexture(GL_TEXTURE_RECTANGLE_ARB, m_texId );
+        glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+        glTexImage2D( GL_TEXTURE_RECTANGLE_ARB, 0, 4, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0 );
+        glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0 );
+
+        glGenFramebuffersEXT( 1, &m_fbId );
+        glBindFramebufferEXT( GL_FRAMEBUFFER_EXT, m_fbId );
+        glFramebufferTexture2DEXT( GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_RECTANGLE_ARB, m_texId, 0 );
+        GLenum ret = glCheckFramebufferStatusEXT( GL_FRAMEBUFFER_EXT );
+        assert( ret == GL_FRAMEBUFFER_COMPLETE_EXT );
+        glBindFramebufferEXT( GL_FRAMEBUFFER_EXT, 0 );
+    }
+
+    if( m_width != width || m_height != height )
 	{
-		m_width = width;
+        // Change texture size
+        m_width = width;
 		m_height = height;
 		glBindTexture( GL_TEXTURE_RECTANGLE_ARB, m_texId );
 		glTexImage2D( GL_TEXTURE_RECTANGLE_ARB, 0, 4, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0 );
 		glBindTexture( GL_TEXTURE_RECTANGLE_ARB, 0 );
 
+        // Clear texture
 		glBindFramebufferEXT( GL_FRAMEBUFFER_EXT, m_fbId );
 		glClearColor( 0.0, 0.0, 0.0, 0.0 );
 		glClear( GL_COLOR_BUFFER_BIT );
@@ -75,10 +66,20 @@ void drwDrawableTexture::Release()
 
 void drwDrawableTexture::DrawToTexture( bool drawTo )
 {
-	if( drawTo && m_fbId )
+    assert( m_fbId );
+    if( drawTo )
+    {
+        assert( !m_isDrawingInTexture );
+        glGetIntegerv( GL_FRAMEBUFFER_BINDING, &m_backupFbId );
 		glBindFramebufferEXT( GL_FRAMEBUFFER_EXT, m_fbId );
+        m_isDrawingInTexture = true;
+    }
 	else
-		glBindFramebufferEXT( GL_FRAMEBUFFER_EXT, 0 );
+    {
+        assert( m_isDrawingInTexture );
+        glBindFramebufferEXT( GL_FRAMEBUFFER_EXT, m_backupFbId );
+        m_isDrawingInTexture = false;
+    }
 }
 
 // Paste the content of a sub-rectangle of

@@ -20,7 +20,7 @@ void drwCursor::SetPosition( int x, int y )
     m_position[0] = x;
     m_position[1] = y;
     double baseWidth = m_lineTool->GetBaseWidth();
-    double pixPerUnit = m_drawingWidget->GetCamera().PixelsPerUnit();
+    double pixPerUnit = m_drawingWidget->GetCamera()->PixelsPerUnit();
     double baseWidthPix = pixPerUnit * baseWidth;
     QRect modifiedRect( x - baseWidthPix, y - baseWidthPix, baseWidthPix, baseWidthPix );
     emit Modified( modifiedRect );
@@ -29,7 +29,7 @@ void drwCursor::SetPosition( int x, int y )
 void drwCursor::Draw( QPainter & painter )
 {
     double baseWidth = m_lineTool->GetBaseWidth();
-    double pixPerUnit = m_drawingWidget->GetCamera().PixelsPerUnit();
+    double pixPerUnit = m_drawingWidget->GetCamera()->PixelsPerUnit();
     double baseWidthPix = pixPerUnit * baseWidth;
 
     QPen pen( Qt::green, 1 );
