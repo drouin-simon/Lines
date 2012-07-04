@@ -20,7 +20,7 @@ public:
 	Node();
 	~Node();
 	
-	void Draw( const drwDrawingContext & context );
+    void Draw( drwDrawingContext & context );
 	
 	SetMacro( Position, Vec2 );
 	GetMacro( Position, Vec2 );

@@ -20,7 +20,7 @@ public:
 		
 protected:
 	
-	void InternDraw( const drwDrawingContext & context );
+    void InternDraw( drwDrawingContext & context );
 	
 	int FindPowerOfTwo( int size );
 	

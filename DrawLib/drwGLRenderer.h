@@ -6,6 +6,7 @@
 class Scene;
 class Node;
 class drwDrawableTexture;
+class drwGlslShader;
 class Camera;
 class Box2d;
 
@@ -27,6 +28,8 @@ public:
     Node * Pick( int currentFrame, int x, int y );
     void SetCurrentScene( Scene * cur );
     drwDrawableTexture * GetWorkTexture() { return m_workTexture; }
+    drwGlslShader * GetWidelineShader() { return m_widelineShader; }
+    void SetWidelineShader( drwGlslShader * shader ) { m_widelineShader = shader; }
     Camera * GetCamera() { return m_camera; }
 
     void WindowToWorld( double xWin, double yWin, double & xWorld, double & yWorld );
@@ -55,6 +58,7 @@ private:
     Camera              * m_camera;
     Scene				* CurrentScene;
     drwDrawableTexture  * m_workTexture;
+    drwGlslShader       * m_widelineShader;
     bool m_showFullFrame;
     double m_framePadding;
     int m_renderWidth;

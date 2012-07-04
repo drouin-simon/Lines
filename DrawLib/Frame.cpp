@@ -22,7 +22,7 @@ void Frame::Clear()
     m_nodesLock.unlock();
 }
 
-void Frame::Draw( const drwDrawingContext & context )
+void Frame::Draw( drwDrawingContext & context )
 {
     m_nodesLock.lockForRead();
 	NodeCont::iterator it = Nodes.begin();

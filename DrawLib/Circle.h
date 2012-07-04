@@ -25,7 +25,7 @@ public:
 
 protected:
 
-	virtual void InternDraw( const drwDrawingContext & context );
+    virtual void InternDraw( drwDrawingContext & context );
 
 	void GeneratePolygonData();
 	void GenerateContour();

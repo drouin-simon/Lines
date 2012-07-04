@@ -12,7 +12,7 @@ Line::~Line()
 }
 
 
-void Line::InternDraw( const drwDrawingContext & context )
+void Line::InternDraw( drwDrawingContext & context )
 {
     Vec4 color = m_color * context.m_colorMultiplier;
     glColor4d( color[0], color[1], color[2], color[3] );

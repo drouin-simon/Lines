@@ -28,7 +28,7 @@ void Circle::SetCenter( double x, double y )
 	Center[1] = y;
 }
 
-void Circle::InternDraw( const drwDrawingContext & context )
+void Circle::InternDraw( drwDrawingContext & context )
 {
 	// Generate the polygons if not already done
 	if( m_poly.IsEmpty() )

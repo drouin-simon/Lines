@@ -5,7 +5,6 @@
 #include "drwDrawingContext.h"
 #include "drwDrawableTexture.h"
 
-drwGlslShader * WideLine::m_shader = 0;
 static const double squareRootOfTwo = sqrt(2.0);
 
 WideLine::WideLine( double width )
@@ -26,7 +25,7 @@ WideLine::~WideLine()
 }
 
 
-void WideLine::InternDraw( const drwDrawingContext & context )
+void WideLine::InternDraw( drwDrawingContext & context )
 {
 	// Draw mask to texture
     drwDrawableTexture * tex = context.GetWorkingTexture();
@@ -49,18 +48,22 @@ void WideLine::InternDraw( const drwDrawingContext & context )
 	// 2 - draw wideline
 	glEnable( GL_BLEND );
 
-	if( !m_shader )
-		Init();
+    drwGlslShader * shader = context.GetWidelineShader();
+    if( !shader )
+    {
+        InitShader( context );
+        shader = context.GetWidelineShader();
+    }
 
-	m_shader->UseProgram( true );
-    m_shader->SetVariable( "pressure_width", m_pressureWidth );
-    m_shader->SetVariable( "pressure_opacity", m_pressureOpacity );
-    m_shader->SetVariable( "base_width", float(m_width) );
-    m_shader->SetVariable( "pix_per_unit", float(context.PixelsPerUnit()) );
-    m_shader->SetVariable( "pix_margin", float(4.0) );
-    m_shader->SetVariable( "pix_damp_width", float(1.0) );
-    m_shader->SetVariable( "sigma_large", float(0.4) );
-    m_shader->SetVariable( "sigma_small", float(0.1) );
+    shader->UseProgram( true );
+    shader->SetVariable( "pressure_width", m_pressureWidth );
+    shader->SetVariable( "pressure_opacity", m_pressureOpacity );
+    shader->SetVariable( "base_width", float(m_width) );
+    shader->SetVariable( "pix_per_unit", float(context.PixelsPerUnit()) );
+    shader->SetVariable( "pix_margin", float(4.0) );
+    shader->SetVariable( "pix_damp_width", float(1.0) );
+    shader->SetVariable( "sigma_large", float(0.4) );
+    shader->SetVariable( "sigma_small", float(0.1) );
 		
 	glBlendEquation( GL_MAX );
 
@@ -74,7 +77,7 @@ void WideLine::InternDraw( const drwDrawingContext & context )
     glDisableClientState( GL_TEXTURE_COORD_ARRAY );
     glDisableClientState( GL_NORMAL_ARRAY );
 	glBlendEquation( GL_FUNC_ADD );
-	m_shader->UseProgram( false );
+    shader->UseProgram( false );
 
     tex->DrawToTexture( false );
 
@@ -386,15 +389,11 @@ void main() \
     gl_TexCoord[0] = gl_MultiTexCoord0; \
 }";
 
-
-
-void WideLine::Init()
+void WideLine::InitShader( drwDrawingContext & context )
 {
-	if( !m_shader)
-	{
-		m_shader = new drwGlslShader;
-        m_shader->AddShaderMemSource( pixelShaderCode );
-        m_shader->AddVertexShaderMemSource( vertexShaderCode );
-		m_shader->Init();
-	}
+    drwGlslShader * shader = new drwGlslShader;
+    shader->AddShaderMemSource( pixelShaderCode );
+    shader->AddVertexShaderMemSource( vertexShaderCode );
+    shader->Init();
+    context.SetWidelineShader( shader );
 }

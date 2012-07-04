@@ -59,7 +59,7 @@ void ImageSprite::SetImage( QImage & image )
 }
 
 
-void ImageSprite::InternDraw( const drwDrawingContext & context )
+void ImageSprite::InternDraw( drwDrawingContext & context )
 {
 	if( TextureId != InvalidTextureId )
 	{

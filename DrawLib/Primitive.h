@@ -15,7 +15,7 @@ public:
 	Primitive() : m_color(1.0,1.0,1.0,1.0) {}
 	virtual ~Primitive() {}
 
-	void Draw( const drwDrawingContext & context )
+    void Draw( drwDrawingContext & context )
 	{
 		InternDraw( context );
 	}
@@ -25,7 +25,7 @@ public:
 	
 protected:
 	
-	virtual void InternDraw( const drwDrawingContext & context ) = 0;
+    virtual void InternDraw( drwDrawingContext & context ) = 0;
 
 	Vec4 m_color;
     RenderState m_renderState;

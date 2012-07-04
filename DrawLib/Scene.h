@@ -23,7 +23,7 @@ public:
 	
 	void Clear();
 	
-	void DrawFrame( int frame, const drwDrawingContext & context );
+    void DrawFrame( int frame, drwDrawingContext & context );
 	
     int AddNodeToFrame( Node * node, int frame );
 	Node * GetNodeById( int frame, unsigned Id );

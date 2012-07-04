@@ -42,9 +42,6 @@ void drwBitmapExporter::run()
 {
     QGLPixelBuffer pixBuffer( m_size );
     pixBuffer.makeCurrent();
-	
-    QGLFramebufferObject fb( m_size );
-    bool res = fb.bind();
 
     drwGLRenderer ren;
     ren.SetCurrentScene( m_scene );
@@ -57,8 +54,10 @@ void drwBitmapExporter::run()
 		emit WritingFrame( i );
 		
         ren.Render( i, 0, 0 );
+
+        glFlush();
 	
-        QImage im = fb.toImage();
+        QImage im = pixBuffer.toImage();
 		QString model( m_baseFilename );
 		model.append( "%1." ).append( m_fileExtension );
 		QString name = model.arg( i, numberOfDigits, 10, QChar('0') );

@@ -31,12 +31,14 @@ void drwDrawableTexture::Resize( int width, int height )
         glTexImage2D( GL_TEXTURE_RECTANGLE_ARB, 0, 4, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0 );
         glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0 );
 
+        int backupFbId = 0;
+        glGetIntegerv( GL_FRAMEBUFFER_BINDING, &backupFbId );
         glGenFramebuffersEXT( 1, &m_fbId );
         glBindFramebufferEXT( GL_FRAMEBUFFER_EXT, m_fbId );
         glFramebufferTexture2DEXT( GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_RECTANGLE_ARB, m_texId, 0 );
         GLenum ret = glCheckFramebufferStatusEXT( GL_FRAMEBUFFER_EXT );
         assert( ret == GL_FRAMEBUFFER_COMPLETE_EXT );
-        glBindFramebufferEXT( GL_FRAMEBUFFER_EXT, 0 );
+        glBindFramebufferEXT( GL_FRAMEBUFFER_EXT, backupFbId );
     }
 
     if( m_width != width || m_height != height )
@@ -49,10 +51,12 @@ void drwDrawableTexture::Resize( int width, int height )
 		glBindTexture( GL_TEXTURE_RECTANGLE_ARB, 0 );
 
         // Clear texture
+        int backupFbId = 0;
+        glGetIntegerv( GL_FRAMEBUFFER_BINDING, &backupFbId );
 		glBindFramebufferEXT( GL_FRAMEBUFFER_EXT, m_fbId );
 		glClearColor( 0.0, 0.0, 0.0, 0.0 );
 		glClear( GL_COLOR_BUFFER_BIT );
-		glBindFramebufferEXT( GL_FRAMEBUFFER_EXT, 0 );
+        glBindFramebufferEXT( GL_FRAMEBUFFER_EXT, backupFbId );
 	}
 }
 

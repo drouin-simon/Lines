@@ -4,6 +4,7 @@
 #include "Camera.h"
 #include "drwDrawableTexture.h"
 #include "drwDrawingContext.h"
+#include "drwGlslShader.h"
 
 drwGLRenderer::drwGLRenderer(QObject *parent) :
     QObject(parent)
@@ -13,12 +14,15 @@ drwGLRenderer::drwGLRenderer(QObject *parent) :
     m_showFullFrame = true;
     m_framePadding = 0.0;
     m_workTexture = new drwDrawableTexture;
+    m_widelineShader = 0;
 }
 
 drwGLRenderer::~drwGLRenderer()
 {
     delete m_camera;
     delete m_workTexture;
+    if( m_widelineShader )
+        delete m_widelineShader;
 }
 
 void drwGLRenderer::RenderSetup()

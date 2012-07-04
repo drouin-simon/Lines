@@ -16,7 +16,7 @@ public:
 	
 	void Clear();
 		
-	void Draw( const drwDrawingContext & context );
+    void Draw( drwDrawingContext & context );
     int AddNode( Node * node );
 	Node * GetNodeById( unsigned Id );
 

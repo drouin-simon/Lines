@@ -34,7 +34,7 @@ void Scene::Clear()
     m_framesLock.unlock();
 }
 
-void Scene::DrawFrame( int frame, const drwDrawingContext & context )
+void Scene::DrawFrame( int frame, drwDrawingContext & context )
 {
     m_framesLock.lockForRead();
 	if( frame < (int)Frames.size() && frame >= 0 )

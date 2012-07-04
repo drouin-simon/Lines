@@ -17,7 +17,7 @@ Node::~Node()
 }
 
 
-void Node::Draw( const drwDrawingContext & context )
+void Node::Draw( drwDrawingContext & context )
 {
 	if( ThePrimitive && !IsHidden )
 	{

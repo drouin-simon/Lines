@@ -23,7 +23,7 @@ public:
 
 protected:
 	
-	void InternDraw( const drwDrawingContext & context );
+    void InternDraw( drwDrawingContext & context );
 
 	double m_lineWidth;
 	

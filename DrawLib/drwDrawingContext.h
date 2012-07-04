@@ -5,6 +5,7 @@
 
 class drwGLRenderer;
 class drwDrawableTexture;
+class drwGlslShader;
 
 class drwDrawingContext
 {
@@ -17,6 +18,8 @@ public:
         , m_renderer(renderer) {}
 
     drwDrawableTexture * GetWorkingTexture() const;
+    drwGlslShader * GetWidelineShader() const;
+    void SetWidelineShader( drwGlslShader * shader );
     void WorldToGLWindow( double xworld, double yworld, int & xwin, int & ywin ) const;
     double PixelsPerUnit() const;
 

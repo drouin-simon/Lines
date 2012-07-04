@@ -25,11 +25,11 @@ public:
 	void SetPressureOpacity( bool o ) { m_pressureOpacity = o; }
 	void SetFill( bool f ) { m_fill = f; }
 	
-	static void Init();
+    void InitShader( drwDrawingContext & context );
 
 protected:
 	
-	virtual void InternDraw( const drwDrawingContext & context );
+    virtual void InternDraw( drwDrawingContext & context );
     void AddLinePoint( double x, double y, double pressure, Box2d & modifBox );
 	void AddFillPoint( double x, double y );
 
@@ -54,8 +54,6 @@ protected:
     Vec2       m_prevPoint;
 	double	   m_prevPressure;
 	bool m_doneAddingPoints;
-	
-	static drwGlslShader * m_shader;
 };
 
 
