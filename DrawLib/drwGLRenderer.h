@@ -36,6 +36,7 @@ public:
     void WorldToGLWindow( double xworld, double yworld, int & xwin, int & ywin );
     double PixelsPerUnit();
     void ShowFullFrame( bool show );
+    void SetClearColor( double r, double g, double b, double a );
     
 signals:
 
@@ -63,6 +64,7 @@ private:
     double m_framePadding;
     int m_renderWidth;
     int m_renderHeight;
+    double m_clearColor[4];
 
 };
 

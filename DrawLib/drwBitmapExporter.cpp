@@ -46,6 +46,7 @@ void drwBitmapExporter::run()
     drwGLRenderer ren;
     ren.SetCurrentScene( m_scene );
     ren.SetRenderSize( m_size.width(), m_size.height() );
+    ren.SetClearColor( 0.0, 0.0, 0.0, 0.0 );
 	
 	int numberOfDigits = QString::number( m_scene->GetNumberOfFrames() ).size();
 	

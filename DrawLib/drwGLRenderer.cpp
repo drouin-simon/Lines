@@ -15,6 +15,10 @@ drwGLRenderer::drwGLRenderer(QObject *parent) :
     m_framePadding = 0.0;
     m_workTexture = new drwDrawableTexture;
     m_widelineShader = 0;
+    m_clearColor[0] = 0.0;
+    m_clearColor[1] = 0.0;
+    m_clearColor[2] = 0.0;
+    m_clearColor[3] = 1.0;
 }
 
 drwGLRenderer::~drwGLRenderer()
@@ -32,7 +36,7 @@ void drwGLRenderer::RenderSetup()
     glDisable( GL_DEPTH_TEST );
     glEnable( GL_LINE_SMOOTH );
     glEnableClientState( GL_VERTEX_ARRAY );
-    glClearColor( 0.0, 0.0, 0.0, 1.0 );
+    glClearColor( m_clearColor[0], m_clearColor[1], m_clearColor[2], m_clearColor[3] );
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     glEnable( GL_TEXTURE_RECTANGLE_ARB );
     glEnable( GL_BLEND );
@@ -198,6 +202,14 @@ void drwGLRenderer::ShowFullFrame( bool show )
     m_showFullFrame = show;
     if( m_showFullFrame )
         m_camera->FitRectInside( CurrentScene->GetFrameWidth(), CurrentScene->GetFrameHeight(), m_framePadding );
+}
+
+void drwGLRenderer::SetClearColor( double r, double g, double b, double a )
+{
+    m_clearColor[0] = r;
+    m_clearColor[1] = g;
+    m_clearColor[2] = b;
+    m_clearColor[3] = a;
 }
 
 #define PICK_BUF_SIZE 512
