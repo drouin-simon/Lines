@@ -46,8 +46,6 @@ public:
 public slots:
 	
 	void RequestRedraw();
-    void RequestRedraw( int frame, Box2d & modifiedArea );
-    void RequestRedraw( QRect modifiedArea );
     void CurrentFrameChanged();
 	void PlaybackStartStop( bool isStart );
 	void DisplaySettingsModified();

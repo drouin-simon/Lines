@@ -124,11 +124,6 @@ void Scene::MarkModified()
 	emit Modified();
 }
 
-void Scene::MarkModified( int frame, Box2d & modifiedArea )
-{
-    emit Modified( frame, modifiedArea );
-}
-
 ImageSprite * Scene::GetImageSprite( const char * filename )
 {
 	// See if a sprite with same filename already exists

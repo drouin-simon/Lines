@@ -8,7 +8,6 @@ class Node;
 class drwDrawableTexture;
 class drwGlslShader;
 class Camera;
-class Box2d;
 
 class drwGLRenderer : public QObject
 {
@@ -41,12 +40,10 @@ public:
 signals:
 
     void NeedRenderSignal();
-    void NeedRenderSignal( int frame, Box2d & modifiedArea );
     
 public slots:
 
     void RequestRedraw();
-    void RequestRedraw( int frame, Box2d & modifiedArea );
     
 protected:
 

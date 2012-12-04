@@ -31,7 +31,6 @@ drwDrawingWidget::drwDrawingWidget( QWidget * parent )
 
     m_renderer = new drwGLRenderer;
     connect( m_renderer, SIGNAL(NeedRenderSignal()), this, SLOT(RequestRedraw()) );
-    connect( m_renderer, SIGNAL(NeedRenderSignal(int,Box2d&)), this, SLOT(RequestRedraw(int,Box2d&)) );
 
     setAcceptDrops(true);
 	setMouseTracking(true);
@@ -90,7 +89,7 @@ void drwDrawingWidget::SetViewportWidget( drwLineToolViewportWidget * w )
 void drwDrawingWidget::SetCursor( drwCursor * cursor )
 {
     m_cursor = cursor;
-    connect( m_cursor, SIGNAL(Modified(QRect)), this, SLOT(RequestRedraw(QRect)) );
+    connect( m_cursor, SIGNAL(Modified()), this, SLOT(RequestRedraw()) );
 }
 
 void drwDrawingWidget::ToggleComputeFps()
@@ -110,38 +109,6 @@ void drwDrawingWidget::ToggleComputeFps()
 void drwDrawingWidget::RequestRedraw()
 {
     update();
-}
-
-#include "Box2d.h"
-
-void drwDrawingWidget::RequestRedraw( int frame, Box2d & modifiedArea )
-{
-    // check if the modified frame is displayed (otherwise, no need to render)
-    bool needRender = false;
-    int firstDisplayFrame = Controler->GetCurrentFrame();
-    int lastDisplayFrame = firstDisplayFrame;
-    if( !DisplaySettings->GetInhibitOnionSkin() )
-    {
-        lastDisplayFrame += DisplaySettings->GetOnionSkinAfter();
-        firstDisplayFrame -= DisplaySettings->GetOnionSkinBefore();
-    }
-    if( frame > lastDisplayFrame || frame < firstDisplayFrame )
-        return;
-
-    // convert the modified area from world space to image space
-    int pointMin[2];
-    m_renderer->WorldToGLWindow( modifiedArea.GetXMin(), modifiedArea.GetYMin(), pointMin[0], pointMin[1] );
-    int pointMax[2];
-    m_renderer->WorldToGLWindow( modifiedArea.GetXMax(), modifiedArea.GetYMax(), pointMax[0], pointMax[1] );
-
-    // update the box
-    QRect updateRect( QPoint( pointMin[0], pointMin[1] ), QPoint( pointMax[0], pointMax[1] ) );
-    this->update( updateRect );
-}
-
-void drwDrawingWidget::RequestRedraw( QRect modifiedArea )
-{
-    update( modifiedArea );
 }
 
 void drwDrawingWidget::CurrentFrameChanged()
@@ -189,15 +156,6 @@ void drwDrawingWidget::resizeGL( int w, int h )
 void drwDrawingWidget::paintEvent( QPaintEvent * event )
 {
 	makeCurrent();
-    
-    QRect paintArea = event->rect();
-    int paintAreaW = paintArea.width();
-    int paintAreaH = paintArea.height();
-    int paintAreaX = paintArea.bottomLeft().x();
-    int paintAreaY = height() - paintArea.bottomLeft().y() - 1;
-    glViewport( paintAreaX, paintAreaY , paintAreaW, paintAreaH );
-
-    std::cout << "x: " << paintAreaX << "y: " << paintAreaY << "w: " << paintAreaW << "h: " << paintAreaH << std::endl;
 	
     if( DisplaySettings->GetShowAllFrames() )
     {

@@ -263,17 +263,11 @@ void drwGLRenderer::SetCurrentScene( Scene * cur )
 {
     CurrentScene = cur;
     connect( CurrentScene, SIGNAL( Modified() ), SLOT( RequestRedraw() ), Qt::DirectConnection );
-    connect( CurrentScene, SIGNAL( Modified(int,Box2d&) ), SLOT( RequestRedraw(int,Box2d&) ), Qt::DirectConnection );
 }
 
 void drwGLRenderer::RequestRedraw()
 {
     emit NeedRenderSignal();
-}
-
-void drwGLRenderer::RequestRedraw( int frame, Box2d & modifiedArea )
-{
-    emit NeedRenderSignal( frame, modifiedArea );
 }
 
 void drwGLRenderer::DisplayCounter()

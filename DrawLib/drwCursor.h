@@ -22,7 +22,7 @@ public:
 
 signals:
 
-    void Modified( QRect modifiedArea );
+    void Modified();
 	
 protected:
 	

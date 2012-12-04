@@ -1,7 +1,6 @@
 #ifndef __WideLine_h_
 #define __WideLine_h_
 
-
 #include "drwDataArray.h"
 #include "LinePrimitive.h"
 #include "Box2d.h"
@@ -17,9 +16,9 @@ public:
 	WideLine( double width );
     ~WideLine();
     
-    virtual void StartPoint( double x, double y, double pressure, Box2d & modifBox );
-    virtual void EndPoint( double x, double y, double pressure, Box2d & modifBox );
-    virtual void AddPoint( double x, double y, double pressure, Box2d & modifBox );
+    virtual void StartPoint( double x, double y, double pressure );
+    virtual void EndPoint( double x, double y, double pressure );
+    virtual void AddPoint( double x, double y, double pressure );
 
 	void SetPressureWidth( bool w ) { m_pressureWidth = w; }
 	void SetPressureOpacity( bool o ) { m_pressureOpacity = o; }
@@ -30,7 +29,7 @@ public:
 protected:
 	
     virtual void InternDraw( drwDrawingContext & context );
-    void AddLinePoint( double x, double y, double pressure, Box2d & modifBox );
+    void AddLinePoint( double x, double y, double pressure );
 	void AddFillPoint( double x, double y );
 
 	// WideLine

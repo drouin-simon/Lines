@@ -112,7 +112,6 @@ void drwLineTool::ExecuteMouseCommand( drwCommand::s_ptr command )
 	drwMouseCommand * mouseCom = dynamic_cast<drwMouseCommand*>(command.get());
 	Q_ASSERT( mouseCom );
 
-    m_lastModifBox.Init();
 
 	if( mouseCom->GetType() == drwMouseCommand::Press )
 	{
@@ -123,7 +122,7 @@ void drwLineTool::ExecuteMouseCommand( drwCommand::s_ptr command )
         m_lastXPix = mouseCom->XPix();
         m_lastYPix = mouseCom->YPix();
 		CreateNewNodes();
-        CurrentScene->MarkModified( m_editionState->GetCurrentFrame(), m_lastModifBox );
+        CurrentScene->MarkModified();
 		emit CommandExecuted( command );
 		emit StartInteraction();
 	}
@@ -138,13 +137,13 @@ void drwLineTool::ExecuteMouseCommand( drwCommand::s_ptr command )
             Node * n = CurrentScene->LockNode( frameIndex, nodeId );
             LinePrimitive * prim = dynamic_cast<LinePrimitive*> (n->GetPrimitive());
             Q_ASSERT( prim );
-            prim->EndPoint( mouseCom->X(), mouseCom->Y(), mouseCom->Pressure(), m_lastModifBox );
+            prim->EndPoint( mouseCom->X(), mouseCom->Y(), mouseCom->Pressure() );
             CurrentScene->UnlockNode( frameIndex, nodeId );
 
 			++it;
 		}
 		CurrentNodes.clear();
-        CurrentScene->MarkModified( m_editionState->GetCurrentFrame(), m_lastModifBox );
+        CurrentScene->MarkModified();
 		IsDrawing = false;
 
         m_lastXWorld = mouseCom->X();
@@ -172,12 +171,12 @@ void drwLineTool::ExecuteMouseCommand( drwCommand::s_ptr command )
                     Node * n = CurrentScene->LockNode( frameIndex, nodeId );
                     LinePrimitive * prim = dynamic_cast<LinePrimitive*> (n->GetPrimitive());
                     Q_ASSERT( prim );
-                    prim->AddPoint( mouseCom->X(), mouseCom->Y(), mouseCom->Pressure(), m_lastModifBox );
+                    prim->AddPoint( mouseCom->X(), mouseCom->Y(), mouseCom->Pressure() );
                     CurrentScene->UnlockNode( frameIndex, nodeId );
 
                     ++it;
                 }
-                CurrentScene->MarkModified( m_editionState->GetCurrentFrame(), m_lastModifBox );
+                CurrentScene->MarkModified();
                 m_lastXWorld = mouseCom->X();
                 m_lastYWorld = mouseCom->Y();
                 m_lastPressure = mouseCom->Pressure();
@@ -214,8 +213,7 @@ void drwLineTool::SetCurrentFrame( int frame )
                 Node * n = CurrentScene->LockNode( frame, nodeId );
                 LinePrimitive * prim = dynamic_cast<LinePrimitive*> (n->GetPrimitive());
                 Q_ASSERT( prim );
-                m_lastModifBox.Init();
-                prim->EndPoint( m_lastXWorld, m_lastYWorld, m_lastPressure, m_lastModifBox );
+                prim->EndPoint( m_lastXWorld, m_lastYWorld, m_lastPressure );
                 CurrentScene->UnlockNode( frame, nodeId );
 
                 CurrentNodesCont::iterator temp = it;
@@ -342,7 +340,7 @@ Node * drwLineTool::CreateNewNode()
 			break;
 	}
 	newPrimitive->SetColor( Color );
-    newPrimitive->StartPoint( m_lastXWorld, m_lastYWorld, m_lastPressure, m_lastModifBox );
+    newPrimitive->StartPoint( m_lastXWorld, m_lastYWorld, m_lastPressure );
 	Node * CurrentNode = new Node;
 	CurrentNode->SetPrimitive( newPrimitive );
 	return CurrentNode;

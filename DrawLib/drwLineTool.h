@@ -5,7 +5,6 @@
 #include <SVL.h>
 #include "macros.h"
 #include <map>
-#include "Box2d.h"
 
 class Node;
 class LinePrimitive;
@@ -73,7 +72,6 @@ protected:
     int m_lastYPix;
 	
 	bool IsDrawing;
-    Box2d m_lastModifBox;
 	
 	// configurable params
 	Vec4 Color;
