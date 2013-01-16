@@ -52,11 +52,24 @@ MainWindow::MainWindow()
 	drawingAreaLayout->setContentsMargins( 0, 0, 0, 0 );
     mainLayout->addLayout( drawingAreaLayout );
 
-    m_rightPanelWidget = new QWidget( m_mainWidget );
+    // Right panel widget
+    m_rightPanelDock = new QDockWidget( tr("Right Panel"), this );
+
+    QWidget * defaultTitleBar = m_rightPanelDock->titleBarWidget();
+    QWidget * emptyTitleBar = new QWidget();
+    m_rightPanelDock->setTitleBarWidget(emptyTitleBar);
+    delete defaultTitleBar;
+
+    m_rightPanelDock->setFeatures( QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable );
+    m_rightPanelDock->setAllowedAreas( Qt::RightDockWidgetArea );
+    addDockWidget( Qt::RightDockWidgetArea, m_rightPanelDock );
+
+    m_rightPanelWidget = new QWidget( m_rightPanelDock );
     QVBoxLayout * rightPanelLayout = new QVBoxLayout( m_rightPanelWidget );
-	rightPanelLayout->setContentsMargins( 0, 10, 0, 10 );
-	rightPanelLayout->setSpacing( 15 );
-    mainLayout->addWidget( m_rightPanelWidget );
+    rightPanelLayout->setContentsMargins( 0, 10, 0, 10 );
+    rightPanelLayout->setSpacing( 15 );
+    //mainLayout->addWidget( m_rightPanelWidget );
+    m_rightPanelDock->setWidget( m_rightPanelWidget );
 	
 	// Create Drawing window
     m_glWidget = new drwDrawingWidget(m_mainWidget);
@@ -400,12 +413,14 @@ void MainWindow::viewFullscreen()
 	{
 		showNormal();
         m_playbackControlerWidget->show();
-        m_rightPanelWidget->show();
+        m_rightPanelDock->show();
+        m_rightPanelDock->setFloating( false );
 	}
 	else
 	{
         m_playbackControlerWidget->hide();
-        m_rightPanelWidget->hide();
+        m_rightPanelDock->hide();
+        m_rightPanelDock->setFloating( true );
 		showFullScreen();
 	}
 }
@@ -554,6 +569,8 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
         else if( keyEvent->key() == Qt::Key_Alt )
         {
             m_glWidget->ActivateViewportWidget( true );
+            if( isFullScreen() )
+                m_rightPanelDock->show();
         }
 	} 
     else if( event->type() == QEvent::KeyRelease )
@@ -562,6 +579,8 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
         if( keyEvent->key() == Qt::Key_Alt )
         {
             m_glWidget->ActivateViewportWidget( false );
+            if( isFullScreen() )
+                m_rightPanelDock->hide();
         }
     }
 	if( !handled )

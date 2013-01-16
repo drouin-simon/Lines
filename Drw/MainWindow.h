@@ -93,6 +93,7 @@ private:
 	
     // Right panel
     QWidget * m_mainWidget;
+    QDockWidget * m_rightPanelDock;
     QWidget * m_rightPanelWidget;
 	PlaybackControlerWidget * m_playbackControlerWidget;
 	PrimitiveToolOptionWidget * m_toolOptionWidget;
