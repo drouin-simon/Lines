@@ -112,13 +112,13 @@ void PrimitiveToolOptionWidget::SetupUi()
 	mainLayout->setContentsMargins( 9, 0, 9, 0 );
 	setLayout( mainLayout );
 
-	gradientWidget = new drwGradientWidget();
-	QSizePolicy gradientPolicy( QSizePolicy::Minimum, QSizePolicy::Fixed );
-	gradientWidget->setSizePolicy( gradientPolicy );
-	gradientWidget->setMinimumHeight( 40 );
-	connect( gradientWidget, SIGNAL(sliderValueChanged(double)), this, SLOT(OnColorSliderValueChanged(double) ) );
-	mainLayout->addWidget( gradientWidget );
-	mainLayout->addSpacing( 10 );
+    //gradientWidget = new drwGradientWidget();
+    //QSizePolicy gradientPolicy( QSizePolicy::Minimum, QSizePolicy::Fixed );
+    //gradientWidget->setSizePolicy( gradientPolicy );
+    //gradientWidget->setMinimumHeight( 40 );
+    //connect( gradientWidget, SIGNAL(sliderValueChanged(double)), this, SLOT(OnColorSliderValueChanged(double) ) );
+    //mainLayout->addWidget( gradientWidget );
+    mainLayout->addSpacing( 15 );
 
 	{
 		QGroupBox * pressureGroupBox = new QGroupBox(tr("Pressure"));
@@ -174,8 +174,8 @@ void PrimitiveToolOptionWidget::UpdateUi()
 {
 	m_updating = true;
 
-	Vec4 color = m_lineTool->GetColor();
-	gradientWidget->setSliderValue( color[0] );
+    //Vec4 color = m_lineTool->GetColor();
+    //gradientWidget->setSliderValue( color[0] );
 	
 	if( m_editionState->GetFrameChangeMode() == Manual )
 		manualFrameChangeRadio->setChecked( true );

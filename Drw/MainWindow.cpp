@@ -42,22 +42,24 @@ MainWindow::MainWindow()
     connect( m_networkManager, SIGNAL(StateChangedSignal()), this, SLOT(NetStateChanged()) );
 
 	// Create main widget  (just a frame to put the viewing widget and the playback control widget)
-	QWidget * mainWidget = new QWidget(this);
-	setCentralWidget( mainWidget );
-	QHBoxLayout * mainLayout = new QHBoxLayout(mainWidget);
-	mainLayout->setContentsMargins( 0, 0, 0, 0 );
-	mainLayout->setSpacing( 0 );
+    m_mainWidget = new QWidget(this);
+    setCentralWidget( m_mainWidget );
+    QHBoxLayout * mainLayout = new QHBoxLayout( m_mainWidget );
+    mainLayout->setContentsMargins( 0, 0, 0, 0 );
+    mainLayout->setSpacing( 0 );
 
-	QVBoxLayout * drawingAreaLayout = new QVBoxLayout(mainWidget);
+    QVBoxLayout * drawingAreaLayout = new QVBoxLayout(m_mainWidget);
 	drawingAreaLayout->setContentsMargins( 0, 0, 0, 0 );
-	mainLayout->addLayout( drawingAreaLayout );
-	QVBoxLayout * rightPanelLayout = new QVBoxLayout( mainWidget );
+    mainLayout->addLayout( drawingAreaLayout );
+
+    m_rightPanelWidget = new QWidget( m_mainWidget );
+    QVBoxLayout * rightPanelLayout = new QVBoxLayout( m_rightPanelWidget );
 	rightPanelLayout->setContentsMargins( 0, 10, 0, 10 );
 	rightPanelLayout->setSpacing( 15 );
-	mainLayout->addLayout( rightPanelLayout );
+    mainLayout->addWidget( m_rightPanelWidget );
 	
 	// Create Drawing window
-	m_glWidget = new drwDrawingWidget(mainWidget);
+    m_glWidget = new drwDrawingWidget(m_mainWidget);
 	m_glWidget->setMinimumSize( 400, 300 );
 	m_glWidget->SetCurrentScene( m_scene );
 	m_glWidget->SetObserver( m_localToolbox );
@@ -78,20 +80,20 @@ MainWindow::MainWindow()
     m_drawingEngine->SetDrawingWidget( m_glWidget );
 	
 	// Create playback control widget
-	m_playbackControlerWidget = new PlaybackControlerWidget( m_glWidget->GetControler(), mainWidget );
+    m_playbackControlerWidget = new PlaybackControlerWidget( m_glWidget->GetControler(), m_mainWidget );
 	drawingAreaLayout->addWidget( m_playbackControlerWidget );
 
 	// Alternative right panel
-	m_toolOptionWidget = new PrimitiveToolOptionWidget( m_controler->GetEditionState(), lineTool, mainWidget );
+    m_toolOptionWidget = new PrimitiveToolOptionWidget( m_controler->GetEditionState(), lineTool, m_rightPanelWidget );
 	rightPanelLayout->addWidget( m_toolOptionWidget );
-	m_displaySettingsWidget = new DisplaySettingsWidget( m_glWidget->GetDisplaySettings(), mainWidget );
+    m_displaySettingsWidget = new DisplaySettingsWidget( m_glWidget->GetDisplaySettings(), m_rightPanelWidget );
 	rightPanelLayout->addWidget( m_displaySettingsWidget );
 
-    QHBoxLayout * networkStateLayout = new QHBoxLayout( mainWidget );
+    QHBoxLayout * networkStateLayout = new QHBoxLayout( m_rightPanelWidget );
     rightPanelLayout->addLayout( networkStateLayout );
     networkStateLayout->setContentsMargins ( 5, 5, 5, 5 );
 
-    m_networkStateLabel = new QLabel( mainWidget );
+    m_networkStateLabel = new QLabel( m_mainWidget );
     m_networkStateLabel->setText( "Not Connected" );
     m_networkStateLabel->setWordWrap( true );
     m_networkStateLabel->setFrameShape( QLabel::Box );
@@ -397,16 +399,14 @@ void MainWindow::viewFullscreen()
 	if( isFullScreen() )
 	{
 		showNormal();
-		m_playbackControlerWidget->show();
-		m_toolOptionWidget->show();
-		m_displaySettingsWidget->show();
+        m_playbackControlerWidget->show();
+        m_rightPanelWidget->show();
 	}
 	else
 	{
+        m_playbackControlerWidget->hide();
+        m_rightPanelWidget->hide();
 		showFullScreen();
-		m_playbackControlerWidget->hide();
-		m_toolOptionWidget->hide();
-		m_displaySettingsWidget->hide();
 	}
 }
 

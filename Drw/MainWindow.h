@@ -91,6 +91,9 @@ private:
 	QAction * m_netShareSessionMenuAction;
 	QAction * m_netConnectMenuItem;
 	
+    // Right panel
+    QWidget * m_mainWidget;
+    QWidget * m_rightPanelWidget;
 	PlaybackControlerWidget * m_playbackControlerWidget;
 	PrimitiveToolOptionWidget * m_toolOptionWidget;
 	DisplaySettingsWidget * m_displaySettingsWidget;

@@ -14,9 +14,9 @@ const int drwLineToolViewportWidget::m_padding = 25;
 const int drwLineToolViewportWidget::m_cursorWidth = 15;
 const int drwLineToolViewportWidget::m_cursorHeight = 8;
 
-static const QColor scaleWidgetColor( 125, 175, 200, 125 );
+static const QColor scaleWidgetColor( 175, 200, 220, 125 );
 static const QColor scaleWidgetButtonColor( 130, 180, 210, 125 );
-static const QColor boundingRectColor( 100, 150, 200, 125 );
+static const QColor boundingRectColor( 150, 175, 200, 125 );
 
 drwLineToolViewportWidget::drwLineToolViewportWidget( drwDrawingWidget * w, drwLineTool * lt )
     : m_x(0), m_y(0), m_active(false),
@@ -150,7 +150,7 @@ void drwLineToolViewportWidget::Draw( QPainter & painter )
         painter.setBrush( QBrush( scaleWidgetButtonColor ) );
         int plusX = m_scaleRect.x() + m_width / 2;
         int plusY = m_scaleRect.y() + m_width / 2;
-        painter.drawEllipse( QPoint( plusX, plusY ), m_scaleButtonRadius, m_scaleButtonRadius );
+        //painter.drawEllipse( QPoint( plusX, plusY ), m_scaleButtonRadius, m_scaleButtonRadius );
         painter.setBrush( QBrush( Qt::white ) );
         painter.drawRect( plusX - m_scaleSignRadius, plusY - 1, 2 * m_scaleSignRadius, 3 );
         painter.drawRect( plusX - 1, plusY - m_scaleSignRadius, 3, 2 * m_scaleSignRadius );
@@ -159,7 +159,7 @@ void drwLineToolViewportWidget::Draw( QPainter & painter )
         painter.setBrush( QBrush( scaleWidgetButtonColor ) );
         int minusX = plusX;
         int minusY = m_scaleRect.bottom() - m_width / 2;
-        painter.drawEllipse( QPoint( minusX, minusY), m_scaleButtonRadius, m_scaleButtonRadius );
+        //painter.drawEllipse( QPoint( minusX, minusY), m_scaleButtonRadius, m_scaleButtonRadius );
         painter.setBrush( QBrush( Qt::white ) );
         painter.drawRect( minusX - m_scaleSignRadius, minusY - 1, 2 * m_scaleSignRadius, 3 );
 

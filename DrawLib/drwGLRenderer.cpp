@@ -149,7 +149,7 @@ void drwGLRenderer::RenderCameraFrame()
     frameBottomRight[0] = CurrentScene->GetFrameWidth();
     frameBottomRight[1] = 0.0;
 
-    glColor4d( .7, .7, .7, .6 );
+    glColor4d( .2, .2, .2, .6 );
     glBegin( GL_QUADS );
     {
         // Top
@@ -172,6 +172,17 @@ void drwGLRenderer::RenderCameraFrame()
         glVertex2d( frameBottomRight[0], frameBottomRight[1] );
         glVertex2d( bottomRight[0], frameBottomRight[1] );
         glVertex2d( bottomRight[0], frameTopLeft[1] );
+    }
+    glEnd();
+
+    glColor4d( .25, .25, .25, 1.0 );
+    glBegin( GL_LINE_STRIP );
+    {
+        glVertex2d( frameTopLeft[0], frameTopLeft[1] );
+        glVertex2d( frameTopLeft[0], frameBottomRight[1] );
+        glVertex2d( frameBottomRight[0], frameBottomRight[1] );
+        glVertex2d( frameBottomRight[0], frameTopLeft[1] );
+        glVertex2d( frameTopLeft[0], frameTopLeft[1] );
     }
     glEnd();
 }
