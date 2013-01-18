@@ -23,10 +23,10 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 # Create classes from Qt ui files
 set( Drw_ui ExportDialog.ui )
-qt4_wrap_ui( Drw_hdr_ui ${Drw_ui} )
+qt5_wrap_ui( Drw_hdr_ui ${Drw_ui} )
 
 # moc Qt source file without a ui file
-qt4_wrap_cpp( Drw_moc ${Drw_hdr})
+qt5_wrap_cpp( Drw_moc ${Drw_hdr})
 
 #--------------------------------------------------------------------------------
 # For Apple set the icns file containing icons
@@ -52,6 +52,7 @@ ENDIF(APPLE)
 #
 set( Drw_all_src ${Drw_src} ${Drw_hdr} ${Drw_moc} ${Drw_hdr_ui} )
 add_executable( ${ExecName} ${EXECUTABLE_FLAG} ${Drw_all_src} )
+qt5_use_modules( ${ExecName} Widgets Network OpenGL )
 target_link_libraries( ${ExecName} Draw svl ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY} ${QT_LIBRARIES} )
 
 if( NOT APPLE )

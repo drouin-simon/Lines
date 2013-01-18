@@ -88,10 +88,10 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 # Create classes from Qt ui files
 set( Drw_ui TabletStateWidget.ui drwNetworkConnectDialog.ui )
-qt4_wrap_ui( DrawLib_hdr_ui ${Drw_ui} )
+qt5_wrap_ui( DrawLib_hdr_ui ${Drw_ui} )
 
 # moc Qt source file without a ui file
-qt4_wrap_cpp( DrawLib_moc ${DrawLib_hdr_moc} )
+qt5_wrap_cpp( DrawLib_moc ${DrawLib_hdr_moc} )
 
 # Create and link executable
 set( DrawLib_all_src ${DrawLib_src} ${DrawLib_moc} ${DrawLib_hdr} ${DrawLib_hdr_moc} ${DrawLib_hdr_ui} )

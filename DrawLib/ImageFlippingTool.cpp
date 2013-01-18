@@ -8,6 +8,8 @@
 #include <QMouseEvent>
 #include <QDropEvent>
 #include <QUrl>
+#include <QMimeData>
+#include <QString>
 
 const unsigned ImageFlippingTool::InvalidPointIndex = unsigned(-1);
 const Vec4 ImageFlippingTool::PointColor( 1.0, 1.0, 1.0, 1.0 );
@@ -177,7 +179,7 @@ void ImageFlippingTool::DropEvent( drwDrawingWidget * w, QDropEvent * e )
 		for (int i = 0; i < urlList.size() && i < 32; ++i)
 		{
 			QString url = urlList.at(i).toLocalFile();
-			ImageSprite * sprite = CurrentScene->GetImageSprite( url.toAscii() );
+            ImageSprite * sprite = CurrentScene->GetImageSprite( url.toUtf8().data() );
 			
 			if( sprite )
 			{

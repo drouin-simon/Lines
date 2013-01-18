@@ -4,7 +4,7 @@
 TabletStateWidget::TabletStateWidget( QWidget * parent ) : QWidget( parent )
 {
 	ui.setupUi(this);
-	QTabletEvent event( QEvent::TabletEnterProximity, QPoint(0,0), QPoint(0,0), QPointF( 0, 0 ), QTabletEvent::NoDevice, QTabletEvent::UnknownPointer, 0, 0, 0, 0, 0, 0, 0, 0 );
+    QTabletEvent event( QEvent::TabletEnterProximity, QPoint(0,0), QPointF( 0, 0 ), QTabletEvent::NoDevice, QTabletEvent::UnknownPointer, 0, 0, 0, 0, 0, 0, 0, 0 );
 	UpdateUi(&event);
 }
 

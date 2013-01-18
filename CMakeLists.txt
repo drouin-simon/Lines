@@ -7,6 +7,7 @@ cmake_minimum_required(VERSION 2.6)
 set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREAD OFF)
 set(Boost_ADDITIONAL_VERSIONS "1.37.0" "1.38.0" "1.39.0" "1.40.0" "1.41.0" "1.42.0" ) 
+set( BOOST_ROOT "/usr/lib" CACHE PATH "Base directory that contains the Boost lib" )
 find_package(Boost)
 if(Boost_FOUND)
   include_directories( ${Boost_INCLUDE_DIR} )
@@ -27,11 +28,24 @@ include_directories( ${BaseIncludeDir} )
 
 #----------------------------------------
 # Use Qt
-find_package(Qt4 REQUIRED)
-set(QT_USE_QTOPENGL TRUE)
-set(QT_USE_QTNETWORK TRUE)
-include(${QT_USE_FILE})
-include_directories(${QT_INCLUDE_DIR})
+#find_package(Qt4 REQUIRED)
+#set(QT_USE_QTOPENGL TRUE)
+#set(QT_USE_QTNETWORK TRUE)
+#include(${QT_USE_FILE})
+#include_directories(${QT_INCLUDE_DIR})
+#----------------------------------------
+
+#----------------------------------------
+# Use Qt 5
+find_package(Qt5Widgets )  # finds QtGUI and QtCore
+find_package(Qt5OpenGL )
+find_package(Qt5Network )
+if( NOT Qt5Widgets_FOUND AND NOT Qt5OpenGL_FOUND AND NOT Qt5Network_FOUND )
+    message( FATAL_ERROR "Qt not found" )
+endif()
+include_directories( ${Qt5Widgets_INCLUDE_DIRS} )
+include_directories( ${Qt5OpenGL_INCLUDE_DIRS} )
+include_directories( ${Qt5Network_INCLUDE_DIRS} )
 #----------------------------------------
 
 #----------------------------------------

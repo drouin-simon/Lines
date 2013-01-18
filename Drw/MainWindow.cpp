@@ -19,7 +19,7 @@
 #include "drwCursor.h"
 #include "drwDrawingEngine.h"
 
-#include <QtGui>
+#include <QtWidgets>
 
 const QString MainWindow::m_appName( "Lines" );
 
@@ -166,8 +166,8 @@ void MainWindow::CreateActions()
 	m_netConnectMenuItem = m_networkMenu->addAction( "Connect...", this, SLOT( NetConnect() ) );
 	
 	// Create the View menu
-	m_viewMenu = menuBar()->addMenu( "&View" );
-	m_viewMenu->addAction( "Fullscreen", this, SLOT( viewFullscreen() ), Qt::CTRL + Qt::Key_F );
+    m_viewMenu = menuBar()->addMenu( "&View" );
+    //m_viewMenu->addAction( "Fullscreen", this, SLOT( viewFullscreen() ), Qt::CTRL + Qt::Key_F );
 	
     // Create a Help menu
     menuBar()->addSeparator();
@@ -206,7 +206,7 @@ void MainWindow::fileOpen()
 	m_localToolbox->blockSignals( true );
 	
     // Read commands from the file
-	m_commandDb->Read( m_filename.toAscii() );
+    m_commandDb->Read( m_filename.toUtf8().data() );
 
     // Dispatch commands
     m_commandDb->LockDb( true );
@@ -232,7 +232,7 @@ bool MainWindow::fileSave()
 			return false;
 	}
 	
-	m_commandDb->Write( m_filename.toAscii() );
+    m_commandDb->Write( m_filename.toUtf8().data() );
 	return true;
 }
 
@@ -241,7 +241,7 @@ void MainWindow::fileSaveAs()
 	if( !GetSaveFilename() )
 		return;
 	
-	m_commandDb->Write( m_filename.toAscii() );
+    m_commandDb->Write( m_filename.toUtf8().data() );
 }
 
 bool MainWindow::fileExport()
@@ -438,6 +438,14 @@ void MainWindow::closeEvent(QCloseEvent *event)
 	}
 }
 
+void MainWindow::changeEvent( QEvent * e )
+{
+    if( e->type() == QEvent::WindowStateChange )
+    {
+        int toto = 0;
+    }
+}
+
 bool MainWindow::GetSaveFilename()
 {
 	m_filename = QFileDialog::getSaveFileName(this, tr("Save Animation"),  m_fileDialogStartPath + QDir::separator() + "untitled.drw", tr("Animation Files (*.drw)"));
@@ -463,7 +471,7 @@ bool MainWindow::maybeSave()
 
 void MainWindow::readSettings()
 {
-	QSettings settings("SD", m_appName.toAscii() );
+    QSettings settings("SD", m_appName.toUtf8().data() );
 
 	// Main window settings
 	QRect mainWindowRect( 0, 0, 800, 600 );
@@ -487,7 +495,7 @@ void MainWindow::writeSettings()
 	if( isFullScreen() )
 		viewFullscreen();
 	
-	QSettings settings( "SD", m_appName.toAscii() );
+    QSettings settings( "SD", m_appName.toUtf8().data() );
 	
 	// Main window settings
 	settings.setValue( "MainWindow_pos", pos() );
@@ -569,8 +577,9 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
         else if( keyEvent->key() == Qt::Key_Alt )
         {
             m_glWidget->ActivateViewportWidget( true );
-            if( isFullScreen() )
-                m_rightPanelDock->show();
+            //if( isFullScreen() )
+            //    m_rightPanelDock->show();
+            handled = true;
         }
 	} 
     else if( event->type() == QEvent::KeyRelease )
@@ -579,8 +588,9 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
         if( keyEvent->key() == Qt::Key_Alt )
         {
             m_glWidget->ActivateViewportWidget( false );
-            if( isFullScreen() )
-                m_rightPanelDock->hide();
+            //if( isFullScreen() )
+            //    m_rightPanelDock->hide();
+            handled = true;
         }
     }
 	if( !handled )
