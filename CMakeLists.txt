@@ -63,7 +63,7 @@ endif(APPLE)
 
 
 add_subdirectory( DrawLib )
-#add_subdirectory( Flip )
+add_subdirectory( Flip )
 add_subdirectory( Drw )
 #add_subdirectory( DrwNetworkLog )
-add_subdirectory( Examples )
+#add_subdirectory( Examples )

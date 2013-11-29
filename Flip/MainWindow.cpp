@@ -1,11 +1,9 @@
-#include "mainwindow.h"
-#include "mainwindow.moc"
-#include "GlWidget.h"
+#include "MainWindow.h"
+#include "drwDrawingWidget.h"
 #include "Scene.h"
 #include "ImageFlippingTool.h"
 
 #include <QApplication>
-#include <QWorkspace>
 #include <QMenu>
 #include <QMenubar>
 #include <QStatusbar>
@@ -19,7 +17,7 @@
 const QString MainWindow::m_appName( "Draw" );
 
 
-MainWindow::MainWindow( QWidget * parent, Qt::WFlags flags ) : QMainWindow( parent, flags )
+MainWindow::MainWindow()
 {
     setWindowTitle( m_appName );
 
@@ -42,7 +40,7 @@ MainWindow::MainWindow( QWidget * parent, Qt::WFlags flags ) : QMainWindow( pare
 	m_flippingTool = new ImageFlippingTool( m_scene );
 
     // Create Viewing window
-	m_glWidget = new GlWidget( this );
+    m_glWidget = new drwDrawingWidget( this );
 	m_glWidget->SetCurrentScene( m_scene );
 	m_glWidget->SetObserver( m_flippingTool );
 	setCentralWidget( m_glWidget );
