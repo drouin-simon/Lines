@@ -19,8 +19,7 @@ set( DrawLib_src  drwDrawingWidget.cpp
         drwDrawingContext.cpp
 		TabletStateWidget.cpp
 		PlaybackControler.cpp 
-		ImageSprite.cpp 
-		ImageFlippingTool.cpp
+                ImageSprite.cpp
 		drwCommand.cpp
 		drwCommandDatabase.cpp
 		drwNetworkConnection.cpp
@@ -57,7 +56,6 @@ set( DrawLib_hdr_moc 	drwDrawingWidget.h
 			drwNetworkConnectDialog.h
 			drwDisplaySettings.h
 			drwEditionState.h 
-			ImageFlippingTool.h
 			drwCommandDispatcher.h 
 			drwBitmapExporter.h
             drwGradientWidget.h
@@ -76,7 +74,7 @@ set( DrawLib_hdr	drwDrawingWidgetInteractor.h
 			Circle.h 
 			drwDrawableTexture.h
 			drwDrawingContext.h
-			ImageSprite.h
+                        ImageSprite.h
 			drwCommand.h
 			drwDataArray.h
 			PolygonData.h
