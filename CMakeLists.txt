@@ -53,6 +53,16 @@ include_directories( ${Qt5Network_INCLUDE_DIRS} )
 find_package(OpenGL)
 #----------------------------------------
 
+#----------------------------------------
+# find and setup RtAudio
+find_path( RtAudio_Include_Dir RtAudio.h )
+if( NOT RtAudio_Include_Dir )
+    message( FATAL " Couldn't find RtAudio. Specify RtAudio_Include_Dir variable" )
+endif()
+include_directories( ${RtAudio_Include_Dir} )
+link_directories( ${RtAudio_Include_Dir} )
+#----------------------------------------
+
 # Set flags to make a bundle on MAC
 if(APPLE)
   SET(EXECUTABLE_FLAG MACOSX_BUNDLE)

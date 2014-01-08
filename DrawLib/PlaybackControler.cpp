@@ -61,6 +61,17 @@ int PlaybackControler::GetCurrentFrame()
 	return m_editionState->GetCurrentFrame(); 
 }
 
+int PlaybackControler::GetNextFrame()
+{
+    int newFrame = GetCurrentFrame() + 1;
+    if( newFrame >= GetNumberOfFrames() )
+    {
+        if( loop )
+            newFrame = 0;
+    }
+    return newFrame;
+}
+
 int PlaybackControler::GetNumberOfFrames() 
 { 
 	return m_scene->GetNumberOfFrames(); 
@@ -73,16 +84,9 @@ void PlaybackControler::NumberOfFramesChangedSlot( int nbFrames )
 
 void PlaybackControler::NextFrame()
 {
-	int newFrame = GetCurrentFrame() + 1;
-	if( newFrame >= GetNumberOfFrames() )
-	{
-		if( loop )
-			SetCurrentFrame( 0 );
-	}
-	else
-	{
-		SetCurrentFrame( newFrame );
-	}
+    int nextFrame = GetNextFrame();
+    if( nextFrame != GetCurrentFrame() )
+        SetCurrentFrame( nextFrame );
 }
 
 

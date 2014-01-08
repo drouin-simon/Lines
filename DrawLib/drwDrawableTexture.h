@@ -8,6 +8,16 @@ public:
 
 	drwDrawableTexture();
 	~drwDrawableTexture();
+
+    void SetPixelTypeToRGB();
+    void SetPixelTypeToRGBA();
+    void SetPixelTypeToGrey();
+
+    void SetComponentTypeToUnsignedChar();
+    void SetComponentTypeToUnsignedShort();
+
+    int GetWidth() { return m_width; }
+    int GetHeight() { return m_height; }
 	
 	void Resize( int width, int height );
 	void Release();
@@ -17,8 +27,18 @@ public:
     void PasteToScreen();
     void Clear( int x, int y, int width, int height );
 
+    void Upload( unsigned char * buffer );
+    void Download( unsigned char * buffer );
+    void Download( unsigned short * buffer );
+    void Download( float * buffer );
+
+    unsigned GetTexId() { return m_texId; }
+
 protected:
 	
+    unsigned m_pixelType;        // GL_RGB, GL_RGBA, GL_LUMINANCE, etc.
+    unsigned m_componentType;    // GL_UNSIGNED_CHAR, GL_FLOAT, etc.
+
     bool m_isDrawingInTexture;
 	unsigned m_texId;
 	unsigned m_fbId;

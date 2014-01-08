@@ -13,6 +13,7 @@ drwGLRenderer::drwGLRenderer(QObject *parent) :
     CurrentScene = 0;
     m_showFullFrame = true;
     m_framePadding = 0.0;
+    m_renderTexture = new drwDrawableTexture;
     m_workTexture = new drwDrawableTexture;
     m_widelineShader = 0;
     m_clearColor[0] = 0.0;
@@ -24,6 +25,7 @@ drwGLRenderer::drwGLRenderer(QObject *parent) :
 drwGLRenderer::~drwGLRenderer()
 {
     delete m_camera;
+    delete m_renderTexture;
     delete m_workTexture;
     if( m_widelineShader )
         delete m_widelineShader;
@@ -32,7 +34,6 @@ drwGLRenderer::~drwGLRenderer()
 void drwGLRenderer::RenderSetup()
 {
     // State setup
-    glEnable( GL_TEXTURE_RECTANGLE_ARB );
     glDisable( GL_DEPTH_TEST );
     glEnable( GL_LINE_SMOOTH );
     glEnableClientState( GL_VERTEX_ARRAY );
@@ -51,6 +52,7 @@ void drwGLRenderer::RenderSetup()
         m_camera->FitRectInside( CurrentScene->GetFrameWidth(), CurrentScene->GetFrameHeight(), m_framePadding );
 
     // Update working texture size if needed
+    m_renderTexture->Resize( m_renderWidth, m_renderHeight );
     m_workTexture->Resize( m_renderWidth, m_renderHeight );
 
     // Place virtual camera
@@ -98,6 +100,20 @@ void drwGLRenderer::Render( int currentFrame, int onionSkinBefore, int onionSkin
 
     // for debugging purpose - display a dot moving every redraw
     //DisplayCounter();
+}
+
+void drwGLRenderer::FlipAndRender( int frameIndex )
+{
+    // display previous frame
+    m_renderTexture->PasteToScreen();
+
+    // render next frame
+    Q_ASSERT( CurrentScene );
+    m_renderTexture->DrawToTexture( true );
+    RenderSetup();
+    drwDrawingContext mainContext(this);
+    CurrentScene->DrawFrame( frameIndex, mainContext );
+    m_renderTexture->DrawToTexture( false );
 }
 
 void drwGLRenderer::RenderAllFrames( int currentFrame )

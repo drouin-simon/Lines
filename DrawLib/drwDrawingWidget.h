@@ -15,6 +15,7 @@ class drwLineToolViewportWidget;
 class drwFpsCounter;
 class PlaybackControler;
 class drwDrawingWidgetInteractor;
+class SoundGenerator;
 
 class drwDrawingWidget : public QGLWidget
 {
@@ -84,6 +85,7 @@ protected:
 private:
 	
     drwGLRenderer * m_renderer;
+    SoundGenerator * m_soundGenerator;
     PlaybackControler * Controler;
     drwDrawingWidgetInteractor * m_interactor;
     drwWidgetObserver * Observer;

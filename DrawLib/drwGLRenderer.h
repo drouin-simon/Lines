@@ -20,6 +20,7 @@ public:
     ~drwGLRenderer();
 
     void Render( int currentFrame, int onionSkinBefore, int onionSkinAfter );
+    void FlipAndRender( int currentFrame );
     void RenderAllFrames( int currentFrame );
     void RenderCameraFrame();
 
@@ -55,6 +56,7 @@ private:
 
     Camera              * m_camera;
     Scene				* CurrentScene;
+    drwDrawableTexture  * m_renderTexture;
     drwDrawableTexture  * m_workTexture;
     drwGlslShader       * m_widelineShader;
     bool m_showFullFrame;

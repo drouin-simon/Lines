@@ -24,6 +24,7 @@ public:
 	
 	void SetCurrentFrame( int frame );
 	int GetCurrentFrame();
+    int GetNextFrame();
 	int GetNumberOfFrames();
 	
 	void NextFrame();
