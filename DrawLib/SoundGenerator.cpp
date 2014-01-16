@@ -35,6 +35,7 @@ SoundGenerator::SoundGenerator()
     m_deviceIndex = 1;
     m_nbChannels = 2;
     m_sampleFreq = 44100;
+    m_nbFramesPerImage = 44100; // default: image generates 1 sec of sound
     m_masterVol = 0.5;
     m_lastTime = 0.0;
 }
@@ -151,7 +152,7 @@ void SoundGenerator::GenerateFramesForImage( drwDrawableTexture * image )
     {
         m_soundGenerationTarget = new drwDrawableTexture;
         m_soundGenerationTarget->SetPixelTypeToGrey();
-        m_soundGenerationTarget->SetComponentTypeToUnsignedShort();
+        m_soundGenerationTarget->SetComponentTypeToFloat();
     }
     m_soundGenerationTarget->Resize( 1000, textureHeight );
     m_soundGenerationTarget->DrawToTexture( true );
@@ -217,7 +218,7 @@ int SoundGenerator::SendFramesToSoundCard( AudioParams & params )
     int nbFramesToCopy = params.nbFrames;
     int nbBlankFrames = 0;
     int nbFramesLeftInBuffer = m_soundBufferSize - m_nextBufferIndex;
-    if( nbFramesToCopy < nbFramesLeftInBuffer )
+    if( nbFramesToCopy > nbFramesLeftInBuffer )
     {
         nbFramesToCopy = nbFramesLeftInBuffer;
         nbBlankFrames = params.nbFrames - nbFramesToCopy;

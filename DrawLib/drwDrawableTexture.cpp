@@ -26,6 +26,7 @@ void drwDrawableTexture::SetPixelTypeToGrey() { m_pixelType = GL_LUMINANCE; }
 
 void drwDrawableTexture::SetComponentTypeToUnsignedChar() { m_componentType = GL_UNSIGNED_BYTE; }
 void drwDrawableTexture::SetComponentTypeToUnsignedShort() { m_componentType = GL_UNSIGNED_SHORT; }
+void drwDrawableTexture::SetComponentTypeToFloat() { m_componentType = GL_FLOAT; }
 
 void drwDrawableTexture::Resize( int width, int height )
 {

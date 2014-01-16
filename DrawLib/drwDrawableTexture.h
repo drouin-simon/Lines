@@ -15,6 +15,7 @@ public:
 
     void SetComponentTypeToUnsignedChar();
     void SetComponentTypeToUnsignedShort();
+    void SetComponentTypeToFloat();
 
     int GetWidth() { return m_width; }
     int GetHeight() { return m_height; }
