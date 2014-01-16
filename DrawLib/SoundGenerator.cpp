@@ -1,10 +1,11 @@
-#include "soundgenerator.h"
+#include "SoundGenerator.h"
 #include "IncludeGLee.h"
 #include "IncludeGl.h"
 #include "RtAudio.h"
 #include <math.h>
 #include "drwDrawableTexture.h"
 #include "drwGlslShader.h"
+#include <cstring>
 
 using namespace std;
 
