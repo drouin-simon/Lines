@@ -20,6 +20,8 @@ public:
     ~drwGLRenderer();
 
     void Render( int currentFrame, int onionSkinBefore, int onionSkinAfter );
+    void RenderToTexture( int currentFrame );
+    drwDrawableTexture * GetRenderTexture() { return m_renderTexture; }
     void FlipAndRender( int currentFrame );
     void RenderAllFrames( int currentFrame );
     void RenderCameraFrame();

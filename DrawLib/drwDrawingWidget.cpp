@@ -110,6 +110,15 @@ void drwDrawingWidget::ToggleComputeFps()
     }
 }
 
+void drwDrawingWidget::PlaySound()
+{
+    makeCurrent();
+
+    m_renderer->RenderToTexture( Controler->GetCurrentFrame() );
+    m_soundGenerator->GenerateFramesForImage( m_renderer->GetRenderTexture() );
+    m_soundGenerator->Play();
+}
+
 void drwDrawingWidget::RequestRedraw()
 {
     update();

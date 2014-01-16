@@ -574,6 +574,11 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
             m_glWidget->ToggleComputeFps();
             handled = true;
         }
+        else if( keyEvent->key() == Qt::Key_S )
+        {
+            m_glWidget->PlaySound();
+            handled = true;
+        }
         else if( keyEvent->key() == Qt::Key_Alt )
         {
             m_glWidget->ActivateViewportWidget( true );

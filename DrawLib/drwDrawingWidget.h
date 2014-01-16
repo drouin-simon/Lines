@@ -46,6 +46,7 @@ public:
 	
 public slots:
 	
+    void PlaySound();
 	void RequestRedraw();
     void CurrentFrameChanged();
 	void PlaybackStartStop( bool isStart );

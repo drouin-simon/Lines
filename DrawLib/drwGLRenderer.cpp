@@ -102,6 +102,15 @@ void drwGLRenderer::Render( int currentFrame, int onionSkinBefore, int onionSkin
     //DisplayCounter();
 }
 
+void drwGLRenderer::RenderToTexture( int currentFrame )
+{
+    RenderSetup();
+    m_renderTexture->DrawToTexture( true );
+    drwDrawingContext mainContext(this);
+    CurrentScene->DrawFrame( currentFrame, mainContext );
+    m_renderTexture->DrawToTexture( false );
+}
+
 void drwGLRenderer::FlipAndRender( int frameIndex )
 {
     // display previous frame
