@@ -8,14 +8,9 @@ public:
 
 	drwDrawableTexture();
 	~drwDrawableTexture();
-
-    void SetPixelTypeToRGB();
-    void SetPixelTypeToRGBA();
-    void SetPixelTypeToGrey();
-
-    void SetComponentTypeToUnsignedChar();
-    void SetComponentTypeToUnsignedShort();
-    void SetComponentTypeToFloat();
+    
+    void SetPixelFormatToRGBU8();
+    void SetPixelFormatToGreyF16();
 
     int GetWidth() { return m_width; }
     int GetHeight() { return m_height; }
@@ -37,6 +32,7 @@ public:
 
 protected:
 	
+    unsigned m_internalFormat;   // ex: GL_RGB16F
     unsigned m_pixelType;        // GL_RGB, GL_RGBA, GL_LUMINANCE, etc.
     unsigned m_componentType;    // GL_UNSIGNED_CHAR, GL_FLOAT, etc.
 

@@ -4,7 +4,8 @@
 #include <assert.h>
 
 drwDrawableTexture::drwDrawableTexture()
-    : m_pixelType( GL_RGBA )
+    : m_internalFormat( GL_RGBA )
+    , m_pixelType( GL_RGBA )
     , m_componentType( GL_UNSIGNED_BYTE )
     , m_isDrawingInTexture( false )
     , m_texId(0)
@@ -20,13 +21,8 @@ drwDrawableTexture::~drwDrawableTexture()
 	Release();
 }
 
-void drwDrawableTexture::SetPixelTypeToRGB() { m_pixelType = GL_RGB; }
-void drwDrawableTexture::SetPixelTypeToRGBA() { m_pixelType = GL_RGBA; }
-void drwDrawableTexture::SetPixelTypeToGrey() { m_pixelType = GL_LUMINANCE; }
-
-void drwDrawableTexture::SetComponentTypeToUnsignedChar() { m_componentType = GL_UNSIGNED_BYTE; }
-void drwDrawableTexture::SetComponentTypeToUnsignedShort() { m_componentType = GL_UNSIGNED_SHORT; }
-void drwDrawableTexture::SetComponentTypeToFloat() { m_componentType = GL_FLOAT; }
+void drwDrawableTexture::SetPixelFormatToRGBU8() { m_internalFormat = GL_RGB; m_pixelType = GL_RGB; m_componentType = GL_UNSIGNED_BYTE; }
+void drwDrawableTexture::SetPixelFormatToGreyF16() { m_internalFormat = GL_R16F; m_pixelType = GL_LUMINANCE; m_componentType = GL_FLOAT; }
 
 void drwDrawableTexture::Resize( int width, int height )
 {
@@ -38,7 +34,7 @@ void drwDrawableTexture::Resize( int width, int height )
         glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
-        glTexImage2D( GL_TEXTURE_RECTANGLE_ARB, 0, m_pixelType, width, height, 0, m_pixelType, m_componentType, 0 );
+        glTexImage2D( GL_TEXTURE_RECTANGLE_ARB, 0, m_internalFormat, width, height, 0, m_pixelType, m_componentType, 0 );
         glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0 );
 
         int backupFbId = 0;
@@ -57,7 +53,7 @@ void drwDrawableTexture::Resize( int width, int height )
         m_width = width;
 		m_height = height;
 		glBindTexture( GL_TEXTURE_RECTANGLE_ARB, m_texId );
-        glTexImage2D( GL_TEXTURE_RECTANGLE_ARB, 0, m_pixelType, width, height, 0, m_pixelType, m_componentType, 0 );
+        glTexImage2D( GL_TEXTURE_RECTANGLE_ARB, 0, m_internalFormat, width, height, 0, m_pixelType, m_componentType, 0 );
 		glBindTexture( GL_TEXTURE_RECTANGLE_ARB, 0 );
 
         // Clear texture
@@ -153,7 +149,7 @@ void drwDrawableTexture::PasteToScreen()
 void drwDrawableTexture::Upload( unsigned char * buffer )
 {
     glBindTexture( GL_TEXTURE_RECTANGLE_ARB, m_texId );
-    glTexImage2D( GL_TEXTURE_RECTANGLE_ARB, 0, m_pixelType, m_width, m_height, 0, m_pixelType, GL_UNSIGNED_BYTE, buffer );
+    glTexImage2D( GL_TEXTURE_RECTANGLE_ARB, 0, m_internalFormat, m_width, m_height, 0, m_pixelType, GL_UNSIGNED_BYTE, buffer );
     glBindTexture( GL_TEXTURE_RECTANGLE_ARB, 0 );
 }
 
