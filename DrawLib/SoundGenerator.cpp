@@ -131,19 +131,23 @@ void main() \
     float PI = 3.14159265358979323846264; \
     float sampleIndex = floor( gl_FragCoord.x - 0.5 + 1000.0 * ( gl_FragCoord.y - 0.5 ) ); \
     float time = startTime + sampleIndex * sampleTimeInterval; \
-    float texRow = 0.5 * samplePixInterval + sampleIndex * samplePixInterval; \
-    float fPix = 0.5 * freqPixInterval; \
-    float sampleValue = 0.0; \
-    for( float f = minFreq; f <= maxFreq; f += freqInterval ) \
-    { \
-        vec2 texCoord = vec2( fPix, texRow ); \
-        vec4 texSample = texture2DRect( tex_id, texCoord ); \
-        float freqIntensity = ( texSample.r + texSample.g + texSample.b ) / 3.0; \
-        sampleValue += freqIntensity * sin( 2.0 * PI * f * time ); \
-        fPix += freqPixInterval; \
-    } \
-    gl_FragColor[0] = sampleValue * masterVolume; \
+    float sampleValue = sin( 2.0 * PI * 440.0 * time ); \
+    //float texRow = 0.5 * samplePixInterval + sampleIndex * samplePixInterval; \
+    //float fPix = 0.5 * freqPixInterval; \
+    //float sampleValue = 0.0; \
+    //for( float f = minFreq; f <= maxFreq; f += freqInterval ) \
+    //{ \
+    //    vec2 texCoord = vec2( fPix, texRow ); \
+    //    vec4 texSample = texture2DRect( tex_id, texCoord ); \
+    //    float freqIntensity = ( texSample.r + texSample.g + texSample.b ) / 3.0; \
+    //    sampleValue += freqIntensity * sin( 2.0 * PI * f * time ); \
+    //    fPix += freqPixInterval; \
+    //} \
+    gl_FragColor = Vec4( 1.0, 1.0, 1.0, 1.0 ); \
+    gl_FragColor.r = sampleValue * masterVolume; \
 }";
+
+#include <stdio.h>
 
 void SoundGenerator::GenerateFramesForImage( drwDrawableTexture * image )
 {
@@ -211,6 +215,11 @@ void SoundGenerator::GenerateFramesForImage( drwDrawableTexture * image )
         m_soundBuffer = new SampleType[ m_soundBufferSize ];
     }
     m_soundGenerationTarget->Download( m_soundBuffer );
+
+    FILE * f = fopen("/home/simon/outsound.txt", "w" );
+    for( int i = 0; i < m_soundBufferSize; ++i )
+        fprintf( f, "%f\n", m_soundBuffer[i] );
+    fclose( f );
 }
 
 int SoundGenerator::SendFramesToSoundCard( AudioParams & params )

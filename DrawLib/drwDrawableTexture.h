@@ -32,9 +32,10 @@ public:
 
 protected:
 	
-    unsigned m_internalFormat;   // ex: GL_RGB16F
-    unsigned m_pixelType;        // GL_RGB, GL_RGBA, GL_LUMINANCE, etc.
-    unsigned m_componentType;    // GL_UNSIGNED_CHAR, GL_FLOAT, etc.
+    unsigned m_internalFormat;     // ex: GL_RGB16F
+    unsigned m_pixelType;          // GL_RGB, GL_RGBA, GL_LUMINANCE, etc.
+    unsigned m_componentType;      // GL_UNSIGNED_CHAR, GL_FLOAT, etc.
+    unsigned m_downloadPixelType;  // Pixel type used when downloading texture, ex. GL_RED
 
     bool m_isDrawingInTexture;
 	unsigned m_texId;

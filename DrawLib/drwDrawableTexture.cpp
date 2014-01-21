@@ -7,6 +7,7 @@ drwDrawableTexture::drwDrawableTexture()
     : m_internalFormat( GL_RGBA )
     , m_pixelType( GL_RGBA )
     , m_componentType( GL_UNSIGNED_BYTE )
+    , m_downloadPixelType( GL_RGBA )
     , m_isDrawingInTexture( false )
     , m_texId(0)
 	, m_fbId(0)
@@ -21,8 +22,8 @@ drwDrawableTexture::~drwDrawableTexture()
 	Release();
 }
 
-void drwDrawableTexture::SetPixelFormatToRGBU8() { m_internalFormat = GL_RGB; m_pixelType = GL_RGB; m_componentType = GL_UNSIGNED_BYTE; }
-void drwDrawableTexture::SetPixelFormatToGreyF16() { m_internalFormat = GL_R16F; m_pixelType = GL_LUMINANCE; m_componentType = GL_FLOAT; }
+void drwDrawableTexture::SetPixelFormatToRGBU8() { m_internalFormat = GL_RGB; m_pixelType = GL_RGB; m_componentType = GL_UNSIGNED_BYTE; m_downloadPixelType = GL_RGB; }
+void drwDrawableTexture::SetPixelFormatToGreyF16() { m_internalFormat = GL_R16F; m_pixelType = GL_LUMINANCE; m_componentType = GL_FLOAT; m_downloadPixelType = GL_RED; }
 
 void drwDrawableTexture::Resize( int width, int height )
 {
@@ -156,20 +157,20 @@ void drwDrawableTexture::Upload( unsigned char * buffer )
 void drwDrawableTexture::Download( unsigned char * buffer )
 {
     glBindTexture( GL_TEXTURE_RECTANGLE_ARB, m_texId );
-    glGetTexImage( GL_TEXTURE_RECTANGLE_ARB, 0, m_pixelType, GL_UNSIGNED_BYTE, buffer );
+    glGetTexImage( GL_TEXTURE_RECTANGLE_ARB, 0, m_downloadPixelType, GL_UNSIGNED_BYTE, buffer );
     glBindTexture( GL_TEXTURE_RECTANGLE_ARB, 0 );
 }
 
 void drwDrawableTexture::Download( unsigned short * buffer )
 {
     glBindTexture( GL_TEXTURE_RECTANGLE_ARB, m_texId );
-    glGetTexImage( GL_TEXTURE_RECTANGLE_ARB, 0, m_pixelType, GL_UNSIGNED_SHORT, buffer );
+    glGetTexImage( GL_TEXTURE_RECTANGLE_ARB, 0, m_downloadPixelType, GL_UNSIGNED_SHORT, buffer );
     glBindTexture( GL_TEXTURE_RECTANGLE_ARB, 0 );
 }
 
 void drwDrawableTexture::Download( float * buffer )
 {
     glBindTexture( GL_TEXTURE_RECTANGLE_ARB, m_texId );
-    glGetTexImage( GL_TEXTURE_RECTANGLE_ARB, 0, m_pixelType, GL_FLOAT, buffer );
+    glGetTexImage( GL_TEXTURE_RECTANGLE_ARB, 0, m_downloadPixelType, GL_FLOAT, buffer );
     glBindTexture( GL_TEXTURE_RECTANGLE_ARB, 0 );
 }
