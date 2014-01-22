@@ -116,6 +116,7 @@ void SoundGenerator::Stop()
 }
 
 static const char * pixelShaderCode = " \
+//#extension GL_ARB_texture_rectangle : enable \
 uniform sampler2DRect tex_id; \
 uniform float samplePixInterval; \
 uniform float freqPixInterval; \
@@ -128,10 +129,10 @@ uniform float masterVolume; \
 \
 void main() \
 { \
-    float PI = 3.14159265358979323846264; \
-    float sampleIndex = floor( gl_FragCoord.x - 0.5 + 1000.0 * ( gl_FragCoord.y - 0.5 ) ); \
-    float time = startTime + sampleIndex * sampleTimeInterval; \
-    float sampleValue = sin( 2.0 * PI * 440.0 * time ); \
+    //float PI = 3.14159265358979323846264; \
+    //float sampleIndex = floor( gl_FragCoord.x - 0.5 + 1000.0 * ( gl_FragCoord.y - 0.5 ) ); \
+    //float time = startTime + sampleIndex * sampleTimeInterval; \
+    //float sampleValue = sin( 2.0 * PI * 440.0 * time ); \
     //float texRow = 0.5 * samplePixInterval + sampleIndex * samplePixInterval; \
     //float fPix = 0.5 * freqPixInterval; \
     //float sampleValue = 0.0; \
@@ -143,23 +144,37 @@ void main() \
     //    sampleValue += freqIntensity * sin( 2.0 * PI * f * time ); \
     //    fPix += freqPixInterval; \
     //} \
-    gl_FragColor = Vec4( 1.0, 1.0, 1.0, 1.0 ); \
-    gl_FragColor.r = sampleValue * masterVolume; \
+    //gl_FragColor = Vec4( 1.0, 1.0, 1.0, 1.0 ); \
+    //gl_FragColor.r = sampleValue * masterVolume; \
+    gl_FragColor = vec4( 0.5, 0.5, 0.5, 1.0 ); \
 }";
 
 #include <stdio.h>
 
 void SoundGenerator::GenerateFramesForImage( drwDrawableTexture * image )
 {
+    glPushAttrib( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT );
+    glDisable( GL_BLEND );
+    glDisable( GL_DEPTH_TEST );
+    glEnable( GL_TEXTURE_RECTANGLE_ARB );
+
     // Update target texture size
     int textureHeight = m_nbFramesPerImage / 1000 + 1;
     if( !m_soundGenerationTarget )
     {
         m_soundGenerationTarget = new drwDrawableTexture;
-        m_soundGenerationTarget->SetPixelFormatToGreyF16();
+        m_soundGenerationTarget->SetPixelFormatToGreyF32();
     }
     m_soundGenerationTarget->Resize( 1000, textureHeight );
     m_soundGenerationTarget->DrawToTexture( true );
+
+    glClearColor( 0.5, 0.5, 0.5, 1.0 );
+    glClear( GL_COLOR_BUFFER_BIT );
+
+    if( glGetError() != GL_NO_ERROR )
+        cout << "Error after resizing target sound texture" << endl;
+
+    glViewport( 0, 0, 1000, textureHeight );
 
     // Update sound generation shader
     if( !m_soundGenerationShader )
@@ -206,6 +221,9 @@ void SoundGenerator::GenerateFramesForImage( drwDrawableTexture * image )
     glFlush();
     m_soundGenerationTarget->DrawToTexture( false );
 
+    if( glGetError() != GL_NO_ERROR )
+        cout << "Error after drawing to target sound texture" << endl;
+
     // download soundtrack from GPU
     int soundBufferSize = textureHeight * 1000;
     if( !m_soundBuffer || soundBufferSize != m_soundBufferSize )
@@ -216,10 +234,15 @@ void SoundGenerator::GenerateFramesForImage( drwDrawableTexture * image )
     }
     m_soundGenerationTarget->Download( m_soundBuffer );
 
+    if( glGetError() != GL_NO_ERROR )
+        cout << "Error after downloading target sound texture" << endl;
+
     FILE * f = fopen("/home/simon/outsound.txt", "w" );
     for( int i = 0; i < m_soundBufferSize; ++i )
         fprintf( f, "%f\n", m_soundBuffer[i] );
     fclose( f );
+
+    glPopAttrib();
 }
 
 int SoundGenerator::SendFramesToSoundCard( AudioParams & params )

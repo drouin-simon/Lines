@@ -11,6 +11,7 @@ public:
     
     void SetPixelFormatToRGBU8();
     void SetPixelFormatToGreyF16();
+    void SetPixelFormatToGreyF32();
 
     int GetWidth() { return m_width; }
     int GetHeight() { return m_height; }
