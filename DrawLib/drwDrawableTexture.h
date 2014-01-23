@@ -10,6 +10,7 @@ public:
 	~drwDrawableTexture();
     
     void SetPixelFormatToRGBU8();
+    void SetPixelFormatToRGBAF32();
     void SetPixelFormatToGreyF16();
     void SetPixelFormatToGreyF32();
 

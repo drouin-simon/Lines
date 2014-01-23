@@ -25,6 +25,7 @@ drwDrawableTexture::~drwDrawableTexture()
 void drwDrawableTexture::SetPixelFormatToRGBU8() { m_internalFormat = GL_RGB; m_pixelType = GL_RGB; m_componentType = GL_UNSIGNED_BYTE; m_downloadPixelType = GL_RGB; }
 //void drwDrawableTexture::SetPixelFormatToGreyF16() { m_internalFormat = GL_R16F; m_pixelType = GL_LUMINANCE; m_componentType = GL_FLOAT; m_downloadPixelType = GL_RED; }
 void drwDrawableTexture::SetPixelFormatToGreyF32() { m_internalFormat = GL_R32F; m_pixelType = GL_RED; m_componentType = GL_FLOAT; m_downloadPixelType = GL_RED; }
+void drwDrawableTexture::SetPixelFormatToRGBAF32() { m_internalFormat = GL_RGBA32F_ARB; m_pixelType = GL_RGBA; m_componentType = GL_FLOAT; m_downloadPixelType = GL_RGBA; }
 
 void drwDrawableTexture::Resize( int width, int height )
 {

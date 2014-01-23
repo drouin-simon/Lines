@@ -20,6 +20,7 @@ struct AudioParams
 
 // Sample format
 #define FORMAT RTAUDIO_FLOAT32
+//#define FORMAT RTAUDIO_SINT8
 
 SoundGenerator::SoundGenerator()
 {
@@ -70,31 +71,48 @@ int SendFramesToSoundCardCB( void *outputBuffer, void *inputBuffer, unsigned int
 
 bool SoundGenerator::Play()
 {
-    m_audio = new RtAudio;
-
-    if( m_audio->getDeviceCount() < 1 )
+    if( !m_audio )
     {
-        cerr << "No audio device!" << endl;
-        return false;
+        m_audio = new RtAudio;
+
+        if( m_audio->getDeviceCount() < 1 )
+        {
+            cerr << "No audio device!" << endl;
+            return false;
+        }
+        
+        m_audio->showWarnings( true );
+        
+        unsigned nbFrames = 512;
+        
+        RtAudio::StreamParameters params;
+        params.deviceId = m_deviceIndex;
+        params.nChannels = m_nbChannels;
+        params.firstChannel = 0;
+        
+        RtAudio::StreamOptions options;
+        options.flags = RTAUDIO_HOG_DEVICE;
+        options.flags |= RTAUDIO_SCHEDULE_REALTIME;
+        options.flags |= RTAUDIO_NONINTERLEAVED;
+        
+        try
+        {
+            m_audio->openStream( &params, NULL, FORMAT, m_sampleFreq, &nbFrames, &SendFramesToSoundCardCB, (void *)this, &options );
+        }
+        catch ( RtError& e )
+        {
+            e.printMessage();
+            delete m_audio;
+            m_audio = 0;
+            return false;
+        }
     }
-
-    m_audio->showWarnings( true );
-
-    unsigned nbFrames = 512;
-
-    RtAudio::StreamParameters params;
-    params.deviceId = m_deviceIndex;
-    params.nChannels = m_nbChannels;
-    params.firstChannel = 0;
-
-    RtAudio::StreamOptions options;
-    options.flags = RTAUDIO_HOG_DEVICE;
-    options.flags |= RTAUDIO_SCHEDULE_REALTIME;
-    options.flags |= RTAUDIO_NONINTERLEAVED;
+    
+    if( m_audio->isStreamRunning() )
+        return false;
 
     try
     {
-        m_audio->openStream( &params, NULL, FORMAT, m_sampleFreq, &nbFrames, &SendFramesToSoundCardCB, (void *)this, &options );
         m_audio->startStream();
     }
     catch ( RtError& e )
@@ -102,6 +120,7 @@ bool SoundGenerator::Play()
         e.printMessage();
         delete m_audio;
         m_audio = 0;
+        return false;
     }
 
     return true;
@@ -109,13 +128,13 @@ bool SoundGenerator::Play()
 
 void SoundGenerator::Stop()
 {
-    if( m_audio && m_audio->isStreamOpen() )
-        m_audio->closeStream();
+    if( m_audio && m_audio->isStreamRunning() )
+        m_audio->stopStream();
     delete m_audio;
     m_audio = 0;
 }
 
-static const char * pixelShaderCode = " \
+/*static const char * pixelShaderCode = " \
 //#extension GL_ARB_texture_rectangle : enable \
 uniform sampler2DRect tex_id; \
 uniform float samplePixInterval; \
@@ -147,6 +166,13 @@ void main() \
     //gl_FragColor = Vec4( 1.0, 1.0, 1.0, 1.0 ); \
     //gl_FragColor.r = sampleValue * masterVolume; \
     gl_FragColor = vec4( 0.5, 0.5, 0.5, 1.0 ); \
+}"; */
+
+static const char * pixelShaderCode = " \
+\
+void main() \
+{ \
+    gl_FragColor = vec4( -0.5, 0.5, 0.5, 1.0 ); \
 }";
 
 #include <stdio.h>
@@ -163,10 +189,12 @@ void SoundGenerator::GenerateFramesForImage( drwDrawableTexture * image )
     if( !m_soundGenerationTarget )
     {
         m_soundGenerationTarget = new drwDrawableTexture;
-        m_soundGenerationTarget->SetPixelFormatToGreyF32();
+        m_soundGenerationTarget->SetPixelFormatToRGBAF32();
     }
     m_soundGenerationTarget->Resize( 1000, textureHeight );
     m_soundGenerationTarget->DrawToTexture( true );
+    
+    glViewport( 0, 0, 1000, textureHeight );
 
     glClearColor( 0.5, 0.5, 0.5, 1.0 );
     glClear( GL_COLOR_BUFFER_BIT );
@@ -181,7 +209,9 @@ void SoundGenerator::GenerateFramesForImage( drwDrawableTexture * image )
     {
         m_soundGenerationShader = new drwGlslShader;
         m_soundGenerationShader->AddShaderMemSource( pixelShaderCode );
-        m_soundGenerationShader->Init();
+        bool shaderInitRes = m_soundGenerationShader->Init();
+        if( !shaderInitRes )
+            cout << "Couldn't build shader!" << endl;
     }
     m_soundGenerationShader->UseProgram( true );
     m_soundGenerationShader->SetVariable( "tex_id", 0 );
@@ -225,7 +255,7 @@ void SoundGenerator::GenerateFramesForImage( drwDrawableTexture * image )
         cout << "Error after drawing to target sound texture" << endl;
 
     // download soundtrack from GPU
-    int soundBufferSize = textureHeight * 1000;
+    int soundBufferSize = textureHeight * 1000 * 4;
     if( !m_soundBuffer || soundBufferSize != m_soundBufferSize )
     {
         delete m_soundBuffer;
@@ -237,9 +267,9 @@ void SoundGenerator::GenerateFramesForImage( drwDrawableTexture * image )
     if( glGetError() != GL_NO_ERROR )
         cout << "Error after downloading target sound texture" << endl;
 
-    FILE * f = fopen("/home/simon/outsound.txt", "w" );
+    FILE * f = fopen("/Users/simondrouin/outsound.txt", "w" );
     for( int i = 0; i < m_soundBufferSize; ++i )
-        fprintf( f, "%f\n", m_soundBuffer[i] );
+        fprintf( f, "%f\n", m_soundBuffer[i*4] );
     fclose( f );
 
     glPopAttrib();
@@ -273,6 +303,8 @@ int SoundGenerator::SendFramesToSoundCard( AudioParams & params )
     m_nextBufferIndex += nbFramesToCopy;
 
     if( nbBlankFrames > 0 )
+    {
         return 1;
+    }
     return 0;
 }
