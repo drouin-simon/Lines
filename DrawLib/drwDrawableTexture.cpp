@@ -173,6 +173,6 @@ void drwDrawableTexture::Download( unsigned short * buffer )
 void drwDrawableTexture::Download( float * buffer )
 {
     glBindTexture( GL_TEXTURE_RECTANGLE_ARB, m_texId );
-    glGetTexImage( GL_TEXTURE_RECTANGLE_ARB, 0, m_downloadPixelType, GL_FLOAT, buffer );
+    glGetTexImage( GL_TEXTURE_RECTANGLE_ARB, 0, GL_RED, GL_FLOAT, buffer );
     glBindTexture( GL_TEXTURE_RECTANGLE_ARB, 0 );
 }

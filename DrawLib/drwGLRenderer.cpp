@@ -52,7 +52,6 @@ void drwGLRenderer::RenderSetup()
         m_camera->FitRectInside( CurrentScene->GetFrameWidth(), CurrentScene->GetFrameHeight(), m_framePadding );
 
     // Update working texture size if needed
-    m_renderTexture->Resize( m_renderWidth, m_renderHeight );
     m_workTexture->Resize( m_renderWidth, m_renderHeight );
 
     // Place virtual camera
@@ -104,8 +103,9 @@ void drwGLRenderer::Render( int currentFrame, int onionSkinBefore, int onionSkin
 
 void drwGLRenderer::RenderToTexture( int currentFrame )
 {
-    RenderSetup();
+    m_renderTexture->Resize( m_renderWidth, m_renderHeight );
     m_renderTexture->DrawToTexture( true );
+    RenderSetup();
     drwDrawingContext mainContext(this);
     CurrentScene->DrawFrame( currentFrame, mainContext );
     m_renderTexture->DrawToTexture( false );
