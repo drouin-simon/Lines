@@ -37,12 +37,7 @@ include_directories( ${BaseIncludeDir} )
 
 #----------------------------------------
 # Use Qt 5
-find_package(Qt5Widgets )  # finds QtGUI and QtCore
-find_package(Qt5OpenGL )
-find_package(Qt5Network )
-if( NOT Qt5Widgets_FOUND AND NOT Qt5OpenGL_FOUND AND NOT Qt5Network_FOUND )
-    message( FATAL_ERROR "Qt not found" )
-endif()
+find_package( Qt5 COMPONENTS Widgets OpenGL Network REQUIRED )
 include_directories( ${Qt5Widgets_INCLUDE_DIRS} )
 include_directories( ${Qt5OpenGL_INCLUDE_DIRS} )
 include_directories( ${Qt5Network_INCLUDE_DIRS} )
