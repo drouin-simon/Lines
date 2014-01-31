@@ -24,6 +24,7 @@ public:
     void PlaceCameraForPicking( int x, int y );
 	
 	void FitRectInside( double w, double h, double percentBorder );
+    static void RectThatFitsInside( double w, double h, double percentBorder, int winW, int winH, int & rectW, int & rectH );
 
 private:
 

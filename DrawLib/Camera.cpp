@@ -88,6 +88,8 @@ void Camera::AdjustFrustum()
     m_bottom = m_posY - radiusY;
 }
 
+// Adjust virtual window dimensions in such a way that a rectangle of
+// size (w,y) will fit inside the window
 void Camera::FitRectInside( double w, double h, double percentBorder )
 {
 	double ratioRect = w / h;
@@ -108,4 +110,26 @@ void Camera::FitRectInside( double w, double h, double percentBorder )
 	m_posX = w / 2;
 	m_posY = h / 2;
 	AdjustFrustum();
+}
+
+// find the the size of rectangle (rectW,rectH) that has the same proportion
+// as (w,h) and that fits inside (winW,winH) with a certain border around it
+// given by percentBorder
+void Camera::RectThatFitsInside( double w, double h, double percentBorder, int winW, int winH, int & rectW, int & rectH )
+{
+    double ratioRect = w / h;
+    double ratioWin = (double)winW / winH;
+    double virtWindowW = 1.0;
+    if( ratioRect > ratioWin )
+    {
+        // the width matters
+        rectW = winW + 2 * percentBorder * winW;
+        rectH = rectW / ratioRect;
+    }
+    else
+    {
+        // the height matters
+        rectH = winH + 2 * percentBorder * winH;
+        rectW = rectH * ratioRect;
+    }
 }

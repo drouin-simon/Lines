@@ -57,6 +57,7 @@ protected:
 private:
 
     Camera              * m_camera;
+    Camera              * m_renderToTextureCamera;
     Scene				* CurrentScene;
     drwDrawableTexture  * m_renderTexture;
     drwDrawableTexture  * m_workTexture;

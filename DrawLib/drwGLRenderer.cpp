@@ -10,6 +10,7 @@ drwGLRenderer::drwGLRenderer(QObject *parent) :
     QObject(parent)
 {
     m_camera = new Camera;
+    m_renderToTextureCamera = new Camera;
     CurrentScene = 0;
     m_showFullFrame = true;
     m_framePadding = 0.0;
@@ -25,6 +26,7 @@ drwGLRenderer::drwGLRenderer(QObject *parent) :
 drwGLRenderer::~drwGLRenderer()
 {
     delete m_camera;
+    delete m_renderToTextureCamera;
     delete m_renderTexture;
     delete m_workTexture;
     if( m_widelineShader )
@@ -103,11 +105,40 @@ void drwGLRenderer::Render( int currentFrame, int onionSkinBefore, int onionSkin
 
 void drwGLRenderer::RenderToTexture( int currentFrame )
 {
-    m_renderTexture->Resize( m_renderWidth, m_renderHeight );
+    // State setup
+    glDisable( GL_DEPTH_TEST );
+    glEnable( GL_LINE_SMOOTH );
+    glEnableClientState( GL_VERTEX_ARRAY );
+    glClearColor( m_clearColor[0], m_clearColor[1], m_clearColor[2], m_clearColor[3] );
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+    glEnable( GL_TEXTURE_RECTANGLE_ARB );
+    glEnable( GL_BLEND );
+    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+
+    // initialize modelview matrix
+    glMatrixMode( GL_MODELVIEW );
+    glLoadIdentity();
+
+    // Resize texture if needed
+    int texW = 1, texH = 1;
+    Camera::RectThatFitsInside( CurrentScene->GetFrameWidth(), CurrentScene->GetFrameHeight(), 0.0, m_renderWidth, m_renderHeight, texW, texH );
+    m_renderTexture->Resize( texW, texH );
     m_renderTexture->DrawToTexture( true );
-    RenderSetup();
+
+    m_renderToTextureCamera->SetViewportSize( texW, texH );
+    m_renderToTextureCamera->FitRectInside( CurrentScene->GetFrameWidth(), CurrentScene->GetFrameHeight(), 0.0 );
+
+    // Update working texture size if needed
+    m_workTexture->Resize( texW, texH );
+
+    // Place virtual camera
+    m_renderToTextureCamera->PlaceCamera();
+
+    // Do the rendering
     drwDrawingContext mainContext(this);
     CurrentScene->DrawFrame( currentFrame, mainContext );
+
+    // stop drawing to texture
     m_renderTexture->DrawToTexture( false );
 }
 
