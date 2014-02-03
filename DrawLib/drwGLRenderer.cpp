@@ -109,8 +109,6 @@ void drwGLRenderer::RenderToTexture( int currentFrame )
     glDisable( GL_DEPTH_TEST );
     glEnable( GL_LINE_SMOOTH );
     glEnableClientState( GL_VERTEX_ARRAY );
-    glClearColor( m_clearColor[0], m_clearColor[1], m_clearColor[2], m_clearColor[3] );
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     glEnable( GL_TEXTURE_RECTANGLE_ARB );
     glEnable( GL_BLEND );
     glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
@@ -135,6 +133,8 @@ void drwGLRenderer::RenderToTexture( int currentFrame )
     m_renderToTextureCamera->PlaceCamera();
 
     // Do the rendering
+    glClearColor( m_clearColor[0], m_clearColor[1], m_clearColor[2], m_clearColor[3] );
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     drwDrawingContext mainContext(this);
     CurrentScene->DrawFrame( currentFrame, mainContext );
 
@@ -142,18 +142,19 @@ void drwGLRenderer::RenderToTexture( int currentFrame )
     m_renderTexture->DrawToTexture( false );
 }
 
-void drwGLRenderer::FlipAndRender( int frameIndex )
+void drwGLRenderer::RenderTextureToScreen()
 {
     // display previous frame
-    m_renderTexture->PasteToScreen();
-
-    // render next frame
-    Q_ASSERT( CurrentScene );
-    m_renderTexture->DrawToTexture( true );
-    RenderSetup();
-    drwDrawingContext mainContext(this);
-    CurrentScene->DrawFrame( frameIndex, mainContext );
-    m_renderTexture->DrawToTexture( false );
+    glDisable( GL_BLEND );
+    //glEnable( GL_BLEND );
+    //glBlendFunc( GL_ONE, GL_ONE_MINUS_SRC_ALPHA );
+    int y = 0;
+    if( m_renderTexture->GetHeight() < m_renderHeight )
+        y = ( m_renderHeight - m_renderTexture->GetHeight() ) / 2;
+    int x = 0;
+    if( m_renderTexture->GetWidth() < m_renderWidth )
+        x = ( m_renderWidth - m_renderTexture->GetWidth() ) / 2;
+    m_renderTexture->PasteToScreen( x, y );
 }
 
 void drwGLRenderer::RenderAllFrames( int currentFrame )

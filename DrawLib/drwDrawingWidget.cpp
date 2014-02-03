@@ -136,7 +136,7 @@ void drwDrawingWidget::PlaybackStartStop( bool isStarting )
 	if( isStarting )
 	{
         // render current frame to texture, generate sound from frame
-        //m_renderer->RenderToTexture( Controler->GetCurrentFrame() );
+        m_renderer->RenderToTexture( Controler->GetCurrentFrame() );
         //m_soundGenerator->GenerateFramesForImage( m_renderer->GetRenderTexture() );
 
         // start timer
@@ -181,7 +181,11 @@ void drwDrawingWidget::paintEvent( QPaintEvent * event )
 	
     if( Controler->IsPlaying() )
     {
-        m_renderer->FlipAndRender( Controler->GetCurrentFrame() );
+        // paste previously rendered image to screen
+        m_renderer->RenderTextureToScreen();
+        
+        // Render next image
+        m_renderer->RenderToTexture( Controler->GetNextFrame() );
 
         // on start playing: generate soundtrack for current frame and start playing sound
         // here: generate soundtrack for next frame

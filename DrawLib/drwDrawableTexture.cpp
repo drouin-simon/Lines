@@ -144,6 +144,11 @@ void drwDrawableTexture::Clear( int x, int y, int width, int height )
     glEnable( GL_BLEND );
 }
 
+void drwDrawableTexture::PasteToScreen( int x, int y )
+{
+    PasteToScreen( x, y, m_width, m_height );
+}
+
 void drwDrawableTexture::PasteToScreen()
 {
     PasteToScreen( 0, 0, m_width, m_height );

@@ -22,7 +22,7 @@ public:
     void Render( int currentFrame, int onionSkinBefore, int onionSkinAfter );
     void RenderToTexture( int currentFrame );
     drwDrawableTexture * GetRenderTexture() { return m_renderTexture; }
-    void FlipAndRender( int currentFrame );
+    void RenderTextureToScreen();
     void RenderAllFrames( int currentFrame );
     void RenderCameraFrame();
 

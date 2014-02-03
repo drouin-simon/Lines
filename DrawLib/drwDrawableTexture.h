@@ -22,6 +22,7 @@ public:
 	
 	void DrawToTexture( bool drawTo );
     void PasteToScreen( int x, int y, int width, int height );
+    void PasteToScreen( int x, int y );
     void PasteToScreen();
     void Clear( int x, int y, int width, int height );
 
