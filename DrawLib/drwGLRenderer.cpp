@@ -154,7 +154,8 @@ void drwGLRenderer::RenderTextureToScreen()
     int x = 0;
     if( m_renderTexture->GetWidth() < m_renderWidth )
         x = ( m_renderWidth - m_renderTexture->GetWidth() ) / 2;
-    m_renderTexture->PasteToScreen( x, y );
+    glViewport( x, y, m_renderTexture->GetWidth(), m_renderTexture->GetHeight() );
+    m_renderTexture->PasteToScreen();
 }
 
 void drwGLRenderer::RenderAllFrames( int currentFrame )
@@ -193,6 +194,8 @@ void drwGLRenderer::RenderAllFrames( int currentFrame )
 
 void drwGLRenderer::RenderCameraFrame()
 {
+    glViewport( 0, 0, m_renderWidth, m_renderHeight );
+    
     // Compute the screen bound in world coordinates
     double topLeft[2] = {0.0,0.0};
     m_camera->WindowToWorld( 0, 0, topLeft[0], topLeft[1] );

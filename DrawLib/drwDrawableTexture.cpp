@@ -105,6 +105,8 @@ void drwDrawableTexture::PasteToScreen( int x, int y, int width, int height )
 	glPushMatrix();
 	glLoadIdentity();
 	gluOrtho2D( 0, m_width, 0, m_height );
+    
+    glColor4d( 1.0, 1.0, 1.0, 1.0 );
 
 	glBindTexture( GL_TEXTURE_RECTANGLE_ARB, m_texId );
 	glBegin( GL_QUADS );
