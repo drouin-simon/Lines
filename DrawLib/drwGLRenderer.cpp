@@ -9,7 +9,8 @@
 drwGLRenderer::drwGLRenderer(QObject *parent) :
     QObject(parent)
 {
-    m_camera = new Camera;
+    m_mainCamera = new Camera;
+    m_camera = m_mainCamera;
     m_renderToTextureCamera = new Camera;
     CurrentScene = 0;
     m_showFullFrame = true;
@@ -25,7 +26,7 @@ drwGLRenderer::drwGLRenderer(QObject *parent) :
 
 drwGLRenderer::~drwGLRenderer()
 {
-    delete m_camera;
+    delete m_mainCamera;
     delete m_renderToTextureCamera;
     delete m_renderTexture;
     delete m_workTexture;
@@ -64,6 +65,8 @@ void drwGLRenderer::Render( int currentFrame, int onionSkinBefore, int onionSkin
 {
     Q_ASSERT( CurrentScene );
 
+    m_camera = m_mainCamera;
+    
     RenderSetup();
 
     drwDrawingContext c(this);
@@ -105,6 +108,8 @@ void drwGLRenderer::Render( int currentFrame, int onionSkinBefore, int onionSkin
 
 void drwGLRenderer::RenderToTexture( int currentFrame )
 {
+    m_camera = m_renderToTextureCamera;
+    
     // State setup
     glDisable( GL_DEPTH_TEST );
     glEnable( GL_LINE_SMOOTH );
@@ -123,14 +128,14 @@ void drwGLRenderer::RenderToTexture( int currentFrame )
     m_renderTexture->Resize( texW, texH );
     m_renderTexture->DrawToTexture( true );
 
-    m_renderToTextureCamera->SetViewportSize( texW, texH );
-    m_renderToTextureCamera->FitRectInside( CurrentScene->GetFrameWidth(), CurrentScene->GetFrameHeight(), 0.0 );
+    m_camera->SetViewportSize( texW, texH );
+    m_camera->FitRectInside( CurrentScene->GetFrameWidth(), CurrentScene->GetFrameHeight(), 0.0 );
 
     // Update working texture size if needed
     m_workTexture->Resize( texW, texH );
 
     // Place virtual camera
-    m_renderToTextureCamera->PlaceCamera();
+    m_camera->PlaceCamera();
 
     // Do the rendering
     glClearColor( m_clearColor[0], m_clearColor[1], m_clearColor[2], m_clearColor[3] );
@@ -146,8 +151,8 @@ void drwGLRenderer::RenderTextureToScreen()
 {
     // display previous frame
     glDisable( GL_BLEND );
-    //glEnable( GL_BLEND );
-    //glBlendFunc( GL_ONE, GL_ONE_MINUS_SRC_ALPHA );
+    glClearColor( 0.0, 0.0, 0.0, 1.0 );
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     int y = 0;
     if( m_renderTexture->GetHeight() < m_renderHeight )
         y = ( m_renderHeight - m_renderTexture->GetHeight() ) / 2;
@@ -378,5 +383,3 @@ void drwGLRenderer::DisplayCounter()
     ++displayCount;
 
 }
-
-
