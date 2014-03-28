@@ -134,7 +134,7 @@ void SoundGenerator::Stop()
     m_audio = 0;
 }
 
-static const char * pixelShaderCode = " \
+/*static const char * pixelShaderCode = " \
 uniform sampler2DRect tex_id; \
 uniform float samplePixInterval; \
 uniform float freqPixInterval; \
@@ -160,6 +160,58 @@ void main() \
         float freqIntensity = ( texSample.r + texSample.g + texSample.b ) / 3.0; \
         sampleValue += freqIntensity * sin( 2.0 * PI * f * time ); \
         fPix += freqPixInterval; \
+    } \
+    gl_FragColor = vec4( 0.0, 0.0, 0.0, 1.0 ); \
+    gl_FragColor.r = sampleValue * masterVolume; \
+}";*/
+
+static const char * pixelShaderCode = " \
+uniform sampler2DRect tex_id; \
+uniform int texWidth; \
+uniform float samplePixInterval; \
+uniform float minFreq; \
+uniform float maxFreq; \
+uniform float sampleTimeInterval; \
+uniform float startTime; \
+uniform float masterVolume; \
+\
+void main() \
+{ \
+    float PI = 3.14159265358979323846264; \
+    float sampleIndex = floor( gl_FragCoord.x - 0.5 + 1000.0 * ( gl_FragCoord.y - 0.5 ) ); \
+    float time = startTime + sampleIndex * sampleTimeInterval; \
+    float texRow = 0.5 * samplePixInterval + sampleIndex * samplePixInterval; \
+    float sampleValue = 0.0; \
+    bool inBlob = false; \
+    float blobIntensity = 0.0; \
+    float blobStart = 0.0; \
+    for( int x = 0; x < texWidth; x++ ) \
+    {  \
+        float xTex = float(x) + 0.5; \
+        vec2 texCoord = vec2( xTex, texRow ); \
+        vec4 texSample = texture2DRect( tex_id, texCoord ); \
+        if( texSample.r > 0.01 ) \
+        { \
+            if( inBlob ) \
+            { \
+                blobIntensity += texSample.r; \
+            } \
+            else \
+            { \
+                inBlob = true; \
+                blobStart = float( x ); \
+            } \
+        } \
+        else if( inBlob ) \
+        { \
+            float blobAmp = blobIntensity / ( float( x ) - float( blobStart ) ); \
+            float blobMiddle = float( x ) - float( blobStart ) / 2.0; \
+            float normMiddle = blobMiddle / float(texWidth); \
+            float blobFreq = pow( 10.0, log( minFreq ) + ( log( maxFreq ) - log( minFreq ) ) * normMiddle ); \
+            sampleValue += 0.5 * blobAmp * sin( 2.0 * PI * blobFreq * time ); \
+            inBlob = false; \
+            blobIntensity = 0.0; \
+        } \
     } \
     gl_FragColor = vec4( 0.0, 0.0, 0.0, 1.0 ); \
     gl_FragColor.r = sampleValue * masterVolume; \
@@ -205,12 +257,13 @@ void SoundGenerator::GenerateFramesForImage( drwDrawableTexture * image )
     }
     m_soundGenerationShader->UseProgram( true );
     m_soundGenerationShader->SetVariable( "tex_id", 0 );
+    m_soundGenerationShader->SetVariable( "texWidth", image->GetWidth() );
     float samplePixInterval = ((float)image->GetHeight()) / m_nbFramesPerImage;
     m_soundGenerationShader->SetVariable( "samplePixInterval", samplePixInterval );
-    float freqPixInterval = ((float)image->GetWidth() ) / m_nbFrequencies ;
-    m_soundGenerationShader->SetVariable( "freqPixInterval", freqPixInterval );
-    float freqInterval = ( m_maxFrequency - m_minFrequency ) / m_nbFrequencies;
-    m_soundGenerationShader->SetVariable( "freqInterval", freqInterval );
+    //float freqPixInterval = ((float)image->GetWidth() ) / m_nbFrequencies ;
+    //m_soundGenerationShader->SetVariable( "freqPixInterval", freqPixInterval );
+    //float freqInterval = ( m_maxFrequency - m_minFrequency ) / m_nbFrequencies;
+    //m_soundGenerationShader->SetVariable( "freqInterval", freqInterval );
     m_soundGenerationShader->SetVariable( "minFreq", float(m_minFrequency) );
     m_soundGenerationShader->SetVariable( "maxFreq", float(m_maxFrequency) );
     float sampleTimeInterval = 1.0 / m_nbFramesPerImage;
