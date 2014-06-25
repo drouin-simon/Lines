@@ -99,7 +99,7 @@ bool SoundGenerator::Play()
         {
             m_audio->openStream( &params, NULL, FORMAT, m_sampleFreq, &nbFrames, &SendFramesToSoundCardCB, (void *)this, &options );
         }
-        catch ( RtError& e )
+        catch ( RtAudioError& e )
         {
             e.printMessage();
             delete m_audio;
@@ -115,7 +115,7 @@ bool SoundGenerator::Play()
     {
         m_audio->startStream();
     }
-    catch ( RtError& e )
+    catch ( RtAudioError& e )
     {
         e.printMessage();
         delete m_audio;
