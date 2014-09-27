@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <SVL.h>
-#include <SVLgl.h>
+//#include <SVLgl.h>
 
 template< class T >
 class drwDataArray : public std::vector< T >

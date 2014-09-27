@@ -1,7 +1,7 @@
 #ifndef __ImageSprite_h_
 #define __ImageSprite_h_
 
-#include <IncludeGl.h>
+#include "IncludeGl.h"
 #include "Primitive.h"
 
 class drwSWFWriter;

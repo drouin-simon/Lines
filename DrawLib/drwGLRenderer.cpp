@@ -362,8 +362,8 @@ void drwGLRenderer::DisplayCounter()
     glColor4d( 1.0, 1.0, 0.0, 1.0 );
 
     int numberOfSteps = ( m_renderWidth - 20) / 10;
-    int pos = displayCount % numberOfSteps;
-    glTranslate( Vec2(pos * 10 + 10, 20) );
+    //int pos = displayCount % numberOfSteps;
+    //glTranslate( Vec2(pos * 10 + 10, 20) );
 
     glBegin( GL_QUADS );
     {

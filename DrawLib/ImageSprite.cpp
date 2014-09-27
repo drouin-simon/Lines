@@ -1,5 +1,5 @@
 #include "ImageSprite.h"
-#include <IncludeGl.h>
+#include "IncludeGl.h"
 #include <QImage>
 #include <QGLWidget>
 

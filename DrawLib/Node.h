@@ -2,7 +2,7 @@
 #define __Node_h_
 
 #include <SVL.h>
-#include <SVLgl.h>
+#include "IncludeGl.h"
 #include "macros.h"
 #include "SharedPtrMacro.h"
 

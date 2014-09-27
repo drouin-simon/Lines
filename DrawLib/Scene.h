@@ -1,7 +1,7 @@
 #ifndef __Scene_h_
 #define __Scene_h_
 
-#include "macros.h"
+//#include "macros.h"
 #include <vector>
 #include <QObject>
 #include <QReadWriteLock>

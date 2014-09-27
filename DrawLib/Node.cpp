@@ -26,7 +26,7 @@ void Node::Draw( drwDrawingContext & context )
 
 		glPushMatrix();
 		
-		glTranslate( Position );
+		//glTranslate( Position );
 
 		ThePrimitive->Draw( context );
 		
