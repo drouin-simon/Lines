@@ -438,14 +438,6 @@ void MainWindow::closeEvent(QCloseEvent *event)
 	}
 }
 
-void MainWindow::changeEvent( QEvent * e )
-{
-    if( e->type() == QEvent::WindowStateChange )
-    {
-        int toto = 0;
-    }
-}
-
 bool MainWindow::GetSaveFilename()
 {
 	m_filename = QFileDialog::getSaveFileName(this, tr("Save Animation"),  m_fileDialogStartPath + QDir::separator() + "untitled.drw", tr("Animation Files (*.drw)"));
@@ -572,11 +564,6 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
             else
                 m_drawingEngine->Start();
             m_glWidget->ToggleComputeFps();
-            handled = true;
-        }
-        else if( keyEvent->key() == Qt::Key_S )
-        {
-            m_glWidget->PlaySound();
             handled = true;
         }
         else if( keyEvent->key() == Qt::Key_Alt )

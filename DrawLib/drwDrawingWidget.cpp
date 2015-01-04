@@ -13,7 +13,6 @@
 #include "drwCursor.h"
 #include "drwFpsCounter.h"
 #include "drwGLRenderer.h"
-#include "SoundGenerator.h"
 
 drwDrawingWidget::drwDrawingWidget( QWidget * parent ) 
 : QGLWidget( QGLFormat(QGL::SampleBuffers), parent ) 
@@ -33,8 +32,6 @@ drwDrawingWidget::drwDrawingWidget( QWidget * parent )
     m_renderer = new drwGLRenderer;
     connect( m_renderer, SIGNAL(NeedRenderSignal()), this, SLOT(RequestRedraw()) );
 
-    m_soundGenerator = new SoundGenerator;
-
     setAcceptDrops(true);
 	setMouseTracking(true);
 	setCursor( Qt::BlankCursor );
@@ -46,7 +43,6 @@ drwDrawingWidget::~drwDrawingWidget()
 {
 	delete m_interactor;
 	delete DisplaySettings;
-    delete m_soundGenerator;
 }
 
 drwCommand::s_ptr drwDrawingWidget::CreateMouseCommand( drwMouseCommand::MouseCommandType commandType, QMouseEvent * e )
@@ -110,15 +106,6 @@ void drwDrawingWidget::ToggleComputeFps()
     }
 }
 
-void drwDrawingWidget::PlaySound()
-{
-    makeCurrent();
-
-    m_renderer->RenderToTexture( Controler->GetCurrentFrame() );
-    m_soundGenerator->GenerateFramesForImage( m_renderer->GetRenderTexture() );
-    m_soundGenerator->Play();
-}
-
 void drwDrawingWidget::RequestRedraw()
 {
     update();
@@ -137,15 +124,11 @@ void drwDrawingWidget::PlaybackStartStop( bool isStarting )
 	{
         // render current frame to texture, generate sound from frame
         m_renderer->RenderToTexture( Controler->GetCurrentFrame() );
-        //m_soundGenerator->GenerateFramesForImage( m_renderer->GetRenderTexture() );
 
         // start timer
 		if( m_timerId == -1 )
 			m_timerId = startTimer(0);
         EnableVSync( true );
-
-        // start playing sound
-        //m_soundGenerator->Play();
 	}
 	else
 	{
@@ -155,7 +138,6 @@ void drwDrawingWidget::PlaybackStartStop( bool isStarting )
 			m_timerId = -1;
 		}
         EnableVSync( false );
-        //m_soundGenerator->Stop();
 	}
 	
 	DisplaySettings->SetInhibitOnionSkin( isStarting );
@@ -186,10 +168,6 @@ void drwDrawingWidget::paintEvent( QPaintEvent * event )
         
         // Render next image
         m_renderer->RenderToTexture( Controler->GetNextFrame() );
-
-        // on start playing: generate soundtrack for current frame and start playing sound
-        // here: generate soundtrack for next frame
-        //
     }
     else if( DisplaySettings->GetShowAllFrames() )
     {

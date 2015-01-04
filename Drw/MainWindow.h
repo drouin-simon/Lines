@@ -38,7 +38,6 @@ public:
     ~MainWindow();
 	
 	void closeEvent( QCloseEvent * e );
-    void changeEvent( QEvent * e );
 
 private slots:
 	

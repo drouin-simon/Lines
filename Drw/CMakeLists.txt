@@ -52,7 +52,7 @@ ENDIF(APPLE)
 #
 set( Drw_all_src ${Drw_src} ${Drw_hdr} ${Drw_moc} ${Drw_hdr_ui} )
 add_executable( ${ExecName} ${EXECUTABLE_FLAG} ${Drw_all_src} )
-target_link_libraries( ${ExecName} Draw svl ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY} ${QT_LIBRARIES} rtaudio )
+target_link_libraries( ${ExecName} Draw svl ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY} ${QT_LIBRARIES} )
 qt5_use_modules( ${ExecName} OpenGL Widgets Network )
 
 if( NOT APPLE )

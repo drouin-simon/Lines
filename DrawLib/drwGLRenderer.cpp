@@ -160,6 +160,7 @@ void drwGLRenderer::RenderTextureToScreen()
     if( m_renderTexture->GetWidth() < m_renderWidth )
         x = ( m_renderWidth - m_renderTexture->GetWidth() ) / 2;
     glViewport( x, y, m_renderTexture->GetWidth(), m_renderTexture->GetHeight() );
+    glColor4d( 1.0, 1.0, 1.0, 1.0 );
     m_renderTexture->PasteToScreen();
 }
 
