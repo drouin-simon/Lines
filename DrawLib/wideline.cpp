@@ -24,7 +24,6 @@ WideLine::~WideLine()
 {
 }
 
-
 void WideLine::InternDraw( drwDrawingContext & context )
 {
 	// Draw mask to texture

@@ -52,7 +52,7 @@ void drwCamera::WorldToGLWindow( double xworld, double yworld, int & xwin, int &
 {
     double scaleFactor = PixelsPerUnit();
     xwin = (int)round( scaleFactor * xworld );
-    ywin = (int)round( scaleFactor * xworld );
+    ywin = (int)round( scaleFactor * yworld );
 }
 
 double drwCamera::PixelsPerUnit()
