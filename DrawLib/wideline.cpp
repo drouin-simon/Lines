@@ -1,4 +1,5 @@
 #include "wideline.h"
+#include "IncludeGLee.h"
 #include "IncludeGl.h"
 #include "math.h"
 #include "drwGlslShader.h"
@@ -75,13 +76,13 @@ void WideLine::InternDraw( drwDrawingContext & context )
 
     glDisableClientState( GL_TEXTURE_COORD_ARRAY );
     glDisableClientState( GL_NORMAL_ARRAY );
-	glBlendEquation( GL_FUNC_ADD );
     shader->UseProgram( false );
 
     tex->DrawToTexture( false );
 
 	// Paste the texture to screen with the right color
-    Vec4 color = m_color * context.m_colorMultiplier;
+    glBlendEquationSeparate( GL_FUNC_ADD, GL_MAX );  // Don't want to affect the alpha of other lines
+    Vec4 color = m_color; // * context.m_colorMultiplier;
     glColor4d( color[0], color[1], color[2], color[3] );
 
     int xWinMin = 0;
@@ -95,6 +96,7 @@ void WideLine::InternDraw( drwDrawingContext & context )
     tex->PasteToScreen( xWinMin, yWinMin, width, height );
 
 	// Erase trace on work texture
+    glBlendEquation( GL_FUNC_ADD );
     tex->DrawToTexture( true );
     tex->Clear( xWinMin, yWinMin, width, height );
     tex->DrawToTexture( false );
