@@ -3,11 +3,10 @@ project( DrawLib )
 set( LibName Draw )
 
 set( DrawLib_src  drwDrawingWidget.cpp
-		drwDrawingWidgetInteractor.cpp
 		drwToolbox.cpp
 		drwLineTool.cpp
 		drwGlslShader.cpp
-		Camera.cpp 
+		drwCamera.cpp
 		Scene.cpp
 		Frame.cpp
 		Node.cpp
@@ -19,7 +18,7 @@ set( DrawLib_src  drwDrawingWidget.cpp
         drwDrawingContext.cpp
 		TabletStateWidget.cpp
 		PlaybackControler.cpp 
-                ImageSprite.cpp
+        ImageSprite.cpp
 		drwCommand.cpp
 		drwCommandDatabase.cpp
 		drwNetworkConnection.cpp
@@ -62,9 +61,9 @@ set( DrawLib_hdr_moc 	drwDrawingWidget.h
             drwDrawingEngine.h
             drwGLRenderer.h )
 
-set( DrawLib_hdr	drwDrawingWidgetInteractor.h
+set( DrawLib_hdr
 			drwGlslShader.h
-			Camera.h
+			drwCamera.h
 			Frame.h
 			line.h  
 			Node.h

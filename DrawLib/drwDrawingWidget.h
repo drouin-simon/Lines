@@ -2,7 +2,6 @@
 #define __drwDrawingWidget_h_
 
 #include <QGLWidget>
-#include "Camera.h"
 #include "macros.h"
 #include "Scene.h"
 #include "drwCommand.h"
@@ -14,7 +13,6 @@ class drwDisplaySettings;
 class drwLineToolViewportWidget;
 class drwFpsCounter;
 class PlaybackControler;
-class drwDrawingWidgetInteractor;
 
 class drwDrawingWidget : public QGLWidget
 {
@@ -35,9 +33,7 @@ public:
     void UpdatePosition( int x, int y );
     void ToggleComputeFps();
     void ActivateViewportWidget( bool active );
-    Camera * GetCamera();
-    void ShowFullFrame( bool );
-    Node * Pick( int x, int y );
+    double PixelsPerUnit();
     void WindowToWorld( double xWin, double yWin, double & xWorld, double & yWorld );
 
 	drwCommand::s_ptr CreateMouseCommand( drwMouseCommand::MouseCommandType commandType, QMouseEvent * e );
@@ -85,7 +81,6 @@ private:
 	
     drwGLRenderer * m_renderer;
     PlaybackControler * Controler;
-    drwDrawingWidgetInteractor * m_interactor;
     drwWidgetObserver * Observer;
     drwDisplaySettings	* DisplaySettings;
     drwLineToolViewportWidget * m_viewportWidget;

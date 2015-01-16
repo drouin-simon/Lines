@@ -8,7 +8,6 @@
 #include "drwDisplaySettings.h"
 #include "drwDrawingContext.h"
 #include "drwDrawableTexture.h"
-#include "drwDrawingWidgetInteractor.h"
 #include "drwLineToolViewportWidget.h"
 #include "drwCursor.h"
 #include "drwFpsCounter.h"
@@ -22,7 +21,6 @@ drwDrawingWidget::drwDrawingWidget( QWidget * parent )
 , m_showCursor(false)
 {
     m_timerId = -1;
-	m_interactor = new drwDrawingWidgetInteractor( this );
     this->Controler = 0;
     m_fpsCounter = 0;
 
@@ -41,7 +39,6 @@ drwDrawingWidget::drwDrawingWidget( QWidget * parent )
 
 drwDrawingWidget::~drwDrawingWidget()
 {
-	delete m_interactor;
 	delete DisplaySettings;
 }
 
@@ -169,10 +166,6 @@ void drwDrawingWidget::paintEvent( QPaintEvent * event )
         // Render next image
         m_renderer->RenderToTexture( Controler->GetNextFrame() );
     }
-    else if( DisplaySettings->GetShowAllFrames() )
-    {
-        m_renderer->RenderAllFrames( Controler->GetCurrentFrame() );
-    }
     else
     {
         int onionSkinBefore = DisplaySettings->GetOnionSkinBefore();
@@ -182,7 +175,8 @@ void drwDrawingWidget::paintEvent( QPaintEvent * event )
             onionSkinBefore = 0;
             onionSkinAfter = 0;
         }
-        m_renderer->Render( Controler->GetCurrentFrame(), onionSkinBefore, onionSkinAfter );
+        //m_renderer->Render( Controler->GetCurrentFrame(), onionSkinBefore, onionSkinAfter );
+        m_renderer->RenderWithTexture( Controler->GetCurrentFrame(), onionSkinBefore, onionSkinAfter );
     }
 
     if( DisplaySettings->GetShowCameraFrame() )
@@ -248,11 +242,6 @@ void drwDrawingWidget::mousePressEvent( QMouseEvent * e )
 	if( widgetSwallows )
 		return;
 	
-	// try the interactor
-	bool interactorSwallows = m_interactor->mousePressEvent( e );
-	if( interactorSwallows )
-		return;
-	
 	// now send the event to observer ( drawing tools)
 	if( e->button() == Qt::LeftButton && Observer )
 	{
@@ -271,11 +260,6 @@ void drwDrawingWidget::mouseReleaseEvent( QMouseEvent * e )
 	if( widgetSwallows )
 		return;
 	
-	// try the interactor
-	bool interactorSwallows = m_interactor->mouseReleaseEvent( e );
-	if( interactorSwallows )
-		return;
-	
 	if ( e->button() == Qt::LeftButton && Observer )
 		Observer->MouseReleaseEvent( this, e );
 }
@@ -289,11 +273,6 @@ void drwDrawingWidget::mouseMoveEvent( QMouseEvent * e )
 	// Try the widget
 	bool widgetSwallows = m_viewportWidget->MouseMove( e->x(), e->y() );
 	if( widgetSwallows )
-		return;
-	
-	// try the interactor first
-	bool interactorSwallows = m_interactor->mouseMoveEvent( e );
-	if( interactorSwallows )
 		return;
 	
 	if ( Observer )
@@ -315,11 +294,6 @@ void drwDrawingWidget::tabletEvent ( QTabletEvent * e )
         widgetSwallows = m_viewportWidget->MouseMove( e->x(), e->y() );
     if( widgetSwallows )
         return;
-
-    // try the interactor
-	bool interactorSwallows = m_interactor->tabletEvent( e );
-	if( interactorSwallows )
-		return;
 	
 	if( Observer )
 		Observer->TabletEvent( this, e );
@@ -340,20 +314,9 @@ void drwDrawingWidget::ActivateViewportWidget( bool active )
     }
 }
 
-Camera * drwDrawingWidget::GetCamera()
+double drwDrawingWidget::PixelsPerUnit()
 {
-    return m_renderer->GetCamera();
-}
-
-void drwDrawingWidget::ShowFullFrame( bool show )
-{
-    m_renderer->ShowFullFrame( show );
-    update();
-}
-
-Node * drwDrawingWidget::Pick( int x, int y )
-{
-    return m_renderer->Pick( Controler->GetCurrentFrame(), x, y );
+    return m_renderer->PixelsPerUnit();
 }
 
 void drwDrawingWidget::WindowToWorld( double xWin, double yWin, double & xWorld, double & yWorld )
