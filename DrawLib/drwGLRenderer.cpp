@@ -29,53 +29,10 @@ drwGLRenderer::~drwGLRenderer()
         delete m_widelineShader;
 }
 
-void drwGLRenderer::RenderWithTexture( int currentFrame, int onionSkinBefore, int onionSkinAfter )
+void drwGLRenderer::RenderToTexture( int currentFrame, int onionSkinBefore, int onionSkinAfter )
 {
     Q_ASSERT( CurrentScene );
     
-    // Clear the screen
-    glClearColor( m_clearColor[0], m_clearColor[1], m_clearColor[2], m_clearColor[3] );
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-    
-    // Adjust onion skins before and after
-    /*int fBefore = onionSkinBefore;
-    if( currentFrame - onionSkinBefore < 0 )
-        fBefore = currentFrame;
-    int fAfter = onionSkinAfter;
-    if( currentFrame + fAfter > CurrentScene->GetNumberOfFrames() - 1 )
-        fAfter = CurrentScene->GetNumberOfFrames() - currentFrame - 1;
-    
-    int maxFrames = std::max( fBefore, fAfter );
-    for( int dist = maxFrames; dist > 0; --dist )
-    {
-        // draw frame before
-        if( fBefore >= dist )
-        {
-            RenderToTexture( currentFrame - dist );
-            RenderTextureToScreen( false );
-        }
-        
-        // draw frame after
-        if( fAfter >= dist )
-        {
-            RenderToTexture( currentFrame + dist );
-            RenderTextureToScreen( false );
-        }
-        
-        // draw background of next layer
-        glColor4d( m_clearColor[0], m_clearColor[1], m_clearColor[2], 0.5 );
-        RenderRectToScreen();
-        
-    }*/
-    
-    // draw current frame
-    RenderToTexture( currentFrame );
-    RenderTextureToScreen( false );
-    
-}
-
-void drwGLRenderer::RenderToTexture( int currentFrame )
-{
     // State setup
     glDisable( GL_DEPTH_TEST );
     glEnable( GL_LINE_SMOOTH );
@@ -83,29 +40,57 @@ void drwGLRenderer::RenderToTexture( int currentFrame )
     glEnable( GL_TEXTURE_RECTANGLE_ARB );
     glEnable( GL_BLEND );
     glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-
+    
     // initialize modelview matrix
     glMatrixMode( GL_MODELVIEW );
     glLoadIdentity();
-
+    
+    // Adjust onion skins before and after
+    int fBefore = onionSkinBefore;
+    if( currentFrame - onionSkinBefore < 0 )
+        fBefore = currentFrame;
+    int fAfter = onionSkinAfter;
+    if( currentFrame + fAfter > CurrentScene->GetNumberOfFrames() - 1 )
+        fAfter = CurrentScene->GetNumberOfFrames() - currentFrame - 1;
+    
     // Resize textures if needed
     double frameSize[2];
     m_camera->GetFrameSizePix( frameSize );
     m_renderTexture->Resize( frameSize[0], frameSize[1] );
     m_workTexture->Resize( frameSize[0], frameSize[1] );
-
+    
     // start drawing to texture
     m_renderTexture->DrawToTexture( true );
     
     // Place virtual camera
     m_camera->SetupForFrame();
     
-    // Do the rendering
-    glClearColor( m_clearColor[0], m_clearColor[1], m_clearColor[2], m_clearColor[3] );
+    // Clear texture
+    glClearColor( m_clearColor[0], m_clearColor[1], m_clearColor[2], 0.0 );
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-    drwDrawingContext mainContext(this);
-    CurrentScene->DrawFrame( currentFrame, mainContext );
-
+    
+    // Create a drawing context
+    drwDrawingContext context(this);
+    
+    int maxFrames = std::max( fBefore, fAfter );
+    for( int dist = maxFrames; dist > 0; --dist )
+    {
+        // draw frame before
+        if( fBefore >= dist )
+            CurrentScene->DrawFrame( currentFrame - dist, context );
+        
+        // draw frame after
+        if( fAfter >= dist )
+            CurrentScene->DrawFrame( currentFrame + dist, context );
+        
+        // draw background of next layer
+        glColor4d( m_clearColor[0], m_clearColor[1], m_clearColor[2], 0.5 );
+        RenderRect();
+    }
+    
+    // draw current frame
+    CurrentScene->DrawFrame( currentFrame, context );
+    
     // stop drawing to texture
     m_renderTexture->DrawToTexture( false );
 }
@@ -126,7 +111,7 @@ void drwGLRenderer::RenderTextureToScreen( bool clear )
     m_renderTexture->PasteToScreen();
 }
 
-void drwGLRenderer::RenderRectToScreen()
+void drwGLRenderer::RenderRect()
 {
     glEnable( GL_BLEND );
     glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
@@ -138,8 +123,6 @@ void drwGLRenderer::RenderRectToScreen()
     double tw = m_renderTexture->GetWidth();
     double th = m_renderTexture->GetHeight();
     gluOrtho2D( 0, tw, 0, th );
-    
-    m_camera->SetupToRenderTextureToScreen();
     
     glBegin( GL_QUADS );
     {

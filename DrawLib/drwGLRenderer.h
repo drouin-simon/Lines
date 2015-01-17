@@ -19,11 +19,10 @@ public:
     explicit drwGLRenderer( QObject * parent = 0 );
     ~drwGLRenderer();
 
-    void RenderWithTexture( int currentFrame, int onionSkinBefore, int onionSkinAfter );
-    void RenderToTexture( int currentFrame );
+    void RenderToTexture( int currentFrame, int onionSkinBefore, int onionSkinAfter );
     drwDrawableTexture * GetRenderTexture() { return m_renderTexture; }
     void RenderTextureToScreen( bool clear = true );
-    void RenderRectToScreen();
+    void RenderRect();
     void RenderCameraFrame();
 
     void SetRenderSize( int width, int height );
@@ -46,11 +45,6 @@ public slots:
     void RequestRedraw();
     
 protected:
-
-    void RenderSetup();
-    void UpdatePosition( int x, int y );
-
-private:
 
     drwCamera           * m_camera;
     Scene				* CurrentScene;

@@ -120,7 +120,7 @@ void drwDrawingWidget::PlaybackStartStop( bool isStarting )
 	if( isStarting )
 	{
         // render current frame to texture, generate sound from frame
-        m_renderer->RenderToTexture( Controler->GetCurrentFrame() );
+        m_renderer->RenderToTexture( Controler->GetCurrentFrame(), 0, 0 );
 
         // start timer
 		if( m_timerId == -1 )
@@ -164,7 +164,7 @@ void drwDrawingWidget::paintEvent( QPaintEvent * event )
         m_renderer->RenderTextureToScreen();
         
         // Render next image
-        m_renderer->RenderToTexture( Controler->GetNextFrame() );
+        m_renderer->RenderToTexture( Controler->GetNextFrame(), 0, 0 );
     }
     else
     {
@@ -175,8 +175,8 @@ void drwDrawingWidget::paintEvent( QPaintEvent * event )
             onionSkinBefore = 0;
             onionSkinAfter = 0;
         }
-        //m_renderer->Render( Controler->GetCurrentFrame(), onionSkinBefore, onionSkinAfter );
-        m_renderer->RenderWithTexture( Controler->GetCurrentFrame(), onionSkinBefore, onionSkinAfter );
+        m_renderer->RenderToTexture( Controler->GetCurrentFrame(), onionSkinBefore, onionSkinAfter );
+        m_renderer->RenderTextureToScreen();
     }
 
     if( DisplaySettings->GetShowCameraFrame() )
