@@ -478,6 +478,9 @@ void MainWindow::readSettings()
 	// Export settings
 	m_exportDefaultPath = settings.value( "ExportDefaultPath", QDir::homePath() ).toString();
 	m_exportRes = settings.value( "ExportResolution", QSize( 640, 360 ) ).toSize();
+    
+    // Allow toolbox and all tools to read their settings
+    m_localToolbox->ReadSettings( settings );
 }
 
 
@@ -497,7 +500,9 @@ void MainWindow::writeSettings()
 	settings.setValue( "filedialogstartpath", m_fileDialogStartPath );
 	settings.setValue( "ExportDefaultPath", m_exportDefaultPath );
 	settings.setValue( "ExportResolution", m_exportRes );
-	
+    
+    // Allow toolbox and all tools to save their settings
+    m_localToolbox->WriteSettings( settings );
 }
 
 void MainWindow::Reset()

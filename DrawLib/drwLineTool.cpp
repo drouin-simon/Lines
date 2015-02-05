@@ -6,6 +6,7 @@
 #include "drwEditionState.h"
 #include "drwDrawingWidget.h"
 #include <QTabletEvent>
+#include <QSettings>
 
 drwLineTool::drwLineTool( Scene * scene, drwEditionState * editionState, QObject * parent )
 : drwWidgetObserver( scene, parent )
@@ -15,7 +16,7 @@ drwLineTool::drwLineTool( Scene * scene, drwEditionState * editionState, QObject
 , IsDrawing( false )
 , Color(1.0,1.0,1.0,1.0)
 , Type( TypeWideLine )
-, m_baseWidth( 10.0 )
+, m_baseWidth( 5.0 )
 , m_pressureWidth(true)
 , m_pressureOpacity(true)
 , m_fill(false)
@@ -27,6 +28,36 @@ drwLineTool::drwLineTool( Scene * scene, drwEditionState * editionState, QObject
 {	
 	// Make sure the Reset function is the only one driving initial param values
 	Reset();
+}
+
+void drwLineTool::ReadSettings( QSettings & s )
+{
+    Color[0] = s.value( "Color.R", Color[0] ).toDouble();
+    Color[1] = s.value( "Color.G", Color[1] ).toDouble();
+    Color[2] = s.value( "Color.B", Color[2] ).toDouble();
+    Color[3] = s.value( "Color.A", Color[3] ).toDouble();
+    
+    m_baseWidth = s.value( "BaseWidth", QVariant(m_baseWidth) ).toDouble();
+    m_pressureWidth = s.value( "PressureWidth", QVariant(m_pressureWidth) ).toBool();
+    m_pressureOpacity = s.value( "PressureOpacity", QVariant(m_pressureOpacity) ).toBool();
+    m_fill = s.value( "Fill", QVariant(m_fill) ).toBool();
+    m_persistence = s.value( "Persistence", QVariant(m_persistence) ).toInt();
+    
+    ParametersChanged();
+}
+
+void drwLineTool::WriteSettings( QSettings & s )
+{
+    s.setValue( "Color.R", QVariant(Color[0]) );
+    s.setValue( "Color.G", QVariant(Color[1]) );
+    s.setValue( "Color.B", QVariant(Color[2]) );
+    s.setValue( "Color.A", QVariant(Color[3]) );
+    
+    s.setValue( "BaseWidth", QVariant(m_baseWidth) );
+    s.setValue( "PressureWidth", QVariant(m_pressureWidth) );
+    s.setValue( "PressureOpacity", QVariant(m_pressureOpacity) );
+    s.setValue( "Fill", QVariant(m_fill) );
+    s.setValue( "Persistence", QVariant(m_persistence) );
 }
 
 void drwLineTool::StartLine( double xWorld, double yWorld )

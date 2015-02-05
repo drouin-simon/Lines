@@ -21,6 +21,10 @@ public:
 	
 	drwLineTool( Scene * scene, drwEditionState * editionState, QObject * parent = 0 );
 	virtual ~drwLineTool() {};
+    
+    // Read and Write settings
+    void ReadSettings( QSettings & s );
+    void WriteSettings( QSettings & s );
 
     // convenience functions used to automatically create lines
     void StartLine( double xWorld, double yWorld );

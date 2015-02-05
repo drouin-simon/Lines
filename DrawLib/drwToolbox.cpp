@@ -34,6 +34,18 @@ drwWidgetObserver * drwToolbox::GetTool( int index )
 	return 0;
 }
 
+void drwToolbox::ReadSettings( QSettings & s )
+{
+    for( unsigned i = 0; i < Tools.size(); ++i )
+        Tools[i]->ReadSettings( s );
+}
+
+void drwToolbox::WriteSettings( QSettings & s )
+{
+    for( unsigned i = 0; i < Tools.size(); ++i )
+        Tools[i]->WriteSettings( s );
+}
+
 // Implementation of drwWidgetObserver
 void drwToolbox::MousePressEvent( drwDrawingWidget * w, QMouseEvent * e )
 {

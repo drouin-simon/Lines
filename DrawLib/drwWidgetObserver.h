@@ -9,6 +9,7 @@ class drwDrawingWidget;
 class QMouseEvent;
 class QTabletEvent;
 class QDropEvent;
+class QSettings;
 
 class drwWidgetObserver : public QObject
 {
@@ -19,6 +20,10 @@ public:
 	
 	drwWidgetObserver( Scene * scene, QObject * parent = 0 ) : QObject(parent) { CurrentScene = scene; CurrentFrame = 0; }
 	virtual ~drwWidgetObserver() {};
+    
+    // Read and Write settings
+    virtual void ReadSettings( QSettings & s ) {}
+    virtual void WriteSettings( QSettings & s ) {}
 	
 	virtual void MousePressEvent( drwDrawingWidget * w, QMouseEvent * e ) {}
 	virtual void MouseReleaseEvent( drwDrawingWidget * w, QMouseEvent * e ) {}

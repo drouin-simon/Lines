@@ -21,6 +21,10 @@ public:
 	
 	void AddTool( drwWidgetObserver * tool );
 	drwWidgetObserver * GetTool( int index );
+    
+    // Read and Write settings
+    void ReadSettings( QSettings & s );
+    void WriteSettings( QSettings & s );
 	
 	// Implementation of drwWidgetObserver
 	virtual void MousePressEvent( drwDrawingWidget * w, QMouseEvent * e );
