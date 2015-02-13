@@ -102,7 +102,7 @@ void drwGLRenderer::RenderTextureToScreen( bool clear )
     
     if( clear )
     {
-        glClearColor( 0.0, 0.0, 0.0, 1.0 );
+        glClearColor( m_clearColor[0], m_clearColor[1], m_clearColor[2], m_clearColor[3] );
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     }
     

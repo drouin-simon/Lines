@@ -1,7 +1,7 @@
 #include "drwDrawingWidget.h"
 #include <QtGui>
 #include <QtOpenGL>
-
+#include "Vec4.h"
 #include "Scene.h"
 #include "drwWidgetObserver.h"
 #include "PlaybackControler.h"
@@ -64,6 +64,11 @@ drwCommand::s_ptr drwDrawingWidget::CreateMouseCommand( drwMouseCommand::MouseCo
     m_renderer->WindowToWorld( xWin, yWin, xWorld, yWorld );
     drwCommand::s_ptr command( new drwMouseCommand( commandType, xWorld, yWorld, 0.0, xWin, yWin, e->xTilt(), e->yTilt(), e->pressure(), e->rotation(), e->tangentialPressure() ) );
 	return command;
+}
+
+void drwDrawingWidget::SetBackgroundColor( Vec4 & color )
+{
+    m_renderer->SetClearColor( color[0], color[1], color[2], color[3] );
 }
 
 void drwDrawingWidget::SetCurrentScene( Scene * scene )

@@ -23,6 +23,7 @@ public:
 	drwDrawingWidget( QWidget * parent=0 );
 	~drwDrawingWidget();
 
+    void SetBackgroundColor( Vec4 & color );
     void SetCurrentScene( Scene * scene );
     SetMacro( Observer, drwWidgetObserver* );
     GetMacro( DisplaySettings, drwDisplaySettings* );

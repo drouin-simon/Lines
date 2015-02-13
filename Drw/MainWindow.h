@@ -48,6 +48,7 @@ private slots:
 	bool fileExport();
 	
 	void editSetNumberOfFrames();
+    void editWhiteOnBlackToggled( bool wob );
 	
 	void NetShareSession();
 	void NetConnect();
@@ -70,6 +71,7 @@ protected:
 
 private:
 	
+    void SetWhiteOnBlack( bool wob );
 	bool GetSaveFilename();
 	bool maybeSave();
 	void readSettings();
@@ -88,6 +90,7 @@ private:
 	QMenu		* m_editMenu;
 	QMenu		* m_networkMenu;
 	
+    QAction * m_whiteOnBlackAction;
 	QAction * m_netShareSessionMenuAction;
 	QAction * m_netConnectMenuItem;
 	
@@ -116,6 +119,7 @@ private:
 	QProgressDialog * m_progressDialog;
 
     static const QString m_appName;
+    bool m_whiteOnBlack;
 };
 
 

@@ -18,7 +18,7 @@
 #include "drwLineToolViewportWidget.h"
 #include "drwCursor.h"
 #include "drwDrawingEngine.h"
-
+#include "Vec4.h"
 #include <QtWidgets>
 
 const QString MainWindow::m_appName( "Lines" );
@@ -27,6 +27,7 @@ MainWindow::MainWindow()
 	: m_progressDialog(0)
 {
     setWindowTitle( m_appName );
+    m_whiteOnBlack = true;
 
 	CreateActions();
 
@@ -68,7 +69,6 @@ MainWindow::MainWindow()
     QVBoxLayout * rightPanelLayout = new QVBoxLayout( m_rightPanelWidget );
     rightPanelLayout->setContentsMargins( 0, 10, 0, 10 );
     rightPanelLayout->setSpacing( 15 );
-    //mainLayout->addWidget( m_rightPanelWidget );
     m_rightPanelDock->setWidget( m_rightPanelWidget );
 	
 	// Create Drawing window
@@ -159,6 +159,11 @@ void MainWindow::CreateActions()
 	// Create the Edit menu
 	m_editMenu = menuBar()->addMenu( "&Edit" );
 	m_editMenu->addAction( "Set Number of Frames", this, SLOT( editSetNumberOfFrames() ), Qt::CTRL + Qt::Key_G );
+    m_whiteOnBlackAction = new QAction( "White on black", m_editMenu );
+    m_whiteOnBlackAction->setCheckable( true );
+    m_whiteOnBlackAction->setChecked( true );
+    connect( m_whiteOnBlackAction, SIGNAL(toggled(bool)), this, SLOT(editWhiteOnBlackToggled(bool)) );
+    m_editMenu->addAction( m_whiteOnBlackAction );
 	
 	// Create the Network menu
 	m_networkMenu = menuBar()->addMenu( "&Network" );
@@ -285,6 +290,12 @@ void MainWindow::editSetNumberOfFrames()
 {
 	int nbFrames = QInputDialog::getInt( this, "Set Number of Frames" , "Number of Frames", m_scene->GetNumberOfFrames(), 0 );
 	m_scene->SetNumberOfFrames( nbFrames );
+}
+
+void MainWindow::editWhiteOnBlackToggled( bool wob )
+{
+    SetWhiteOnBlack( wob );
+    m_glWidget->RequestRedraw();
 }
 
 void MainWindow::NetShareSession()
@@ -438,6 +449,39 @@ void MainWindow::closeEvent(QCloseEvent *event)
 	}
 }
 
+void MainWindow::SetWhiteOnBlack( bool wob )
+{
+    if( m_whiteOnBlack == wob )
+        return;
+    
+    m_whiteOnBlack = wob;
+    
+    // update action
+    m_whiteOnBlackAction->blockSignals( true );
+    m_whiteOnBlackAction->setChecked( wob );
+    m_whiteOnBlackAction->blockSignals( false );
+    
+    drwLineTool * lineTool = dynamic_cast<drwLineTool*>(m_localToolbox->GetTool( 0 ));
+    Q_ASSERT(lineTool);
+    
+    // set new fg color as inverse of previous
+    Vec4 currentFgCol = lineTool->GetColor();
+    Vec4 newFgCol( 1.0 - currentFgCol[0], 1.0 - currentFgCol[1], 1.0 - currentFgCol[2], currentFgCol[3] );
+    lineTool->SetColor( newFgCol );
+    
+    // Set new bg color depending on scheme
+    if( m_whiteOnBlack )
+    {
+        Vec4 bg( 0.0, 0.0, 0.0, 1.0 );
+        m_glWidget->SetBackgroundColor( bg );
+    }
+    else
+    {
+        Vec4 bg( 1.0, 1.0, 1.0, 1.0 );
+        m_glWidget->SetBackgroundColor( bg );
+    }
+}
+
 bool MainWindow::GetSaveFilename()
 {
 	m_filename = QFileDialog::getSaveFileName(this, tr("Save Animation"),  m_fileDialogStartPath + QDir::separator() + "untitled.drw", tr("Animation Files (*.drw)"));
@@ -479,6 +523,10 @@ void MainWindow::readSettings()
 	m_exportDefaultPath = settings.value( "ExportDefaultPath", QDir::homePath() ).toString();
 	m_exportRes = settings.value( "ExportResolution", QSize( 640, 360 ) ).toSize();
     
+    // white on black or black on white
+    bool wob = settings.value( "WhiteOnBlack", true ).toBool();
+    SetWhiteOnBlack( wob );
+    
     // Allow toolbox and all tools to read their settings
     m_localToolbox->ReadSettings( settings );
 }
@@ -500,6 +548,9 @@ void MainWindow::writeSettings()
 	settings.setValue( "filedialogstartpath", m_fileDialogStartPath );
 	settings.setValue( "ExportDefaultPath", m_exportDefaultPath );
 	settings.setValue( "ExportResolution", m_exportRes );
+    
+    // white on black or black on white
+    settings.setValue( "WhiteOnBlack", m_whiteOnBlack );
     
     // Allow toolbox and all tools to save their settings
     m_localToolbox->WriteSettings( settings );
