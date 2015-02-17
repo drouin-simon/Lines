@@ -25,6 +25,15 @@ public:
 	void SetFill( bool f ) { m_fill = f; }
 	
     void InitShader( drwDrawingContext & context );
+    
+    static void SetPixMargin( float pixMargin ) { m_pix_margin = pixMargin; }
+    static float GetPixMargin() { return m_pix_margin; }
+    static void SetPixDampWidth( float pixDampWidth ) { m_pix_damp_width = pixDampWidth; }
+    static float GetPixDampWidth() { return m_pix_damp_width; }
+    static void SetSigmaLarge( float sigmaLarge ) { m_sigma_large = sigmaLarge; if( sigmaLarge < m_sigma_small ) m_sigma_small = m_sigma_large; }
+    static float GetSigmaLarge() { return m_sigma_large; }
+    static void SetSigmaSmall( float ss ) { m_sigma_small = ss; if( m_sigma_large < m_sigma_small ) m_sigma_large = m_sigma_small; }
+    static float GetSigmaSmall() { return m_sigma_small; }
 
 protected:
 	
@@ -48,6 +57,12 @@ protected:
 	bool m_pressureOpacity;
 	bool m_fill;
     Box2d m_boundingBox;
+    
+    // Global attributes for all lines
+    static float m_pix_margin;
+    static float m_pix_damp_width;
+    static float m_sigma_large;
+    static float m_sigma_small;
 
     // cache previous point computation during editing
     Vec2       m_prevPoint;

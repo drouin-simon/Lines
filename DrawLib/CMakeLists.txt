@@ -36,7 +36,9 @@ set( DrawLib_src  drwDrawingWidget.cpp
         drwLineToolViewportWidget.cpp
         drwFpsCounter.cpp
         drwDrawingEngine.cpp
-        drwGLRenderer.cpp )
+        drwGLRenderer.cpp 
+	drwGlobalLineParams.cpp 
+	drwAutoGui.cpp )
 
 set( DrawLib_hdr_moc 	drwDrawingWidget.h 
 			drwWidgetObserver.h
@@ -59,7 +61,9 @@ set( DrawLib_hdr_moc 	drwDrawingWidget.h
 			drwBitmapExporter.h
             drwGradientWidget.h
             drwDrawingEngine.h
-            drwGLRenderer.h )
+            drwGLRenderer.h 
+	    drwGlobalLineParams.h
+            drwAutoGui.h )
 
 set( DrawLib_hdr
 			drwGlslShader.h

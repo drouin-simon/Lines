@@ -18,6 +18,7 @@
 #include "drwLineToolViewportWidget.h"
 #include "drwCursor.h"
 #include "drwDrawingEngine.h"
+#include "drwGlobalLineParams.h"
 #include "Vec4.h"
 #include <QtWidgets>
 
@@ -41,6 +42,8 @@ MainWindow::MainWindow()
 	m_commandDispatcher = new drwCommandDispatcher( m_networkManager, m_commandDb, m_localToolbox, m_scene, this );
 	m_networkManager->SetDispatcher( m_commandDispatcher );
     connect( m_networkManager, SIGNAL(StateChangedSignal()), this, SLOT(NetStateChanged()) );
+    m_globalLineParams = new drwGlobalLineParams( this );
+    m_globalLineParamsDock = 0;
 
 	// Create main widget  (just a frame to put the viewing widget and the playback control widget)
     m_mainWidget = new QWidget(this);
@@ -78,6 +81,7 @@ MainWindow::MainWindow()
 	m_glWidget->SetObserver( m_localToolbox );
 	m_glWidget->SetControler( m_controler );
 	drawingAreaLayout->addWidget( m_glWidget );
+    m_globalLineParams->SetDrawingWidget( m_glWidget );
 
     // Create special widget to go inside drawing widget
     drwLineTool * lineTool = dynamic_cast<drwLineTool*>(m_localToolbox->GetTool( 0 ));
@@ -624,7 +628,12 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
             //    m_rightPanelDock->show();
             handled = true;
         }
-	} 
+        else if( keyEvent->key() == Qt::Key_H )
+        {
+            ToggleShowGlobalLineParams();
+            handled = true;
+        }
+	}
     else if( event->type() == QEvent::KeyRelease )
     {
         QKeyEvent * keyEvent = static_cast<QKeyEvent *>(event);
@@ -642,4 +651,30 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 		return QObject::eventFilter(obj, event);
 	}
 	return true;
+}
+
+void MainWindow::ToggleShowGlobalLineParams()
+{
+    if( m_globalLineParamsDock )
+    {
+        m_globalLineParamsDock->close();
+        m_globalLineParamsDock = 0;
+    }
+    else
+    {
+        m_globalLineParamsDock = new QDockWidget( tr("GlobalLineParamsDock"), this );
+        m_globalLineParamsDock->setAllowedAreas( Qt::NoDockWidgetArea );
+        m_globalLineParamsDock->setFloating( true );
+        QWidget * globalLineParamsWidget = m_globalLineParams->CreateGui();
+        m_globalLineParamsDock->setWidget(globalLineParamsWidget);
+        m_globalLineParamsDock->setFeatures( QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetFloatable );
+        m_globalLineParamsDock->setAttribute( Qt::WA_DeleteOnClose );
+        connect( m_globalLineParamsDock, SIGNAL(destroyed()), this, SLOT(GlobalLineParamsDockClosed()) );
+        m_globalLineParamsDock->show();
+    }
+}
+
+void MainWindow::GlobalLineParamsDockClosed()
+{
+    m_globalLineParamsDock = 0;
 }

@@ -7,6 +7,10 @@
 #include "drwDrawableTexture.h"
 
 static const double squareRootOfTwo = sqrt(2.0);
+float WideLine::m_pix_margin = 4.0;
+float WideLine::m_pix_damp_width = 1.0;
+float WideLine::m_sigma_large = 0.4;
+float WideLine::m_sigma_small = 0.1;
 
 WideLine::WideLine( double width )
 : m_width( width )
@@ -60,10 +64,10 @@ void WideLine::InternDraw( drwDrawingContext & context )
     shader->SetVariable( "pressure_opacity", m_pressureOpacity );
     shader->SetVariable( "base_width", float(m_width) );
     shader->SetVariable( "pix_per_unit", float(context.PixelsPerUnit()) );
-    shader->SetVariable( "pix_margin", float(4.0) );
-    shader->SetVariable( "pix_damp_width", float(1.0) );
-    shader->SetVariable( "sigma_large", float(0.4) );
-    shader->SetVariable( "sigma_small", float(0.1) );
+    shader->SetVariable( "pix_margin", m_pix_margin );
+    shader->SetVariable( "pix_damp_width", m_pix_damp_width );
+    shader->SetVariable( "sigma_large", m_sigma_large );
+    shader->SetVariable( "sigma_small", m_sigma_small );
 		
 	glBlendEquation( GL_MAX );
 

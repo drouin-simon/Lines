@@ -27,6 +27,7 @@ class drwNetworkManager;
 class drwLineToolViewportWidget;
 class drwCursor;
 class drwDrawingEngine;
+class drwGlobalLineParams;
 
 class MainWindow : public QMainWindow
 {
@@ -60,6 +61,8 @@ private slots:
 
     void about();
     void aboutQt();
+    
+    void GlobalLineParamsDockClosed();
 	
 protected:
 	
@@ -77,6 +80,7 @@ private:
 	void readSettings();
 	void writeSettings();
 	void Reset();
+    void ToggleShowGlobalLineParams();
 	
 	QString m_filename;
 	QString m_fileDialogStartPath;
@@ -105,6 +109,9 @@ private:
 
 	TabletStateWidget * m_tabletStateWidget;
 	QDockWidget * m_dockTabletState;
+    
+    drwGlobalLineParams * m_globalLineParams;
+    QDockWidget * m_globalLineParamsDock;
 	
 	Scene					* m_scene;
 	PlaybackControler		* m_controler;
