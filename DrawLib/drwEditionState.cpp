@@ -26,5 +26,6 @@ void drwEditionState::SetFrameChangeMode( drwFrameChangeMode mode )
 void drwEditionState::Reset()
 {
 	m_currentFrame = 0;
-	m_frameChangeMode = Manual;
+	m_frameChangeMode = AfterIntervention;
+    emit ModifiedSignal();
 }
