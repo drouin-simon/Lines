@@ -58,6 +58,7 @@ private slots:
 	void UpdateNetworkStatus();
 	
 	void viewFullscreen();
+    void toggleShowGui();
 
     void about();
     void aboutQt();

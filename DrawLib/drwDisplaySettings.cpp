@@ -2,7 +2,7 @@
 
 drwDisplaySettings::drwDisplaySettings( QObject * parent )
 : QObject( parent )
-, m_onionSkinFramesBefore(0)
+, m_onionSkinFramesBefore(1)
 , m_onionSkinFramesAfter(0)
 , m_showAllFrames(false)
 , m_inhibitOnionSkin(false)

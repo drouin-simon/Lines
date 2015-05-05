@@ -19,6 +19,7 @@
 #include "drwCursor.h"
 #include "drwDrawingEngine.h"
 #include "drwGlobalLineParams.h"
+#include "drwDisplaySettings.h"
 #include "Vec4.h"
 #include <QtWidgets>
 
@@ -440,6 +441,23 @@ void MainWindow::viewFullscreen()
 	}
 }
 
+void MainWindow::toggleShowGui()
+{
+    bool isHidden = m_rightPanelDock->isHidden();
+    if( isHidden )
+    {
+        m_playbackControlerWidget->show();
+        m_rightPanelDock->show();
+        m_glWidget->GetDisplaySettings()->SetShowCameraFrame( true );
+    }
+    else
+    {
+        m_playbackControlerWidget->hide();
+        m_rightPanelDock->hide();
+        m_glWidget->GetDisplaySettings()->SetShowCameraFrame( false );
+    }
+}
+
 void MainWindow::closeEvent(QCloseEvent *event)
 {
 	if (maybeSave()) 
@@ -631,6 +649,11 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
         else if( keyEvent->key() == Qt::Key_H )
         {
             ToggleShowGlobalLineParams();
+            handled = true;
+        }
+        else if( keyEvent->key() == Qt::Key_F )
+        {
+            toggleShowGui();
             handled = true;
         }
 	}

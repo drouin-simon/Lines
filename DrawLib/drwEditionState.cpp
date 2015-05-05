@@ -3,7 +3,7 @@
 drwEditionState::drwEditionState( QObject * parent )
 : QObject( parent )
 , m_currentFrame(0)
-, m_frameChangeMode( Manual )
+, m_frameChangeMode( AfterIntervention )
 {
 }
 
