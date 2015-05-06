@@ -25,6 +25,7 @@ public:
 	
 protected:
 
+    double GetCurrentIntensity();
     void ModifyColor( int x );
     double PosToSliderValue( int x, QRect & r );
     int SliderValueToPos( double value, QRect & r );

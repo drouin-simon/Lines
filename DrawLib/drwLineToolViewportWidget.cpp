@@ -35,7 +35,7 @@ void drwLineToolViewportWidget::Activate( int x, int y )
     m_y = y;
     m_active = true;
 
-    double intensity = m_lineTool->GetColor()[0];
+    double intensity = GetCurrentIntensity();
 
     // compute scaling rect
     int scaleCorner[2];
@@ -171,7 +171,7 @@ void drwLineToolViewportWidget::Draw( QPainter & painter )
         painter.drawRoundedRect( m_gradRect, m_roundedCornerRadius, m_roundedCornerRadius );
 
         // Draw slider
-        double sliderValue = m_lineTool->GetColor()[0];
+        double sliderValue = GetCurrentIntensity();
         float cursorPosition = SliderValueToPos( sliderValue, m_gradRect );
 
         int sliderXMin = m_x - m_width / 2 + 3;
@@ -201,9 +201,15 @@ void drwLineToolViewportWidget::ModifyColor( int y )
     if( value > 1.0 )
         value = 1.0;
     double color = 1.0 - value;
-    Vec4 newColor( color, color, color, 1.0 );
+    //Vec4 newColor( color, color, color, 1.0 );
+    Vec4 newColor( 1.0, 1.0, 1.0, color );
     m_lineTool->SetColor( newColor );
     m_drawingWidget->RequestRedraw();
+}
+
+double drwLineToolViewportWidget::GetCurrentIntensity()
+{
+    return m_lineTool->GetColor()[3];
 }
 
 double drwLineToolViewportWidget::PosToSliderValue( int y, QRect & r )

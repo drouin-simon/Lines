@@ -615,12 +615,12 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 			m_glWidget->GetControler()->PlayPause();
 			handled = true;
 		}
-		else if ( keyEvent->key() == Qt::Key_PageDown )
+		else if ( keyEvent->key() == Qt::Key_Up )
 		{
 			m_glWidget->GetControler()->GotoEnd();
 			handled = true;
 		}
-		else if ( keyEvent->key() == Qt::Key_PageUp )
+		else if ( keyEvent->key() == Qt::Key_Down )
 		{
 			m_glWidget->GetControler()->GotoStart();
 			handled = true;
