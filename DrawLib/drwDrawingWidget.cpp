@@ -51,6 +51,8 @@ drwCommand::s_ptr drwDrawingWidget::CreateMouseCommand( drwMouseCommand::MouseCo
 	return command;
 }
 
+#include <iostream>
+
 drwCommand::s_ptr drwDrawingWidget::CreateMouseCommand( drwMouseCommand::MouseCommandType commandType, QTabletEvent * e )
 {
 	double deltaX = e->hiResGlobalX() - e->globalX();
@@ -164,26 +166,21 @@ void drwDrawingWidget::paintEvent( QPaintEvent * event )
     
 	makeCurrent();
 	
-    if( Controler->IsPlaying() )
+    int onionSkinBefore = 0;
+    int onionSkinAfter = 0;
+    if( !Controler->IsPlaying() )
     {
-        // paste previously rendered image to screen
-        m_renderer->RenderTextureToScreen();
-        
-        // Render next image
-        m_renderer->RenderToTexture( Controler->GetNextFrame(), 0, 0 );
-    }
-    else
-    {
-        int onionSkinBefore = DisplaySettings->GetOnionSkinBefore();
-        int onionSkinAfter = DisplaySettings->GetOnionSkinAfter();
+        onionSkinBefore = DisplaySettings->GetOnionSkinBefore();
+        onionSkinAfter = DisplaySettings->GetOnionSkinAfter();
         if( DisplaySettings->GetInhibitOnionSkin() )
         {
             onionSkinBefore = 0;
             onionSkinAfter = 0;
         }
-        m_renderer->RenderToTexture( Controler->GetCurrentFrame(), onionSkinBefore, onionSkinAfter );
-        m_renderer->RenderTextureToScreen();
     }
+    
+    m_renderer->RenderToTexture( Controler->GetCurrentFrame(), onionSkinBefore, onionSkinAfter );
+    m_renderer->RenderTextureToScreen();
 
     if( DisplaySettings->GetShowCameraFrame() )
         m_renderer->RenderCameraFrame();
@@ -299,7 +296,10 @@ void drwDrawingWidget::tabletEvent ( QTabletEvent * e )
     else if( e->type() == QEvent::TabletMove )
         widgetSwallows = m_viewportWidget->MouseMove( e->x(), e->y() );
     if( widgetSwallows )
+    {
+        e->accept();
         return;
+    }
 	
 	if( Observer )
 		Observer->TabletEvent( this, e );

@@ -76,6 +76,10 @@ protected:
     int m_lastYPix;
 	
 	bool IsDrawing;
+    
+    // prevents mouse commands to be generated while tablet is active
+    // for drivers that send both mouse and tablet events to the program
+    bool m_tabletHasControl;
 	
 	// configurable params
 	Vec4 Color;

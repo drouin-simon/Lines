@@ -148,7 +148,6 @@ bool PlaybackControler::Tick()
 			}
 			if( needSetFrame )
 			{
-				//std::cout << "cur time: " << current << " last time: " << m_lastFrameWantedTime << " jump: " << jump << std::endl;
 				SetCurrentFrame( newFrame );
 				didSomething = true;
 				m_lastFrameWantedTime += jump * frameInterval;

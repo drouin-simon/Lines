@@ -14,6 +14,7 @@ drwLineTool::drwLineTool( Scene * scene, drwEditionState * editionState, QObject
 , m_lastYWorld( 0.0 )
 , m_lastPressure( 1.0 )
 , IsDrawing( false )
+, m_tabletHasControl( false )
 , Color(1.0,1.0,1.0,1.0)
 , Type( TypeWideLine )
 , m_baseWidth( 5.0 )
@@ -80,26 +81,36 @@ void drwLineTool::EndLine( double xWorld, double yWorld )
 
 void drwLineTool::MousePressEvent( drwDrawingWidget * w, QMouseEvent * e )
 {
-    drwCommand::s_ptr command = w->CreateMouseCommand( drwMouseCommand::Press, e );
-    ExecuteCommand( command );
+    if( !m_tabletHasControl )
+    {
+        drwCommand::s_ptr command = w->CreateMouseCommand( drwMouseCommand::Press, e );
+        ExecuteCommand( command );
+    }
 }
 
 void drwLineTool::MouseReleaseEvent( drwDrawingWidget * w, QMouseEvent * e )
 {
-    drwCommand::s_ptr command = w->CreateMouseCommand( drwMouseCommand::Release, e );
-    ExecuteCommand( command );
+    if( !m_tabletHasControl )
+    {
+        drwCommand::s_ptr command = w->CreateMouseCommand( drwMouseCommand::Release, e );
+        ExecuteCommand( command );
+    }
 }
 
 void drwLineTool::MouseMoveEvent( drwDrawingWidget * w, QMouseEvent * e )
 {
-    drwCommand::s_ptr command = w->CreateMouseCommand( drwMouseCommand::Move, e );
-    ExecuteCommand( command );
+    if( !m_tabletHasControl )
+    {
+        drwCommand::s_ptr command = w->CreateMouseCommand( drwMouseCommand::Move, e );
+        ExecuteCommand( command );
+    }
 }
 
 void drwLineTool::TabletEvent( drwDrawingWidget * w, QTabletEvent * e )
 {
     if( e->type() == QEvent::TabletPress )
     {
+        m_tabletHasControl = true;
         drwCommand::s_ptr command = w->CreateMouseCommand( drwMouseCommand::Press, e );
         ExecuteCommand( command );
         e->accept();
@@ -109,6 +120,7 @@ void drwLineTool::TabletEvent( drwDrawingWidget * w, QTabletEvent * e )
         drwCommand::s_ptr command = w->CreateMouseCommand( drwMouseCommand::Release, e );
         ExecuteCommand( command );
         e->accept();
+        m_tabletHasControl = false;
     }
     else if( e->type() == QEvent::TabletMove )
     {
@@ -142,7 +154,6 @@ void drwLineTool::ExecuteMouseCommand( drwCommand::s_ptr command )
 {
 	drwMouseCommand * mouseCom = dynamic_cast<drwMouseCommand*>(command.get());
 	Q_ASSERT( mouseCom );
-
 
 	if( mouseCom->GetType() == drwMouseCommand::Press )
 	{
@@ -187,39 +198,32 @@ void drwLineTool::ExecuteMouseCommand( drwCommand::s_ptr command )
 	{
 		if( IsDrawing )
 		{
-            double diffX = (double)( mouseCom->XPix() - m_lastXPix );
-            double diffY = (double)( mouseCom->YPix() - m_lastYPix );
-            double distWithLast = sqrt( diffX*diffX + diffY*diffY );
-            if( distWithLast  > m_minDistanceBetweenPoints )
+            CurrentNodesCont::iterator it = CurrentNodes.begin();
+            while( it != CurrentNodes.end() )
             {
-
-                CurrentNodesCont::iterator it = CurrentNodes.begin();
-                while( it != CurrentNodes.end() )
-                {
-                    int nodeId = it->second;
-                    int frameIndex = it->first;
-
-                    Node * n = CurrentScene->LockNode( frameIndex, nodeId );
-                    LinePrimitive * prim = dynamic_cast<LinePrimitive*> (n->GetPrimitive());
-                    Q_ASSERT( prim );
-                    prim->AddPoint( mouseCom->X(), mouseCom->Y(), mouseCom->Pressure() );
-                    CurrentScene->UnlockNode( frameIndex, nodeId );
-
-                    ++it;
-                }
-                CurrentScene->MarkModified();
-                m_lastXWorld = mouseCom->X();
-                m_lastYWorld = mouseCom->Y();
-                m_lastPressure = mouseCom->Pressure();
-                m_lastXPix = mouseCom->XPix();
-                m_lastYPix = mouseCom->YPix();
-                emit CommandExecuted( command );
+                int nodeId = it->second;
+                int frameIndex = it->first;
+                
+                Node * n = CurrentScene->LockNode( frameIndex, nodeId );
+                LinePrimitive * prim = dynamic_cast<LinePrimitive*> (n->GetPrimitive());
+                Q_ASSERT( prim );
+                prim->AddPoint( mouseCom->X(), mouseCom->Y(), mouseCom->Pressure() );
+                CurrentScene->UnlockNode( frameIndex, nodeId );
+                
+                ++it;
             }
+            CurrentScene->MarkModified();
+            m_lastXWorld = mouseCom->X();
+            m_lastYWorld = mouseCom->Y();
+            m_lastPressure = mouseCom->Pressure();
+            m_lastXPix = mouseCom->XPix();
+            m_lastYPix = mouseCom->YPix();
+            emit CommandExecuted( command );
 		}
 	}
 }
-			
-void drwLineTool::SetCurrentFrame( int frame ) 
+
+void drwLineTool::SetCurrentFrame( int frame )
 {
 	// This is for the case where we are drawing while animating
 	if( IsDrawing )
