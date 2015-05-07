@@ -17,8 +17,6 @@ public:
 	void SetOnionSkinBefore( int );
 	int GetOnionSkinAfter() { return m_onionSkinFramesAfter; }
 	void SetOnionSkinAfter( int );
-	bool GetShowAllFrames() { return m_showAllFrames; }
-	void SetShowAllFrames( bool );
 	bool GetInhibitOnionSkin() { return m_inhibitOnionSkin; }
 	void SetInhibitOnionSkin( bool isOn );
 	bool GetShowCameraFrame() { return m_showCameraFrame; }
@@ -32,7 +30,6 @@ private:
 	
 	int m_onionSkinFramesBefore;
 	int m_onionSkinFramesAfter;
-	bool m_showAllFrames;
 	bool m_inhibitOnionSkin;
 	bool m_showCameraFrame;
 	

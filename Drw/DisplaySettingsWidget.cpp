@@ -34,12 +34,6 @@ void DisplaySettingsWidget::OnFramesAfterValueChanged( int value )
 		m_displaySettings->SetOnionSkinAfter( value );
 }
 
-void DisplaySettingsWidget::OnAllFrameChecked( bool isOn )
-{
-	if( !m_updating )
-		m_displaySettings->SetShowAllFrames( isOn );
-}
-
 void DisplaySettingsWidget::OnDisplayCameraFrameChecked( bool isOn )
 {
 	if( !m_updating )
@@ -94,10 +88,6 @@ void DisplaySettingsWidget::SetupUi()
 			connect( framesAfterSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnFramesAfterValueChanged(int)) );
 		}
 		onionSkinLayout->addLayout( framesAfterLayout );
-	
-		allFramesCheckBox = new QCheckBox(tr("All frames"),onionSkinGroupBox);
-		connect( allFramesCheckBox, SIGNAL(toggled(bool)), this, SLOT(OnAllFrameChecked(bool)) );
-		onionSkinLayout->addWidget(allFramesCheckBox); 
 	}
 	mainLayout->addWidget(onionSkinGroupBox);
 	
@@ -112,7 +102,6 @@ void DisplaySettingsWidget::UpdateUi()
 	
 	framesBeforeSpinBox->setValue( m_displaySettings->GetOnionSkinBefore() );
 	framesAfterSpinBox->setValue( m_displaySettings->GetOnionSkinAfter() );
-	allFramesCheckBox->setChecked( m_displaySettings->GetShowAllFrames() );
 	displayCameraFrameCheckBox->setChecked( m_displaySettings->GetShowCameraFrame() );
 		
 	m_updating = false;

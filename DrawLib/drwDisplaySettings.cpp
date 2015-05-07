@@ -4,7 +4,6 @@ drwDisplaySettings::drwDisplaySettings( QObject * parent )
 : QObject( parent )
 , m_onionSkinFramesBefore(1)
 , m_onionSkinFramesAfter(0)
-, m_showAllFrames(false)
 , m_inhibitOnionSkin(false)
 , m_showCameraFrame(true)
 {
@@ -23,12 +22,6 @@ void drwDisplaySettings::SetOnionSkinBefore( int value )
 void drwDisplaySettings::SetOnionSkinAfter( int value )
 {
 	m_onionSkinFramesAfter = value;
-	emit ModifiedSignal();
-}
-
-void drwDisplaySettings::SetShowAllFrames( bool isOn )
-{
-	m_showAllFrames = isOn;
 	emit ModifiedSignal();
 }
 
