@@ -32,9 +32,10 @@ public:
 	virtual void MouseMoveEvent( drwDrawingWidget * w, QMouseEvent * e );
 	virtual void TabletEvent( drwDrawingWidget * w, QTabletEvent * e );
 	virtual void DropEvent( drwDrawingWidget * w, QDropEvent * e );
-	
+
 	virtual void SetCurrentFrame( int frame );
 	virtual void Reset();
+    drwEditionState * GetEditionState() { return m_editionState; }
 	
 	void blockSignals( bool block );
 	

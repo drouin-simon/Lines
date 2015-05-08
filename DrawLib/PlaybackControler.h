@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QTime>
 #include "drwGlobal.h"
+#include "drwEditionState.h"
 
 class Scene;
 class drwEditionState;
@@ -19,7 +20,7 @@ public:
 	
 	drwEditionState * GetEditionState() { return m_editionState; }
 	
-	void PlayPause();
+	void PlayPause( bool manual = true );
 	bool IsPlaying() { return isPlaying; }
 	
 	void SetCurrentFrame( int frame );
@@ -58,6 +59,7 @@ protected:
 	
 	Scene			* m_scene;
 	drwEditionState * m_editionState;
+    drwFrameChangeMode m_backupFrameChangeMode;
 	QTime			time;
 	int				frameInterval;  // number of miliseconds between frames
 	bool			isPlaying;

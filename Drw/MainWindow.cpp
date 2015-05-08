@@ -642,8 +642,6 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
         else if( keyEvent->key() == Qt::Key_Alt )
         {
             m_glWidget->ActivateViewportWidget( true );
-            //if( isFullScreen() )
-            //    m_rightPanelDock->show();
             handled = true;
         }
         else if( keyEvent->key() == Qt::Key_H )

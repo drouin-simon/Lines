@@ -128,6 +128,7 @@ private:
 
     static const QString m_appName;
     bool m_whiteOnBlack;
+    
 };
 
 

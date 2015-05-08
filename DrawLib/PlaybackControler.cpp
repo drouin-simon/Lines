@@ -1,6 +1,5 @@
 #include "PlaybackControler.h"
 #include "Scene.h"
-#include "drwEditionState.h"
 
 PlaybackControler::PlaybackControler( Scene * scene, QObject * parent ) 
 : QObject( parent )
@@ -11,6 +10,7 @@ PlaybackControler::PlaybackControler( Scene * scene, QObject * parent )
 , interactionStartFrame(0)
 , insertFrameMode(false)
 {
+    m_backupFrameChangeMode = Manual;
 	m_editionState = new drwEditionState( this );
 	time.start();
 	connect( m_scene, SIGNAL( NumberOfFramesChanged(int) ), this, SLOT( NumberOfFramesChangedSlot( int ) ) );
@@ -20,19 +20,26 @@ PlaybackControler::PlaybackControler( Scene * scene, QObject * parent )
 PlaybackControler::~PlaybackControler()
 {
 	if( isPlaying )
-		PlayPause();
+		PlayPause( false );
 }
 
 
-void PlaybackControler::PlayPause()
+void PlaybackControler::PlayPause( bool manual )
 {
 	if( isPlaying )
 	{
+        if( manual )
+            m_editionState->SetFrameChangeMode( m_backupFrameChangeMode );
 		isPlaying = false;
 		emit StartStop( false );
 	}
 	else
 	{
+        if( manual )
+        {
+            m_backupFrameChangeMode = m_editionState->GetFrameChangeMode();
+            m_editionState->SetFrameChangeMode( Manual );
+        }
 		if( GetCurrentFrame() == GetNumberOfFrames() - 1 )
 			SetCurrentFrame( 0 );
 		isPlaying = true;
@@ -169,7 +176,7 @@ void PlaybackControler::StartInteraction( )
 	if( m_editionState->GetFrameChangeMode() == Play && !IsPlaying() )
 	{
 		interactionStartFrame = GetCurrentFrame();
-		PlayPause();
+		PlayPause( false );
 	}
 }
 
@@ -178,7 +185,7 @@ void PlaybackControler::EndInteraction()
 {
 	if( m_editionState->GetFrameChangeMode() == Play && IsPlaying() )
 	{
-		PlayPause();
+		PlayPause( false );
 		SetCurrentFrame( interactionStartFrame );
 	}
 	
