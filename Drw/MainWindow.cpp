@@ -654,6 +654,11 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
             toggleShowGui();
             handled = true;
         }
+        /*else if( keyEvent->key() == Qt::Key_T )
+        {
+            DrawSinusoidLine();
+            handled = true;
+        }*/
 	}
     else if( event->type() == QEvent::KeyRelease )
     {
@@ -661,8 +666,6 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
         if( keyEvent->key() == Qt::Key_Alt )
         {
             m_glWidget->ActivateViewportWidget( false );
-            //if( isFullScreen() )
-            //    m_rightPanelDock->hide();
             handled = true;
         }
     }
@@ -698,4 +701,25 @@ void MainWindow::ToggleShowGlobalLineParams()
 void MainWindow::GlobalLineParamsDockClosed()
 {
     m_globalLineParamsDock = 0;
+}
+
+void MainWindow::DrawSinusoidLine()
+{
+    double xstart = 100.0;
+    double ystart = 560.0;
+    double interval = 5.0;
+    double amp = 200.0;
+    double per = 150;
+    m_glWidget->SimulateTabletEvent( drwMouseCommand::Press, xstart, ystart, 0.0 );
+    double x = xstart;
+    double y = 0.0;
+    while( x < 1800.0 )
+    {
+        double y = ystart + amp * sin( (x - xstart) / per * 6.2 );
+        double pressure = std::abs( sin( (x - xstart) / per * 6.2 ) );
+        m_glWidget->SimulateTabletEvent( drwMouseCommand::Move, x, y, pressure );
+        QApplication::processEvents();
+        x += interval;
+    }
+    m_glWidget->SimulateTabletEvent( drwMouseCommand::Release, x, y, 1.0 );
 }

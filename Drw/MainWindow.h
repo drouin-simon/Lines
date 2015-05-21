@@ -82,6 +82,7 @@ private:
 	void writeSettings();
 	void Reset();
     void ToggleShowGlobalLineParams();
+    void DrawSinusoidLine();
 	
 	QString m_filename;
 	QString m_fileDialogStartPath;

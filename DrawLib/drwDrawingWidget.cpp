@@ -66,6 +66,15 @@ drwCommand::s_ptr drwDrawingWidget::CreateMouseCommand( drwMouseCommand::MouseCo
 	return command;
 }
 
+void drwDrawingWidget::SimulateTabletEvent( drwMouseCommand::MouseCommandType type, double xWorld, double yWorld, double pressure )
+{
+    int xWin, yWin;
+    m_renderer->WorldToGLWindow( xWorld, yWorld, xWin, yWin );
+    drwCommand::s_ptr command( new drwMouseCommand( type, xWorld, yWorld, 0.0, xWin, yWin, 0, 0, pressure, 0, 0 ) );
+    Observer->ExecuteCommand( command );
+}
+
+
 void drwDrawingWidget::SetBackgroundColor( Vec4 & color )
 {
     m_renderer->SetClearColor( color[0], color[1], color[2], color[3] );
