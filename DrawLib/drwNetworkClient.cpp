@@ -84,7 +84,10 @@ void drwNetworkClient::CommandReceivedSlot( drwCommand::s_ptr command )
 			drwServerInitialCommand * serverMsg = dynamic_cast<drwServerInitialCommand*> (command.get());
 			m_totalNumberOfCommandsToRead = serverMsg->GetNumberOfCommands();
 			m_numberOfCommandsToRead = m_totalNumberOfCommandsToRead;
-			SetState( ReceivingScene );
+            if( m_numberOfCommandsToRead > 0 )
+                SetState( ReceivingScene );
+            else
+                SetState( Operating );
 		}
 	}
 	else
@@ -92,7 +95,7 @@ void drwNetworkClient::CommandReceivedSlot( drwCommand::s_ptr command )
 		m_dispatcher->IncomingNetCommand( command );
 		if( m_state == ReceivingScene )
 		{
-			if( m_numberOfCommandsToRead == 1 )
+            if( m_numberOfCommandsToRead == 1 )
 			{
 				SetState( Operating );
 			}
