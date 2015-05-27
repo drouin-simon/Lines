@@ -1,7 +1,8 @@
 #ifndef __drwDrawingWidget_h_
 #define __drwDrawingWidget_h_
 
-#include <QGLWidget>
+//#include <QGLWidget>
+#include <QOpenGLWidget>
 #include "macros.h"
 #include "Scene.h"
 #include "drwCommand.h"
@@ -14,7 +15,7 @@ class drwLineToolViewportWidget;
 class drwFpsCounter;
 class PlaybackControler;
 
-class drwDrawingWidget : public QGLWidget
+class drwDrawingWidget : public QOpenGLWidget
 {
 	Q_OBJECT
   

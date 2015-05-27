@@ -1,6 +1,8 @@
 #include "drwCursor.h"
 #include "drwLineTool.h"
 #include "drwDrawingWidget.h"
+#include <QPen>
+#include <QPainter>
 
 drwCursor::drwCursor( drwLineTool * lineTool, drwDrawingWidget * widget )
 : m_lineTool( lineTool )

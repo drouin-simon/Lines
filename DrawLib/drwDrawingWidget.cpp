@@ -14,7 +14,7 @@
 #include "drwGLRenderer.h"
 
 drwDrawingWidget::drwDrawingWidget( QWidget * parent ) 
-: QGLWidget( QGLFormat(QGL::SampleBuffers), parent ) 
+: QOpenGLWidget( parent )
 , Observer(0)
 , m_viewportWidget(0)
 , m_cursor(0)
@@ -396,5 +396,5 @@ bool drwDrawingWidget::event( QEvent * e )
 		controlerUpdated = Controler->Tick();
     }
 	
-	return QGLWidget::event(e);
+    return QOpenGLWidget::event(e);
 }
