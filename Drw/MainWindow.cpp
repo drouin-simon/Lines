@@ -53,7 +53,7 @@ MainWindow::MainWindow()
     mainLayout->setContentsMargins( 0, 0, 0, 0 );
     mainLayout->setSpacing( 0 );
 
-    QVBoxLayout * drawingAreaLayout = new QVBoxLayout(m_mainWidget);
+    QVBoxLayout * drawingAreaLayout = new QVBoxLayout();
 	drawingAreaLayout->setContentsMargins( 0, 0, 0, 0 );
     mainLayout->addLayout( drawingAreaLayout );
 
@@ -107,7 +107,7 @@ MainWindow::MainWindow()
     m_displaySettingsWidget = new DisplaySettingsWidget( m_glWidget->GetDisplaySettings(), m_rightPanelWidget );
 	rightPanelLayout->addWidget( m_displaySettingsWidget );
 
-    QHBoxLayout * networkStateLayout = new QHBoxLayout( m_rightPanelWidget );
+    QHBoxLayout * networkStateLayout = new QHBoxLayout();
     rightPanelLayout->addLayout( networkStateLayout );
     networkStateLayout->setContentsMargins ( 5, 5, 5, 5 );
 
