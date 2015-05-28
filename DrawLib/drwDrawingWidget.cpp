@@ -33,6 +33,7 @@ drwDrawingWidget::drwDrawingWidget( QWidget * parent )
     setAcceptDrops(true);
 	setMouseTracking(true);
 	setAutoFillBackground(false);
+    setCursor( QCursor( Qt::BlankCursor ) );
 }
 
 drwDrawingWidget::~drwDrawingWidget()
@@ -170,9 +171,6 @@ void drwDrawingWidget::resizeGL( int w, int h )
 
 void drwDrawingWidget::paintEvent( QPaintEvent * event )
 {
-    unsetCursor();
-    setCursor( QCursor( Qt::BlankCursor ) );
-    
 	makeCurrent();
 	
     int onionSkinBefore = 0;
@@ -375,20 +373,6 @@ void drwDrawingWidget::dragEnterEvent(QDragEnterEvent *event)
 
 bool drwDrawingWidget::event( QEvent * e )
 {
-    /*if( e->type() == QEvent::Enter ||
-       e->type() == QEvent::MouseButtonPress ||
-       e->type() == QEvent::MouseButtonRelease ||
-       e->type() == QEvent::MouseMove ||
-       e->type() == QEvent::TabletEnterProximity ||
-       e->type() == QEvent::TabletMove ||
-       e->type() == QEvent::TabletPress ||
-       e->type() == QEvent::TabletRelease
-       e->type() == QEvent::)
-    {
-        unsetCursor();
-        setCursor( QCursor( Qt::BlankCursor ) );
-    }*/
-    
 	// Give a chance to the controler to change frame. A frame change triggers an updateGL
 	bool controlerUpdated = false;
 	if( Controler )
