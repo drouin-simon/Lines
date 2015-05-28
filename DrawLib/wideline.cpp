@@ -85,8 +85,9 @@ void WideLine::InternDraw( drwDrawingContext & context )
     tex->DrawToTexture( false );
 
 	// Paste the texture to screen with the right color
-    glBlendEquationSeparate( GL_FUNC_ADD, GL_MAX );  // Don't want to affect the alpha of other lines
-    Vec4 color = m_color; // * context.m_colorMultiplier;
+    glBlendEquation( GL_FUNC_ADD );
+    glBlendFuncSeparate( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE );
+    Vec4 color = m_color;
     glColor4d( color[0], color[1], color[2], color[3] );
 
     int xWinMin = 0;
@@ -101,6 +102,7 @@ void WideLine::InternDraw( drwDrawingContext & context )
 
 	// Erase trace on work texture
     glBlendEquation( GL_FUNC_ADD );
+    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
     tex->DrawToTexture( true );
     tex->Clear( xWinMin, yWinMin, width, height );
     tex->DrawToTexture( false );
