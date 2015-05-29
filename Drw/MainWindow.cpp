@@ -154,21 +154,23 @@ void MainWindow::CreateActions()
 {
 	// Creates a file menu
     QMenu * file = menuBar()->addMenu( "&File" );
-	file->addAction( "New", this, SLOT( fileNew() ), Qt::CTRL + Qt::Key_N );
-	file->addAction( "Open...", this, SLOT( fileOpen() ), Qt::CTRL + Qt::Key_O );
+    m_fileNewAction = file->addAction( "New", this, SLOT( fileNew() ), Qt::CTRL + Qt::Key_N );
+    m_fileOpenAction = file->addAction( "Open...", this, SLOT( fileOpen() ), Qt::CTRL + Qt::Key_O );
 	file->addAction( "Save", this, SLOT( fileSave() ), Qt::CTRL + Qt::Key_S );
 	file->addAction( "Save As...", this, SLOT( fileSaveAs() ), Qt::SHIFT + Qt::CTRL + Qt::Key_S );
 	file->addAction( "Export...", this, SLOT( fileExport() ) );
     file->addAction( "&Exit", this, SLOT( close() ) );
+    connect( file, SIGNAL(aboutToShow()), this, SLOT(fileMenuAboutToShow()) );
 	
 	// Create the Edit menu
 	m_editMenu = menuBar()->addMenu( "&Edit" );
-	m_editMenu->addAction( "Set Number of Frames", this, SLOT( editSetNumberOfFrames() ), Qt::CTRL + Qt::Key_G );
-    m_whiteOnBlackAction = new QAction( "White on black", m_editMenu );
-    m_whiteOnBlackAction->setCheckable( true );
-    m_whiteOnBlackAction->setChecked( true );
-    connect( m_whiteOnBlackAction, SIGNAL(toggled(bool)), this, SLOT(editWhiteOnBlackToggled(bool)) );
-    m_editMenu->addAction( m_whiteOnBlackAction );
+    m_editSetNumberOfFramesAction = m_editMenu->addAction( "Set Number of Frames", this, SLOT( editSetNumberOfFrames() ), Qt::CTRL + Qt::Key_G );
+    //m_whiteOnBlackAction = new QAction( "White on black", m_editMenu );
+    //m_whiteOnBlackAction->setCheckable( true );
+    //m_whiteOnBlackAction->setChecked( true );
+    //connect( m_whiteOnBlackAction, SIGNAL(toggled(bool)), this, SLOT(editWhiteOnBlackToggled(bool)) );
+    //m_editMenu->addAction( m_whiteOnBlackAction );
+    connect( m_editMenu, SIGNAL(aboutToShow()), this, SLOT(editMenuAboutToShow()) );
 	
 	// Create the Network menu
 	m_networkMenu = menuBar()->addMenu( "&Network" );
@@ -189,6 +191,13 @@ void MainWindow::CreateActions()
 
 
 // -------- File Menu implementation --------
+
+void MainWindow::fileMenuAboutToShow()
+{
+    bool networkOn = m_networkManager->IsConnected() || m_networkManager->IsSharing();
+    m_fileNewAction->setEnabled( !networkOn );
+    m_fileOpenAction->setEnabled( !networkOn );
+}
 
 void MainWindow::fileNew()
 {
@@ -289,6 +298,12 @@ bool MainWindow::fileExport()
         return res;
 	}
 	return false;
+}
+
+void MainWindow::editMenuAboutToShow()
+{
+    bool networkOn = m_networkManager->IsConnected() || m_networkManager->IsSharing();
+    m_editSetNumberOfFramesAction->setEnabled( !networkOn );
 }
 
 void MainWindow::editSetNumberOfFrames()

@@ -42,12 +42,14 @@ public:
 
 private slots:
 	
+    void fileMenuAboutToShow();
 	void fileNew();
 	void fileOpen();
 	bool fileSave();
 	void fileSaveAs();
 	bool fileExport();
 	
+    void editMenuAboutToShow();
 	void editSetNumberOfFrames();
     void editWhiteOnBlackToggled( bool wob );
 	
@@ -96,6 +98,9 @@ private:
 	QMenu		* m_editMenu;
 	QMenu		* m_networkMenu;
 	
+    QAction * m_fileNewAction;
+    QAction * m_fileOpenAction;
+    QAction * m_editSetNumberOfFramesAction;
     QAction * m_whiteOnBlackAction;
 	QAction * m_netShareSessionMenuAction;
 	QAction * m_netConnectMenuItem;

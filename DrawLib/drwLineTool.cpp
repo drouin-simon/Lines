@@ -21,7 +21,7 @@ drwLineTool::drwLineTool( Scene * scene, drwEditionState * editionState, QObject
 , m_pressureWidth(true)
 , m_pressureOpacity(true)
 , m_fill(false)
-, m_persistence( 0 )
+, m_persistence( 4 )
 , m_minDistanceBetweenPoints( 4.0 )
 , m_minWidth( 2.0 )
 , m_maxWidth( 100.0 )
@@ -274,7 +274,7 @@ void drwLineTool::Reset()
 	m_pressureWidth = true;
 	m_pressureOpacity = true;
 	m_fill = false;
-	m_persistence = 0;
+    m_persistence = 4;
     CurrentNodes.clear();
 }
 

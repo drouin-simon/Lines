@@ -3,7 +3,7 @@
 drwEditionState::drwEditionState( QObject * parent )
 : QObject( parent )
 , m_currentFrame(0)
-, m_frameChangeMode( AfterIntervention )
+, m_frameChangeMode( Manual )
 {
 }
 
@@ -26,6 +26,6 @@ void drwEditionState::SetFrameChangeMode( drwFrameChangeMode mode )
 void drwEditionState::Reset()
 {
 	m_currentFrame = 0;
-	m_frameChangeMode = AfterIntervention;
+    m_frameChangeMode = Manual;
     emit ModifiedSignal();
 }
