@@ -88,6 +88,7 @@ void drwNetworkClient::CommandReceivedSlot( drwCommand::s_ptr command )
                 SetState( ReceivingScene );
             else
                 SetState( Operating );
+            m_dispatcher->IncomingNetCommand( command );
 		}
 	}
 	else

@@ -127,12 +127,13 @@ class drwServerInitialCommand : public drwCommand
 public:
 
 	drwServerInitialCommand()
-		: NumberOfCommands( 0 ){}
-	drwServerInitialCommand( int nbCommands )
-		: NumberOfCommands( nbCommands ){}
+        : NumberOfCommands( 0 ), NumberOfFrames(30) {}
+    drwServerInitialCommand( int nbCommands, int nbFrames )
+        : NumberOfCommands( nbCommands ), NumberOfFrames( nbFrames ) {}
 	drwServerInitialCommand( drwServerInitialCommand & other )
 		: drwCommand( other )
-		, NumberOfCommands( other.NumberOfCommands ){}
+        , NumberOfCommands( other.NumberOfCommands )
+        , NumberOfFrames( other.NumberOfFrames ) {}
 	virtual ~drwServerInitialCommand() {}
 	virtual s_ptr Clone() { s_ptr newCom( new drwServerInitialCommand( *this ) ); return newCom; }
 
@@ -145,10 +146,13 @@ public:
 
 	SetMacro(NumberOfCommands,int);
 	GetMacro(NumberOfCommands,int);
+    SetMacro(NumberOfFrames,int);
+    GetMacro(NumberOfFrames,int);
 
 protected:
 
 	int NumberOfCommands;
+    int NumberOfFrames;
 };
 
 class drwMouseCommand : public drwCommand

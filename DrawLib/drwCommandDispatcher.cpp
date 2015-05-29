@@ -37,6 +37,11 @@ int drwCommandDispatcher::RequestNewUserId()
 	return ++m_lastUsedUserId;
 }
 
+int drwCommandDispatcher::GetNumberOfFrames()
+{
+    return m_scene->GetNumberOfFrames();
+}
+
 void drwCommandDispatcher::Reset()
 {
 	m_scene->Clear();
@@ -50,15 +55,23 @@ void drwCommandDispatcher::Reset()
 
 void drwCommandDispatcher::IncomingNetCommand( drwCommand::s_ptr command )
 {
-	// Execute the command in the appropriate toolbox
-	int commandUserId = command->GetUserId();
-	drwToolbox * box = m_toolboxes[ commandUserId ];
-	if( !box )
-		box = AddUser( commandUserId );
-	box->ExecuteCommand( command );
+    if( command->GetCommandId() == drwIdServerInitialCommand )
+    {
+        drwServerInitialCommand * serverMsg = dynamic_cast<drwServerInitialCommand*> (command.get());
+        m_scene->SetNumberOfFrames( serverMsg->GetNumberOfFrames() );
+    }
+    else
+    {
+        // Execute the command in the appropriate toolbox
+        int commandUserId = command->GetUserId();
+        drwToolbox * box = m_toolboxes[ commandUserId ];
+        if( !box )
+            box = AddUser( commandUserId );
+        box->ExecuteCommand( command );
 
-	// Store it in the database
-	m_db->PushCommand( command );
+        // Store it in the database
+        m_db->PushCommand( command );
+    }
 }
 
 void drwCommandDispatcher::IncomingLocalCommand( drwCommand::s_ptr command )

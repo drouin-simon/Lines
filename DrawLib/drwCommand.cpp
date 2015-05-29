@@ -70,7 +70,6 @@ void drwSetFrameCommand::Read( QDataStream & stream )
 	stream >> NewFrame;
 }
 
-
 bool drwSetFrameCommand::WriteImpl( QDataStream & stream )
 {
 	stream << NewFrame;
@@ -185,23 +184,26 @@ bool drwLineToolParamsCommand::Concatenate( drwCommand * other )
 
 int drwServerInitialCommand::BodySize()
 {
-	return sizeof(NumberOfCommands);
+    return sizeof(NumberOfCommands) + sizeof(NumberOfFrames);
 }
 
 void drwServerInitialCommand::Read( QDataStream & stream )
 {
 	stream >> NumberOfCommands;
+    stream >> NumberOfFrames;
 }
 
 bool drwServerInitialCommand::WriteImpl( QDataStream & stream )
 {
 	stream << NumberOfCommands;
+    stream << NumberOfFrames;
 	return true;
 }
 
 void drwServerInitialCommand::Write( QTextStream & stream )
 {
 	stream << "ServerInitialCommand: NumberOfCommands = " << NumberOfCommands;
+    stream << "; NumberOfFrames = " << NumberOfFrames;
 }
 
 //===================================

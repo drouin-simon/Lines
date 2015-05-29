@@ -22,6 +22,7 @@ public:
 	drwCommandDatabase * GetDb() { return m_db; }
 	int RequestNewUserId();
 	int GetLocalUserId() { return m_localToolboxId; }
+    int GetNumberOfFrames();
 	void Reset();
 	
 	void IncomingNetCommand( drwCommand::s_ptr );
