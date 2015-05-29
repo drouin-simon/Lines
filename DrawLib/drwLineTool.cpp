@@ -168,7 +168,7 @@ void drwLineTool::ExecuteMouseCommand( drwCommand::s_ptr command )
 		emit CommandExecuted( command );
 		emit StartInteraction();
 	}
-	else if( mouseCom->GetType() == drwMouseCommand::Release )
+    else if( mouseCom->GetType() == drwMouseCommand::Release && IsDrawing )
 	{
 		CurrentNodesCont::iterator it = CurrentNodes.begin();
 		while( it != CurrentNodes.end() )

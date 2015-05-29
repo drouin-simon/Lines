@@ -34,13 +34,14 @@ private slots:
 	void PlaybackControlerModifiedSlot();
 	void PlaybackStartStopSlot( bool isStart );
 
+    void UpdateCurrentFrame();
+
 private:
 	
 	void timerEvent(QTimerEvent *event);
 
 	void SetupUi();
-	void UpdateUi();
-	void UpdateCurrentFrame();
+    void UpdateUi();
 	
 	PlaybackControler * m_controler;
 	int m_frameRateIndex;
