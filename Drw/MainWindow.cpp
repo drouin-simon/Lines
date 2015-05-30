@@ -195,7 +195,7 @@ void MainWindow::CreateActions()
 void MainWindow::fileMenuAboutToShow()
 {
     bool networkOn = m_networkManager->IsConnected() || m_networkManager->IsSharing();
-    m_fileNewAction->setEnabled( !networkOn );
+    m_fileNewAction->setEnabled( !m_networkManager->IsConnected() );
     m_fileOpenAction->setEnabled( !networkOn );
 }
 

@@ -8,7 +8,7 @@
 class QDataStream;
 class QTextStream;
 
-enum drwCommandId { drwIdSetFrameCommand, drwIdMouseCommand, drwIdLineToolParamsCommand, drwIdServerInitialCommand };
+enum drwCommandId { drwIdSetFrameCommand, drwIdMouseCommand, drwIdLineToolParamsCommand, drwIdServerInitialCommand, drwIdNewSceneCommand };
 
 class drwCommand
 {
@@ -203,5 +203,22 @@ protected:
 	double m_tangentialPressure;
 };
 
+class drwNewSceneCommand : public drwCommand
+{
+
+public:
+
+    drwNewSceneCommand() {}
+    drwNewSceneCommand( drwSetFrameCommand & other ) : drwCommand( other ) {}
+    virtual ~drwNewSceneCommand() {}
+    virtual s_ptr Clone() { s_ptr newCom( new drwNewSceneCommand( *this ) ); return newCom; }
+
+    drwCommandId GetCommandId() { return drwIdNewSceneCommand; }
+    virtual bool IsStateCommand() { return false; }
+    int BodySize();
+    void Read( QDataStream & stream );
+    bool WriteImpl( QDataStream & stream );
+    void Write( QTextStream & stream );
+};
 
 #endif

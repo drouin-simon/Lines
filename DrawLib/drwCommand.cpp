@@ -25,6 +25,9 @@ drwCommand::s_ptr drwCommand::InstanciateSubclass( drwCommandId id )
 	case drwIdServerInitialCommand:
 		newCommand.reset( new drwServerInitialCommand );
 		break;
+    case drwIdNewSceneCommand:
+        newCommand.reset( new drwNewSceneCommand );
+        break;
 	default:
 		Q_ASSERT(0); // If we get here, we try to read a command type that is not yet defined.
 		break;
@@ -305,4 +308,26 @@ void drwMouseCommand::Write( QTextStream & stream )
 {
     stream << "Pos = (" << m_x << ", " << m_y << ", " << m_z << ") Screen Pos = ( " << m_xPixel << ", " <<  m_yPixel << ") Tilt = (" << m_xTilt << ", " << m_yTilt
 	<< ")  Pressure = " << m_pressure << "   Rotation = " << m_rotation << "  Tang pressure = " << m_tangentialPressure; 
+}
+
+//===================================
+// drwNewSceneCommand Implementation
+//===================================
+
+int drwNewSceneCommand::BodySize()
+{
+    return 0;
+}
+
+void drwNewSceneCommand::Read( QDataStream & stream )
+{
+}
+
+bool drwNewSceneCommand::WriteImpl( QDataStream & stream )
+{
+}
+
+void drwNewSceneCommand::Write( QTextStream & stream )
+{
+    stream << "New Scene";
 }

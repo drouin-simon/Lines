@@ -44,6 +44,11 @@ int drwCommandDispatcher::GetNumberOfFrames()
 
 void drwCommandDispatcher::Reset()
 {
+    if( m_netManager->IsSharing() )
+    {
+        drwCommand::s_ptr newSceneCommand( new drwNewSceneCommand );
+        m_netManager->SendCommand( newSceneCommand );
+    }
 	m_scene->Clear();
 	m_db->Clear();
 	ClearAllToolboxesButLocal();
@@ -59,6 +64,10 @@ void drwCommandDispatcher::IncomingNetCommand( drwCommand::s_ptr command )
     {
         drwServerInitialCommand * serverMsg = dynamic_cast<drwServerInitialCommand*> (command.get());
         m_scene->SetNumberOfFrames( serverMsg->GetNumberOfFrames() );
+    }
+    else if( command->GetCommandId() == drwIdNewSceneCommand )
+    {
+        Reset();
     }
     else
     {
