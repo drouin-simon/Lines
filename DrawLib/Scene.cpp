@@ -30,6 +30,7 @@ void Scene::Clear()
 	for( unsigned i = 0; i < Frames.size(); ++i )
         Frames[i]->Clear();
     m_framesLock.unlock();
+    emit Modified();
 }
 
 void Scene::DrawFrame( int frame, drwDrawingContext & context )

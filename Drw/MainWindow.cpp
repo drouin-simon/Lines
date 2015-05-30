@@ -364,12 +364,17 @@ void MainWindow::NetConnect()
 
         // Create progress dialog and start it
         m_progressDialog = new QProgressDialog( "Connecting", "Cancel", 0, 100 );
-        m_progressDialog->setAttribute( Qt::WA_DeleteOnClose );
         m_progressDialog->exec();
 
         m_scene->blockSignals( false );
 
-        // todo : If the operation didn't succeed, clear the scene again
+        if( m_progressDialog->wasCanceled() )
+        {
+            m_networkManager->Disconnect();
+        }
+
+        delete m_progressDialog;
+        m_progressDialog = 0;
     }
 }
 
