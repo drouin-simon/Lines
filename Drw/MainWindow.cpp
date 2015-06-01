@@ -563,7 +563,7 @@ void MainWindow::readSettings()
 	
 	// Export settings
 	m_exportDefaultPath = settings.value( "ExportDefaultPath", QDir::homePath() ).toString();
-	m_exportRes = settings.value( "ExportResolution", QSize( 640, 360 ) ).toSize();
+    m_exportRes = settings.value( "ExportResolution", QSize( 1920, 1080 ) ).toSize();
     
     // white on black or black on white
     bool wob = settings.value( "WhiteOnBlack", true ).toBool();
