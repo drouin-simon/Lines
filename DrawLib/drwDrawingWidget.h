@@ -36,7 +36,6 @@ public:
     void ToggleComputeFps();
     void ActivateViewportWidget( bool active );
     double PixelsPerUnit();
-    void WindowToWorld( double xWin, double yWin, double & xWorld, double & yWorld );
 
 	drwCommand::s_ptr CreateMouseCommand( drwMouseCommand::MouseCommandType commandType, QMouseEvent * e );
 	drwCommand::s_ptr CreateMouseCommand( drwMouseCommand::MouseCommandType commandType, QTabletEvent * e );

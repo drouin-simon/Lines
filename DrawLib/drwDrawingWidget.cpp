@@ -332,11 +332,6 @@ double drwDrawingWidget::PixelsPerUnit()
     return m_renderer->PixelsPerUnit();
 }
 
-void drwDrawingWidget::WindowToWorld( double xWin, double yWin, double & xWorld, double & yWorld )
-{
-    m_renderer->WindowToWorld( xWin, yWin, xWorld, yWorld );
-}
-
 void drwDrawingWidget::enterEvent( QEvent * e )
 {
     m_showCursor = true;
