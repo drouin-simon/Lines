@@ -21,7 +21,7 @@ public:
 
     void RenderToTexture( int currentFrame, int onionSkinBefore, int onionSkinAfter );
     drwDrawableTexture * GetRenderTexture() { return m_renderTexture; }
-    void RenderTextureToScreen( bool transparentBack = false );
+    void RenderTextureToScreen();
     void RenderRect();
     void RenderCameraFrame();
 

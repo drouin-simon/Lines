@@ -95,15 +95,12 @@ void drwGLRenderer::RenderToTexture( int currentFrame, int onionSkinBefore, int 
     m_renderTexture->DrawToTexture( false );
 }
 
-void drwGLRenderer::RenderTextureToScreen( bool transparentBack )
+void drwGLRenderer::RenderTextureToScreen()
 {
     glEnable( GL_BLEND );
     glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
     
-    double alpha = m_clearColor[3];
-    if( transparentBack )
-        alpha = 0.0;
-    glClearColor( m_clearColor[0], m_clearColor[1], m_clearColor[2], alpha );
+    glClearColor( m_clearColor[0], m_clearColor[1], m_clearColor[2], m_clearColor[3] );
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     
     m_camera->SetupToRenderTextureToScreen();

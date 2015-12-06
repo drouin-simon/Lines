@@ -38,10 +38,34 @@ bool drwBitmapExporter::StartWriting()
 	return true;
 }
 
+#include <QSurfaceFormat>
+#include <QWindow>
+#include <QOpenGLContext>
+#include <QOpenGLFramebufferObjectFormat>
+#include <QOpenGLFramebufferObject>
+
 void drwBitmapExporter::run()
 {
-    QGLPixelBuffer pixBuffer( m_size );
-    pixBuffer.makeCurrent();
+    QSurfaceFormat format;
+    format.setMajorVersion(3);
+    format.setMinorVersion(2);
+
+    QWindow window;
+    window.setSurfaceType(QWindow::OpenGLSurface);
+    window.setFormat(format);
+    window.create();
+
+    QOpenGLContext context;
+    context.setFormat(format);
+    if (!context.create())
+        qFatal("Cannot create the requested OpenGL context!");
+    context.makeCurrent(&window);
+
+    QOpenGLFramebufferObjectFormat fboFormat;
+    fboFormat.setSamples(16);
+    fboFormat.setAttachment(QOpenGLFramebufferObject::CombinedDepthStencil);
+
+    QOpenGLFramebufferObject fbo( m_size, fboFormat);
 
     drwGLRenderer ren;
     ren.SetCurrentScene( m_scene );
@@ -52,19 +76,20 @@ void drwBitmapExporter::run()
 	
 	for( int i = 0; i < m_scene->GetNumberOfFrames(); ++i )
 	{
+        fbo.bind();
+
 		emit WritingFrame( i );
 		
         ren.RenderToTexture( i, 0, 0 );
-        ren.RenderTextureToScreen( true );
+        ren.RenderTextureToScreen();
 
         glFlush();
-	
-        QImage im = pixBuffer.toImage();
+
+        fbo.release();
+        QImage im = fbo.toImage();
 		QString model( m_baseFilename );
 		model.append( "%1." ).append( m_fileExtension );
 		QString name = model.arg( i, numberOfDigits, 10, QChar('0') );
 		im.save( name );
     }
-	
-    pixBuffer.doneCurrent();
 }
