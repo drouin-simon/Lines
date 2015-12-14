@@ -104,6 +104,7 @@ drwLineToolParamsCommand::drwLineToolParamsCommand()
 	, PressureWidth( false )
 	, PressureOpacity( false )
 	, Fill( false )
+    , Erase( false )
 	, Persistence(0)
 {
 }
@@ -115,6 +116,7 @@ drwLineToolParamsCommand::drwLineToolParamsCommand( drwLineToolParamsCommand & o
 	, PressureWidth( other.PressureWidth )
 	, PressureOpacity( other.PressureOpacity )
 	, Fill( other.Fill )
+    , Erase( other.Erase )
 	, Persistence( other.Persistence )
 {
 }
@@ -122,7 +124,7 @@ drwLineToolParamsCommand::drwLineToolParamsCommand( drwLineToolParamsCommand & o
 
 int drwLineToolParamsCommand::BodySize()
 {
-	return (4 * sizeof(double) + sizeof(BaseWidth) + sizeof(PressureWidth) + sizeof(PressureOpacity) + sizeof(Fill) + sizeof(Persistence) );
+    return (4 * sizeof(double) + sizeof(BaseWidth) + sizeof(PressureWidth) + sizeof(PressureOpacity) + sizeof(Fill) + sizeof(Erase) + sizeof(Persistence) );
 }
 
 void drwLineToolParamsCommand::Read( QDataStream & stream )
@@ -135,6 +137,7 @@ void drwLineToolParamsCommand::Read( QDataStream & stream )
 	stream >> PressureWidth;
 	stream >> PressureOpacity;
 	stream >> Fill;
+    stream >> Erase;
 	stream >> Persistence;
 }
 
@@ -148,6 +151,7 @@ bool drwLineToolParamsCommand::WriteImpl( QDataStream & stream )
 	stream << PressureWidth;
 	stream << PressureOpacity;
 	stream << Fill;
+    stream << Erase;
 	stream << Persistence;
 	return true;
 }
@@ -160,6 +164,7 @@ void drwLineToolParamsCommand::Write( QTextStream & stream )
 	stream << "PressureWidth = " << PressureWidth << "  ";
 	stream << "PressureOpactity = " << PressureOpacity << "  ";
 	stream << "Fill = " << Fill << "  ";
+    stream << "Erase = " << Erase << " ";
 	stream << "Persistence = " << Persistence << "  ";
 }
 
@@ -174,6 +179,7 @@ bool drwLineToolParamsCommand::Concatenate( drwCommand * other )
 		PressureWidth = o->PressureWidth;
 		PressureOpacity = o->PressureOpacity;
 		Fill = o->Fill;
+        Erase = o->Erase;
 		Persistence = o->Persistence;
 		return true;
 	}

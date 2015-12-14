@@ -32,8 +32,7 @@ public:
 	virtual void DropEvent( drwDrawingWidget * w, QDropEvent * e ) {}
 	
 	virtual void SetCurrentFrame( int frame ) { CurrentFrame = frame; }
-	virtual void Reset() {}
-	virtual void ToggleBrushEraser() {}
+    virtual void Reset() {}
 	
 	virtual void ExecuteCommand( drwCommand::s_ptr command ) {}
 	

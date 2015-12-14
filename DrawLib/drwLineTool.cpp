@@ -21,6 +21,7 @@ drwLineTool::drwLineTool( Scene * scene, drwEditionState * editionState, QObject
 , m_pressureWidth(true)
 , m_pressureOpacity(true)
 , m_fill(false)
+, m_erase(false)
 , m_persistence( 4 )
 , m_minDistanceBetweenPoints( 4.0 )
 , m_minWidth( 2.0 )
@@ -42,6 +43,7 @@ void drwLineTool::ReadSettings( QSettings & s )
     m_pressureWidth = s.value( "PressureWidth", QVariant(m_pressureWidth) ).toBool();
     m_pressureOpacity = s.value( "PressureOpacity", QVariant(m_pressureOpacity) ).toBool();
     m_fill = s.value( "Fill", QVariant(m_fill) ).toBool();
+    m_erase = s.value( "Erase", QVariant(m_erase) ).toBool();
     m_persistence = s.value( "Persistence", QVariant(m_persistence) ).toInt();
     
     ParametersChanged();
@@ -58,6 +60,7 @@ void drwLineTool::WriteSettings( QSettings & s )
     s.setValue( "PressureWidth", QVariant(m_pressureWidth) );
     s.setValue( "PressureOpacity", QVariant(m_pressureOpacity) );
     s.setValue( "Fill", QVariant(m_fill) );
+    s.setValue( "Erase", QVariant(m_erase) );
     s.setValue( "Persistence", QVariant(m_persistence) );
 }
 
@@ -301,6 +304,12 @@ void drwLineTool::SetFill( bool f )
 	ParametersChanged();
 }
 
+void drwLineTool::SetErase( bool e )
+{
+    m_erase = e;
+    ParametersChanged();
+}
+
 void drwLineTool::SetColor( Vec4 & c )
 {
 	Color = c;
@@ -368,6 +377,7 @@ Node * drwLineTool::CreateNewNode()
                 newWideLine->SetPressureOpacity( false );
             }
 			newWideLine->SetFill( m_fill );
+            newWideLine->SetErase( m_erase );
 			newPrimitive = newWideLine;
 		}
 			break;

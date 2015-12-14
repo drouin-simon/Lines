@@ -645,11 +645,6 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 			m_glWidget->GetControler()->GotoStart();
 			handled = true;
 		}
-		else if( keyEvent->key() == Qt::Key_B )
-		{
-			m_localToolbox->ToggleBrushEraser();
-			handled = true;
-		}
         else if( keyEvent->key() == Qt::Key_E )
         {
             if( m_drawingEngine->IsRunning() )
@@ -662,6 +657,13 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
         else if( keyEvent->key() == Qt::Key_Alt )
         {
             m_glWidget->ActivateViewportWidget( true );
+            handled = true;
+        }
+        else if( keyEvent->key() == Qt::Key_Shift )
+        {
+            drwLineTool * lineTool = dynamic_cast<drwLineTool*>(m_localToolbox->GetTool( 0 ));
+            Q_ASSERT(lineTool);
+            lineTool->SetErase( true );
             handled = true;
         }
         else if( keyEvent->key() == Qt::Key_H )
@@ -686,6 +688,13 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
         if( keyEvent->key() == Qt::Key_Alt )
         {
             m_glWidget->ActivateViewportWidget( false );
+            handled = true;
+        }
+        else if( keyEvent->key() == Qt::Key_Shift )
+        {
+            drwLineTool * lineTool = dynamic_cast<drwLineTool*>(m_localToolbox->GetTool( 0 ));
+            Q_ASSERT(lineTool);
+            lineTool->SetErase( false );
             handled = true;
         }
     }

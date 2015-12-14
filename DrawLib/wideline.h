@@ -23,6 +23,7 @@ public:
 	void SetPressureWidth( bool w ) { m_pressureWidth = w; }
 	void SetPressureOpacity( bool o ) { m_pressureOpacity = o; }
 	void SetFill( bool f ) { m_fill = f; }
+    void SetErase( bool erase ) { m_erase = erase; }
 	
     void InitShader( drwDrawingContext & context );
     
@@ -56,6 +57,7 @@ protected:
 	bool m_pressureWidth;
 	bool m_pressureOpacity;
 	bool m_fill;
+    bool m_erase;
     Box2d m_boundingBox;
     
     // Global attributes for all lines

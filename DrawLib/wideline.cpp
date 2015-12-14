@@ -17,6 +17,7 @@ WideLine::WideLine( double width )
 , m_pressureWidth( true )
 , m_pressureOpacity( true )
 , m_fill( false )
+, m_erase( false )
 , m_boundingBox( 0.0, 0.0, 0.0, 0.0 )
 , m_prevPoint( 0, 0 )
 , m_prevPressure( 1.0 )
@@ -85,10 +86,18 @@ void WideLine::InternDraw( drwDrawingContext & context )
     tex->DrawToTexture( false );
 
 	// Paste the texture to screen with the right color
-    glBlendEquation( GL_FUNC_ADD );
-    glBlendFuncSeparate( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE );
-    Vec4 color = m_color;
-    glColor4d( color[0], color[1], color[2], color[3] );
+    if( !m_erase )
+    {
+        glBlendEquation( GL_FUNC_ADD );
+        glBlendFuncSeparate( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE );
+        glColor4d( m_color[0], m_color[1], m_color[2], m_color[3] );
+    }
+    else
+    {
+        glBlendEquationSeparate( GL_FUNC_ADD, GL_FUNC_REVERSE_SUBTRACT );
+        glBlendFuncSeparate( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE );
+        glColor4d( 0.0, 0.0, 0.0, 1.0 );
+    }
 
     int xWinMin = 0;
     int yWinMin = 0;

@@ -8,6 +8,7 @@ class Node;
 class drwDrawableTexture;
 class drwGlslShader;
 class drwCamera;
+class drwDrawingContext;
 
 class drwGLRenderer : public QObject
 {
@@ -46,9 +47,12 @@ public slots:
     
 protected:
 
+    void RenderLayer( int frame, drwDrawingContext & context );
+
     drwCamera           * m_camera;
     Scene				* CurrentScene;
     drwDrawableTexture  * m_renderTexture;
+    drwDrawableTexture  * m_layerTexture;
     drwDrawableTexture  * m_workTexture;
     drwGlslShader       * m_widelineShader;
     double m_clearColor[4];

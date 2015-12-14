@@ -106,6 +106,8 @@ public:
 	GetMacro(PressureOpacity,bool);
 	SetMacro(Fill,bool);
 	GetMacro(Fill,bool);
+    SetMacro(Erase,bool);
+    GetMacro(Erase,bool);
 	SetMacro(Persistence,int);
 	GetMacro(Persistence,bool);
 
@@ -118,6 +120,7 @@ protected:
 	bool PressureWidth;
 	bool PressureOpacity;
 	bool Fill;
+    bool Erase;
 	int Persistence;
 };
 

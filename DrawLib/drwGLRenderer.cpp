@@ -12,6 +12,7 @@ drwGLRenderer::drwGLRenderer(QObject *parent) :
     m_camera = new drwCamera;
     CurrentScene = 0;
     m_renderTexture = new drwDrawableTexture;
+    m_layerTexture = new drwDrawableTexture;
     m_workTexture = new drwDrawableTexture;
     m_widelineShader = 0;
     m_clearColor[0] = 0.0;
@@ -24,6 +25,7 @@ drwGLRenderer::~drwGLRenderer()
 {
     delete m_camera;
     delete m_renderTexture;
+    delete m_layerTexture;
     delete m_workTexture;
     if( m_widelineShader )
         delete m_widelineShader;
@@ -57,6 +59,7 @@ void drwGLRenderer::RenderToTexture( int currentFrame, int onionSkinBefore, int 
     double frameSize[2];
     m_camera->GetFrameSizePix( frameSize );
     m_renderTexture->Resize( frameSize[0], frameSize[1] );
+    m_layerTexture->Resize( frameSize[0], frameSize[1] );
     m_workTexture->Resize( frameSize[0], frameSize[1] );
     
     // start drawing to texture
@@ -77,11 +80,13 @@ void drwGLRenderer::RenderToTexture( int currentFrame, int onionSkinBefore, int 
     {
         // draw frame before
         if( fBefore >= dist )
-            CurrentScene->DrawFrame( currentFrame - dist, context );
+            RenderLayer( currentFrame - dist, context );
+            //CurrentScene->DrawFrame( currentFrame - dist, context );
         
         // draw frame after
         if( fAfter >= dist )
-            CurrentScene->DrawFrame( currentFrame + dist, context );
+            RenderLayer( currentFrame + dist, context );
+            //CurrentScene->DrawFrame( currentFrame + dist, context );
         
         // draw background of next layer
         glColor4d( m_clearColor[0], m_clearColor[1], m_clearColor[2], 0.5 );
@@ -89,16 +94,31 @@ void drwGLRenderer::RenderToTexture( int currentFrame, int onionSkinBefore, int 
     }
     
     // draw current frame
-    CurrentScene->DrawFrame( currentFrame, context );
+    //CurrentScene->DrawFrame( currentFrame, context );
+    RenderLayer( currentFrame, context );
     
     // stop drawing to texture
     m_renderTexture->DrawToTexture( false );
 }
 
+void drwGLRenderer::RenderLayer( int frame, drwDrawingContext & context )
+{
+    m_layerTexture->DrawToTexture( true );
+    glClearColor( m_clearColor[0], m_clearColor[1], m_clearColor[2], 0.0 );
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+    CurrentScene->DrawFrame( frame, context );
+    m_layerTexture->DrawToTexture( false );
+    
+    glEnable( GL_BLEND );
+    glBlendFunc( GL_ONE, GL_ONE_MINUS_SRC_ALPHA );
+    glColor4d( 1.0, 1.0, 1.0, 1.0 );
+    m_layerTexture->PasteToScreen();
+}
+
 void drwGLRenderer::RenderTextureToScreen()
 {
     glEnable( GL_BLEND );
-    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+    glBlendFunc( GL_ONE, GL_ONE_MINUS_SRC_ALPHA );
     
     glClearColor( m_clearColor[0], m_clearColor[1], m_clearColor[2], m_clearColor[3] );
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -110,9 +130,11 @@ void drwGLRenderer::RenderTextureToScreen()
 
 void drwGLRenderer::RenderRect()
 {
+    glPushAttrib( GL_COLOR_BUFFER_BIT );
+
     glEnable( GL_BLEND );
-    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-    
+    glBlendFuncSeparate( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ZERO, GL_ONE );
+
     glMatrixMode( GL_PROJECTION );
     glPushMatrix();
     glLoadIdentity();
@@ -132,6 +154,8 @@ void drwGLRenderer::RenderRect()
     
     glPopMatrix();
     glMatrixMode( GL_MODELVIEW );
+
+    glPopAttrib();
 }
 
 void drwGLRenderer::RenderCameraFrame()

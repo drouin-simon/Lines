@@ -48,6 +48,8 @@ public:
     bool IsPerssureWidthAndOpacityEnabled();
 	bool GetFill() { return m_fill; }
 	void SetFill( bool f );
+    bool GetErase() { return m_erase; }
+    void SetErase( bool e );
 	GetMacro( Color, Vec4 );
 	void SetColor( Vec4 & c );
 	int GetPersistence() { return m_persistence; }
@@ -88,6 +90,7 @@ protected:
 	bool m_pressureWidth;
 	bool m_pressureOpacity;
 	bool m_fill;
+    bool m_erase;
 	int m_persistence;
 
     double m_minDistanceBetweenPoints;
