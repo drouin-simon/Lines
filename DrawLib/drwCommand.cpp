@@ -331,6 +331,7 @@ void drwNewSceneCommand::Read( QDataStream & stream )
 
 bool drwNewSceneCommand::WriteImpl( QDataStream & stream )
 {
+    return true;
 }
 
 void drwNewSceneCommand::Write( QTextStream & stream )

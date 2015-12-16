@@ -150,6 +150,7 @@ void drwLineTool::ExecuteLineToolParamCommand( drwCommand::s_ptr command )
 	m_pressureWidth = paramCom->GetPressureWidth();
 	m_pressureOpacity = paramCom->GetPressureOpacity();
 	m_fill = paramCom->GetFill();
+    m_erase = paramCom->GetErase();
 	m_persistence = paramCom->GetPersistence();
 }
 
@@ -345,6 +346,7 @@ void drwLineTool::ParametersChanged()
 	c->SetPressureWidth( m_pressureWidth );
 	c->SetPressureOpacity( m_pressureOpacity );
 	c->SetFill( m_fill );
+    c->SetErase( m_erase );
 	c->SetPersistence( m_persistence );
 	drwCommand::s_ptr command( c );
 	emit CommandExecuted( command );

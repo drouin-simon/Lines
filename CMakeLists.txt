@@ -3,6 +3,10 @@ PROJECT( Draw )
 cmake_minimum_required(VERSION 2.6)
 
 #----------------------------------------
+# Include BOOST dir if available
+include_directories( ${BOOST_ROOT} )
+
+#----------------------------------------
 # Use Svl
 add_subdirectory(svl)
 include_directories( ${svlIncludeDir} )
