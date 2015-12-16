@@ -36,4 +36,4 @@ protected:
     int m_selectedRow;
 };
 
-#endif // CONNECTWIDGET_H
+#endif

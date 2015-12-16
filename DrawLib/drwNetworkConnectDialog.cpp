@@ -1,6 +1,7 @@
 #include "drwNetworkConnectDialog.h"
 #include "ui_drwNetworkConnectDialog.h"
 #include "drwNetworkServerFinder.h"
+#include <QHostAddress>
 
 drwNetworkConnectDialog::drwNetworkConnectDialog(QWidget *parent) :
     QDialog(parent),
@@ -29,6 +30,17 @@ bool drwNetworkConnectDialog::GetSelectedUserAndAddress( QString & user, QHostAd
 		address = addresses.at( m_selectedRow );
 		return true;
 	}
+    else
+    {
+        QHostAddress stringAddr;
+        bool valid = stringAddr.setAddress( ui->serverIPEdit->text() );
+        if( valid )
+        {
+            user = "Manual IP";
+            address = stringAddr;
+            return true;
+        }
+    }
 	return false;
 }
 

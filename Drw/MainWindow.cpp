@@ -30,6 +30,7 @@ MainWindow::MainWindow()
 {
     setWindowTitle( m_appName );
     m_whiteOnBlack = true;
+    m_backupBaseWidth = 10.0;
 
 	CreateActions();
 
@@ -663,7 +664,16 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
         {
             drwLineTool * lineTool = dynamic_cast<drwLineTool*>(m_localToolbox->GetTool( 0 ));
             Q_ASSERT(lineTool);
+            m_backupBaseWidth = lineTool->GetBaseWidth();
+
+            // line width increases more if basewidth is small
+            // 10 -> triple, 200 -> stays the same, linearly in between
+            double ratio = 1.0 + 2.0 * ( 200.0 - m_backupBaseWidth ) / 190.0;
+            lineTool->SetBaseWidth( m_backupBaseWidth * ratio );
+
             lineTool->SetErase( true );
+            m_cursor->SetColor( "orange" );
+            m_glWidget->RequestRedraw();
             handled = true;
         }
         else if( keyEvent->key() == Qt::Key_H )
@@ -695,6 +705,9 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
             drwLineTool * lineTool = dynamic_cast<drwLineTool*>(m_localToolbox->GetTool( 0 ));
             Q_ASSERT(lineTool);
             lineTool->SetErase( false );
+            lineTool->SetBaseWidth( m_backupBaseWidth );
+            m_cursor->SetColor( "yellowgreen" );
+            m_glWidget->RequestRedraw();
             handled = true;
         }
     }

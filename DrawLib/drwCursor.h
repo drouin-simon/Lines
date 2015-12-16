@@ -18,6 +18,7 @@ public:
 	~drwCursor();
 	
     void SetPosition( int x, int y );
+    void SetColor( QString colorName ) { m_colorName = colorName; }
     void Draw( QPainter & painter );
 
 signals:
@@ -29,6 +30,7 @@ protected:
     drwLineTool * m_lineTool;
     drwDrawingWidget * m_drawingWidget;
 
+    QString m_colorName;
     int m_position[2];
 };
 

@@ -10,6 +10,7 @@ drwCursor::drwCursor( drwLineTool * lineTool, drwDrawingWidget * widget )
 {
     m_position[0] = 0;
     m_position[1] = 0;
+    m_colorName = "yellowgreen";
 }
 
 drwCursor::~drwCursor()
@@ -29,7 +30,8 @@ void drwCursor::Draw( QPainter & painter )
     double pixPerUnit = m_drawingWidget->PixelsPerUnit();
     double baseWidthPix = pixPerUnit * baseWidth;
 
-    QPen pen( Qt::green, 1 );
+    QPen pen;
+    pen.setColor( m_colorName );
     painter.setPen( pen );
     painter.setBrush( Qt::NoBrush );
     painter.drawEllipse( QPointF( m_position[0], m_position[1] ), baseWidthPix, baseWidthPix );
