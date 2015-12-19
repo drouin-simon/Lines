@@ -28,12 +28,12 @@ drwNetworkServer::drwNetworkServer( drwCommandDispatcher * dispatcher, QObject *
 
 drwNetworkServer::~drwNetworkServer()
 {
+    // delete all connections
+    Stop();
+
 	delete m_broadcastSocket;
 	delete m_broadcastTimer;
 	delete m_tcpServer;
-
-	// delete all connections
-	Stop();
 }
 
 void drwNetworkServer::Start()
@@ -57,10 +57,17 @@ void drwNetworkServer::Stop()
 		m_broadcastSocket->close();
 
 		// delete all connections
-		ConnectionsContainer::iterator it = m_connections.begin();
+        ConnectionsContainer::iterator it = m_connections.begin();
 		while ( it != m_connections.end() )
 		{
-			delete it.key();
+            drwNetworkConnection * connection = it.key();
+
+            // needed before deleting, otherwise the connection lost callback is called.
+            disconnect( connection, SIGNAL(ConnectionLost(drwNetworkConnection*)), this, SLOT(ConnectionLost(drwNetworkConnection*)) );
+            disconnect( connection, SIGNAL(ConnectionReady(drwNetworkConnection*)), this, SLOT(ConnectionReadySlot(drwNetworkConnection*)));
+            disconnect( connection, SIGNAL(CommandReceived(drwCommand::s_ptr)), this, SLOT(CommandReceivedSlot(drwCommand::s_ptr)) );
+
+            delete connection;
 			++it;
 		}
 		m_connections.clear();
