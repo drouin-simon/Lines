@@ -217,6 +217,8 @@ void drwInThreadAgent::MessageToThreadSlot()
 	else if( m_messageToThread == drwNetworkManager::DisconnectMsg )
 	{
 		Reset();
+        m_manager->SetMessageFromThread( drwNetworkManager::ConnectionLostMsg );
+        emit MessageFromThreadSignal();
 	}
 	else if( m_messageToThread == drwNetworkManager::ResetMsg )
 	{
@@ -234,6 +236,7 @@ void drwInThreadAgent::ClientStateChanged()
 	}
 	else if( state == drwNetworkClient::ConnectionLost )
 	{
+        Reset();
 		m_manager->SetMessageFromThread( drwNetworkManager::ConnectionLostMsg );
 		emit MessageFromThreadSignal();
 	}
@@ -255,6 +258,7 @@ void drwInThreadAgent::Reset()
 {
 	if( m_client )
 	{
+        disconnect( m_client, SIGNAL(StateChanged()), this, SLOT(ClientStateChanged()) );
 		m_client->Disconnect();
 		m_client->deleteLater();
 		m_client = 0;
