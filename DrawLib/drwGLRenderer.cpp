@@ -47,14 +47,6 @@ void drwGLRenderer::RenderToTexture( int currentFrame, int onionSkinBefore, int 
     glMatrixMode( GL_MODELVIEW );
     glLoadIdentity();
     
-    // Adjust onion skins before and after
-    int fBefore = onionSkinBefore;
-    if( currentFrame - onionSkinBefore < 0 )
-        fBefore = currentFrame;
-    int fAfter = onionSkinAfter;
-    if( currentFrame + fAfter > CurrentScene->GetNumberOfFrames() - 1 )
-        fAfter = CurrentScene->GetNumberOfFrames() - currentFrame - 1;
-    
     // Resize textures if needed
     double frameSize[2];
     m_camera->GetFrameSizePix( frameSize );
@@ -75,18 +67,26 @@ void drwGLRenderer::RenderToTexture( int currentFrame, int onionSkinBefore, int 
     // Create a drawing context
     drwDrawingContext context(this);
     
-    int maxFrames = std::max( fBefore, fAfter );
+    int maxFrames = std::max( onionSkinBefore, onionSkinAfter );
     for( int dist = maxFrames; dist > 0; --dist )
     {
         // draw frame before
-        if( fBefore >= dist )
-            RenderLayer( currentFrame - dist, context );
-            //CurrentScene->DrawFrame( currentFrame - dist, context );
+        if( onionSkinBefore >= dist )
+        {
+            int f = currentFrame - dist;
+            while( f < 0 )
+                f = CurrentScene->GetNumberOfFrames() - abs( f );
+            RenderLayer( f, context );
+        }
         
         // draw frame after
-        if( fAfter >= dist )
-            RenderLayer( currentFrame + dist, context );
-            //CurrentScene->DrawFrame( currentFrame + dist, context );
+        if( onionSkinAfter >= dist )
+        {
+            int f = currentFrame + dist;
+            while( f > CurrentScene->GetNumberOfFrames() - 1 )
+                f = f - CurrentScene->GetNumberOfFrames();
+            RenderLayer( f, context );
+        }
         
         // draw background of next layer
         glColor4d( m_clearColor[0], m_clearColor[1], m_clearColor[2], 0.5 );
@@ -94,7 +94,6 @@ void drwGLRenderer::RenderToTexture( int currentFrame, int onionSkinBefore, int 
     }
     
     // draw current frame
-    //CurrentScene->DrawFrame( currentFrame, context );
     RenderLayer( currentFrame, context );
     
     // stop drawing to texture
