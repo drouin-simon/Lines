@@ -95,7 +95,7 @@ bool drwSetFrameCommand::Concatenate( drwCommand * other )
 }
 
 //===================================
-// drwSetPersistenceCommand Implementation
+// drwLineToolParamsCommand Implementation
 //===================================
 
 drwLineToolParamsCommand::drwLineToolParamsCommand()

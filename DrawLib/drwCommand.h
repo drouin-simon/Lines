@@ -109,7 +109,7 @@ public:
     SetMacro(Erase,bool);
     GetMacro(Erase,bool);
 	SetMacro(Persistence,int);
-	GetMacro(Persistence,bool);
+    GetMacro(Persistence,int);
 
 	virtual bool Concatenate( drwCommand * other );
 	
