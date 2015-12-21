@@ -86,7 +86,7 @@ void PrimitiveToolOptionWidget::OnPersistenceSpinBoxValueChanged( int value )
 {
 	if( !m_updating )
 	{
-		m_lineTool->SetPersistence( value );
+        m_editionState->SetPersistence( value );
 	}
 }
 
@@ -189,8 +189,11 @@ void PrimitiveToolOptionWidget::UpdateUi()
 	pressureOpacityCheckBox->setChecked( m_lineTool->GetPressureOpacity() );
     pressureOpacityCheckBox->setEnabled( m_lineTool->IsPerssureWidthAndOpacityEnabled() );
 	fillCheckBox->setChecked( m_lineTool->GetFill() );
-	persistenceSpinBox->setValue( m_lineTool->GetPersistence() );
-    persistenceSpinBox->setEnabled( m_lineTool->IsPersistenceEnabled() );
+
+    persistenceSpinBox->blockSignals( true );
+    persistenceSpinBox->setValue( m_editionState->GetPersistence() );
+    persistenceSpinBox->setEnabled( m_editionState->IsPersistenceEnabled() );
+    persistenceSpinBox->blockSignals( false );
 	
 	m_updating = false;
 }

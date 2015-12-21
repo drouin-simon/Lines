@@ -22,7 +22,7 @@ drwLineTool::drwLineTool( Scene * scene, drwEditionState * editionState, QObject
 , m_pressureOpacity(true)
 , m_fill(false)
 , m_erase(false)
-, m_persistence( 4 )
+, m_persistence( 0 )
 , m_minDistanceBetweenPoints( 4.0 )
 , m_minWidth( 2.0 )
 , m_maxWidth( 100.0 )
@@ -30,6 +30,8 @@ drwLineTool::drwLineTool( Scene * scene, drwEditionState * editionState, QObject
 {	
 	// Make sure the Reset function is the only one driving initial param values
 	Reset();
+
+    connect( m_editionState, SIGNAL(ModifiedSignal()), this, SLOT(OnEditionStateParamsModified()) );
 }
 
 void drwLineTool::ReadSettings( QSettings & s )
@@ -44,7 +46,6 @@ void drwLineTool::ReadSettings( QSettings & s )
     m_pressureOpacity = s.value( "PressureOpacity", QVariant(m_pressureOpacity) ).toBool();
     m_fill = s.value( "Fill", QVariant(m_fill) ).toBool();
     m_erase = s.value( "Erase", QVariant(m_erase) ).toBool();
-    m_persistence = s.value( "Persistence", QVariant(m_persistence) ).toInt();
     
     ParametersChanged();
 }
@@ -61,24 +62,23 @@ void drwLineTool::WriteSettings( QSettings & s )
     s.setValue( "PressureOpacity", QVariant(m_pressureOpacity) );
     s.setValue( "Fill", QVariant(m_fill) );
     s.setValue( "Erase", QVariant(m_erase) );
-    s.setValue( "Persistence", QVariant(m_persistence) );
 }
 
-void drwLineTool::StartLine( double xWorld, double yWorld )
+void drwLineTool::StartLine( double xWorld, double yWorld, double pressure )
 {
-    drwCommand::s_ptr command( new drwMouseCommand( drwMouseCommand::Press, xWorld, yWorld, (int)xWorld, (int)yWorld, 0.0, 0, 0, 1.0, 0.0, 0.0 ) );
+    drwCommand::s_ptr command( new drwMouseCommand( drwMouseCommand::Press, xWorld, yWorld, (int)xWorld, (int)yWorld, 0.0, 0, 0, pressure, 0.0, 0.0 ) );
     ExecuteCommand( command );
 }
 
-void drwLineTool::AddPoint( double xWorld, double yWorld )
+void drwLineTool::AddPoint( double xWorld, double yWorld, double pressure )
 {
-    drwCommand::s_ptr command( new drwMouseCommand( drwMouseCommand::Move, xWorld, yWorld, (int)xWorld, (int)yWorld, 0.0, 0, 0, 1.0, 0.0, 0.0 ) );
+    drwCommand::s_ptr command( new drwMouseCommand( drwMouseCommand::Move, xWorld, yWorld, (int)xWorld, (int)yWorld, 0.0, 0, 0, pressure, 0.0, 0.0 ) );
     ExecuteCommand( command );
 }
 
-void drwLineTool::EndLine( double xWorld, double yWorld )
+void drwLineTool::EndLine( double xWorld, double yWorld, double pressure )
 {
-    drwCommand::s_ptr command( new drwMouseCommand( drwMouseCommand::Release, xWorld, yWorld, (int)xWorld, (int)yWorld, 0.0, 0, 0, 1.0, 0.0, 0.0 ) );
+    drwCommand::s_ptr command( new drwMouseCommand( drwMouseCommand::Release, xWorld, yWorld, (int)xWorld, (int)yWorld, 0.0, 0, 0, pressure, 0.0, 0.0 ) );
     ExecuteCommand( command );
 }
 
@@ -278,7 +278,7 @@ void drwLineTool::Reset()
 	m_pressureWidth = true;
 	m_pressureOpacity = true;
 	m_fill = false;
-    m_persistence = 4;
+    m_persistence = 0;
     CurrentNodes.clear();
 }
 
@@ -323,11 +323,6 @@ void drwLineTool::SetPersistence( int p )
 	ParametersChanged();
 }
 
-bool drwLineTool::IsPersistenceEnabled()
-{
-    return ( m_editionState->GetFrameChangeMode() == Play );
-}
-
 void drwLineTool::SetBaseWidth( double newBaseWidth )
 {
     m_baseWidth = newBaseWidth;
@@ -336,6 +331,15 @@ void drwLineTool::SetBaseWidth( double newBaseWidth )
     if( m_baseWidth > m_maxWidth )
         m_baseWidth = m_maxWidth;
     ParametersChanged();
+}
+
+void drwLineTool::OnEditionStateParamsModified()
+{
+    // todo : drwEditionState should be called this
+    if( m_editionState->GetFrameChangeMode() == Play )
+        SetPersistence( m_editionState->GetPersistence() );
+    else
+        SetPersistence( 0 );
 }
 
 void drwLineTool::ParametersChanged()
@@ -396,9 +400,7 @@ Node * drwLineTool::CreateNewNode()
 
 void drwLineTool::CreateNewNodes( )
 {
-    int lastFrame = m_editionState->GetCurrentFrame();
-    if( this->IsPersistenceEnabled() )
-        lastFrame += m_persistence;
+    int lastFrame = m_editionState->GetCurrentFrame() + m_persistence;
     if( lastFrame >= CurrentScene->GetNumberOfFrames() )
         lastFrame = CurrentScene->GetNumberOfFrames() - 1;
 	for( int frame = m_editionState->GetCurrentFrame(); frame <= lastFrame; ++frame )

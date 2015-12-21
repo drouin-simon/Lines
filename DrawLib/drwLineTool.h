@@ -27,9 +27,9 @@ public:
     void WriteSettings( QSettings & s );
 
     // convenience functions used to automatically create lines
-    void StartLine( double xWorld, double yWorld );
-    void AddPoint( double xWorld, double yWorld );
-    void EndLine( double xWorld, double yWorld );
+    void StartLine( double xWorld, double yWorld, double pressure = 1.0 );
+    void AddPoint( double xWorld, double yWorld, double pressure = 1.0 );
+    void EndLine( double xWorld, double yWorld, double pressure = 1.0 );
 	
 	virtual void MousePressEvent( drwDrawingWidget * w, QMouseEvent * e );
 	virtual void MouseReleaseEvent( drwDrawingWidget * w, QMouseEvent * e );
@@ -54,14 +54,16 @@ public:
 	void SetColor( Vec4 & c );
 	int GetPersistence() { return m_persistence; }
 	void SetPersistence( int p );
-    bool IsPersistenceEnabled();
-    void SetPersistenceEnabled( bool on );
     void SetBaseWidth( double bw );
     double GetBaseWidth() { return m_baseWidth; }
 
 signals:
 
 	void ParametersChangedSignal();
+
+protected slots:
+
+    void OnEditionStateParamsModified();
 	
 protected:
 	

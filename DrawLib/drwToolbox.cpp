@@ -38,12 +38,15 @@ void drwToolbox::ReadSettings( QSettings & s )
 {
     for( unsigned i = 0; i < Tools.size(); ++i )
         Tools[i]->ReadSettings( s );
+
+    m_editionState->ReadSettings( s );
 }
 
 void drwToolbox::WriteSettings( QSettings & s )
 {
     for( unsigned i = 0; i < Tools.size(); ++i )
         Tools[i]->WriteSettings( s );
+    m_editionState->WriteSettings( s );
 }
 
 // Implementation of drwWidgetObserver

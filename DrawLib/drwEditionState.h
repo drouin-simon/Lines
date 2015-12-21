@@ -3,6 +3,8 @@
 
 #include <QObject>
 
+class QSettings;
+
 enum drwFrameChangeMode{ Manual, AfterIntervention, Play };
 
 // This class stores all global state information that is needed by drawing tools
@@ -20,7 +22,12 @@ public:
 	void SetCurrentFrame(int);
 	drwFrameChangeMode GetFrameChangeMode() { return m_frameChangeMode; }
 	void SetFrameChangeMode( drwFrameChangeMode mode );
+    void SetPersistence( int nbFrames );
+    int GetPersistence() { return m_persistence; }
+    bool IsPersistenceEnabled() { return m_frameChangeMode == Play; }
 	void Reset();
+    void ReadSettings( QSettings & s );
+    void WriteSettings( QSettings & s );
 	
 signals:
 	
@@ -32,6 +39,7 @@ private:
 	int m_currentFrame;
 	int m_currentLayer;
 	drwFrameChangeMode m_frameChangeMode;
+    int m_persistence;
 };
 
 
