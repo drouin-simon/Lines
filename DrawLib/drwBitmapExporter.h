@@ -20,6 +20,7 @@ public:
 	void SetScene( Scene * scene ) { m_scene = scene; }
 	void SetFilename( QString filename ) { m_filename = filename; }
 	void SetSize( const QSize & size );
+    void SetExportAlpha( bool e ) { m_exportAlpha = e; }
 	
 	bool StartWriting();
 	
@@ -36,7 +37,7 @@ protected:
 	QString m_baseFilename;
 	QString m_fileExtension;
 	QSize m_size;
-	
+    bool m_exportAlpha;
 };
 
 #endif

@@ -18,6 +18,8 @@ ExportDialog::ExportDialog( QString & defaultPath, int defaultXRes, int defaultY
 	QString yres;
 	yres.setNum( defaultYRes );
 	ui.yResolutionEditBox->setText( yres );
+
+    ui.exportAlphaCheckBox->setChecked( false );
 	
 	ui.fileEditBox->setText( defaultPath );
 }
@@ -35,6 +37,11 @@ void ExportDialog::GetResolution( QSize & res )
 QString ExportDialog::GetFileName()
 {
 	return ui.fileEditBox->text();
+}
+
+bool ExportDialog::IsExportingAlpha()
+{
+    return ui.exportAlphaCheckBox->isChecked();
 }
 
 void ExportDialog::on_browseButton_clicked()

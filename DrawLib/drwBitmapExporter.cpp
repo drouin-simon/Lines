@@ -9,6 +9,7 @@
 drwBitmapExporter::drwBitmapExporter()
 : m_scene(0)
 {
+    m_exportAlpha = false;
 }
 
 drwBitmapExporter::~drwBitmapExporter()
@@ -70,7 +71,8 @@ void drwBitmapExporter::run()
     drwGLRenderer ren;
     ren.SetCurrentScene( m_scene );
     ren.SetRenderSize( m_size.width(), m_size.height() );
-    ren.SetClearColor( 0.0, 0.0, 0.0, 0.0 );
+    double clearAlpha = m_exportAlpha ? 0.0 : 1.0;
+    ren.SetClearColor( 0.0, 0.0, 0.0, clearAlpha );
 	
 	int numberOfDigits = QString::number( m_scene->GetNumberOfFrames() ).size();
 	

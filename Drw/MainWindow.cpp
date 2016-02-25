@@ -137,6 +137,14 @@ MainWindow::MainWindow()
 	
 	// Read Application settings
 	readSettings();
+
+    // Temp: for testing
+    /*lineTool->SetPressureWidth( false );
+    lineTool->SetPressureOpacity( true );
+    lineTool->SetBaseWidth( 200.0 );
+    lineTool->StartLine( 200.0, 200.0, 0.1 );
+    lineTool->AddPoint( 220.0, 220.0, 1.0 );
+    lineTool->EndLine( 240.0, 240.0, 1.0 ); */
 	
 	// Tell the qApp unique instance to send event to MainWindow::eventFilter before anyone else
 	// so that we can grab global keyboard shortcuts.
@@ -281,6 +289,7 @@ bool MainWindow::fileExport()
 		exporter->SetFilename( path );
         exporter->SetScene( m_scene );
 		exporter->SetSize( m_exportRes );
+        exporter->SetExportAlpha( dlg.IsExportingAlpha() );
 		bool res = exporter->StartWriting();
 		
 		// Create the progress dialog, connect it to the exporter and start modal

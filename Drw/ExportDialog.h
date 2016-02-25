@@ -16,6 +16,7 @@ public:
 	
 	void GetResolution( QSize & res );
 	QString GetFileName();
+    bool IsExportingAlpha();
 	
 private slots:
 	
