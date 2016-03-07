@@ -8,7 +8,8 @@
 class QDataStream;
 class QTextStream;
 
-enum drwCommandId { drwIdSetFrameCommand, drwIdMouseCommand, drwIdLineToolParamsCommand, drwIdServerInitialCommand, drwIdNewSceneCommand };
+static int CommandProtocolVersion = 1;
+enum drwCommandId { drwIdSetFrameCommand, drwIdMouseCommand, drwIdLineToolParamsCommand, drwIdServerInitialCommand, drwIdNewSceneCommand, drwIdSceneParamsCommand };
 
 class drwCommand
 {
@@ -130,13 +131,13 @@ class drwServerInitialCommand : public drwCommand
 public:
 
 	drwServerInitialCommand()
-        : NumberOfCommands( 0 ), NumberOfFrames(30) {}
-    drwServerInitialCommand( int nbCommands, int nbFrames )
-        : NumberOfCommands( nbCommands ), NumberOfFrames( nbFrames ) {}
+        : ProtocolVersion( CommandProtocolVersion ), NumberOfCommands( 0 ) {}
+    drwServerInitialCommand( int nbCommands )
+        : ProtocolVersion( CommandProtocolVersion ), NumberOfCommands( nbCommands ) {}
 	drwServerInitialCommand( drwServerInitialCommand & other )
 		: drwCommand( other )
-        , NumberOfCommands( other.NumberOfCommands )
-        , NumberOfFrames( other.NumberOfFrames ) {}
+        , ProtocolVersion( other.ProtocolVersion )
+        , NumberOfCommands( other.NumberOfCommands ) {}
 	virtual ~drwServerInitialCommand() {}
 	virtual s_ptr Clone() { s_ptr newCom( new drwServerInitialCommand( *this ) ); return newCom; }
 
@@ -147,15 +148,14 @@ public:
 	bool WriteImpl( QDataStream & stream );
 	void Write( QTextStream & stream );
 
+    GetMacro(ProtocolVersion,int);
 	SetMacro(NumberOfCommands,int);
 	GetMacro(NumberOfCommands,int);
-    SetMacro(NumberOfFrames,int);
-    GetMacro(NumberOfFrames,int);
 
 protected:
 
+    int ProtocolVersion;
 	int NumberOfCommands;
-    int NumberOfFrames;
 };
 
 class drwMouseCommand : public drwCommand
@@ -222,6 +222,32 @@ public:
     void Read( QDataStream & stream );
     bool WriteImpl( QDataStream & stream );
     void Write( QTextStream & stream );
+};
+
+class drwSceneParamsCommand : public drwCommand
+{
+
+public:
+
+    drwSceneParamsCommand() : m_numberOfFrames(24) {}
+    drwSceneParamsCommand( int nbFrames ) : m_numberOfFrames( nbFrames ) {}
+    drwSceneParamsCommand( drwSceneParamsCommand & other ) : m_numberOfFrames( other.m_numberOfFrames ) {}
+    virtual ~drwSceneParamsCommand() {}
+    virtual s_ptr Clone() { s_ptr newCom( new drwSceneParamsCommand( *this ) ); return newCom; }
+
+    drwCommandId GetCommandId() { return drwIdSceneParamsCommand; }
+    virtual bool IsStateCommand() { return false; }
+    int BodySize();
+    void Read( QDataStream & stream );
+    bool WriteImpl( QDataStream & stream );
+    void Write( QTextStream & stream );
+
+    void SetNumberOfFrames( int nbFrames ) { m_numberOfFrames = nbFrames; }
+    int GetNumberOfFrames() { return m_numberOfFrames; }
+
+protected:
+
+    int m_numberOfFrames;
 };
 
 #endif

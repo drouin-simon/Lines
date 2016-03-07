@@ -36,7 +36,6 @@ MainWindow::MainWindow()
 
 	// Create a Scene and a tool
 	m_scene = new Scene(this);
-	m_scene->SetNumberOfFrames( 30 );
 	m_controler = new PlaybackControler(m_scene, this);
 	m_localToolbox = new drwToolbox( m_scene, m_controler->GetEditionState(), this );
 	m_commandDb = new drwCommandDatabase(this);
@@ -44,6 +43,7 @@ MainWindow::MainWindow()
 	m_commandDispatcher = new drwCommandDispatcher( m_networkManager, m_commandDb, m_localToolbox, m_scene, this );
 	m_networkManager->SetDispatcher( m_commandDispatcher );
     connect( m_networkManager, SIGNAL(StateChangedSignal()), this, SLOT(NetStateChanged()) );
+    m_scene->SetNumberOfFrames( 24 ); // do this after everything else is initialized to make sure we generate a command for the db.
     m_globalLineParams = new drwGlobalLineParams( this );
     m_globalLineParamsDock = 0;
 
@@ -195,7 +195,6 @@ void MainWindow::CreateActions()
     QMenu * help = menuBar()->addMenu( "&Help" );
     help->addSeparator();
     help->addAction( "&About", this, SLOT(about()) );
-    help->addAction( "About&Qt", this, SLOT(aboutQt()));
 }
 
 
@@ -312,7 +311,7 @@ bool MainWindow::fileExport()
 
 void MainWindow::editMenuAboutToShow()
 {
-    bool networkOn = m_networkManager->IsConnected() || m_networkManager->IsSharing();
+    bool networkOn = m_networkManager->IsConnected();
     m_editSetNumberOfFramesAction->setEnabled( !networkOn );
 }
 
@@ -614,14 +613,15 @@ void MainWindow::Reset()
 	m_filename = "";
 }
 
+#include "linesversion.h"
+
 void MainWindow::about()
 {
-    QMessageBox::about( this, m_appName, "Copyrights Simon Drouin 2008\n" );
-}
-
-void MainWindow::aboutQt()
-{
-    QMessageBox::aboutQt( this, m_appName );
+    QString msg = QString( "Lines - version %1.%2\n" ).arg(LINES_MAJOR_VERSION).arg(LINES_MINOR_VERSION);
+    msg += QString("Protocol version %1\n").arg(LINES_PROTOCOL_VERSION);
+    msg += QString("Build date: %1\n").arg(LINES_BUILD_DATE);
+    msg += QString("Copyrights Simon Drouin 2008-2016\n");
+    QMessageBox::about( this, m_appName, msg );
 }
 
 bool MainWindow::eventFilter(QObject *obj, QEvent *event)
@@ -647,15 +647,16 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 		}
 		else if ( keyEvent->key() == Qt::Key_Up )
 		{
-			m_glWidget->GetControler()->GotoEnd();
+            m_glWidget->GetControler()->GotoStart();
 			handled = true;
 		}
 		else if ( keyEvent->key() == Qt::Key_Down )
 		{
-			m_glWidget->GetControler()->GotoStart();
+            m_glWidget->GetControler()->GotoEnd();
 			handled = true;
 		}
-        else if( keyEvent->key() == Qt::Key_E )
+        // For testing paint speed
+        /*else if( keyEvent->key() == Qt::Key_E )
         {
             if( m_drawingEngine->IsRunning() )
                 m_drawingEngine->Stop();
@@ -663,7 +664,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
                 m_drawingEngine->Start();
             m_glWidget->ToggleComputeFps();
             handled = true;
-        }
+        }*/
         else if( keyEvent->key() == Qt::Key_Alt )
         {
             m_glWidget->ActivateViewportWidget( true );

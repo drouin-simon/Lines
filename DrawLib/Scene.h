@@ -1,11 +1,11 @@
 #ifndef __Scene_h_
 #define __Scene_h_
 
-//#include "macros.h"
 #include <vector>
 #include <QObject>
 #include <QReadWriteLock>
 #include "Frame.h"
+#include "drwCommand.h"
 
 class ImageSprite;
 class drwCursor;
@@ -43,6 +43,7 @@ signals:
 	
 	void Modified();
 	void NumberOfFramesChanged(int);
+    void CommandExecuted( drwCommand::s_ptr command );
 	
 public slots:
 	

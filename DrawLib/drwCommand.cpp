@@ -28,6 +28,9 @@ drwCommand::s_ptr drwCommand::InstanciateSubclass( drwCommandId id )
     case drwIdNewSceneCommand:
         newCommand.reset( new drwNewSceneCommand );
         break;
+    case drwIdSceneParamsCommand:
+        newCommand.reset( new drwSceneParamsCommand );
+        break;
 	default:
 		Q_ASSERT(0); // If we get here, we try to read a command type that is not yet defined.
 		break;
@@ -193,26 +196,25 @@ bool drwLineToolParamsCommand::Concatenate( drwCommand * other )
 
 int drwServerInitialCommand::BodySize()
 {
-    return sizeof(NumberOfCommands) + sizeof(NumberOfFrames);
+    return sizeof(ProtocolVersion) + sizeof(NumberOfCommands);
 }
 
 void drwServerInitialCommand::Read( QDataStream & stream )
 {
+    stream >> ProtocolVersion;
 	stream >> NumberOfCommands;
-    stream >> NumberOfFrames;
 }
 
 bool drwServerInitialCommand::WriteImpl( QDataStream & stream )
 {
+    stream << ProtocolVersion;
 	stream << NumberOfCommands;
-    stream << NumberOfFrames;
 	return true;
 }
 
 void drwServerInitialCommand::Write( QTextStream & stream )
 {
-	stream << "ServerInitialCommand: NumberOfCommands = " << NumberOfCommands;
-    stream << "; NumberOfFrames = " << NumberOfFrames;
+    stream << "ServerInitialCommand: ProtocolVersion = " << ProtocolVersion << " NumberOfCommands = " << NumberOfCommands;
 }
 
 //===================================
@@ -337,4 +339,29 @@ bool drwNewSceneCommand::WriteImpl( QDataStream & stream )
 void drwNewSceneCommand::Write( QTextStream & stream )
 {
     stream << "New Scene";
+}
+
+//===================================
+// drwSceneParamsCommand Implementation
+//===================================
+
+int drwSceneParamsCommand::BodySize()
+{
+    return sizeof( m_numberOfFrames );
+}
+
+void drwSceneParamsCommand::Read( QDataStream & stream )
+{
+    stream >> m_numberOfFrames;
+}
+
+bool drwSceneParamsCommand::WriteImpl( QDataStream & stream )
+{
+    stream << m_numberOfFrames;
+    return true;
+}
+
+void drwSceneParamsCommand::Write( QTextStream & stream )
+{
+    stream << "Number of frames = " << m_numberOfFrames;
 }

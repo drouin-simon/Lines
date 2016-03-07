@@ -96,7 +96,12 @@ void Scene::SetNumberOfFrames( int nbFrames )
 
     m_framesLock.unlock();
 
+    // Tell interface number of frames have changed
 	emit NumberOfFramesChanged( nbFrames );
+
+    // Tell db and network peers
+    drwCommand::s_ptr command( new drwSceneParamsCommand( nbFrames ) );
+    emit CommandExecuted( command );
 }
 
 void Scene::InsertFrame( int beforeThisFrame )

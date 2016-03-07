@@ -18,6 +18,7 @@ drwCommandDispatcher::drwCommandDispatcher( drwNetworkManager * net,
 , m_lastUsedUserId( 0 ) // last used is local
 {
 	connect( local, SIGNAL(CommandExecuted(drwCommand::s_ptr)), this, SLOT(IncomingLocalCommand(drwCommand::s_ptr)));
+    connect( scene, SIGNAL(CommandExecuted(drwCommand::s_ptr)), this, SLOT(IncomingLocalCommand(drwCommand::s_ptr)));
 	m_toolboxes[ m_localToolboxId ] = local;
 }
 
@@ -63,11 +64,18 @@ void drwCommandDispatcher::IncomingNetCommand( drwCommand::s_ptr command )
     if( command->GetCommandId() == drwIdServerInitialCommand )
     {
         drwServerInitialCommand * serverMsg = dynamic_cast<drwServerInitialCommand*> (command.get());
-        m_scene->SetNumberOfFrames( serverMsg->GetNumberOfFrames() );
     }
     else if( command->GetCommandId() == drwIdNewSceneCommand )
     {
         Reset();
+    }
+    else if( command->GetCommandId() == drwIdSceneParamsCommand )
+    {
+        drwSceneParamsCommand * serverMsg = dynamic_cast<drwSceneParamsCommand*> (command.get());
+        m_scene->SetNumberOfFrames( serverMsg->GetNumberOfFrames() );
+
+        // Store it in the database
+        m_db->PushCommand( command );
     }
     else
     {
@@ -124,12 +132,20 @@ void drwCommandDispatcher::IncomingLocalCommand( drwCommand::s_ptr command )
 
 void drwCommandDispatcher::IncomingDbCommand( drwCommand::s_ptr command )
 {
-	// Execute the command in the appropriate toolbox
-	int commandUserId = command->GetUserId();
-	drwToolbox * box = m_toolboxes[ commandUserId ];
-	if( !box )
-		box = AddUser( commandUserId );
-	box->ExecuteCommand( command );
+    if( command->GetCommandId() == drwIdSceneParamsCommand )
+    {
+        drwSceneParamsCommand * serverMsg = dynamic_cast<drwSceneParamsCommand*> (command.get());
+        m_scene->SetNumberOfFrames( serverMsg->GetNumberOfFrames() );
+    }
+    else
+    {
+        // Execute the command in the appropriate toolbox
+        int commandUserId = command->GetUserId();
+        drwToolbox * box = m_toolboxes[ commandUserId ];
+        if( !box )
+            box = AddUser( commandUserId );
+        box->ExecuteCommand( command );
+    }
 }
 
 drwToolbox * drwCommandDispatcher::AddUser( int commandUserId )

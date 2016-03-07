@@ -63,7 +63,6 @@ private slots:
     void toggleShowGui();
 
     void about();
-    void aboutQt();
     
     void GlobalLineParamsDockClosed();
 	

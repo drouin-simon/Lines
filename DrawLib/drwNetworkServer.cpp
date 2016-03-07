@@ -113,7 +113,7 @@ void drwNetworkServer::ConnectionReadySlot( drwNetworkConnection * connection )
 {
 	// Send the initial command
 	drwCommandDatabase * db = m_dispatcher->GetDb();
-    drwCommand::s_ptr command( new drwServerInitialCommand( db->GetNumberOfCommands(), m_dispatcher->GetNumberOfFrames() ) );
+    drwCommand::s_ptr command( new drwServerInitialCommand( db->GetNumberOfCommands() ) );
 	connection->SendCommand( command );
 
 	// Send all commands in the database.
