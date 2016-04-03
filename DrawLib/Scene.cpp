@@ -1,6 +1,5 @@
 #include "Scene.h"
 #include "Node.h"
-#include "ImageSprite.h"
 #include <QImage>
 
 Scene::Scene( QObject * parent )
@@ -14,14 +13,7 @@ Scene::~Scene()
     for( unsigned i = 0; i < Frames.size(); ++i )
     {
         delete Frames[i];
-    }
-
-	// Delete all images
-	for( unsigned i = 0; i < m_imageDb.size(); ++i )
-	{
-		delete m_imageDb[i].Sprite;
-	}
-	m_imageDb.clear();
+    }	
 }
 
 void Scene::Clear()
@@ -128,29 +120,4 @@ void Scene::MarkModified()
 	emit Modified();
 }
 
-ImageSprite * Scene::GetImageSprite( const char * filename )
-{
-	// See if a sprite with same filename already exists
-	for( unsigned i = 0; i < m_imageDb.size(); ++i )
-	{
-		if( m_imageDb[i].ImageFileName == filename )
-		{
-			return m_imageDb[i].Sprite;
-		}
-	}
-	
-	// It doesn't, try to load
-	QImage im;
-	if ( !im.load( filename ) )
-		return 0;
-
-	// Create the sprite
-	ImageInfo info;
-	info.ImageFileName = filename;
-	info.Sprite = new ImageSprite;
-	info.Sprite->SetImage( im );
-	m_imageDb.push_back( info );
-	
-	return info.Sprite;
-}
 

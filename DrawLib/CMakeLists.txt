@@ -18,7 +18,6 @@ set( DrawLib_src  drwDrawingWidget.cpp
         drwDrawingContext.cpp
 		TabletStateWidget.cpp
 		PlaybackControler.cpp 
-        ImageSprite.cpp
 		drwCommand.cpp
 		drwCommandDatabase.cpp
 		drwNetworkConnection.cpp
@@ -77,7 +76,6 @@ set( DrawLib_hdr        linesversion.h
 			Circle.h 
 			drwDrawableTexture.h
 			drwDrawingContext.h
-                        ImageSprite.h
 			drwCommand.h
 			drwDataArray.h
 			PolygonData.h

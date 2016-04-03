@@ -7,7 +7,6 @@
 #include "Frame.h"
 #include "drwCommand.h"
 
-class ImageSprite;
 class drwCursor;
 
 class Scene : public QObject
@@ -37,8 +36,6 @@ public:
 	// used by other classes to mark end of modification and notify clients they can re-render
 	void MarkModified();
 	
-	ImageSprite * GetImageSprite( const char * filename );
-	
 signals:
 	
 	void Modified();
@@ -54,15 +51,6 @@ protected:
     QReadWriteLock m_framesLock;
     typedef std::vector<Frame*> FrameCont;
     FrameCont Frames;
-	
-	// Database of images used throughout the scene
-	struct ImageInfo
-	{
-		ImageSprite * Sprite;
-		std::string ImageFileName;
-	};
-	std::vector< ImageInfo > m_imageDb;
-
 };
 
 #endif
