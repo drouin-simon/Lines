@@ -12,8 +12,7 @@ set( DrawLib_src  drwDrawingWidget.cpp
 		Node.cpp
 		Primitive.cpp
 		line.cpp  
-		wideline.cpp
-		Circle.cpp 
+                wideline.cpp
 		drwDrawableTexture.cpp
         drwDrawingContext.cpp
 		TabletStateWidget.cpp
@@ -73,7 +72,6 @@ set( DrawLib_hdr        linesversion.h
 			Primitive.h
 			LinePrimitive.h
 			wideline.h
-			Circle.h 
 			drwDrawableTexture.h
 			drwDrawingContext.h
 			drwCommand.h
