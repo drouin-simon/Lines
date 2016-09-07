@@ -447,6 +447,11 @@ void MainWindow::NetStateChanged()
 {
     if( m_networkManager->GetState() == drwNetworkManager::ConnectionLost )
     {
+        QString errorMessage = m_networkManager->GetErrorMessage();
+        if( !errorMessage.isEmpty() )
+            QMessageBox::warning( this, "Connection Lost", errorMessage );
+        else
+            QMessageBox::warning( this, "Connection Lost", "Server closed connection!" );
         m_networkManager->ResetState();
     }
     UpdateNetworkStatus();

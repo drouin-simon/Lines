@@ -32,6 +32,7 @@ public:
 
 	void SetDispatcher( drwCommandDispatcher * disp ) { m_dispatcher = disp; }
 	NetworkState GetState() { return m_state; }
+    QString GetErrorMessage();
     void ResetState();
 	double GetPercentRead();
 
@@ -102,6 +103,9 @@ public:
 
 	void SetMessageToThread( drwNetworkManager::MessageToThread msg ) { m_messageToThread = msg; }
 
+    QString GetErrorMessage();
+    void SetErrorMessage( QString msg );
+
 public slots:
 	
 	void NewCommandsToSend();
@@ -123,6 +127,7 @@ private:
 	QMutex m_attributesMutex;
 	QString m_userName;
 	QHostAddress m_remoteIp;
+    QString m_errorMessage;
 
 	drwNetworkServer * m_server;
 	drwNetworkManager * m_manager;

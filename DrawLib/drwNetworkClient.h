@@ -21,10 +21,11 @@ public:
 	~drwNetworkClient();
 
 	int GetPercentRead();
+    QString GetErrorMessage() { return m_errorMessage; }
 
 	ClientState GetState() { return m_state; }
     QString GetPeerUserName() { return m_peerUserName; }
-	
+
 	void Connect();
 	void Disconnect();
 	
@@ -39,7 +40,7 @@ public slots:
 private slots:
 		
 	void ConnectionReadySlot( drwNetworkConnection * connection );
-	void ConnectionLostSlot( drwNetworkConnection * connection );
+    void ConnectionLostSlot( drwNetworkConnection * connection, QString errorMessage );
 	void CommandReceivedSlot( drwCommand::s_ptr );
 	
 protected:
@@ -58,6 +59,7 @@ protected:
 	int m_totalNumberOfCommandsToRead;
 
 	ClientState m_state;
+    QString m_errorMessage;
 
 	int m_timerId; // timer used track failed connections
 };

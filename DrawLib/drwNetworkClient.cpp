@@ -38,7 +38,7 @@ void drwNetworkClient::Connect( )
 {
 	// Create a new connection
 	m_connection = new drwNetworkConnection( m_peerUserName, m_peerAddress );
-	connect( m_connection, SIGNAL(ConnectionLost(drwNetworkConnection*)), this, SLOT(ConnectionLostSlot(drwNetworkConnection*)) );
+    connect( m_connection, SIGNAL(ConnectionLost(drwNetworkConnection*,QString)), this, SLOT(ConnectionLostSlot(drwNetworkConnection*,QString)) );
 	connect( m_connection, SIGNAL(ConnectionReady(drwNetworkConnection*)), this, SLOT(ConnectionReadySlot(drwNetworkConnection*)) );
 	m_timerId = startTimer( 3000 );
 	SetState( WaitingForServer );
@@ -63,11 +63,12 @@ void drwNetworkClient::ConnectionReadySlot( drwNetworkConnection * connection )
 	SetState( WaitingForNbCommands );
 }
 
-void drwNetworkClient::ConnectionLostSlot( drwNetworkConnection * connection )
+void drwNetworkClient::ConnectionLostSlot( drwNetworkConnection * connection, QString errorMessage )
 {
+    m_errorMessage = errorMessage;
 	m_connection->deleteLater();
 	m_connection = 0;
-	SetState( ConnectionLost );
+    SetState( ConnectionLost );
 }
 
 void drwNetworkClient::SendCommand( drwCommand::s_ptr command )

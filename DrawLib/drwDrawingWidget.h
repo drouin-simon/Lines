@@ -47,6 +47,7 @@ public slots:
     void CurrentFrameChanged();
 	void PlaybackStartStop( bool isStart );
 	void DisplaySettingsModified();
+    void UpdateCursor();
 
 signals:
 

@@ -26,9 +26,15 @@ drwNetworkManager::~drwNetworkManager()
 	}
 }
 
+QString drwNetworkManager::GetErrorMessage()
+{
+    return m_inThread->GetErrorMessage();
+}
+
 void drwNetworkManager::ResetState()
 {
     SetState( Idle );
+    m_inThread->SetErrorMessage("");  // reset error message
 }
 
 double drwNetworkManager::GetPercentRead()
@@ -157,6 +163,21 @@ void drwInThreadAgent::SetConnectAttributes( QString user, QHostAddress remoteIp
 	m_attributesMutex.unlock();
 }
 
+QString drwInThreadAgent::GetErrorMessage()
+{
+    m_attributesMutex.lock();
+    QString ret = m_errorMessage;
+    m_attributesMutex.unlock();
+    return ret;
+}
+
+void drwInThreadAgent::SetErrorMessage( QString msg )
+{
+    m_attributesMutex.lock();
+    m_errorMessage = msg;
+    m_attributesMutex.unlock();
+}
+
 QString drwInThreadAgent::GetServerUserName()
 {
     if( m_client )
@@ -236,6 +257,7 @@ void drwInThreadAgent::ClientStateChanged()
 	}
 	else if( state == drwNetworkClient::ConnectionLost )
 	{
+        SetErrorMessage( m_client->GetErrorMessage() );
         Reset();
 		m_manager->SetMessageFromThread( drwNetworkManager::ConnectionLostMsg );
 		emit MessageFromThreadSignal();

@@ -11,7 +11,8 @@ QT_END_NAMESPACE
 
 static const int MaxBufferSize = 1024000;
 static const int ConnectionPort = 45455;
-static const QByteArray ProgramSignature = "DRAW_FRIEND_SEARCH";
+static const QByteArray ProgramSignature = "LINES_BROADCAST_SESSION";
+static const QByteArray LinesProtocolSignature = "LINES_PROTOCOL_v1";
 static const quint16 BroadcastPort = 45454;
 
 class drwNetworkConnection : public QObject
@@ -20,7 +21,7 @@ class drwNetworkConnection : public QObject
 
 public:
 
-	enum NextRead{ PeerNameSize, PeerName, CommandHeader, CommandBody };
+    enum NextRead{ ClientProtocolSignature, ServerProtocolSignature, PeerNameSize, PeerName, CommandHeader, CommandBody };
 
     drwNetworkConnection( QTcpSocket *socket, QObject * parent = 0 );
 	drwNetworkConnection( QString peerUserName, QHostAddress & address, QObject *parent = 0 );
@@ -37,7 +38,7 @@ signals:
 
 	void CommandReceived( drwCommand::s_ptr command );
 	void ConnectionReady( drwNetworkConnection * );
-	void ConnectionLost( drwNetworkConnection * );
+    void ConnectionLost( drwNetworkConnection *, QString errorMsg );
 	
 public slots:
 
@@ -51,6 +52,8 @@ private slots:
 	
 private:
 	
+    void SelfDisconnect( QString errorMsg );
+    void SendProtocolSignature();
 	void SendString( const QString & msg );
 	
 	QTcpSocket * m_socket;
