@@ -80,13 +80,11 @@ bool drwNetworkManager::IsConnected()
 
 void drwNetworkManager::Connect( QString username, QHostAddress ip )
 {
-	if( m_state == Idle )
-	{
-		m_inThread->SetConnectAttributes( username, ip );
-		m_inThread->SetMessageToThread( ConnectMsg );
-		emit MessageToThreadSignal();
-        SetState( WaitingForConnection );
-	}
+    Q_ASSERT( m_state == Idle );
+    m_inThread->SetConnectAttributes( username, ip );
+    m_inThread->SetMessageToThread( ConnectMsg );
+    emit MessageToThreadSignal();
+    SetState( WaitingForConnection );
 }
 
 void drwNetworkManager::Disconnect()
@@ -252,6 +250,7 @@ void drwInThreadAgent::ClientStateChanged()
 	drwNetworkClient::ClientState state = m_client->GetState();
 	if( state == drwNetworkClient::ConnectionTimedOut )
 	{
+        Reset();
 		m_manager->SetMessageFromThread( drwNetworkManager::ConnectionTimedOutMsg );
 		emit MessageFromThreadSignal();
 	}
@@ -262,8 +261,7 @@ void drwInThreadAgent::ClientStateChanged()
 		m_manager->SetMessageFromThread( drwNetworkManager::ConnectionLostMsg );
 		emit MessageFromThreadSignal();
 	}
-	else if( state == drwNetworkClient::WaitingForServer ||
-			 state == drwNetworkClient::WaitingForNbCommands ||
+	else if( state == drwNetworkClient::WaitingForNbCommands ||
 			 state == drwNetworkClient::ReceivingScene )
 	{
 		m_manager->SetMessageFromThread( drwNetworkManager::ReceivingSceneMsg );

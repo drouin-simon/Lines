@@ -373,6 +373,7 @@ void MainWindow::NetConnect()
 
         // Create progress dialog and start it
         m_progressDialog = new QProgressDialog( "Connecting", "Cancel", 0, 100 );
+        m_progressDialog->setLabelText("Waiting for server...");
         m_progressDialog->exec();
 
         m_scene->blockSignals( false );
@@ -390,24 +391,12 @@ void MainWindow::NetConnect()
 void MainWindow::NetConnectProgress()
 {
 	drwNetworkManager::NetworkState state = m_networkManager->GetState();
-	if( state == drwNetworkManager::WaitingForConnection )
-	{
-		m_progressDialog->setLabelText("Waiting for server...");
-	}
-	else if( state == drwNetworkManager::ReceivingScene )
+	if( state == drwNetworkManager::ReceivingScene )
 	{
 		// get progress and set it
 		double percent = m_networkManager->GetPercentRead();
 		m_progressDialog->setValue( percent );
 		m_progressDialog->setLabelText("Receiving animation...");
-	}
-	else if( state == drwNetworkManager::Connected )
-	{
-		m_progressDialog->accept();
-	}
-	else
-	{
-		m_progressDialog->cancel();
 	}
 }
 
@@ -445,14 +434,27 @@ void MainWindow::UpdateNetworkStatus()
 
 void MainWindow::NetStateChanged()
 {
-    if( m_networkManager->GetState() == drwNetworkManager::ConnectionLost )
+    drwNetworkManager::NetworkState state = m_networkManager->GetState();
+    if( state == drwNetworkManager::ConnectionLost )
     {
         QString errorMessage = m_networkManager->GetErrorMessage();
         if( !errorMessage.isEmpty() )
             QMessageBox::warning( this, "Connection Lost", errorMessage );
-        else
-            QMessageBox::warning( this, "Connection Lost", "Server closed connection!" );
         m_networkManager->ResetState();
+        if( m_progressDialog )
+            m_progressDialog->cancel();
+    }
+    else if( state == drwNetworkManager::ConnectionTimedOut )
+    {
+        QMessageBox::warning( this, "Server not responding", "Connection timed out!" );
+        m_networkManager->ResetState();
+        if( m_progressDialog )
+            m_progressDialog->cancel();
+    }
+    else if( state == drwNetworkManager::Connected )
+    {
+        if( m_progressDialog )
+            m_progressDialog->accept();
     }
     UpdateNetworkStatus();
 }
