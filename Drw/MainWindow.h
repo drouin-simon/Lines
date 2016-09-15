@@ -64,6 +64,7 @@ private slots:
 	
 	void viewFullscreen();
     void toggleShowGui();
+    void toggleRightPanel();
 
     void about();
     

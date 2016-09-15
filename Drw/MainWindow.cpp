@@ -88,6 +88,7 @@ MainWindow::MainWindow()
     rightPanelLayout->setContentsMargins( 0, 10, 0, 10 );
     rightPanelLayout->setSpacing( 15 );
     m_rightPanelDock->setWidget( m_rightPanelWidget );
+    m_rightPanelDock->setHidden( true ); // by default, this is hidden
 	
 	// Create Drawing window
     m_glWidget = new drwDrawingWidget(m_mainWidget,m_displaySettings);
@@ -509,6 +510,15 @@ void MainWindow::toggleShowGui()
     }
 }
 
+void MainWindow::toggleRightPanel()
+{
+    bool isHidden = m_rightPanelDock->isHidden();
+    if( isHidden )
+        m_rightPanelDock->show();
+    else
+        m_rightPanelDock->hide();
+}
+
 void MainWindow::closeEvent(QCloseEvent *event)
 {
 	if (maybeSave()) 
@@ -716,6 +726,11 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
         else if( keyEvent->key() == Qt::Key_F )
         {
             toggleShowGui();
+            handled = true;
+        }
+        else if( keyEvent->key() == Qt::Key_A )
+        {
+            toggleRightPanel();
             handled = true;
         }
         /*else if( keyEvent->key() == Qt::Key_T )
