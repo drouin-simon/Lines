@@ -9,7 +9,7 @@ drwCamera::drwCamera()
     m_winSizePix[1] = 600;
     m_frameSizeWorld[0] = 1920.0;
     m_frameSizeWorld[1] = 1080.0;
-    m_framePadding = 0.0;
+    m_framePadding = 0.005;
     
     // Computed vars -> will be updated in UpdateSize()
     m_frameSizePix[0] = 0;
@@ -108,7 +108,7 @@ void drwCamera::RenderCameraFrame()
     frameBottomRight[0] = m_frameSizeWorld[0];
     frameBottomRight[1] = 0.0;
     
-    glColor4d( .2, .2, .2, .6 );
+    glColor4d( .24, .24, .24, 1.0 );
     glBegin( GL_QUADS );
     {
         // Top
@@ -174,13 +174,13 @@ void drwCamera::RectThatFitsInside( double w, double h, double percentBorder, in
     if( ratioRect > ratioWin )
     {
         // the width matters
-        rectW = winW + 2 * percentBorder * winW;
+        rectW = winW - 2 * percentBorder * winW;
         rectH = rectW / ratioRect;
     }
     else
     {
         // the height matters
-        rectH = winH + 2 * percentBorder * winH;
+        rectH = winH - 2 * percentBorder * winH;
         rectW = rectH * ratioRect;
     }
 }
