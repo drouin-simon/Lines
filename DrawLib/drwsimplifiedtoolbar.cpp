@@ -41,15 +41,21 @@ void drwSimplifiedToolbar::UpdateUI()
     BlockSigs( true );
 
     // Line tool properties
+    bool allOff = !m_app->IsSmallBrush() && !m_app->IsBigBrush() && !m_app->IsErasing();
+    ui->paintToolButtonGroup->setExclusive( !allOff );
     ui->smallBrushButton->setChecked( m_app->IsSmallBrush() );
     ui->bigBrushButton->setChecked( m_app->IsBigBrush() );
     ui->eraserButton->setChecked( m_app->IsErasing() );
 
     // Frame change mode
+    allOff = !m_app->IsFrameChangeManual() && !m_app->IsFrameChangeJumpAfter();
+    ui->frameChangeButtonGroup->setExclusive( !allOff );
     ui->manualModeButton->setChecked( m_app->IsFrameChangeManual() );
     ui->jumpModeButton->setChecked( m_app->IsFrameChangeJumpAfter() );
 
     // Onion Skin
+    allOff = !m_app->IsNoOnionSkin() && !m_app->IsOneOnionSkin() && !m_app->IsManyOnionSkin();
+    ui->OnionSkinButtonGroup->setExclusive( !allOff );
     ui->noOnionButton->setChecked( m_app->IsNoOnionSkin() );
     ui->oneOnionButton->setChecked( m_app->IsOneOnionSkin() );
     ui->manyOnionButton->setChecked( m_app->IsManyOnionSkin() );
