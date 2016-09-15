@@ -2,7 +2,9 @@ project( DrawLib )
 
 set( LibName Draw )
 
-set( DrawLib_src  drwDrawingWidget.cpp
+set( DrawLib_src LinesApp.cpp
+                drwDrawingWidget.cpp
+                drwsimplifiedtoolbar.cpp
 		drwToolbox.cpp
 		drwLineTool.cpp
 		drwGlslShader.cpp
@@ -38,7 +40,9 @@ set( DrawLib_src  drwDrawingWidget.cpp
 	drwGlobalLineParams.cpp 
 	drwAutoGui.cpp )
 
-set( DrawLib_hdr_moc 	drwDrawingWidget.h 
+set( DrawLib_hdr_moc 	LinesApp.h
+                        drwDrawingWidget.h
+                        drwsimplifiedtoolbar.h
 			drwWidgetObserver.h
 			drwToolbox.h
 			drwLineTool.h
@@ -84,14 +88,18 @@ set( DrawLib_hdr        linesversion.h
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 # Create classes from Qt ui files
-set( Drw_ui TabletStateWidget.ui drwNetworkConnectDialog.ui )
+set( Drw_ui TabletStateWidget.ui drwNetworkConnectDialog.ui drwsimplifiedtoolbar.ui )
 qt5_wrap_ui( DrawLib_hdr_ui ${Drw_ui} )
 
 # moc Qt source file without a ui file
 qt5_wrap_cpp( DrawLib_moc ${DrawLib_hdr_moc} )
 
+# make rules to create c++ source from Qt resource files
+set( LinesLib_rcs lineslibresources.qrc )
+qt5_add_resources( LinesLib_rcs_src ${LinesLib_rcs})
+
 # Create and link executable
-set( DrawLib_all_src ${DrawLib_src} ${DrawLib_moc} ${DrawLib_hdr} ${DrawLib_hdr_moc} ${DrawLib_hdr_ui} )
+set( DrawLib_all_src ${DrawLib_src} ${DrawLib_moc} ${DrawLib_hdr} ${DrawLib_hdr_moc} ${DrawLib_hdr_ui} ${LinesLib_rcs_src} )
 add_library( ${LibName} ${DrawLib_all_src} )
 
 #================================

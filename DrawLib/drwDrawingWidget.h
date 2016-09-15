@@ -21,7 +21,7 @@ class drwDrawingWidget : public QOpenGLWidget
   
 public:
 		
-	drwDrawingWidget( QWidget * parent=0 );
+    drwDrawingWidget( QWidget * parent, drwDisplaySettings * dispSettings );
 	~drwDrawingWidget();
 
     void SetBackgroundColor( Vec4 & color );

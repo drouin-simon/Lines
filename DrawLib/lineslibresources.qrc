@@ -1,0 +1,20 @@
+<RCC>
+    <qresource prefix="/">
+        <file>lines-icons-48x48/big-brush.png</file>
+        <file>lines-icons-48x48/eraser.png</file>
+        <file>lines-icons-48x48/jump.png</file>
+        <file>lines-icons-48x48/manual.png</file>
+        <file>lines-icons-48x48/many-onions.png</file>
+        <file>lines-icons-48x48/no-onion.png</file>
+        <file>lines-icons-48x48/one-onion.png</file>
+        <file>lines-icons-48x48/small-brush.png</file>
+        <file>lines-icons-48x48/big-brush-white.png</file>
+        <file>lines-icons-48x48/eraser-white.png</file>
+        <file>lines-icons-48x48/jump-white.png</file>
+        <file>lines-icons-48x48/manual-white.png</file>
+        <file>lines-icons-48x48/many-onions-white.png</file>
+        <file>lines-icons-48x48/no-onion-white.png</file>
+        <file>lines-icons-48x48/one-onion-white.png</file>
+        <file>lines-icons-48x48/small-brush-white.png</file>
+    </qresource>
+</RCC>

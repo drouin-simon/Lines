@@ -28,6 +28,9 @@ class drwLineToolViewportWidget;
 class drwCursor;
 class drwDrawingEngine;
 class drwGlobalLineParams;
+class drwSimplifiedToolbar;
+class drwDisplaySettings;
+class LinesApp;
 
 class MainWindow : public QMainWindow
 {
@@ -92,6 +95,9 @@ private:
 	QSize m_exportRes;
 
 	drwDrawingWidget    * m_glWidget;
+    drwSimplifiedToolbar * m_simplifiedToolbar;
+    LinesApp * m_linesApp;
+    drwDisplaySettings * m_displaySettings;
 
 	QMenu       * m_viewMenu;
 	QMenu		* m_editMenu;

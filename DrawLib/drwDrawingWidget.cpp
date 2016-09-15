@@ -13,18 +13,18 @@
 #include "drwFpsCounter.h"
 #include "drwGLRenderer.h"
 
-drwDrawingWidget::drwDrawingWidget( QWidget * parent ) 
+drwDrawingWidget::drwDrawingWidget( QWidget * parent, drwDisplaySettings * dispSettings )
 : QOpenGLWidget( parent )
 , Observer(0)
 , m_viewportWidget(0)
 , m_cursor(0)
 , m_showCursor(false)
+, DisplaySettings( dispSettings )
 {
     m_timerId = -1;
     this->Controler = 0;
     m_fpsCounter = 0;
 
-	DisplaySettings = new drwDisplaySettings;
 	connect( DisplaySettings, SIGNAL(ModifiedSignal()), this, SLOT(DisplaySettingsModified()) );
 
     m_renderer = new drwGLRenderer;
@@ -39,7 +39,6 @@ drwDrawingWidget::drwDrawingWidget( QWidget * parent )
 
 drwDrawingWidget::~drwDrawingWidget()
 {
-	delete DisplaySettings;
 }
 
 drwCommand::s_ptr drwDrawingWidget::CreateMouseCommand( drwMouseCommand::MouseCommandType commandType, QMouseEvent * e )

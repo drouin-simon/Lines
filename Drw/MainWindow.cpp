@@ -22,6 +22,9 @@
 #include "drwDisplaySettings.h"
 #include "Vec4.h"
 #include <QtWidgets>
+#include "drwsimplifiedtoolbar.h"
+#include "LinesApp.h"
+#include "drwDisplaySettings.h"
 
 const QString MainWindow::m_appName( "Lines" );
 
@@ -46,14 +49,24 @@ MainWindow::MainWindow()
     m_scene->SetNumberOfFrames( 24 ); // do this after everything else is initialized to make sure we generate a command for the db.
     m_globalLineParams = new drwGlobalLineParams( this );
     m_globalLineParamsDock = 0;
+    m_displaySettings = new drwDisplaySettings;
+
+    m_linesApp = new LinesApp( m_controler->GetEditionState(), m_localToolbox, m_displaySettings );
 
 	// Create main widget  (just a frame to put the viewing widget and the playback control widget)
     m_mainWidget = new QWidget(this);
     setCentralWidget( m_mainWidget );
+
     QHBoxLayout * mainLayout = new QHBoxLayout( m_mainWidget );
     mainLayout->setContentsMargins( 0, 0, 0, 0 );
     mainLayout->setSpacing( 0 );
 
+    // Left panel widget (simplified toolbar)
+    m_simplifiedToolbar = new drwSimplifiedToolbar( m_mainWidget );
+    m_simplifiedToolbar->SetApp( m_linesApp );
+    mainLayout->addWidget( m_simplifiedToolbar );
+
+    // Drawing area layout (drawing window + timeline)
     QVBoxLayout * drawingAreaLayout = new QVBoxLayout();
 	drawingAreaLayout->setContentsMargins( 0, 0, 0, 0 );
     mainLayout->addLayout( drawingAreaLayout );
@@ -77,7 +90,7 @@ MainWindow::MainWindow()
     m_rightPanelDock->setWidget( m_rightPanelWidget );
 	
 	// Create Drawing window
-    m_glWidget = new drwDrawingWidget(m_mainWidget);
+    m_glWidget = new drwDrawingWidget(m_mainWidget,m_displaySettings);
 	m_glWidget->setMinimumSize( 400, 300 );
 	m_glWidget->SetCurrentScene( m_scene );
 	m_glWidget->SetObserver( m_localToolbox );
@@ -157,6 +170,8 @@ MainWindow::~MainWindow()
     delete m_viewportWidget;
     delete m_cursor;
     delete m_drawingEngine;
+    delete m_linesApp;
+    delete m_displaySettings;
 }
 
 void MainWindow::CreateActions()
