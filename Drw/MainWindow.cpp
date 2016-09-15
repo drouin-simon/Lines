@@ -118,7 +118,7 @@ MainWindow::MainWindow()
 	// Alternative right panel
     m_toolOptionWidget = new PrimitiveToolOptionWidget( m_controler->GetEditionState(), lineTool, m_rightPanelWidget );
 	rightPanelLayout->addWidget( m_toolOptionWidget );
-    m_displaySettingsWidget = new DisplaySettingsWidget( m_glWidget->GetDisplaySettings(), m_rightPanelWidget );
+    m_displaySettingsWidget = new DisplaySettingsWidget( m_displaySettings, m_rightPanelWidget );
 	rightPanelLayout->addWidget( m_displaySettingsWidget );
 
     QHBoxLayout * networkStateLayout = new QHBoxLayout();

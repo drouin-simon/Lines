@@ -27,17 +27,12 @@ private slots:
 	void OnFramesBeforeValueChanged(int);
 	void OnFramesAfterValueChanged(int);
 	void OnDisplayCameraFrameChecked( bool );
-	void SettingsModified();
+    void UpdateUI();
 	
 private:
-	
-	void timerEvent(QTimerEvent *event);
-	
-	void SetupUi();
-	void UpdateUi();
-	
-	int m_timerId;
-	bool m_updating;
+
+    void SetupUi();
+    void BlockSigs( bool block );
 	
 	drwDisplaySettings * m_displaySettings;
 	

@@ -10,12 +10,11 @@
 
 DisplaySettingsWidget::DisplaySettingsWidget( drwDisplaySettings * displaySettings, QWidget * parent )
 : QWidget( parent )
-, m_timerId(-1)
-, m_updating(false)
 , m_displaySettings(displaySettings)
 {
 	SetupUi();
-	UpdateUi();
+    connect( m_displaySettings, SIGNAL(ModifiedSignal()), this, SLOT(UpdateUI()) );
+    UpdateUI();
 }
 
 DisplaySettingsWidget::~DisplaySettingsWidget()
@@ -24,33 +23,26 @@ DisplaySettingsWidget::~DisplaySettingsWidget()
 
 void DisplaySettingsWidget::OnFramesBeforeValueChanged( int value )
 {
-	if(!m_updating)
-		m_displaySettings->SetOnionSkinBefore( value );
+    m_displaySettings->SetOnionSkinBefore( value );
 }
 
 void DisplaySettingsWidget::OnFramesAfterValueChanged( int value )
 {
-	if(!m_updating)
-		m_displaySettings->SetOnionSkinAfter( value );
+    m_displaySettings->SetOnionSkinAfter( value );
 }
 
 void DisplaySettingsWidget::OnDisplayCameraFrameChecked( bool isOn )
 {
-	if( !m_updating )
-		m_displaySettings->SetShowCameraFrame( isOn );
+    m_displaySettings->SetShowCameraFrame( isOn );
 }
 
-void DisplaySettingsWidget::SettingsModified()
+void DisplaySettingsWidget::UpdateUI()
 {
-	if( m_timerId != -1 )
-		m_timerId = startTimer( 0 );
-}
-
-void DisplaySettingsWidget::timerEvent(QTimerEvent *event)
-{
-	killTimer( m_timerId );
-	m_timerId = -1;
-	UpdateUi();
+    BlockSigs( true );
+    framesBeforeSpinBox->setValue( m_displaySettings->GetOnionSkinBefore() );
+    framesAfterSpinBox->setValue( m_displaySettings->GetOnionSkinAfter() );
+    displayCameraFrameCheckBox->setChecked( m_displaySettings->GetShowCameraFrame() );
+    BlockSigs( false );
 }
 
 void DisplaySettingsWidget::SetupUi()
@@ -96,13 +88,9 @@ void DisplaySettingsWidget::SetupUi()
 	mainLayout->addWidget( displayCameraFrameCheckBox );	
 }
 
-void DisplaySettingsWidget::UpdateUi()
+void DisplaySettingsWidget::BlockSigs( bool block )
 {
-	m_updating = true;
-	
-	framesBeforeSpinBox->setValue( m_displaySettings->GetOnionSkinBefore() );
-	framesAfterSpinBox->setValue( m_displaySettings->GetOnionSkinAfter() );
-	displayCameraFrameCheckBox->setChecked( m_displaySettings->GetShowCameraFrame() );
-		
-	m_updating = false;
+    framesBeforeSpinBox->blockSignals( block );
+    framesAfterSpinBox->blockSignals( block );
+    displayCameraFrameCheckBox->blockSignals( block );
 }
