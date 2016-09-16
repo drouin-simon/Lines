@@ -140,7 +140,7 @@ private:
 
     static const QString m_appName;
     bool m_whiteOnBlack;
-    double m_backupBaseWidth;
+    bool m_eraseToggled;
 };
 
 

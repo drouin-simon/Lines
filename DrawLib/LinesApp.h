@@ -8,6 +8,7 @@
 class drwDisplaySettings;
 class drwToolbox;
 class drwLineTool;
+class drwCursor;
 
 class LinesApp : public QObject
 {
@@ -19,17 +20,21 @@ public:
     LinesApp( drwEditionState * edState, drwToolbox * toolbox, drwDisplaySettings * dispSettings );
     ~LinesApp();
 
+    void SetCursor( drwCursor * cursor ) { m_cursor = cursor; }
+
     // Line brush
     bool IsSmallBrush();
     void SetSmallBrush();
     bool IsBigBrush();
     void SetBigBrush();
+    void ToggleBigSmallBrush();
     void SetLineWidth( double w );
     double GetLineWidth();
     void SetLineColor( Vec4 & color );
     Vec4 GetLineColor();
     void SetErasing();
     bool IsErasing();
+    void ToggleErasing();
 
     // Frame Change mode
     bool IsFrameChangeManual();
@@ -67,9 +72,13 @@ private:
 
     drwLineTool * GetLineTool();
 
+    double m_backupBrushWidth;
+    double m_backupBrushOpacity;
+
     drwEditionState * m_editionState;
     drwToolbox * m_localToolbox;
     drwDisplaySettings * m_displaySettings;
+    drwCursor * m_cursor;
 
 };
 

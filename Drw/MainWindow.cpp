@@ -33,7 +33,7 @@ MainWindow::MainWindow()
 {
     setWindowTitle( m_appName );
     m_whiteOnBlack = true;
-    m_backupBaseWidth = 10.0;
+    m_eraseToggled = false;
 
 	CreateActions();
 
@@ -106,6 +106,7 @@ MainWindow::MainWindow()
     m_glWidget->SetViewportWidget( m_viewportWidget );
     m_cursor = new drwCursor( lineTool, m_glWidget );
     m_glWidget->SetCursor( m_cursor );
+    m_linesApp->SetCursor( m_cursor );
 
     // Create Drawing engine (for testing only for now)
     m_drawingEngine = new drwDrawingEngine;
@@ -687,6 +688,12 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
             m_glWidget->GetControler()->GotoEnd();
 			handled = true;
 		}
+        else if ( keyEvent->key() == Qt::Key_B )
+        {
+            m_linesApp->ToggleBigSmallBrush();
+            m_glWidget->RequestRedraw();
+            handled = true;
+        }
         // For testing paint speed
         /*else if( keyEvent->key() == Qt::Key_E )
         {
@@ -704,18 +711,12 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
         }
         else if( keyEvent->key() == Qt::Key_Shift )
         {
-            drwLineTool * lineTool = dynamic_cast<drwLineTool*>(m_localToolbox->GetTool( 0 ));
-            Q_ASSERT(lineTool);
-            m_backupBaseWidth = lineTool->GetBaseWidth();
-
-            // line width increases more if basewidth is small
-            // 10 -> triple, 200 -> stays the same, linearly in between
-            double ratio = 1.0 + 2.0 * ( 200.0 - m_backupBaseWidth ) / 190.0;
-            lineTool->SetBaseWidth( m_backupBaseWidth * ratio );
-
-            lineTool->SetErase( true );
-            m_cursor->SetColor( "orange" );
-            m_glWidget->RequestRedraw();
+            if( !m_linesApp->IsErasing() )
+            {
+                m_eraseToggled = true;
+                m_linesApp->ToggleErasing();
+                m_glWidget->RequestRedraw();
+            }
             handled = true;
         }
         else if( keyEvent->key() == Qt::Key_H )
@@ -749,11 +750,11 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
         }
         else if( keyEvent->key() == Qt::Key_Shift )
         {
-            drwLineTool * lineTool = dynamic_cast<drwLineTool*>(m_localToolbox->GetTool( 0 ));
-            Q_ASSERT(lineTool);
-            lineTool->SetErase( false );
-            lineTool->SetBaseWidth( m_backupBaseWidth );
-            m_cursor->SetColor( "yellowgreen" );
+            if( m_linesApp->IsErasing() && m_eraseToggled )
+            {
+                m_linesApp->ToggleErasing();
+                m_eraseToggled = false;
+            }
             m_glWidget->RequestRedraw();
             handled = true;
         }

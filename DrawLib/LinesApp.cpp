@@ -2,11 +2,26 @@
 #include "drwToolbox.h"
 #include "drwDisplaySettings.h"
 #include "drwLineTool.h"
+#include "drwCursor.h"
+
+static double smallBrushWidth = 6.0;
+static double smallBrushAlpha = 1.0;
+static double bigBrushWidth = 40.0;
+static double bigBrushAlpha = 0.5;
+static double eraserWidth = 40.0;
+static double eraserAlpha = 1.0;
+static int nbOnionOneBefore = 1;
+static int nbOnionOneAfter = 0;
+static int nbOnionManyBefore = 5;
+static int nbOnionManyAfter = 5;
 
 LinesApp::LinesApp( drwEditionState * edState, drwToolbox * toolbox, drwDisplaySettings * dispSettings )
-    : m_editionState( edState )
+    : m_backupBrushWidth( smallBrushWidth )
+    , m_backupBrushOpacity( smallBrushAlpha )
+    , m_editionState( edState )
     , m_localToolbox( toolbox )
     , m_displaySettings( dispSettings )
+    , m_cursor(0)
 {
     connect( m_editionState, SIGNAL(ModifiedSignal()), this, SLOT(EditParamsModifiedSlot()) );
     drwLineTool * lineTool = dynamic_cast<drwLineTool*>(m_localToolbox->GetTool( 0 ));
@@ -19,17 +34,6 @@ LinesApp::~LinesApp()
 {
 
 }
-
-static double smallBrushWidth = 6.0;
-static double smallBrushAlpha = 1.0;
-static double bigBrushWidth = 100.0;
-static double bigBrushAlpha = 0.5;
-static double eraserWidth = 60.0;
-static double eraserAlpha = 1.0;
-static int nbOnionOneBefore = 1;
-static int nbOnionOneAfter = 1;
-static int nbOnionManyBefore = 5;
-static int nbOnionManyAfter = 5;
 
 bool LinesApp::IsSmallBrush()
 {
@@ -44,6 +48,7 @@ void LinesApp::SetSmallBrush()
     Vec4 col( 1.0, 1.0, 1.0, smallBrushAlpha );
     SetLineColor( col );
     GetLineTool()->SetErase( false );
+    m_cursor->SetColor( "yellowgreen" );
 }
 
 bool LinesApp::IsBigBrush()
@@ -60,6 +65,15 @@ void LinesApp::SetBigBrush()
     Vec4 col( 1.0, 1.0, 1.0, bigBrushAlpha );
     SetLineColor( col );
     GetLineTool()->SetErase( false );
+    m_cursor->SetColor( "yellowgreen" );
+}
+
+void LinesApp::ToggleBigSmallBrush()
+{
+    if( IsSmallBrush() )
+        SetBigBrush();
+    else
+        SetSmallBrush();
 }
 
 void LinesApp::SetLineWidth( double w )
@@ -88,11 +102,30 @@ void LinesApp::SetErasing()
     SetLineWidth( eraserWidth );
     Vec4 color( 1.0, 1.0, 1.0, eraserAlpha );
     SetLineColor( color );
+    m_cursor->SetColor( "orange" );
 }
 
 bool LinesApp::IsErasing()
 {
     return GetLineTool()->GetErase();
+}
+
+void LinesApp::ToggleErasing()
+{
+    if( IsErasing() )
+    {
+        SetLineWidth( m_backupBrushWidth );
+        Vec4 col( 1.0, 1.0, 1.0, m_backupBrushOpacity );
+        SetLineColor( col );
+        GetLineTool()->SetErase( false );
+        m_cursor->SetColor( "yellowgreen" );
+    }
+    else
+    {
+        m_backupBrushWidth = GetLineWidth();
+        m_backupBrushOpacity = GetLineColor()[3];
+        SetErasing();
+    }
 }
 
 bool LinesApp::IsFrameChangeManual()
