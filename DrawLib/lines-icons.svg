@@ -1,0 +1,497 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="744.09448819"
+   height="1052.3622047"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.5 r10040"
+   sodipodi:docname="lines-icons.svg">
+  <defs
+     id="defs4">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="358.22057 : 861.65028 : 1"
+       inkscape:vp_y="-312.5061 : 1497.0658 : 1"
+       inkscape:vp_z="2128.2243 : 308.69371 : 1"
+       inkscape:persp3d-origin="27.493899 : 109.92293 : 1"
+       id="perspective3841" />
+    <inkscape:perspective
+       id="perspective10"
+       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
+       inkscape:vp_z="744.09448 : 526.18109 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 526.18109 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:path-effect
+       is_visible="true"
+       id="path-effect3598"
+       effect="spiro" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.49497475"
+     inkscape:cx="8.7293483"
+     inkscape:cy="492.415"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1276"
+     inkscape:window-height="755"
+     inkscape:window-x="4"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g
+       id="g3828"
+       transform="matrix(0.17125008,0.14961253,-0.14919261,0.1717321,168.70547,-3.4833118)"
+       inkscape:export-filename="/Users/simon/Dropbox/lines-icons-48x48/small-brush.png"
+       inkscape:export-xdpi="43.799999"
+       inkscape:export-ydpi="43.799999">
+      <path
+         sodipodi:nodetypes="ccccc"
+         inkscape:connector-curvature="0"
+         style="fill:#000000;fill-opacity:1;stroke:none"
+         d="m 192.49306,462.65628 c -0.21548,4.60179 -3.21847,15.68099 -3.45275,20.1006 -4.68138,-4.85979 -21.96558,-4.97708 -29.32908,-0.82622 -0.23378,-4.4128 -2.98376,-14.97976 -3.19879,-19.57407 10.3653,-6.45449 26.13731,-7.06344 35.98062,0.29969 z"
+         id="path2994" />
+      <path
+         sodipodi:nodetypes="sscscss"
+         inkscape:connector-curvature="0"
+         id="path2985"
+         d="m 174.75,144.23336 c -11.71573,0 -21.21875,93.89781 -21.21875,209.73493 0,36.98039 0.98843,71.70914 2.6875,101.8772 5.59719,-2.12215 12.08487,-3.34819 19.03125,-3.34819 6.5378,0 12.69506,1.08278 18.0625,2.97873 1.68606,-30.08122 2.65625,-64.67982 2.65625,-101.50774 0,-115.83712 -9.50302,-209.73493 -21.21875,-209.73493 z"
+         style="fill:#000000;fill-opacity:1;stroke:none" />
+      <path
+         sodipodi:nodetypes="sccs"
+         inkscape:connector-curvature="0"
+         id="path2999"
+         d="m 156.84699,488.37486 c 28.79606,-11.9058 57.49105,2.90542 49.58158,46.50036 -11.26743,50.79698 -61.54824,59.3354 -103.09173,62.28464 66.85389,-38.81802 9.60485,-90.63225 53.51015,-108.785 z"
+         style="fill:#000000;fill-opacity:1;stroke:none" />
+    </g>
+    <g
+       id="g3833"
+       transform="matrix(0.14998232,0.15040447,-0.14998232,0.15040447,137.47027,72.986698)"
+       inkscape:export-filename="/Users/simon/Dropbox/lines-icons-48x48/big-brush.png"
+       inkscape:export-xdpi="43.799999"
+       inkscape:export-ydpi="43.799999">
+      <path
+         sodipodi:nodetypes="sscscsssssccs"
+         inkscape:connector-curvature="0"
+         id="path3816"
+         d="m 417.1875,144.21875 c -22.82741,0 -41.4218,91.89257 -21.21875,209.75 6.24802,36.44875 -75.78316,29.28053 -74.08409,59.44859 5.59719,-2.12215 91.88692,-1.32344 98.8333,-1.32344 6.5378,0 91.48696,-0.94751 96.8544,0.94844 1.68606,-30.08122 -86.105,-22.90527 -79.16611,-59.07359 22.22336,-115.83712 1.60866,-209.75 -21.21875,-209.75 z m 0.25,41.4375 c 8.92514,0.14172 16.04797,7.48111 15.90625,16.40625 -0.14172,8.92514 -7.48111,16.04797 -16.40625,15.90625 -8.89202,-0.14119 -16.00075,-7.41986 -15.90625,-16.3125 l 0,-0.0937 c 0.14172,-8.92514 7.48111,-16.04797 16.40625,-15.90625 z"
+         style="fill:#000000;fill-opacity:1;stroke:none" />
+      <rect
+         y="418.99652"
+         x="323.24881"
+         height="12.121831"
+         width="193.9493"
+         id="rect3821"
+         style="opacity:0.98999999;fill:#000000;fill-opacity:1;stroke:none" />
+      <rect
+         style="opacity:0.98999999;fill:#000000;fill-opacity:1;stroke:none"
+         id="rect3823"
+         width="193.9493"
+         height="25.253815"
+         x="323.24881"
+         y="437.17926" />
+      <path
+         sodipodi:nodetypes="ccccc"
+         inkscape:connector-curvature="0"
+         id="rect3825"
+         d="m 324.25896,469.50411 c 0,0 174.75639,-2.02031 193.94929,0 -19.1929,27.27412 14.14214,81.82235 0,114.14723 0,0 -145.46197,-16.16244 -193.94929,0 12.12183,-31.31473 -19.1929,-86.87311 0,-114.14723 z"
+         style="opacity:0.98999999;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:7.27847242;stroke-miterlimit:4;stroke-opacity:1" />
+    </g>
+    <g
+       id="g3875"
+       transform="matrix(0.17742954,-0.17792895,0.17742954,0.17792895,-89.933133,236.2659)"
+       inkscape:export-filename="/Users/simon/Dropbox/lines-icons-48x48/eraser.png"
+       inkscape:export-xdpi="43.799999"
+       inkscape:export-ydpi="43.799999">
+      <rect
+         ry="31.428572"
+         y="775.18665"
+         x="270.37936"
+         height="134.3503"
+         width="335.37064"
+         id="rect3839"
+         style="opacity:0.98999999;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:21.97335434;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
+      <rect
+         ry="8.0053911"
+         y="772.36218"
+         x="338.57147"
+         height="141.42857"
+         width="228.57143"
+         id="rect3871"
+         style="opacity:0.98999999;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:6.15253878;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
+      <rect
+         ry="7.8571429"
+         y="799.505"
+         x="335.71429"
+         height="15.714286"
+         width="232.85715"
+         id="rect3873"
+         style="opacity:0.98999999;fill:#ffffff;fill-opacity:1;stroke:none" />
+    </g>
+    <path
+       sodipodi:nodetypes="ccssccczsscc"
+       inkscape:connector-curvature="0"
+       d="m 134.61977,781.21598 c 0.3221,-5.7995 1.2796,-1.22141 5.2437,-0.33989 0.2937,-4.40738 -4.7399,-1.94301 0.3354,-4.62916 8.2083,-4.34425 27.6286,-12.1451 28.1462,-31.91587 0.4408,-16.83758 -11.7794,-21.75786 -25.6416,-29.53221 -7.0225,-2.55172 -0.1554,-13.15431 -0.1554,-13.15431 0,0 -7.1303,5.99769 -10.2732,2.21993 -2.0973,2.95051 6.3499,4.98601 -1.7531,10.88833 -8.103,5.90229 -23.4435,11.09328 -25.9352,27.71446 -2.4916,16.62123 17.3476,31.98722 24.5304,33.39369 6.5638,1.28518 -0.3283,1.51083 1.4005,5.32187 4.891,-4.98808 1.7803,-3.23158 4.1023,0.0331 z"
+       style="fill:#000000;fill-opacity:1;stroke:none"
+       id="path3900"
+       inkscape:export-filename="/Users/simon/Dropbox/lines-icons-48x48/no-onion.png"
+       inkscape:export-xdpi="43.799999"
+       inkscape:export-ydpi="43.799999" />
+    <g
+       id="g4330"
+       transform="matrix(0.39790416,0,0,0.39902414,-722.50713,200.36227)"
+       inkscape:export-filename="/Users/simon/Dropbox/lines-icons-48x48/one-onion.png"
+       inkscape:export-xdpi="43.799999"
+       inkscape:export-ydpi="43.799999">
+      <path
+         sodipodi:nodetypes="ccssccczsscc"
+         inkscape:connector-curvature="0"
+         d="m 2155.9502,1724.5254 c 0.8094,-14.5342 3.216,-3.0611 13.1785,-0.8519 0.738,-11.0454 -11.9123,-4.8694 0.8429,-11.6012 20.6286,-10.8872 69.435,-30.4369 70.7358,-79.9848 1.108,-42.1969 -29.6035,-54.5276 -64.4414,-74.011 -17.6489,-6.395 -0.3907,-32.9663 -0.3907,-32.9663 0,0 -17.9198,15.0309 -25.8184,5.5634 -5.2708,7.3943 15.9588,12.4956 -4.4057,27.2874 -20.3643,14.7918 -58.9175,27.8011 -65.1794,69.4556 -6.2618,41.6548 43.5973,80.1636 61.6488,83.6884 16.4962,3.2208 -0.8248,3.7863 3.5198,13.3373 12.2919,-12.5007 4.4743,-8.0987 10.3098,0.083 z"
+         style="fill:#000000;fill-opacity:1;stroke:none"
+         id="path3895" />
+      <path
+         sodipodi:nodetypes="csscsssc"
+         inkscape:connector-curvature="0"
+         id="path3898"
+         d="m 2152.3575,1559.0897 c 0,0 -77.1172,40.1314 -67.5237,73.2675 9.5935,33.136 28.0426,59.6448 46.4917,68.4812 18.4491,8.8362 23.9838,9.5726 23.9838,9.5726 0,0 -18.0801,-23.1953 -22.8768,-34.977 -4.7968,-11.7817 -13.6523,-47.8631 -7.7487,-65.1675 5.9038,-17.3044 17.3421,-37.1861 21.4011,-40.4996 4.0587,-3.3137 6.2726,-10.6772 6.2726,-10.6772 z"
+         style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.38566673px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         sodipodi:nodetypes="cccsssc"
+         inkscape:connector-curvature="0"
+         id="path3902"
+         d="m 2158.2612,1560.9306 c -16.6042,34.9769 -29.5811,24.2845 -29.1496,62.5904 -3.4378,31.0739 20.395,31.6199 29.1496,85.7854 0,0 3.3209,-7.3635 11.4385,-20.618 8.1175,-13.2544 13.2834,-8.8362 11.8074,-43.8131 -1.4759,-34.9771 -11.4385,-22.8271 -11.0694,-49.3359 0.3701,-26.5932 -12.1765,-34.6088 -12.1765,-34.6088 z"
+         style="fill:#ffffff;fill-opacity:1;stroke:none" />
+      <path
+         style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.38566673px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 2165.9216,1559.0897 c 0,0 77.1173,40.1314 67.5237,73.2675 -9.5935,33.136 -28.0426,59.6448 -46.4917,68.4812 -18.4491,8.8362 -23.9839,9.5726 -23.9839,9.5726 0,0 18.0802,-23.1953 22.877,-34.977 4.7967,-11.7817 13.6523,-47.8631 7.7486,-65.1675 -5.9037,-17.3044 -17.3422,-37.1861 -21.401,-40.4996 -4.0589,-3.3137 -6.2727,-10.6772 -6.2727,-10.6772 z"
+         id="path3904"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="csscsssc" />
+    </g>
+    <g
+       id="g4320"
+       transform="matrix(0.39790416,0,0,0.39902414,-722.50713,206.81147)"
+       inkscape:export-filename="/Users/simon/Dropbox/lines-icons-48x48/many-onions.png"
+       inkscape:export-xdpi="43.799999"
+       inkscape:export-ydpi="43.799999">
+      <path
+         sodipodi:nodetypes="ccssccczsscc"
+         inkscape:connector-curvature="0"
+         d="m 2154.1038,1980.7013 c 0.8094,-14.5342 3.2159,-3.061 13.1783,-0.8519 0.738,-11.0454 -11.9123,-4.8694 0.843,-11.6011 20.6286,-10.8873 69.4351,-30.437 70.7359,-79.9849 1.1078,-42.1969 -29.6036,-54.5276 -64.4416,-74.011 -17.6487,-6.395 -0.3906,-32.9663 -0.3906,-32.9663 0,0 -17.9196,15.0309 -25.8183,5.5634 -5.2708,7.3944 15.9586,12.4956 -4.4057,27.2874 -20.3643,14.7919 -58.9176,27.8011 -65.1794,69.4557 -6.2619,41.6546 43.5972,80.1635 61.6488,83.6882 16.4961,3.221 -0.8249,3.7865 3.5198,13.3374 12.2919,-12.5007 4.4742,-8.0987 10.3098,0.083 z"
+         style="fill:#000000;fill-opacity:1;stroke:none"
+         id="path3906" />
+      <path
+         sodipodi:nodetypes="csscssc"
+         inkscape:connector-curvature="0"
+         id="path3908"
+         d="m 2154.5714,1811.6599 c 0,0 -67.1547,41.9724 -68.2617,72.5313 -1.1069,30.5587 40.5881,72.5311 49.8126,75.8446 9.2246,3.3137 13.6523,6.6273 13.6523,6.6273 0,0 -40.588,-40.1315 -44.6468,-51.5449 -4.0588,-11.4136 -12.5454,-36.818 -6.2727,-45.6542 6.2727,-8.8363 55.7163,-57.8041 55.7163,-57.8041 z"
+         style="fill:#ffffff;fill-opacity:1;stroke:none" />
+      <path
+         sodipodi:nodetypes="csssssssssc"
+         inkscape:connector-curvature="0"
+         id="path3910"
+         d="m 2157.1543,1813.5008 c 0,0 -48.0611,48.5335 -50.5505,57.8041 -3.7147,13.8332 1.1069,30.1905 2.2139,32.7678 1.1069,2.5773 10.3315,16.1999 13.2833,21.3544 2.9518,5.1546 23.2459,33.1361 26.1977,34.2406 2.9519,1.1045 -13.2833,-22.0907 -13.6523,-23.5635 -0.369,-1.4726 -14.7913,-26.8766 -16.9732,-33.136 -2.9518,-8.4681 -2.8087,-22.6765 0,-33.136 2.4327,-9.0593 11.4384,-18.4089 14.7593,-23.5635 3.3208,-5.1544 12.1764,-13.6226 15.4972,-18.4089 3.3209,-4.7863 9.2246,-14.359 9.2246,-14.359 z"
+         style="fill:#ffffff;fill-opacity:1;stroke:none" />
+      <path
+         sodipodi:nodetypes="ccccsccsssssc"
+         inkscape:connector-curvature="0"
+         id="path3912"
+         d="m 2160.1061,1813.1327 c 0,0 -9.2244,18.0408 -14.7592,28.3497 -4.4279,6.9955 -13.2834,20.9862 -17.3422,34.2407 -2.2139,12.1498 0.738,36.4496 0.738,36.4496 0,0 12.9143,19.8816 14.0213,22.0906 1.1069,2.2092 8.8555,24.2999 8.8555,24.2999 l 2.9519,7.3635 c 0,0 0.1037,-17.9695 -2.5828,-24.2998 -4.2613,-10.04 -7.4032,-17.4825 -11.4385,-30.5588 -3.7113,-12.0266 -0.3691,-20.9861 -2.5829,-27.9816 -0.8889,-2.8086 4.0588,-25.7723 5.1658,-27.6132 1.107,-1.841 12.1764,-19.5135 12.5453,-20.9862 0.3691,-1.4727 4.4278,-21.3544 4.4278,-21.3544 z"
+         style="fill:#ffffff;fill-opacity:1;stroke:none" />
+      <path
+         sodipodi:nodetypes="csscssc"
+         style="fill:#ffffff;fill-opacity:1;stroke:none"
+         d="m 2169.3085,1814.2372 c 0,0 64.2029,39.7633 65.3098,70.3221 1.1069,30.5589 -37.6362,64.4313 -46.8607,67.7448 -9.2246,3.3137 -20.6631,13.9909 -20.6631,13.9909 0,0 40.8413,-37.1978 47.2298,-47.4952 9.5935,-15.4635 11.8074,-40.8677 5.5348,-49.704 -6.2728,-8.8362 -50.5506,-54.8586 -50.5506,-54.8586 z"
+         id="path3914"
+         inkscape:connector-curvature="0" />
+      <path
+         sodipodi:nodetypes="cssscsssssc"
+         style="fill:#ffffff;fill-opacity:1;stroke:none"
+         d="m 2159.8067,1813.5008 c 0,0 45.0425,44.534 50.5506,54.8586 6.2153,11.6502 6.768,22.8165 4.0589,36.0816 -1.808,8.8517 -15.1283,16.9361 -18.0802,22.0906 -2.9518,5.1546 -17.7111,25.0361 -26.1977,32.7679 9.8482,-17.7606 14.4689,-22.3755 16.9731,-27.2452 6.4155,-12.4749 14.5547,-17.996 18.8182,-32.7679 3.5403,-12.2664 -1.0414,-16.0325 -4.7968,-28.3497 -3.0967,-10.1565 -13.2834,-18.7771 -16.6042,-23.9316 -3.3209,-5.1544 -12.1765,-15.4635 -15.4972,-20.2498 -3.321,-4.7863 -9.2247,-13.2545 -9.2247,-13.2545 z"
+         id="path3916"
+         inkscape:connector-curvature="0" />
+      <path
+         sodipodi:nodetypes="ccccsccsssssc"
+         style="fill:#ffffff;fill-opacity:1;stroke:none"
+         d="m 2158.9992,1811.2918 11.8074,27.2452 c 0,0 16.2352,22.459 20.294,35.3452 3.6899,9.2043 -0.738,36.4496 -0.738,36.4496 0,0 -12.9143,19.8816 -14.0212,22.0908 -1.107,2.209 -8.8556,24.2997 -8.8556,24.2997 l -2.9518,7.3635 c 0,0 1.1069,-19.1453 1.8449,-21.3543 0.7379,-2.2091 12.9143,-29.0861 15.4971,-30.927 1.5311,-1.0911 -0.08,-20.5471 -2.9519,-30.5589 -2.6312,-9.1748 -5.1657,-26.1406 -6.2726,-27.9814 -1.1069,-1.8409 -8.8555,-19.1453 -9.2246,-20.6181 -0.3689,-1.4726 -4.4277,-21.3543 -4.4277,-21.3543 z"
+         id="path3918"
+         inkscape:connector-curvature="0" />
+      <path
+         sodipodi:nodetypes="cssscsscc"
+         inkscape:connector-curvature="0"
+         id="path3920"
+         d="m 2158.6301,1831.5416 c 0,0 -5.5346,22.0907 -4.7966,32.7679 0.7379,10.6772 -3.3209,33.8724 -1.476,38.2906 1.8449,4.4181 3.3208,22.0906 4.7968,24.6679 1.476,2.5773 0,33.5042 0,33.5042 0,0 7.7486,-32.7678 8.1175,-35.7133 0.3691,-2.9454 2.9519,-29.086 0.3691,-35.7133 -2.5829,-6.6272 -3.6898,-28.3498 -3.6898,-28.3498 z"
+         style="fill:#ffffff;fill-opacity:1;stroke:none" />
+    </g>
+    <g
+       id="g3980" />
+    <path
+       id="path4252"
+       style="opacity:0.98999999000000005;fill:none;stroke:#000000;stroke-width:4.021;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dashoffset:0;stroke-dasharray:none"
+       d="m 150.31807,444.3413 c 0.012,-2.26995 1.8091,-4.09746 4.0561,-4.09746 2.2471,0 4.0614,1.82749 4.0562,4.09746 l -0.075,33.1478 c -0.2267,10.00033 -8.0776,17.04393 -17.6108,16.90374 -6.1609,-0.0906 -11.5197,-3.16013 -15.368,-8.72271 l -15.6328,-19.99587 c -1.936,-2.48916 -1.5792,-6.05381 0.8601,-8.04085 2.4393,-1.98705 6.0025,-1.61577 7.946,0.86742 l 6.7023,8.56384 0.093,-29.9542 c 0,-2.27001 1.809,-4.09749 4.0561,-4.09749 2.2471,0 4.0385,1.82755 4.0561,4.09749 l 0.1591,22.57631 0.159,-25.79002 c 0.014,-2.26998 1.809,-4.09748 4.0561,-4.09748 2.2471,0 4.0478,1.82748 4.0562,4.09748 l 0.08,23.46006 0.08,-22.33528 c 0.01,-2.26998 1.809,-4.09749 4.0561,-4.09749 2.247,0 4.048,1.82751 4.0561,4.09749 l 0.079,24.98659 z"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ssscscssscssscssscssscs"
+       inkscape:export-filename="/Users/simon/Dropbox/lines-icons-48x48/manual.png"
+       inkscape:export-xdpi="43.799999"
+       inkscape:export-ydpi="43.799999" />
+    <g
+       id="g4310"
+       transform="matrix(0.22160122,0,0,0.22222496,-184.33053,444.85133)"
+       inkscape:export-filename="/Users/simon/Dropbox/lines-icons-48x48/jump.png"
+       inkscape:export-xdpi="43.799999"
+       inkscape:export-ydpi="43.799999">
+      <g
+         transform="translate(-271.42857,-135.71429)"
+         id="g4276">
+        <path
+           style="fill:#000000;fill-opacity:1;stroke:none"
+           d="m 1746.4286,636.6479 30.2525,0.67096 75.4618,-76.38525 c 4.5457,-4.04061 14.5308,-8.57143 22.0562,-1.21937 6.6616,6.50824 4.3364,18.44145 0.8009,21.21937 l -73.658,85.29586 -3.4849,81.847 61.7424,31.48241 c 10.0895,4.77627 8.0918,16.66316 7.0203,20.94887 l -16.5405,75.30331 c -2.2729,8.08122 -8.9243,11.80366 -20.7936,11.55112 -14.3947,-1.51523 -16.4212,-13.63271 -15.7069,-17.20414 l 8.171,-59.21699 -59.607,-26.07886 -24.2857,47.14285 c -1.7857,6.78571 -9.2857,13.21428 -14.2857,13.21428 -5,0 -71.4285,-1.42857 -71.4285,-1.42857 -8.8388,-0.50508 -15.9005,-9.1975 -15.6277,-18.32632 0.2954,-9.88323 6.3165,-17.57922 12.6406,-17.68383 3.6416,-0.0602 58.0304,-1.84699 58.0304,-1.84699 l 18.4848,-57.14286 -3.4848,-81.89031 -76.176,-88.36223 c -2.2729,-9.09137 -2.3595,-14.58158 2.6045,-19.20649 2.6913,-3.10968 14.2784,-5.20921 19.5817,-1.1686 z"
+           id="path4272"
+           inkscape:connector-curvature="0"
+           sodipodi:nodetypes="cccscccccccccccscssccccccc" />
+        <path
+           sodipodi:type="arc"
+           style="opacity:0.98999999;fill:#000000;fill-opacity:1;stroke:none"
+           id="path4274"
+           sodipodi:cx="1760"
+           sodipodi:cy="584.50507"
+           sodipodi:rx="33.57143"
+           sodipodi:ry="33.57143"
+           d="m 1726.4328,583.97207 c 0.2944,-18.53866 15.5615,-33.32857 34.1002,-33.0342 18.5387,0.29436 33.3286,15.56154 33.0342,34.1002 -0.2944,18.53865 -15.5615,33.32856 -34.1002,33.03419 -18.4699,-0.29327 -33.2328,-15.45278 -33.0365,-33.92392"
+           sodipodi:start="3.1574699"
+           sodipodi:end="9.435404"
+           sodipodi:open="true"
+           transform="matrix(1.0744679,0,0,1.0744679,-128.56349,-44.598286)" />
+      </g>
+      <rect
+         ry="3.2142856"
+         y="510.93359"
+         x="1305.7144"
+         height="6.4285712"
+         width="115.71429"
+         id="rect4280"
+         style="opacity:0.98999999;fill:#000000;fill-opacity:1;stroke:none" />
+      <rect
+         style="opacity:0.98999999;fill:#000000;fill-opacity:1;stroke:none"
+         id="rect4284"
+         width="102.85714"
+         height="6.4285712"
+         x="1330.7144"
+         y="556.64789"
+         ry="3.2142856" />
+      <rect
+         ry="3.2142856"
+         y="598.07648"
+         x="1334.2858"
+         height="6.4285712"
+         width="99.285713"
+         id="rect4286"
+         style="opacity:0.98999999;fill:#000000;fill-opacity:1;stroke:none" />
+      <rect
+         style="opacity:0.98999999;fill:#000000;fill-opacity:1;stroke:none"
+         id="rect4288"
+         width="115.71429"
+         height="6.4285712"
+         x="1274.2858"
+         y="468.79074"
+         ry="3.2142856" />
+      <rect
+         style="opacity:0.98999999;fill:#000000;fill-opacity:1;stroke:none"
+         id="rect4290"
+         width="72.14286"
+         height="6.4285712"
+         x="1355"
+         y="638.79077"
+         ry="3.2142856" />
+    </g>
+    <rect
+       style="opacity:0.98999999000000005;fill:none;stroke:none;stroke-opacity:1"
+       id="rect4292"
+       width="98.07431"
+       height="98.350365"
+       x="90.004707"
+       y="38.637657"
+       ry="1.2825775"
+       inkscape:export-filename="/Users/simon/Dropbox/lines-icons-48x48/small-brush.png"
+       inkscape:export-xdpi="43.799999"
+       inkscape:export-ydpi="43.799999" />
+    <rect
+       ry="1.2825775"
+       y="149.48828"
+       x="87.811867"
+       height="98.350365"
+       width="98.07431"
+       id="rect4294"
+       style="opacity:0.98999999000000005;fill:none;stroke:none;stroke-width:0.55213796999999998;stroke-opacity:1"
+       inkscape:export-filename="/Users/simon/Dropbox/lines-icons-48x48/big-brush.png"
+       inkscape:export-xdpi="43.799999"
+       inkscape:export-ydpi="43.799999" />
+    <rect
+       style="opacity:0.98999999000000005;fill:none;stroke:none;stroke-width:0.55213796999999998;stroke-opacity:1"
+       id="rect4296"
+       width="98.07431"
+       height="98.350365"
+       x="87.811867"
+       y="259.93091"
+       ry="1.2825775"
+       inkscape:export-filename="/Users/simon/Dropbox/lines-icons-48x48/eraser.png"
+       inkscape:export-xdpi="43.799999"
+       inkscape:export-ydpi="43.799999" />
+    <rect
+       ry="1.2825775"
+       y="413.90567"
+       x="87.811867"
+       height="98.350365"
+       width="98.07431"
+       id="rect4298"
+       style="opacity:0.98999999000000005;fill:none;stroke:none;stroke-width:0.55213796999999998;stroke-opacity:1"
+       inkscape:export-filename="/Users/simon/Dropbox/lines-icons-48x48/manual.png"
+       inkscape:export-xdpi="43.799999"
+       inkscape:export-ydpi="43.799999" />
+    <rect
+       style="opacity:0.98999999000000005;fill:none;stroke:none;stroke-width:0.55213796999999998;stroke-opacity:1"
+       id="rect4300"
+       width="98.07431"
+       height="98.350365"
+       x="87.811867"
+       y="523.54211"
+       ry="1.2825775"
+       inkscape:export-filename="/Users/simon/Dropbox/lines-icons-48x48/jump.png"
+       inkscape:export-xdpi="43.799999"
+       inkscape:export-ydpi="43.799999" />
+    <rect
+       ry="1.2825775"
+       y="692.83368"
+       x="87.811867"
+       height="98.350365"
+       width="98.07431"
+       id="rect4304"
+       style="opacity:0.98999999000000005;fill:none;stroke:none;stroke-width:0.55213796999999998;stroke-opacity:1"
+       inkscape:export-filename="/Users/simon/Dropbox/lines-icons-48x48/no-onion.png"
+       inkscape:export-xdpi="43.799999"
+       inkscape:export-ydpi="43.799999" />
+    <rect
+       style="opacity:0.98999999000000005;fill:none;stroke:none;stroke-width:0.55213796999999998;stroke-opacity:1"
+       id="rect4306"
+       width="98.07431"
+       height="98.350365"
+       x="87.811867"
+       y="800.05176"
+       ry="1.2825775"
+       inkscape:export-filename="/Users/simon/Dropbox/lines-icons-48x48/one-onion.png"
+       inkscape:export-xdpi="43.799999"
+       inkscape:export-ydpi="43.799999" />
+    <rect
+       ry="1.2825775"
+       y="908.07593"
+       x="87.811867"
+       height="98.350365"
+       width="98.07431"
+       id="rect4308"
+       style="opacity:0.98999999000000005;fill:none;stroke:none;stroke-width:0.55213796999999998;stroke-opacity:1"
+       inkscape:export-filename="/Users/simon/Dropbox/lines-icons-48x48/many-onions.png"
+       inkscape:export-xdpi="43.799999"
+       inkscape:export-ydpi="43.799999" />
+    <g
+       id="g3954"
+       transform="matrix(0.77886944,0,0,0.77886944,113.50247,147.79239)"
+       inkscape:export-filename="/Users/simon/Lines/src/DrawLib/lines-icons-48x48/pause.png"
+       inkscape:export-xdpi="43.799999"
+       inkscape:export-ydpi="43.799999">
+      <path
+         inkscape:connector-curvature="0"
+         id="path2818"
+         d="m 304.28205,66.406913 0,56.580417"
+         style="fill:none;stroke:#000000;stroke-width:20.37388992;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+      <path
+         inkscape:connector-curvature="0"
+         style="fill:none;stroke:#000000;stroke-width:20.37388992;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+         d="m 337.14316,66.406913 0,56.580417"
+         id="path3592" />
+    </g>
+    <path
+       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:13.12521744;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 343.0132,59.787901 48.93946,29.06552 -49.31385,31.024979 0.37439,-60.090499 z"
+       id="path3600"
+       sodipodi:nodetypes="cccc"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/Users/simon/Lines/src/DrawLib/lines-icons-48x48/play.png"
+       inkscape:export-xdpi="43.799999"
+       inkscape:export-ydpi="43.799999" />
+    <rect
+       inkscape:export-ydpi="43.799999"
+       inkscape:export-xdpi="43.799999"
+       inkscape:export-filename="/Users/simon/Dropbox/lines-icons-48x48/small-brush.png"
+       ry="1.2825775"
+       y="38.637657"
+       x="90.004707"
+       height="98.350365"
+       width="98.07431"
+       id="rect3168"
+       style="opacity:0.98999999000000005;fill:none;stroke:none;stroke-opacity:1" />
+    <rect
+       inkscape:export-ydpi="43.799999"
+       inkscape:export-xdpi="43.799999"
+       inkscape:export-filename="/Users/simon/Lines/src/DrawLib/lines-icons-48x48/pause.png"
+       ry="1.2825775"
+       y="173.99809"
+       x="314.25858"
+       height="98.350365"
+       width="98.07431"
+       id="rect3938"
+       style="opacity:0.98999999000000005;fill:none;stroke:none;stroke-opacity:1" />
+    <rect
+       style="opacity:0.98999999000000005;fill:none;stroke:none;stroke-opacity:1"
+       id="rect3940"
+       width="98.07431"
+       height="98.350365"
+       x="314.25858"
+       y="173.99809"
+       ry="1.2825775"
+       inkscape:export-filename="/Users/simon/Lines/src/DrawLib/lines-icons-48x48/pause.png"
+       inkscape:export-xdpi="43.799999"
+       inkscape:export-ydpi="43.799999" />
+    <rect
+       inkscape:export-ydpi="43.799999"
+       inkscape:export-xdpi="43.799999"
+       inkscape:export-filename="/Users/simon/Lines/src/DrawLib/lines-icons-48x48/play.png"
+       ry="1.2825775"
+       y="40.657967"
+       x="314.25858"
+       height="98.350365"
+       width="98.07431"
+       id="rect3958"
+       style="opacity:0.98999999000000005;fill:none;stroke:none;stroke-opacity:1" />
+  </g>
+</svg>
