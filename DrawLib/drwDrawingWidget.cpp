@@ -34,7 +34,6 @@ drwDrawingWidget::drwDrawingWidget( QWidget * parent, drwDisplaySettings * dispS
 	setMouseTracking(true);
 	setAutoFillBackground(false);
     setCursor( QCursor( Qt::BlankCursor ) );
-    //UpdateCursor();
 }
 
 drwDrawingWidget::~drwDrawingWidget()
@@ -158,16 +157,6 @@ void drwDrawingWidget::PlaybackStartStop( bool isStarting )
 void drwDrawingWidget::DisplaySettingsModified()
 {
 	update();
-}
-
-void drwDrawingWidget::UpdateCursor()
-{
-    QPixmap pm( 400, 400 );
-    pm.fill( QColor( 0, 0, 0, 0 ) );
-    QPainter paint( &pm );
-    paint.setPen( Qt::red );
-    paint.drawEllipse( 0, 0, 399, 399 );
-    setCursor( QCursor( pm ) );
 }
 
 void drwDrawingWidget::initializeGL()

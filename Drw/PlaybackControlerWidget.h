@@ -2,6 +2,7 @@
 #define __PlaybackControlerWidget_h_
 
 #include <QWidget>
+#include <QIcon>
 
 class PlaybackControler;
 class QHBoxLayout;
@@ -10,7 +11,7 @@ class QSlider;
 class QCheckBox;
 class QSpacerItem;
 class QLabel;
-class QPushButton;
+class QToolButton;
 
 class PlaybackControlerWidget : public QWidget
 {
@@ -21,6 +22,8 @@ public:
 	
 	PlaybackControlerWidget( PlaybackControler * controler, QWidget * parent = 0 );
 	~PlaybackControlerWidget();
+
+    void SetHideFrameRate( bool hide );
 	
 private slots:
 	
@@ -31,29 +34,25 @@ private slots:
 	void PlayPauseButtonClicked();
 	
 	// Controler-connected slots
-	void PlaybackControlerModifiedSlot();
 	void PlaybackStartStopSlot( bool isStart );
-
     void UpdateCurrentFrame();
 
 private:
-	
-	void timerEvent(QTimerEvent *event);
 
 	void SetupUi();
     void UpdateUi();
 	
 	PlaybackControler * m_controler;
 	int m_frameRateIndex;
-	int m_timerId;
-	bool m_isUpdating;
 	static const int NumberOfFrameRates;
 	static const int AvailableFrameRates[8];	
 	
 	QHBoxLayout * mainLayout;
     QLineEdit	* currentFrameLineEdit;
     QSlider		* currentFrameSlider;
-	QPushButton * playPauseButton;
+    QToolButton * playPauseButton;
+    QIcon         playIcon;
+    QIcon         pauseIcon;
     QCheckBox	* loopCheckBox;
     QSpacerItem * postLoopSpacer;
     QSlider		* frameRateSlider;

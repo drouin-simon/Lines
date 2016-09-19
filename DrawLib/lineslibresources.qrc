@@ -16,5 +16,9 @@
         <file>lines-icons-48x48/no-onion-white.png</file>
         <file>lines-icons-48x48/one-onion-white.png</file>
         <file>lines-icons-48x48/small-brush-white.png</file>
+        <file>lines-icons-48x48/play.png</file>
+        <file>lines-icons-48x48/play-white.png</file>
+        <file>lines-icons-48x48/pause.png</file>
+        <file>lines-icons-48x48/pause-white.png</file>
     </qresource>
 </RCC>

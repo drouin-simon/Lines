@@ -116,6 +116,7 @@ MainWindow::MainWindow()
 	// Create playback control widget
     m_playbackControlerWidget = new PlaybackControlerWidget( m_glWidget->GetControler(), m_mainWidget );
 	drawingAreaLayout->addWidget( m_playbackControlerWidget );
+    m_playbackControlerWidget->SetHideFrameRate( true );
 
 	// Alternative right panel
     m_toolOptionWidget = new PrimitiveToolOptionWidget( m_controler->GetEditionState(), lineTool, m_rightPanelWidget );
@@ -515,9 +516,15 @@ void MainWindow::toggleRightPanel()
 {
     bool isHidden = m_rightPanelDock->isHidden();
     if( isHidden )
+    {
         m_rightPanelDock->show();
+        m_playbackControlerWidget->SetHideFrameRate( false );
+    }
     else
+    {
         m_rightPanelDock->hide();
+        m_playbackControlerWidget->SetHideFrameRate( true );
+    }
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)

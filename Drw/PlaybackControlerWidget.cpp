@@ -6,7 +6,7 @@
 #include <QLineEdit>
 #include <QSlider>
 #include <QSpacerItem>
-#include <QPushButton>
+#include <QToolButton>
 
 const int PlaybackControlerWidget::NumberOfFrameRates = 8;
 const int PlaybackControlerWidget::AvailableFrameRates[8] =  \
@@ -25,87 +25,53 @@ PlaybackControlerWidget::PlaybackControlerWidget( PlaybackControler * controler,
 : QWidget( parent )
 , m_controler( controler )
 , m_frameRateIndex(6)
-, m_timerId(-1)
-, m_isUpdating(false)
+, playIcon("://lines-icons-48x48/play-white.png")
+, pauseIcon("://lines-icons-48x48/pause-white.png")
 {
 	SetupUi();
 	UpdateUi();
 	
-	connect( m_controler, SIGNAL( ModifiedSignal() ), this, SLOT(PlaybackControlerModifiedSlot()) );
+    //connect( m_controler, SIGNAL( ModifiedSignal() ), this, SLOT(PlaybackControlerModifiedSlot()) );
 	connect( m_controler, SIGNAL( StartStop(bool) ), this, SLOT(PlaybackStartStopSlot(bool)) );
-    connect( m_controler, SIGNAL(FrameChanged(int)), this, SLOT(UpdateCurrentFrame()) );
+    connect( m_controler, SIGNAL( FrameChanged(int) ), this, SLOT(UpdateCurrentFrame()) );
 }
 
 PlaybackControlerWidget::~PlaybackControlerWidget()
 {
 }
 
+void PlaybackControlerWidget::SetHideFrameRate( bool hide )
+{
+    frameRateLineEdit->setHidden( hide );
+    frameRateSlider->setHidden( hide );
+    fpsLabel->setHidden( hide );
+}
+
 void PlaybackControlerWidget::OnCurrentFrameSliderValueChanged( int value )
 {
-	if( !m_isUpdating )
-		m_controler->SetCurrentFrame( value );
+    m_controler->SetCurrentFrame( value );
 }
 
 void PlaybackControlerWidget::OnFrameRateSliderValueChanged( int value )
 {
-	if( !m_isUpdating )
-	{
-		m_frameRateIndex = value;
-		int ms = AvailableFrameRates[ m_frameRateIndex ];
-		m_controler->SetFrameInterval( ms );
-	}
+    m_frameRateIndex = value;
+    int ms = AvailableFrameRates[ m_frameRateIndex ];
+    m_controler->SetFrameInterval( ms );
 }
 
 void PlaybackControlerWidget::OnLoopCheckBoxToggled( bool isOn )
 {
-	if( !m_isUpdating )
-	{
-		m_controler->SetLooping( isOn );
-	}
+    m_controler->SetLooping( isOn );
 }
 
 void PlaybackControlerWidget::PlayPauseButtonClicked()
 {
-	if( !m_isUpdating )
-	{
-		m_controler->PlayPause();
-	}
-}
-
-void PlaybackControlerWidget::PlaybackControlerModifiedSlot()
-{
-	if( m_timerId == -1 )
-		m_timerId = startTimer(0);
+    m_controler->PlayPause();
 }
 
 void PlaybackControlerWidget::PlaybackStartStopSlot( bool isStart )
 {
-	if( isStart )
-	{
-		if( m_timerId != -1 )
-			killTimer( m_timerId );
-		startTimer( 300 );
-	}
-	else 
-	{
-		if( m_timerId != -1 )
-		{
-			killTimer( m_timerId );
-			m_timerId = -1;
-		}
-	}
-	if( m_timerId == -1 )
-		m_timerId = startTimer(0);
-}
-
-void PlaybackControlerWidget::timerEvent(QTimerEvent *event)
-{
-	if( !m_controler->IsPlaying() && m_timerId != -1 )
-	{
-		killTimer( m_timerId );
-		m_timerId = -1;
-	}
-	UpdateUi();
+    UpdateUi();
 }
 
 void PlaybackControlerWidget::SetupUi()
@@ -138,12 +104,10 @@ void PlaybackControlerWidget::SetupUi()
 	
 	// Play/Pause button
 	{
-		playPauseButton = new QPushButton( tr("Play"), this );
-		QSizePolicy policy( QSizePolicy::Fixed, QSizePolicy::Fixed );
-		playPauseButton->setSizePolicy( policy );
-		playPauseButton->setMinimumWidth( 81 );
+        playPauseButton = new QToolButton( this );
+        playPauseButton->setIcon( playIcon );
 	}
-	mainLayout->addWidget(playPauseButton);
+    mainLayout->addWidget( playPauseButton );
 	
 	// Loop playback checkbox
 	loopCheckBox = new QCheckBox(tr("Loop"),this);
@@ -184,45 +148,49 @@ void PlaybackControlerWidget::SetupUi()
 	
 	connect( currentFrameSlider, SIGNAL(valueChanged(int)), this, SLOT(OnCurrentFrameSliderValueChanged(int)) );
 	connect( frameRateSlider, SIGNAL(valueChanged(int)), this, SLOT(OnFrameRateSliderValueChanged(int)) );
-	connect( playPauseButton, SIGNAL(clicked()), this, SLOT(PlayPauseButtonClicked()) );
+    connect( playPauseButton, SIGNAL(clicked()), this, SLOT(PlayPauseButtonClicked()) );
 	connect( loopCheckBox, SIGNAL(toggled(bool)), this, SLOT(OnLoopCheckBoxToggled(bool)) );
 }
 
 void PlaybackControlerWidget::UpdateUi()
-{	
-	m_isUpdating = true;
-	
+{		
 	// Current frame widgets
 	UpdateCurrentFrame();
 	
 	// Play/Pause button
 	if( m_controler->IsPlaying() )
-		playPauseButton->setText(tr("Pause"));
+        playPauseButton->setIcon( pauseIcon );
 	else
-		playPauseButton->setText(tr("Play"));
+        playPauseButton->setIcon( playIcon );
 	
 	// Loop check box
+    loopCheckBox->blockSignals( true );
 	loopCheckBox->setChecked( m_controler->GetLooping() );
+    loopCheckBox->blockSignals( false );
 	
 	// Frame rate slider
+    frameRateSlider->blockSignals( true );
 	frameRateSlider->setValue( m_frameRateIndex );
+    frameRateSlider->blockSignals( false );
 	
 	// Frame rate line edit
 	int mSecPerFrame = AvailableFrameRates[ m_frameRateIndex ];
 	double fps = double(1000) / double(mSecPerFrame);
 	frameRateLineEdit->setText( QString::number( fps, 'g', 2 ) );
-	
-	m_isUpdating = false;
 }
 
 void PlaybackControlerWidget::UpdateCurrentFrame()
 {
+    currentFrameSlider->blockSignals( true );
+
 	int numberOfFrames = m_controler->GetNumberOfFrames();
 	currentFrameSlider->setRange( 0, numberOfFrames - 1 );
 	
 	// Current frame slider
 	int currentFrame = m_controler->GetCurrentFrame();
 	currentFrameSlider->setValue( currentFrame );
+
+    currentFrameSlider->blockSignals( false );
 	
 	// Current frame line edit
 	currentFrameLineEdit->setText( QString::number( currentFrame ) );
