@@ -335,8 +335,7 @@ void drwLineTool::SetBaseWidth( double newBaseWidth )
 
 void drwLineTool::OnEditionStateParamsModified()
 {
-    // todo : drwEditionState should be called this
-    if( m_editionState->GetFrameChangeMode() == Play )
+    if( m_editionState->IsPersistenceEnabled() )
         SetPersistence( m_editionState->GetPersistence() );
     else
         SetPersistence( 0 );

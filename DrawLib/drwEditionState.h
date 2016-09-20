@@ -24,7 +24,8 @@ public:
 	void SetFrameChangeMode( drwFrameChangeMode mode );
     void SetPersistence( int nbFrames );
     int GetPersistence() { return m_persistence; }
-    bool IsPersistenceEnabled() { return m_frameChangeMode == Play; }
+    void SetPersistenceEnabled( bool enable );
+    bool IsPersistenceEnabled() { return m_persistenceEnabled; }
 	void Reset();
     void ReadSettings( QSettings & s );
     void WriteSettings( QSettings & s );
@@ -39,6 +40,7 @@ private:
 	int m_currentFrame;
 	int m_currentLayer;
 	drwFrameChangeMode m_frameChangeMode;
+    bool m_persistenceEnabled;
     int m_persistence;
 };
 

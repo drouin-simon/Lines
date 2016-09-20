@@ -31,6 +31,7 @@ void PlaybackControler::PlayPause( bool manual )
         if( manual )
             m_editionState->SetFrameChangeMode( m_backupFrameChangeMode );
 		isPlaying = false;
+        m_editionState->SetPersistenceEnabled( false );
 		emit StartStop( false );
 	}
 	else
@@ -43,6 +44,7 @@ void PlaybackControler::PlayPause( bool manual )
 		if( GetCurrentFrame() == GetNumberOfFrames() - 1 )
 			SetCurrentFrame( 0 );
 		isPlaying = true;
+        m_editionState->SetPersistenceEnabled( true );
 		time.restart();
 		m_lastFrameWantedTime = 0;
 		emit StartStop( true );

@@ -6,6 +6,7 @@ drwEditionState::drwEditionState( QObject * parent )
 , m_currentFrame(0)
 , m_frameChangeMode( Manual )
 , m_persistence( 0 )
+, m_persistenceEnabled( false )
 {
 }
 
@@ -31,11 +32,18 @@ void drwEditionState::SetPersistence( int nbFrames )
     emit ModifiedSignal();
 }
 
+void drwEditionState::SetPersistenceEnabled( bool enable )
+{
+    m_persistenceEnabled = enable;
+    emit ModifiedSignal();
+}
+
 void drwEditionState::Reset()
 {
 	m_currentFrame = 0;
     m_frameChangeMode = Manual;
     m_persistence = 4;
+    m_persistenceEnabled = false;
     emit ModifiedSignal();
 }
 

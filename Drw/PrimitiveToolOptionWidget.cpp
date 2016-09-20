@@ -173,9 +173,6 @@ void PrimitiveToolOptionWidget::SetupUi()
 void PrimitiveToolOptionWidget::UpdateUi()
 {
 	m_updating = true;
-
-    //Vec4 color = m_lineTool->GetColor();
-    //gradientWidget->setSliderValue( color[0] );
 	
 	if( m_editionState->GetFrameChangeMode() == Manual )
 		manualFrameChangeRadio->setChecked( true );
@@ -192,7 +189,6 @@ void PrimitiveToolOptionWidget::UpdateUi()
 
     persistenceSpinBox->blockSignals( true );
     persistenceSpinBox->setValue( m_editionState->GetPersistence() );
-    persistenceSpinBox->setEnabled( m_editionState->IsPersistenceEnabled() );
     persistenceSpinBox->blockSignals( false );
 	
 	m_updating = false;
