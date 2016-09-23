@@ -28,6 +28,8 @@ public:
     bool IsBigBrush();
     void SetBigBrush();
     void ToggleBigSmallBrush();
+    void IncreaseBrushSize();
+    void DecreaseBrushSize();
     void SetLineWidth( double w );
     double GetLineWidth();
     void SetLineColor( Vec4 & color );

@@ -696,6 +696,18 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
             m_glWidget->RequestRedraw();
             handled = true;
         }
+        else if ( keyEvent->key() == Qt::Key_M )
+        {
+            m_linesApp->IncreaseBrushSize();
+            m_glWidget->RequestRedraw();
+            handled = true;
+        }
+        else if ( keyEvent->key() == Qt::Key_N )
+        {
+            m_linesApp->DecreaseBrushSize();
+            m_glWidget->RequestRedraw();
+            handled = true;
+        }
         // For testing paint speed
         /*else if( keyEvent->key() == Qt::Key_E )
         {

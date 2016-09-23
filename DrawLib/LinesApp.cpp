@@ -10,6 +10,7 @@ static double bigBrushWidth = 40.0;
 static double bigBrushAlpha = 0.5;
 static double eraserWidth = 40.0;
 static double eraserAlpha = 1.0;
+static double percentBrushIncrease = 0.2;
 static int nbOnionOneBefore = 1;
 static int nbOnionOneAfter = 0;
 static int nbOnionManyBefore = 5;
@@ -74,6 +75,18 @@ void LinesApp::ToggleBigSmallBrush()
         SetBigBrush();
     else
         SetSmallBrush();
+}
+
+void LinesApp::IncreaseBrushSize()
+{
+    double size = GetLineWidth();
+    SetLineWidth( size + percentBrushIncrease * size );
+}
+
+void LinesApp::DecreaseBrushSize()
+{
+    double size = GetLineWidth();
+    SetLineWidth( size - percentBrushIncrease * size );
 }
 
 void LinesApp::SetLineWidth( double w )
