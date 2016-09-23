@@ -34,6 +34,8 @@ MainWindow::MainWindow()
     setWindowTitle( m_appName );
     m_whiteOnBlack = true;
     m_eraseToggled = false;
+    m_simplifiedGui = true;
+    m_guiHidden = false;
 
 	CreateActions();
 
@@ -65,6 +67,7 @@ MainWindow::MainWindow()
     m_simplifiedToolbar = new drwSimplifiedToolbar( m_mainWidget );
     m_simplifiedToolbar->SetApp( m_linesApp );
     mainLayout->addWidget( m_simplifiedToolbar );
+    m_simplifiedToolbar->setHidden( !m_simplifiedGui );
 
     // Drawing area layout (drawing window + timeline)
     QVBoxLayout * drawingAreaLayout = new QVBoxLayout();
@@ -88,7 +91,7 @@ MainWindow::MainWindow()
     rightPanelLayout->setContentsMargins( 0, 10, 0, 10 );
     rightPanelLayout->setSpacing( 15 );
     m_rightPanelDock->setWidget( m_rightPanelWidget );
-    m_rightPanelDock->setHidden( true ); // by default, this is hidden
+    m_rightPanelDock->setHidden( m_simplifiedGui ); // by default, this is hidden
 	
 	// Create Drawing window
     m_glWidget = new drwDrawingWidget(m_mainWidget,m_displaySettings);
@@ -497,19 +500,11 @@ void MainWindow::viewFullscreen()
 
 void MainWindow::toggleShowGui()
 {
-    bool isHidden = m_rightPanelDock->isHidden();
-    if( isHidden )
-    {
-        m_playbackControlerWidget->show();
-        m_rightPanelDock->show();
-        m_glWidget->GetDisplaySettings()->SetShowCameraFrame( true );
-    }
-    else
-    {
-        m_playbackControlerWidget->hide();
-        m_rightPanelDock->hide();
-        m_glWidget->GetDisplaySettings()->SetShowCameraFrame( false );
-    }
+    m_guiHidden = !m_guiHidden;
+    m_simplifiedToolbar->setHidden( m_guiHidden || !m_simplifiedGui );
+    m_playbackControlerWidget->setHidden( m_guiHidden );
+    m_rightPanelDock->setHidden( m_guiHidden || m_simplifiedGui );
+    m_glWidget->GetDisplaySettings()->SetShowCameraFrame( !m_guiHidden );
 }
 
 void MainWindow::toggleRightPanel()

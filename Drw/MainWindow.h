@@ -141,6 +141,8 @@ private:
     static const QString m_appName;
     bool m_whiteOnBlack;
     bool m_eraseToggled;
+    bool m_simplifiedGui;
+    bool m_guiHidden;
 };
 
 
