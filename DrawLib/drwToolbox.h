@@ -49,7 +49,7 @@ private slots:
 	
 protected:
 	
-	unsigned CurrentTool;
+    int CurrentTool;
 	std::vector<drwWidgetObserver*> Tools;
 	
 	drwEditionState * m_editionState;
