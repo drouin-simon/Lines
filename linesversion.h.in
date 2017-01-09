@@ -1,0 +1,13 @@
+#ifndef __linesversion_h_
+#define __linesversion_h_
+
+#define LINES_MAJOR_VERSION ((int)${LINES_MAJOR_VERSION})
+#define LINES_MINOR_VERSION ((int)${LINES_MINOR_VERSION})
+#define LINES_PATCH_VERSION ((int)${LINES_PATCH_VERSION})
+#define LINES_VERSION_QUALIFIER ("${LINES_VERSION_QUALIFIER}")  // Alpha, Beta, Dev or version name
+#define LINES_BUILD_QUALIFIER ("${LINES_BUILD_QUALIFIER}")      // Debug
+#define LINES_COPYRIGHT ("${LINES_COPYRIGHT}")
+
+#define LINES_PROTOCOL_VERSION ((int)${LINES_PROTOCOL_VERSION})
+
+#endif

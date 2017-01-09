@@ -31,18 +31,24 @@ qt5_wrap_cpp( Drw_moc ${Drw_hdr})
 #--------------------------------------------------------------------------------
 # For Apple set the icns file containing icons
 IF(APPLE)
+
   # set how it shows up in the Info.plist file
+  set( MACOSX_BUNDLE_BUNDLE_NAME "Lines" )
   set( MACOSX_BUNDLE_INFO_STRING "Lines" )
   set( MACOSX_BUNDLE_ICON_FILE "lines_icon.icns" )
-  set( MACOSX_BUNDLE_SHORT_VERSION_STRING 0.9 )
-  set( MACOSX_BUNDLE_VERSION 0.9 )
-  set( MACOSX_BUNDLE_LONG_VERSION_STRING 0.9 )
-  set( MACOSX_BUNDLE_BUNDLE_VERSION 0.9 )
-  set( MACOSX_BUNDLE_COPYRIGHT "2010 Simon Drouin" )
-  # set where in the bundle to put the icns file
-  SET_SOURCE_FILES_PROPERTIES(${CMAKE_CURRENT_SOURCE_DIR}/lines_icon.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
-  # include the icns file in the target
-  SET( Drw_src ${Drw_src} ${CMAKE_CURRENT_SOURCE_DIR}/lines_icon.icns)
+  set( MACOSX_BUNDLE_VERSION ${LINES_MAJOR_VERSION}.${LINES_MINOR_VERSION}.${LINES_PATCH_VERSION} )
+  set( MACOSX_BUNDLE_SHORT_VERSION_STRING ${LINES_MAJOR_VERSION}.${LINES_MINOR_VERSION}.${LINES_PATCH_VERSION} )
+  set( MACOSX_BUNDLE_LONG_VERSION_STRING "${LINES_MAJOR_VERSION}.${LINES_MINOR_VERSION}.${LINES_PATCH_VERSION} - ${LINES_VERSION_QUALIFIER} rev. ${LINES_GIT_HASH}" )
+  set( MACOSX_BUNDLE_COPYRIGHT ${LINES_COPYRIGHT} )
+  configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/LinesInfo.plist.in ${CMAKE_CURRENT_BINARY_DIR}/LinesInfo.plist )
+
+  # Deal with the icon
+  set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/lines_icon.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+  set( Drw_src ${Drw_src} ${CMAKE_CURRENT_SOURCE_DIR}/lines_icon.icns)
+
+  # make sure we create an app bundle and not a standalone executable
+  set( executable_flags MACOSX_BUNDLE )
+
 ENDIF(APPLE)
 #--------------------------------------------------------------------------------
 
@@ -59,6 +65,10 @@ if( NOT APPLE )
 	target_link_libraries( ${ExecName} GLee )
 endif( NOT APPLE )
 #--------------------------------------------------------------------------------
+
+if (APPLE)
+    set_target_properties( ${ExecName} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_BINARY_DIR}/LinesInfo.plist )
+endif()
 
 
 #--------------------------------------------------------------------------------

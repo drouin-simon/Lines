@@ -42,8 +42,9 @@ drwDrawingWidget::~drwDrawingWidget()
 
 drwCommand::s_ptr drwDrawingWidget::CreateMouseCommand( drwMouseCommand::MouseCommandType commandType, QMouseEvent * e )
 {
-	double xWin = (double)e->x();
-	double yWin = (double)e->y();
+    int ratio = this->devicePixelRatio();
+    double xWin = ratio * (double)e->x();
+    double yWin = ratio * (double)e->y();
 	double xWorld = 0.0;
 	double yWorld = 0.0;
     m_renderer->WindowToWorld( xWin, yWin, xWorld, yWorld );
@@ -55,10 +56,11 @@ drwCommand::s_ptr drwDrawingWidget::CreateMouseCommand( drwMouseCommand::MouseCo
 
 drwCommand::s_ptr drwDrawingWidget::CreateMouseCommand( drwMouseCommand::MouseCommandType commandType, QTabletEvent * e )
 {
+    int ratio = this->devicePixelRatio();
 	double deltaX = e->hiResGlobalX() - e->globalX();
-	double xWin = (double)e->x() + deltaX;
+    double xWin = ratio * ((double)e->x() + deltaX);
 	double deltaY = e->hiResGlobalY() - e->globalY();
-	double yWin = (double)e->y() + deltaY;
+    double yWin = ratio * ((double)e->y() + deltaY);
 	double xWorld = 0.0;
 	double yWorld = 0.0;
     m_renderer->WindowToWorld( xWin, yWin, xWorld, yWorld );
@@ -165,7 +167,8 @@ void drwDrawingWidget::initializeGL()
 
 void drwDrawingWidget::resizeGL( int w, int h )
 {
-    m_renderer->SetRenderSize( w, h );
+    int ratio = this->devicePixelRatio();
+    m_renderer->SetRenderSize( ratio*w, ratio*h );
 }
 
 void drwDrawingWidget::paintEvent( QPaintEvent * event )

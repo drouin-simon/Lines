@@ -67,8 +67,7 @@ set( DrawLib_hdr_moc 	LinesApp.h
 	    drwGlobalLineParams.h
             drwAutoGui.h )
 
-set( DrawLib_hdr        linesversion.h
-			drwGlslShader.h
+set( DrawLib_hdr        drwGlslShader.h
 			drwCamera.h
 			Frame.h
 			line.h  

@@ -28,7 +28,8 @@ void drwCursor::Draw( QPainter & painter )
 {
     double baseWidth = m_lineTool->GetBaseWidth();
     double pixPerUnit = m_drawingWidget->PixelsPerUnit();
-    double baseWidthPix = pixPerUnit * baseWidth;
+    double dotPerPix = 1.0 / m_drawingWidget->devicePixelRatioF();
+    double baseWidthPix = dotPerPix * pixPerUnit * baseWidth;
 
     QPen pen;
     pen.setColor( m_colorName );

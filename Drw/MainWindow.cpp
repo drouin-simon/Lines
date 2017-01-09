@@ -649,13 +649,14 @@ void MainWindow::Reset()
 }
 
 #include "linesversion.h"
+#include "githash.h"
 
 void MainWindow::about()
 {
-    QString msg = QString( "Lines - version %1.%2\n" ).arg(LINES_MAJOR_VERSION).arg(LINES_MINOR_VERSION);
+    QString msg = QString( "Lines - version %1.%2.%3\n" ).arg(LINES_MAJOR_VERSION).arg(LINES_MINOR_VERSION).arg(LINES_PATCH_VERSION);
     msg += QString("Protocol version %1\n").arg(LINES_PROTOCOL_VERSION);
-    msg += QString("Build date: %1\n").arg(LINES_BUILD_DATE);
-    msg += QString("Copyrights Simon Drouin 2008-2016\n");
+    msg += QString("Git Hash: %1\n").arg(LINES_GIT_HASH_SHORT);
+    msg += QString(LINES_COPYRIGHT);
     QMessageBox::about( this, m_appName, msg );
 }
 

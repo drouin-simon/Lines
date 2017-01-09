@@ -9,6 +9,7 @@ public:
     drwCamera();
     
     void SetWindowSize( int w, int h );
+    int * GetWindowSize() { return m_winSizePix; }
     void SetFrameSize( double w, double h );
     void GetFrameSizePix( double frameSize[2] ) { frameSize[0] = m_frameSizePix[0]; frameSize[1] = m_frameSizePix[1]; }
 

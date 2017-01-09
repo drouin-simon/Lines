@@ -168,6 +168,11 @@ void drwGLRenderer::SetRenderSize( int width, int height )
     m_camera->SetWindowSize( width, height );
 }
 
+int * drwGLRenderer::GetRenderSize()
+{
+    return m_camera->GetWindowSize();
+}
+
 void drwGLRenderer::WindowToWorld( double xWin, double yWin, double & xWorld, double & yWorld )
 {
     m_camera->WindowToWorld( xWin, yWin, xWorld, yWorld );

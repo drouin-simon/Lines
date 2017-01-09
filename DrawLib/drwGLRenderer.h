@@ -27,6 +27,7 @@ public:
     void RenderCameraFrame();
 
     void SetRenderSize( int width, int height );
+    int * GetRenderSize();
     void SetCurrentScene( Scene * cur );
     drwDrawableTexture * GetWorkTexture() { return m_workTexture; }
     drwGlslShader * GetWidelineShader() { return m_widelineShader; }
