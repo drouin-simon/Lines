@@ -4,7 +4,7 @@
 #include "Scene.h"
 #include "Node.h"
 #include "drwEditionState.h"
-#include "drwDrawingWidget.h"
+#include "drwDrawingSurface.h"
 #include <QTabletEvent>
 #include <QSettings>
 
@@ -82,8 +82,9 @@ void drwLineTool::EndLine( double xWorld, double yWorld, double pressure )
     ExecuteCommand( command );
 }
 
-void drwLineTool::MousePressEvent( drwDrawingWidget * w, QMouseEvent * e )
+void drwLineTool::MousePressEvent( drwDrawingSurface * w, QMouseEvent * e )
 {
+    std::cout << "drwLineTool: MousePressEvent" << std::endl;
     if( !m_tabletHasControl )
     {
         drwCommand::s_ptr command = w->CreateMouseCommand( drwMouseCommand::Press, e );
@@ -91,7 +92,7 @@ void drwLineTool::MousePressEvent( drwDrawingWidget * w, QMouseEvent * e )
     }
 }
 
-void drwLineTool::MouseReleaseEvent( drwDrawingWidget * w, QMouseEvent * e )
+void drwLineTool::MouseReleaseEvent( drwDrawingSurface * w, QMouseEvent * e )
 {
     if( !m_tabletHasControl )
     {
@@ -100,7 +101,7 @@ void drwLineTool::MouseReleaseEvent( drwDrawingWidget * w, QMouseEvent * e )
     }
 }
 
-void drwLineTool::MouseMoveEvent( drwDrawingWidget * w, QMouseEvent * e )
+void drwLineTool::MouseMoveEvent( drwDrawingSurface * w, QMouseEvent * e )
 {
     if( !m_tabletHasControl )
     {
@@ -109,7 +110,7 @@ void drwLineTool::MouseMoveEvent( drwDrawingWidget * w, QMouseEvent * e )
     }
 }
 
-void drwLineTool::TabletEvent( drwDrawingWidget * w, QTabletEvent * e )
+void drwLineTool::TabletEvent( drwDrawingSurface * w, QTabletEvent * e )
 {
     if( e->type() == QEvent::TabletPress )
     {

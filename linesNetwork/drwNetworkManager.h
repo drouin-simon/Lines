@@ -7,6 +7,7 @@
 #include <QHostAddress>
 
 #include "drwCommand.h"
+#include "drwRemoteCommandIO.h"
 
 class drwCommandDispatcher;
 class drwNetworkClient;
@@ -16,7 +17,7 @@ class QWidget;
 class drwInThreadAgent;
 class drwNetState;
 
-class drwNetworkManager : public QThread
+class drwNetworkManager : public QThread, public drwRemoteCommandIO
 {
 	
 	Q_OBJECT
@@ -47,9 +48,8 @@ public:
 
 	void SetMessageFromThread( MessageFromThread msg ) { m_messageFromThread = msg; }
 	friend class drwInThreadAgent;
-	
-public slots:
 
+    // Implements drwRemoteCommandIO interface
 	void SendCommand( drwCommand::s_ptr );
 
 private slots:

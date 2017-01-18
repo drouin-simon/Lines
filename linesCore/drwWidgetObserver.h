@@ -5,7 +5,7 @@
 #include "drwCommand.h"
 
 class Scene;
-class drwDrawingWidget;
+class drwDrawingSurface;
 class QMouseEvent;
 class QTabletEvent;
 class QDropEvent;
@@ -25,11 +25,11 @@ public:
     virtual void ReadSettings( QSettings & s ) {}
     virtual void WriteSettings( QSettings & s ) {}
 	
-	virtual void MousePressEvent( drwDrawingWidget * w, QMouseEvent * e ) {}
-	virtual void MouseReleaseEvent( drwDrawingWidget * w, QMouseEvent * e ) {}
-	virtual void MouseMoveEvent( drwDrawingWidget * w, QMouseEvent * e ) {}
-	virtual void TabletEvent( drwDrawingWidget * w, QTabletEvent * e ) {}
-	virtual void DropEvent( drwDrawingWidget * w, QDropEvent * e ) {}
+    virtual void MousePressEvent( drwDrawingSurface * w, QMouseEvent * e ) {}
+    virtual void MouseReleaseEvent( drwDrawingSurface * w, QMouseEvent * e ) {}
+    virtual void MouseMoveEvent( drwDrawingSurface * w, QMouseEvent * e ) {}
+    virtual void TabletEvent( drwDrawingSurface * w, QTabletEvent * e ) {}
+    virtual void DropEvent( drwDrawingSurface * w, QDropEvent * e ) {}
 	
 	virtual void SetCurrentFrame( int frame ) { CurrentFrame = frame; }
     virtual void Reset() {}

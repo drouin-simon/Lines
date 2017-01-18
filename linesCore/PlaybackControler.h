@@ -3,7 +3,6 @@
 
 #include <QObject>
 #include <QTime>
-#include "drwGlobal.h"
 #include "drwEditionState.h"
 
 class Scene;

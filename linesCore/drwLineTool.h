@@ -9,6 +9,7 @@
 class Node;
 class LinePrimitive;
 class drwEditionState;
+class drwDrawingSurface;
 
 enum PrimitiveType { TypeLine = 0, TypeWideLine, EndType };
 
@@ -31,10 +32,10 @@ public:
     void AddPoint( double xWorld, double yWorld, double pressure = 1.0 );
     void EndLine( double xWorld, double yWorld, double pressure = 1.0 );
 	
-	virtual void MousePressEvent( drwDrawingWidget * w, QMouseEvent * e );
-	virtual void MouseReleaseEvent( drwDrawingWidget * w, QMouseEvent * e );
-	virtual void MouseMoveEvent( drwDrawingWidget * w, QMouseEvent * e );
-	virtual void TabletEvent( drwDrawingWidget * w, QTabletEvent * e );
+    virtual void MousePressEvent( drwDrawingSurface * w, QMouseEvent * e );
+    virtual void MouseReleaseEvent( drwDrawingSurface * w, QMouseEvent * e );
+    virtual void MouseMoveEvent( drwDrawingSurface * w, QMouseEvent * e );
+    virtual void TabletEvent( drwDrawingSurface * w, QTabletEvent * e );
 	
 	virtual void ExecuteCommand( drwCommand::s_ptr command );
 	virtual void SetCurrentFrame( int frame );

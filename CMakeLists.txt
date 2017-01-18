@@ -1,4 +1,4 @@
-PROJECT( Draw )
+PROJECT( Lines )
 
 cmake_minimum_required(VERSION 2.6)
 
@@ -53,6 +53,7 @@ else(APPLE)
   include_directories( ${GLeeIncludeDir} )
 endif(APPLE)
 
-
-add_subdirectory( DrawLib )
-add_subdirectory( Drw )
+add_subdirectory( linesCore )
+add_subdirectory( linesNetwork )
+add_subdirectory( linesDesktopLib )
+add_subdirectory( linesDesktop )

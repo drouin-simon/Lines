@@ -1,5 +1,3 @@
-project( LinesProject )
-
 set( ExecName Lines )
 
 set( Drw_src  main.cpp 
@@ -16,7 +14,9 @@ set( Drw_hdr MainWindow.h
 		ExportDialog.h )
 
 # Include dir for DrawLib
-include_directories(${DRAWLIB_INCLUDE_DIR})
+include_directories(${linesCoreIncludeDirs})
+include_directories(${linesNetworkIncludeDirs})
+include_directories(${linesDesktopLibIncludeDirs})
 
 # Include bin directory for moc files
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
@@ -58,7 +58,7 @@ ENDIF(APPLE)
 #
 set( Drw_all_src ${Drw_src} ${Drw_hdr} ${Drw_moc} ${Drw_hdr_ui} )
 add_executable( ${ExecName} ${EXECUTABLE_FLAG} ${Drw_all_src} )
-target_link_libraries( ${ExecName} Draw svl ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY} ${QT_LIBRARIES} )
+target_link_libraries( ${ExecName} linesDesktopLib linesNetwork linesCore svl ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY} ${QT_LIBRARIES} )
 qt5_use_modules( ${ExecName} OpenGL Widgets Network )
 
 if( NOT APPLE )
@@ -99,7 +99,7 @@ ENDIF(APPLE)
 #================================
 # Explicit dependencies
 #================================
-add_dependencies( ${ExecName} svl Draw )
+add_dependencies( ${ExecName} svl linesDesktopLib )
 if( NOT APPLE )
 	add_dependencies( ${ExecName} GLee )
 endif( NOT APPLE )

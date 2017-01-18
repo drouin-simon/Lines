@@ -2,7 +2,6 @@
 #define __DisplaySettingsWidget_h_
 
 #include <QWidget>
-#include "drwGlobal.h"
 
 class QVBoxLayout;
 class QHBoxLayout;

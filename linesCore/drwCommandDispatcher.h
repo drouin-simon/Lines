@@ -7,7 +7,7 @@
 
 class Scene;
 class drwToolbox;
-class drwNetworkManager;
+class drwRemoteCommandIO;
 class drwCommandDatabase;
 
 class drwCommandDispatcher : public QObject
@@ -17,7 +17,7 @@ class drwCommandDispatcher : public QObject
 	
 public:
 	
-	drwCommandDispatcher( drwNetworkManager * net, drwCommandDatabase * db, drwToolbox * local, Scene * scene, QObject * parent );
+    drwCommandDispatcher( drwRemoteCommandIO * remote, drwCommandDatabase * db, drwToolbox * local, Scene * scene, QObject * parent );
 	~drwCommandDispatcher();
 	drwCommandDatabase * GetDb() { return m_db; }
 	int RequestNewUserId();
@@ -39,7 +39,7 @@ protected:
 	
 	Scene * m_scene;
 	drwCommandDatabase * m_db;
-	drwNetworkManager * m_netManager;
+    drwRemoteCommandIO * m_remoteIO;
 
 	// Container to cache state commands until an effective command comes
 	typedef QList< drwCommand::s_ptr > CommandContainer;

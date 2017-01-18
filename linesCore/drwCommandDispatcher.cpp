@@ -1,12 +1,12 @@
 #include "drwCommandDispatcher.h"
 #include "drwToolbox.h"
 #include "drwCommandDatabase.h"
-#include "drwNetworkManager.h"
+#include "drwRemoteCommandIO.h"
 #include "Scene.h"
 
 const int drwCommandDispatcher::m_localToolboxId = 0;
 
-drwCommandDispatcher::drwCommandDispatcher( drwNetworkManager * net,
+drwCommandDispatcher::drwCommandDispatcher( drwRemoteCommandIO * remote,
 											drwCommandDatabase * db,
 											drwToolbox * local,
 											Scene * scene,
@@ -14,7 +14,7 @@ drwCommandDispatcher::drwCommandDispatcher( drwNetworkManager * net,
 : QObject(parent)
 , m_scene( scene )
 , m_db( db )
-, m_netManager( net )
+, m_remoteIO( remote )
 , m_lastUsedUserId( 0 ) // last used is local
 {
 	connect( local, SIGNAL(CommandExecuted(drwCommand::s_ptr)), this, SLOT(IncomingLocalCommand(drwCommand::s_ptr)));
@@ -45,10 +45,11 @@ int drwCommandDispatcher::GetNumberOfFrames()
 
 void drwCommandDispatcher::Reset()
 {
-    if( m_netManager->IsSharing() )
+    // todo : This should probably be done in network manager
+    if( m_remoteIO->IsSharing() )
     {
         drwCommand::s_ptr newSceneCommand( new drwNewSceneCommand );
-        m_netManager->SendCommand( newSceneCommand );
+        m_remoteIO->SendCommand( newSceneCommand );
     }
 	m_scene->Clear();
 	m_db->Clear();
@@ -117,13 +118,13 @@ void drwCommandDispatcher::IncomingLocalCommand( drwCommand::s_ptr command )
 		// Send state commands on the stack
 		for( int i = 0; i < m_cachedStateCommands.size(); ++i )
 		{
-			m_netManager->SendCommand( m_cachedStateCommands[i] );
+            m_remoteIO->SendCommand( m_cachedStateCommands[i] );
 			m_db->PushCommand( m_cachedStateCommands[i] );
 		}
 		m_cachedStateCommands.clear();
 
 		// Send it to the network
-		m_netManager->SendCommand( command );
+        m_remoteIO->SendCommand( command );
 
 		// Store it in the database
 		m_db->PushCommand( command );

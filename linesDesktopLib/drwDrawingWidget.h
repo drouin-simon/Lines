@@ -1,11 +1,11 @@
 #ifndef __drwDrawingWidget_h_
 #define __drwDrawingWidget_h_
 
-//#include <QGLWidget>
 #include <QOpenGLWidget>
 #include "macros.h"
 #include "Scene.h"
 #include "drwCommand.h"
+#include "drwDrawingSurface.h"
 
 class QPushButton;
 class drwGLRenderer;
@@ -15,7 +15,7 @@ class drwLineToolViewportWidget;
 class drwFpsCounter;
 class PlaybackControler;
 
-class drwDrawingWidget : public QOpenGLWidget
+class drwDrawingWidget : public QOpenGLWidget, public drwDrawingSurface
 {
 	Q_OBJECT
   
