@@ -68,12 +68,6 @@ protected:
 	void enterEvent( QEvent * );
 	void leaveEvent( QEvent * );
 	
-	// Handling of Drag and Drop
-	void dragEnterEvent(QDragEnterEvent *event);
-	void dragMoveEvent(QDragMoveEvent *event);
-	void dragLeaveEvent(QDragLeaveEvent *event);
-	void dropEvent(QDropEvent *event);
-	
 	// stuff to do for all events
 	bool event ( QEvent * event );
 
@@ -89,6 +83,7 @@ private:
     drwFpsCounter * m_fpsCounter;
     drwCursor * m_cursor;
     bool m_showCursor;
+    bool m_tabletHasControl;  // make sur not to generate both mouse and tablet events
 }; 
 
 #endif

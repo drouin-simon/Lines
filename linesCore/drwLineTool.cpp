@@ -4,7 +4,6 @@
 #include "Scene.h"
 #include "Node.h"
 #include "drwEditionState.h"
-#include "drwDrawingSurface.h"
 #include <QTabletEvent>
 #include <QSettings>
 
@@ -80,58 +79,6 @@ void drwLineTool::EndLine( double xWorld, double yWorld, double pressure )
 {
     drwCommand::s_ptr command( new drwMouseCommand( drwMouseCommand::Release, xWorld, yWorld, (int)xWorld, (int)yWorld, 0.0, 0, 0, pressure, 0.0, 0.0 ) );
     ExecuteCommand( command );
-}
-
-void drwLineTool::MousePressEvent( drwDrawingSurface * w, QMouseEvent * e )
-{
-    std::cout << "drwLineTool: MousePressEvent" << std::endl;
-    if( !m_tabletHasControl )
-    {
-        drwCommand::s_ptr command = w->CreateMouseCommand( drwMouseCommand::Press, e );
-        ExecuteCommand( command );
-    }
-}
-
-void drwLineTool::MouseReleaseEvent( drwDrawingSurface * w, QMouseEvent * e )
-{
-    if( !m_tabletHasControl )
-    {
-        drwCommand::s_ptr command = w->CreateMouseCommand( drwMouseCommand::Release, e );
-        ExecuteCommand( command );
-    }
-}
-
-void drwLineTool::MouseMoveEvent( drwDrawingSurface * w, QMouseEvent * e )
-{
-    if( !m_tabletHasControl )
-    {
-        drwCommand::s_ptr command = w->CreateMouseCommand( drwMouseCommand::Move, e );
-        ExecuteCommand( command );
-    }
-}
-
-void drwLineTool::TabletEvent( drwDrawingSurface * w, QTabletEvent * e )
-{
-    if( e->type() == QEvent::TabletPress )
-    {
-        m_tabletHasControl = true;
-        drwCommand::s_ptr command = w->CreateMouseCommand( drwMouseCommand::Press, e );
-        ExecuteCommand( command );
-        e->accept();
-    }
-    else if( e->type() == QEvent::TabletRelease )
-    {
-        drwCommand::s_ptr command = w->CreateMouseCommand( drwMouseCommand::Release, e );
-        ExecuteCommand( command );
-        e->accept();
-        m_tabletHasControl = false;
-    }
-    else if( e->type() == QEvent::TabletMove )
-    {
-        drwCommand::s_ptr command = w->CreateMouseCommand( drwMouseCommand::Move, e );
-        ExecuteCommand( command );
-        e->accept();
-    }
 }
 
 void drwLineTool::ExecuteCommand( drwCommand::s_ptr command )

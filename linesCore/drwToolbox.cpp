@@ -49,38 +49,6 @@ void drwToolbox::WriteSettings( QSettings & s )
     m_editionState->WriteSettings( s );
 }
 
-// Implementation of drwWidgetObserver
-void drwToolbox::MousePressEvent( drwDrawingSurface * w, QMouseEvent * e )
-{
-    std::cout << "drwToolbox: MousePressEvent" << std::endl;
-	if( CurrentTool >= 0 && CurrentTool < Tools.size() )
-		Tools[CurrentTool]->MousePressEvent( w, e );
-}
-
-void drwToolbox::MouseReleaseEvent( drwDrawingSurface * w, QMouseEvent * e )
-{
-	if( CurrentTool >= 0 && CurrentTool < Tools.size() )
-		Tools[CurrentTool]->MouseReleaseEvent( w, e );
-}
-
-void drwToolbox::MouseMoveEvent( drwDrawingSurface * w, QMouseEvent * e )
-{
-	if( CurrentTool >= 0 && CurrentTool < Tools.size() )
-		Tools[CurrentTool]->MouseMoveEvent( w, e );
-}
-
-void drwToolbox::TabletEvent( drwDrawingSurface * w, QTabletEvent * e )
-{
-	if( CurrentTool >= 0 && CurrentTool < Tools.size() )
-		Tools[CurrentTool]->TabletEvent( w, e );
-}
-
-void drwToolbox::DropEvent( drwDrawingSurface * w, QDropEvent * e )
-{
-	if( CurrentTool >= 0 && CurrentTool < Tools.size() )
-		Tools[CurrentTool]->DropEvent( w, e );
-}
-
 void drwToolbox::SetCurrentFrame( int frame )
 {
 	if( CurrentTool >= 0 && CurrentTool < Tools.size() )

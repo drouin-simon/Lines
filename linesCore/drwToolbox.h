@@ -25,13 +25,6 @@ public:
     // Read and Write settings
     void ReadSettings( QSettings & s );
     void WriteSettings( QSettings & s );
-	
-	// Implementation of drwWidgetObserver
-    virtual void MousePressEvent( drwDrawingSurface * w, QMouseEvent * e );
-    virtual void MouseReleaseEvent( drwDrawingSurface * w, QMouseEvent * e );
-    virtual void MouseMoveEvent( drwDrawingSurface * w, QMouseEvent * e );
-    virtual void TabletEvent( drwDrawingSurface * w, QTabletEvent * e );
-    virtual void DropEvent( drwDrawingSurface * w, QDropEvent * e );
 
 	virtual void SetCurrentFrame( int frame );
 	virtual void Reset();

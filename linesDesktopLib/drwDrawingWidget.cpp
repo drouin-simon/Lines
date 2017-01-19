@@ -19,6 +19,7 @@ drwDrawingWidget::drwDrawingWidget( QWidget * parent, drwDisplaySettings * dispS
 , m_viewportWidget(0)
 , m_cursor(0)
 , m_showCursor(false)
+, m_tabletHasControl(false)
 , DisplaySettings( dispSettings )
 {
     m_timerId = -1;
@@ -255,9 +256,10 @@ void drwDrawingWidget::mousePressEvent( QMouseEvent * e )
 		return;
 	
 	// now send the event to observer ( drawing tools)
-	if( e->button() == Qt::LeftButton && Observer )
+    if( e->button() == Qt::LeftButton && Observer && !m_tabletHasControl )
 	{
-		Observer->MousePressEvent( this, e );
+        drwCommand::s_ptr command = CreateMouseCommand( drwMouseCommand::Press, e );
+        Observer->ExecuteCommand( command );
 	}
 }
 
@@ -272,8 +274,11 @@ void drwDrawingWidget::mouseReleaseEvent( QMouseEvent * e )
 	if( widgetSwallows )
 		return;
 	
-	if ( e->button() == Qt::LeftButton && Observer )
-		Observer->MouseReleaseEvent( this, e );
+    if ( e->button() == Qt::LeftButton && Observer && !m_tabletHasControl)
+    {
+        drwCommand::s_ptr command = CreateMouseCommand( drwMouseCommand::Release, e );
+        Observer->ExecuteCommand( command );
+    }
 }
 
 
@@ -287,8 +292,11 @@ void drwDrawingWidget::mouseMoveEvent( QMouseEvent * e )
 	if( widgetSwallows )
 		return;
 	
-	if ( Observer )
-		Observer->MouseMoveEvent( this, e );
+    if ( Observer && !m_tabletHasControl )
+    {
+        drwCommand::s_ptr command = CreateMouseCommand( drwMouseCommand::Move, e );
+        Observer->ExecuteCommand( command );
+    }
 }
 
 void drwDrawingWidget::tabletEvent ( QTabletEvent * e )
@@ -311,7 +319,28 @@ void drwDrawingWidget::tabletEvent ( QTabletEvent * e )
     }
 	
 	if( Observer )
-		Observer->TabletEvent( this, e );
+    {
+        if( e->type() == QEvent::TabletPress )
+        {
+            m_tabletHasControl = true;
+            drwCommand::s_ptr command = CreateMouseCommand( drwMouseCommand::Press, e );
+            Observer->ExecuteCommand( command );
+            e->accept();
+        }
+        else if( e->type() == QEvent::TabletRelease )
+        {
+            drwCommand::s_ptr command = CreateMouseCommand( drwMouseCommand::Release, e );
+            Observer->ExecuteCommand( command );
+            e->accept();
+            m_tabletHasControl = false;
+        }
+        else if( e->type() == QEvent::TabletMove )
+        {
+            drwCommand::s_ptr command = CreateMouseCommand( drwMouseCommand::Move, e );
+            Observer->ExecuteCommand( command );
+            e->accept();
+        }
+    }
 }
 
 void drwDrawingWidget::ActivateViewportWidget( bool active )
@@ -346,27 +375,6 @@ void drwDrawingWidget::leaveEvent( QEvent * e )
         m_viewportWidget->Deactivate();
 	update();
 }
-
-void drwDrawingWidget::dragEnterEvent(QDragEnterEvent *event)
- {
-     event->acceptProposedAction();
- }
-
- void drwDrawingWidget::dragMoveEvent(QDragMoveEvent *event)
- {
-     event->acceptProposedAction();
- }
-
- void drwDrawingWidget::dropEvent(QDropEvent * event)
- {
-	 Observer->DropEvent( this, event );
-     event->acceptProposedAction();
- }
-
- void drwDrawingWidget::dragLeaveEvent(QDragLeaveEvent *event)
- {
-     event->accept();
- }
 
 bool drwDrawingWidget::event( QEvent * e )
 {
