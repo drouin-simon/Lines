@@ -19,12 +19,10 @@
 #include "drwCursor.h"
 #include "drwDrawingEngine.h"
 #include "drwGlobalLineParams.h"
-#include "drwDisplaySettings.h"
 #include "Vec4.h"
 #include <QtWidgets>
 #include "drwsimplifiedtoolbar.h"
 #include "LinesApp.h"
-#include "drwDisplaySettings.h"
 
 const QString MainWindow::m_appName( "Lines" );
 
@@ -51,9 +49,8 @@ MainWindow::MainWindow()
     m_scene->SetNumberOfFrames( 24 ); // do this after everything else is initialized to make sure we generate a command for the db.
     m_globalLineParams = new drwGlobalLineParams( this );
     m_globalLineParamsDock = 0;
-    m_displaySettings = new drwDisplaySettings;
 
-    m_linesApp = new LinesApp( m_controler->GetEditionState(), m_localToolbox, m_displaySettings );
+    m_linesApp = new LinesApp( m_controler->GetEditionState(), m_localToolbox );
 
 	// Create main widget  (just a frame to put the viewing widget and the playback control widget)
     m_mainWidget = new QWidget(this);
@@ -94,13 +91,14 @@ MainWindow::MainWindow()
     m_rightPanelDock->setHidden( m_simplifiedGui ); // by default, this is hidden
 	
 	// Create Drawing window
-    m_glWidget = new drwDrawingWidget(m_mainWidget,m_displaySettings);
+    m_glWidget = new drwDrawingWidget(m_mainWidget);
 	m_glWidget->setMinimumSize( 400, 300 );
 	m_glWidget->SetCurrentScene( m_scene );
 	m_glWidget->SetObserver( m_localToolbox );
 	m_glWidget->SetControler( m_controler );
 	drawingAreaLayout->addWidget( m_glWidget );
     m_globalLineParams->SetDrawingWidget( m_glWidget );
+    m_linesApp->SetDrawingWidget( m_glWidget );
 
     // Create special widget to go inside drawing widget
     drwLineTool * lineTool = dynamic_cast<drwLineTool*>(m_localToolbox->GetTool( 0 ));
@@ -124,7 +122,7 @@ MainWindow::MainWindow()
 	// Alternative right panel
     m_toolOptionWidget = new PrimitiveToolOptionWidget( m_controler->GetEditionState(), lineTool, m_rightPanelWidget );
 	rightPanelLayout->addWidget( m_toolOptionWidget );
-    m_displaySettingsWidget = new DisplaySettingsWidget( m_displaySettings, m_rightPanelWidget );
+    m_displaySettingsWidget = new DisplaySettingsWidget( m_glWidget, m_rightPanelWidget );
 	rightPanelLayout->addWidget( m_displaySettingsWidget );
 
     QHBoxLayout * networkStateLayout = new QHBoxLayout();
@@ -156,14 +154,6 @@ MainWindow::MainWindow()
 	
 	// Read Application settings
 	readSettings();
-
-    // Temp: for testing
-    /*lineTool->SetPressureWidth( false );
-    lineTool->SetPressureOpacity( true );
-    lineTool->SetBaseWidth( 200.0 );
-    lineTool->StartLine( 200.0, 200.0, 0.1 );
-    lineTool->AddPoint( 220.0, 220.0, 1.0 );
-    lineTool->EndLine( 240.0, 240.0, 1.0 ); */
 	
 	// Tell the qApp unique instance to send event to MainWindow::eventFilter before anyone else
 	// so that we can grab global keyboard shortcuts.
@@ -177,7 +167,6 @@ MainWindow::~MainWindow()
     delete m_cursor;
     delete m_drawingEngine;
     delete m_linesApp;
-    delete m_displaySettings;
 }
 
 void MainWindow::CreateActions()
@@ -504,7 +493,7 @@ void MainWindow::toggleShowGui()
     m_simplifiedToolbar->setHidden( m_guiHidden || !m_simplifiedGui );
     m_playbackControlerWidget->setHidden( m_guiHidden );
     m_rightPanelDock->setHidden( m_guiHidden || m_simplifiedGui );
-    m_glWidget->GetDisplaySettings()->SetShowCameraFrame( !m_guiHidden );
+    m_glWidget->SetShowCameraFrame( !m_guiHidden );
 }
 
 void MainWindow::toggleRightPanel()

@@ -1,5 +1,5 @@
 #include "DisplaySettingsWidget.h"
-#include "drwDisplaySettings.h"
+#include "drwDrawingWidget.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -8,12 +8,12 @@
 #include <QGroupBox>
 
 
-DisplaySettingsWidget::DisplaySettingsWidget( drwDisplaySettings * displaySettings, QWidget * parent )
+DisplaySettingsWidget::DisplaySettingsWidget( drwDrawingWidget * widget, QWidget * parent )
 : QWidget( parent )
-, m_displaySettings(displaySettings)
+, m_drawingWidget( widget )
 {
 	SetupUi();
-    connect( m_displaySettings, SIGNAL(ModifiedSignal()), this, SLOT(UpdateUI()) );
+    connect( m_drawingWidget, SIGNAL(DisplaySettingsModified()), this, SLOT(UpdateUI()) );
     UpdateUI();
 }
 
@@ -23,25 +23,25 @@ DisplaySettingsWidget::~DisplaySettingsWidget()
 
 void DisplaySettingsWidget::OnFramesBeforeValueChanged( int value )
 {
-    m_displaySettings->SetOnionSkinBefore( value );
+    m_drawingWidget->SetOnionSkinBefore( value );
 }
 
 void DisplaySettingsWidget::OnFramesAfterValueChanged( int value )
 {
-    m_displaySettings->SetOnionSkinAfter( value );
+    m_drawingWidget->SetOnionSkinAfter( value );
 }
 
 void DisplaySettingsWidget::OnDisplayCameraFrameChecked( bool isOn )
 {
-    m_displaySettings->SetShowCameraFrame( isOn );
+    m_drawingWidget->SetShowCameraFrame( isOn );
 }
 
 void DisplaySettingsWidget::UpdateUI()
 {
     BlockSigs( true );
-    framesBeforeSpinBox->setValue( m_displaySettings->GetOnionSkinBefore() );
-    framesAfterSpinBox->setValue( m_displaySettings->GetOnionSkinAfter() );
-    displayCameraFrameCheckBox->setChecked( m_displaySettings->GetShowCameraFrame() );
+    framesBeforeSpinBox->setValue( m_drawingWidget->GetOnionSkinBefore() );
+    framesAfterSpinBox->setValue( m_drawingWidget->GetOnionSkinAfter() );
+    displayCameraFrameCheckBox->setChecked( m_drawingWidget->GetShowCameraFrame() );
     BlockSigs( false );
 }
 

@@ -1,8 +1,8 @@
 #include "LinesApp.h"
 #include "drwToolbox.h"
-#include "drwDisplaySettings.h"
 #include "drwLineTool.h"
 #include "drwCursor.h"
+#include "drwDrawingWidget.h"
 
 static double smallBrushWidth = 6.0;
 static double smallBrushAlpha = 1.0;
@@ -16,24 +16,28 @@ static int nbOnionOneAfter = 0;
 static int nbOnionManyBefore = 5;
 static int nbOnionManyAfter = 5;
 
-LinesApp::LinesApp( drwEditionState * edState, drwToolbox * toolbox, drwDisplaySettings * dispSettings )
+LinesApp::LinesApp( drwEditionState * edState, drwToolbox * toolbox )
     : m_backupBrushWidth( smallBrushWidth )
     , m_backupBrushOpacity( smallBrushAlpha )
     , m_editionState( edState )
     , m_localToolbox( toolbox )
-    , m_displaySettings( dispSettings )
     , m_cursor(0)
 {
     connect( m_editionState, SIGNAL(ModifiedSignal()), this, SLOT(EditParamsModifiedSlot()) );
     drwLineTool * lineTool = dynamic_cast<drwLineTool*>(m_localToolbox->GetTool( 0 ));
     Q_ASSERT(lineTool);
     connect( lineTool, SIGNAL(ParametersChangedSignal()), this, SLOT(LineParamsModifiedSlot()) );
-    connect( m_displaySettings, SIGNAL(ModifiedSignal()), this, SLOT(DisplayParamsModifiedSlot()) );
 }
 
 LinesApp::~LinesApp()
 {
 
+}
+
+void LinesApp::SetDrawingWidget( drwDrawingWidget * w )
+{
+    m_drawingWidget = w;
+    connect( m_drawingWidget, SIGNAL(DisplaySettingsModified()), this, SLOT(DisplayParamsModifiedSlot()) );
 }
 
 bool LinesApp::IsSmallBrush()
@@ -178,11 +182,11 @@ void LinesApp::SetOneOnionSkin() { SetOnionSkinBefore( nbOnionOneBefore ); SetOn
 bool LinesApp::IsManyOnionSkin() { return GetOnionSkinBefore() == nbOnionManyBefore && GetOnionSkinAfter() == nbOnionManyAfter; }
 void LinesApp::SetManyOnionSkin() { SetOnionSkinBefore( nbOnionManyBefore ); SetOnionSkinAfter( nbOnionManyAfter ); }
 
-void LinesApp::SetOnionSkinBefore( int nbFrames ) { m_displaySettings->SetOnionSkinBefore( nbFrames ); }
-int LinesApp::GetOnionSkinBefore() { return m_displaySettings->GetOnionSkinBefore(); }
+void LinesApp::SetOnionSkinBefore( int nbFrames ) { m_drawingWidget->SetOnionSkinBefore( nbFrames ); }
+int LinesApp::GetOnionSkinBefore() { return m_drawingWidget->GetOnionSkinBefore(); }
 
-void LinesApp::SetOnionSkinAfter( int nbFrames ) { m_displaySettings->SetOnionSkinAfter( nbFrames ); }
-int LinesApp::GetOnionSkinAfter() { return m_displaySettings->GetOnionSkinAfter(); }
+void LinesApp::SetOnionSkinAfter( int nbFrames ) { m_drawingWidget->SetOnionSkinAfter( nbFrames ); }
+int LinesApp::GetOnionSkinAfter() { return m_drawingWidget->GetOnionSkinAfter(); }
 
 void LinesApp::LineParamsModifiedSlot()
 {

@@ -5,7 +5,7 @@
 #include "drwEditionState.h"
 #include <SVL.h>
 
-class drwDisplaySettings;
+class drwDrawingWidget;
 class drwToolbox;
 class drwLineTool;
 class drwCursor;
@@ -17,9 +17,10 @@ class LinesApp : public QObject
 
 public:
 
-    LinesApp( drwEditionState * edState, drwToolbox * toolbox, drwDisplaySettings * dispSettings );
+    LinesApp( drwEditionState * edState, drwToolbox * toolbox );
     ~LinesApp();
 
+    void SetDrawingWidget( drwDrawingWidget * w );
     void SetCursor( drwCursor * cursor ) { m_cursor = cursor; }
 
     // Line brush
@@ -79,7 +80,7 @@ private:
 
     drwEditionState * m_editionState;
     drwToolbox * m_localToolbox;
-    drwDisplaySettings * m_displaySettings;
+    drwDrawingWidget * m_drawingWidget;
     drwCursor * m_cursor;
 
 };

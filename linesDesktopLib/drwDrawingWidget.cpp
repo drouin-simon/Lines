@@ -5,7 +5,6 @@
 #include "Scene.h"
 #include "drwWidgetObserver.h"
 #include "PlaybackControler.h"
-#include "drwDisplaySettings.h"
 #include "drwDrawingContext.h"
 #include "drwDrawableTexture.h"
 #include "drwLineToolViewportWidget.h"
@@ -13,20 +12,23 @@
 #include "drwFpsCounter.h"
 #include "drwGLRenderer.h"
 
-drwDrawingWidget::drwDrawingWidget( QWidget * parent, drwDisplaySettings * dispSettings )
+drwDrawingWidget::drwDrawingWidget( QWidget * parent )
 : QOpenGLWidget( parent )
 , Observer(0)
 , m_viewportWidget(0)
 , m_cursor(0)
 , m_showCursor(false)
 , m_tabletHasControl(false)
-, DisplaySettings( dispSettings )
 {
+    // Display Settings
+    m_onionSkinFramesBefore = 1;
+    m_onionSkinFramesAfter = 0;
+    m_inhibitOnionSkin = false;
+    m_showCameraFrame = true;
+
     m_timerId = -1;
     this->Controler = 0;
     m_fpsCounter = 0;
-
-	connect( DisplaySettings, SIGNAL(ModifiedSignal()), this, SLOT(DisplaySettingsModified()) );
 
     m_renderer = new drwGLRenderer;
     connect( m_renderer, SIGNAL(NeedRenderSignal()), this, SLOT(RequestRedraw()) );
@@ -154,12 +156,7 @@ void drwDrawingWidget::PlaybackStartStop( bool isStarting )
         EnableVSync( false );
 	}
 	
-	DisplaySettings->SetInhibitOnionSkin( isStarting );
-}
-
-void drwDrawingWidget::DisplaySettingsModified()
-{
-	update();
+    SetInhibitOnionSkin( isStarting );
 }
 
 void drwDrawingWidget::initializeGL()
@@ -180,9 +177,9 @@ void drwDrawingWidget::paintEvent( QPaintEvent * event )
     int onionSkinAfter = 0;
     if( !Controler->IsPlaying() )
     {
-        onionSkinBefore = DisplaySettings->GetOnionSkinBefore();
-        onionSkinAfter = DisplaySettings->GetOnionSkinAfter();
-        if( DisplaySettings->GetInhibitOnionSkin() )
+        onionSkinBefore = GetOnionSkinBefore();
+        onionSkinAfter = GetOnionSkinAfter();
+        if( GetInhibitOnionSkin() )
         {
             onionSkinBefore = 0;
             onionSkinAfter = 0;
@@ -192,7 +189,7 @@ void drwDrawingWidget::paintEvent( QPaintEvent * event )
     m_renderer->RenderToTexture( Controler->GetCurrentFrame(), onionSkinBefore, onionSkinAfter );
     m_renderer->RenderTextureToScreen();
 
-    if( DisplaySettings->GetShowCameraFrame() )
+    if( GetShowCameraFrame() )
         m_renderer->RenderCameraFrame();
 
     QPainter painter;
@@ -361,6 +358,34 @@ void drwDrawingWidget::ActivateViewportWidget( bool active )
 double drwDrawingWidget::PixelsPerUnit()
 {
     return m_renderer->PixelsPerUnit();
+}
+
+void drwDrawingWidget::SetOnionSkinBefore( int value )
+{
+    m_onionSkinFramesBefore = value;
+    emit DisplaySettingsModified();
+    update();
+}
+
+void drwDrawingWidget::SetOnionSkinAfter( int value )
+{
+    m_onionSkinFramesAfter = value;
+    emit DisplaySettingsModified();
+    update();
+}
+
+void drwDrawingWidget::SetInhibitOnionSkin( bool isOn )
+{
+    m_inhibitOnionSkin = isOn;
+    emit DisplaySettingsModified();
+    update();
+}
+
+void drwDrawingWidget::SetShowCameraFrame( bool isOn )
+{
+    m_showCameraFrame = isOn;
+    emit DisplaySettingsModified();
+    update();
 }
 
 void drwDrawingWidget::enterEvent( QEvent * e )

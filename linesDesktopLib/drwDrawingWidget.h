@@ -10,7 +10,6 @@
 class QPushButton;
 class drwGLRenderer;
 class drwWidgetObserver;
-class drwDisplaySettings;
 class drwLineToolViewportWidget;
 class drwFpsCounter;
 class PlaybackControler;
@@ -21,13 +20,12 @@ class drwDrawingWidget : public QOpenGLWidget, public drwDrawingSurface
   
 public:
 		
-    drwDrawingWidget( QWidget * parent, drwDisplaySettings * dispSettings );
+    drwDrawingWidget( QWidget * parent );
 	~drwDrawingWidget();
 
     void SetBackgroundColor( Vec4 & color );
     void SetCurrentScene( Scene * scene );
     SetMacro( Observer, drwWidgetObserver* );
-    GetMacro( DisplaySettings, drwDisplaySettings* );
     void SetControler( PlaybackControler * controler );
     GetMacro( Controler, PlaybackControler* );
     void SetViewportWidget( drwLineToolViewportWidget * w );
@@ -40,17 +38,27 @@ public:
 	drwCommand::s_ptr CreateMouseCommand( drwMouseCommand::MouseCommandType commandType, QMouseEvent * e );
 	drwCommand::s_ptr CreateMouseCommand( drwMouseCommand::MouseCommandType commandType, QTabletEvent * e );
     void SimulateTabletEvent( drwMouseCommand::MouseCommandType type, double xWorld, double yWorld, double pressure );
+
+    // Display settings
+    int GetOnionSkinBefore() { return m_onionSkinFramesBefore; }
+    void SetOnionSkinBefore( int );
+    int GetOnionSkinAfter() { return m_onionSkinFramesAfter; }
+    void SetOnionSkinAfter( int );
+    bool GetInhibitOnionSkin() { return m_inhibitOnionSkin; }
+    void SetInhibitOnionSkin( bool isOn );
+    bool GetShowCameraFrame() { return m_showCameraFrame; }
+    void SetShowCameraFrame( bool );
 	
 public slots:
 	
 	void RequestRedraw();
     void CurrentFrameChanged();
 	void PlaybackStartStop( bool isStart );
-	void DisplaySettingsModified();
 
 signals:
 
     void FinishedPainting();
+    void DisplaySettingsModified();
 		
 protected:
 		
@@ -74,11 +82,16 @@ protected:
     void EnableVSync( bool enable );
   
 private:
+
+    // Display settings
+    int m_onionSkinFramesBefore;
+    int m_onionSkinFramesAfter;
+    bool m_inhibitOnionSkin;
+    bool m_showCameraFrame;
 	
     drwGLRenderer * m_renderer;
     PlaybackControler * Controler;
     drwWidgetObserver * Observer;
-    drwDisplaySettings	* DisplaySettings;
     drwLineToolViewportWidget * m_viewportWidget;
     drwFpsCounter * m_fpsCounter;
     drwCursor * m_cursor;

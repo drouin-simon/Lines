@@ -8,7 +8,7 @@ class QHBoxLayout;
 class QLabel;
 class QCheckBox;
 class QSpinBox;
-class drwDisplaySettings;
+class drwDrawingWidget;
 class QGroupBox;
 
 class DisplaySettingsWidget : public QWidget
@@ -18,7 +18,7 @@ class DisplaySettingsWidget : public QWidget
 	
 public:
 	
-	DisplaySettingsWidget( drwDisplaySettings * DisplaySettings, QWidget * parent = 0 );
+    DisplaySettingsWidget( drwDrawingWidget * widget, QWidget * parent = 0 );
 	~DisplaySettingsWidget();
 	
 private slots:
@@ -33,7 +33,7 @@ private:
     void SetupUi();
     void BlockSigs( bool block );
 	
-	drwDisplaySettings * m_displaySettings;
+    drwDrawingWidget * m_drawingWidget;
 	
 	// UI elements
 	QVBoxLayout * mainLayout;
