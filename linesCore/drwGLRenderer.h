@@ -1,28 +1,28 @@
 #ifndef __drwGLRenderer_h_
 #define __drwGLRenderer_h_
 
-#include <QObject>
-
 class Scene;
 class Node;
 class drwDrawableTexture;
 class drwGlslShader;
 class drwCamera;
 class drwDrawingContext;
+class drwDrawingSurface;
 
-class drwGLRenderer : public QObject
+class drwGLRenderer
 {
-
-    Q_OBJECT
 
 public:
 
-    explicit drwGLRenderer( QObject * parent = 0 );
+    explicit drwGLRenderer();
     ~drwGLRenderer();
+
+    void SetDrawingSurface( drwDrawingSurface * s ) { m_drawingSurface = s; }
 
     void RenderToTexture( int currentFrame, int onionSkinBefore, int onionSkinAfter );
     drwDrawableTexture * GetRenderTexture() { return m_renderTexture; }
     void RenderTextureToScreen();
+    void RenderTextureToScreen( int x, int y, int width, int height );
     void RenderRect();
     void RenderCameraFrame();
 
@@ -37,21 +37,17 @@ public:
     void WorldToGLWindow( double xworld, double yworld, int & xwin, int & ywin );
     double PixelsPerUnit();
     void SetClearColor( double r, double g, double b, double a );
-    
-signals:
 
-    void NeedRenderSignal();
-    
-public slots:
-
-    void RequestRedraw();
+    void NeedRedraw();
+    void NeedRedraw( int x, int y, int width, int height );
     
 protected:
 
     void RenderLayer( int frame, drwDrawingContext & context );
 
+    drwDrawingSurface   * m_drawingSurface;
     drwCamera           * m_camera;
-    Scene				* CurrentScene;
+    Scene				* m_scene;
     drwDrawableTexture  * m_renderTexture;
     drwDrawableTexture  * m_layerTexture;
     drwDrawableTexture  * m_workTexture;

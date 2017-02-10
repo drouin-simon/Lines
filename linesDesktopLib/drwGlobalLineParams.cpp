@@ -67,6 +67,6 @@ double drwGlobalLineParams::GetSigmaSmall()
 void drwGlobalLineParams::MarkModified()
 {
     Q_ASSERT( m_drawingWidget );
-    m_drawingWidget->RequestRedraw();
+    m_drawingWidget->NeedRedraw();
     emit Modified();
 }

@@ -10,10 +10,10 @@ set( DrawLib_src LinesApp.cpp drwDrawingWidget.cpp drwsimplifiedtoolbar.cpp
 	drwGlobalLineParams.cpp drwAutoGui.cpp )
 
 set( DrawLib_hdr_moc LinesApp.h drwDrawingWidget.h drwsimplifiedtoolbar.h TabletStateWidget.h 
-        drwNetworkConnectDialog.h drwCursor.h drwBitmapExporter.h drwGradientWidget.h
+        drwNetworkConnectDialog.h drwBitmapExporter.h drwGradientWidget.h
 	drwDrawingEngine.h drwGlobalLineParams.h drwAutoGui.h )
 
-set( DrawLib_hdr drwLineToolViewportWidget.h drwFpsCounter.h )
+set( DrawLib_hdr drwLineToolViewportWidget.h drwCursor.h drwFpsCounter.h )
 
 # Include bin directory for ui_ files
 include_directories(${CMAKE_CURRENT_BINARY_DIR})

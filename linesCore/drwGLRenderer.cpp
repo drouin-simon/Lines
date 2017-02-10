@@ -5,12 +5,13 @@
 #include "drwDrawableTexture.h"
 #include "drwDrawingContext.h"
 #include "drwGlslShader.h"
+#include "drwDrawingSurface.h"
 
-drwGLRenderer::drwGLRenderer(QObject *parent) :
-    QObject(parent)
+drwGLRenderer::drwGLRenderer()
 {
+    m_drawingSurface = 0;
     m_camera = new drwCamera;
-    CurrentScene = 0;
+    m_scene = 0;
     m_renderTexture = new drwDrawableTexture;
     m_layerTexture = new drwDrawableTexture;
     m_workTexture = new drwDrawableTexture;
@@ -33,7 +34,7 @@ drwGLRenderer::~drwGLRenderer()
 
 void drwGLRenderer::RenderToTexture( int currentFrame, int onionSkinBefore, int onionSkinAfter )
 {
-    Q_ASSERT( CurrentScene );
+    Q_ASSERT( m_scene );
     
     // State setup
     glDisable( GL_DEPTH_TEST );
@@ -75,7 +76,7 @@ void drwGLRenderer::RenderToTexture( int currentFrame, int onionSkinBefore, int 
         {
             int f = currentFrame - dist;
             while( f < 0 )
-                f = CurrentScene->GetNumberOfFrames() - abs( f );
+                f = m_scene->GetNumberOfFrames() - abs( f );
             RenderLayer( f, context );
         }
         
@@ -83,8 +84,8 @@ void drwGLRenderer::RenderToTexture( int currentFrame, int onionSkinBefore, int 
         if( onionSkinAfter >= dist )
         {
             int f = currentFrame + dist;
-            while( f > CurrentScene->GetNumberOfFrames() - 1 )
-                f = f - CurrentScene->GetNumberOfFrames();
+            while( f > m_scene->GetNumberOfFrames() - 1 )
+                f = f - m_scene->GetNumberOfFrames();
             RenderLayer( f, context );
         }
         
@@ -105,7 +106,7 @@ void drwGLRenderer::RenderLayer( int frame, drwDrawingContext & context )
     m_layerTexture->DrawToTexture( true );
     glClearColor( m_clearColor[0], m_clearColor[1], m_clearColor[2], 0.0 );
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-    CurrentScene->DrawFrame( frame, context );
+    m_scene->DrawFrame( frame, context );
     m_layerTexture->DrawToTexture( false );
     
     glEnable( GL_BLEND );
@@ -116,6 +117,14 @@ void drwGLRenderer::RenderLayer( int frame, drwDrawingContext & context )
 
 void drwGLRenderer::RenderTextureToScreen()
 {
+    RenderTextureToScreen( 0, 0, GetRenderSize()[0], GetRenderSize()[1] );
+}
+
+void drwGLRenderer::RenderTextureToScreen( int x, int y, int width, int height )
+{
+    glEnable( GL_SCISSOR_TEST );
+    glScissor( x, y, width, height );
+
     glEnable( GL_BLEND );
     glBlendFunc( GL_ONE, GL_ONE_MINUS_SRC_ALPHA );
     
@@ -125,6 +134,9 @@ void drwGLRenderer::RenderTextureToScreen()
     m_camera->SetupToRenderTextureToScreen();
     glColor4d( 1.0, 1.0, 1.0, 1.0 );
     m_renderTexture->PasteToScreen();
+
+    glDisable( GL_SCISSOR_TEST );
+    glScissor( x, y, width, height );
 }
 
 void drwGLRenderer::RenderRect()
@@ -196,13 +208,18 @@ void drwGLRenderer::SetClearColor( double r, double g, double b, double a )
     m_clearColor[3] = a;
 }
 
-void drwGLRenderer::SetCurrentScene( Scene * cur )
+void drwGLRenderer::SetCurrentScene( Scene * s )
 {
-    CurrentScene = cur;
-    connect( CurrentScene, SIGNAL( Modified() ), SLOT( RequestRedraw() ), Qt::DirectConnection );
+    m_scene = s;
+    m_scene->SetRenderer( this );
 }
 
-void drwGLRenderer::RequestRedraw()
+void drwGLRenderer::NeedRedraw()
 {
-    emit NeedRenderSignal();
+    m_drawingSurface->NeedRedraw();
+}
+
+void drwGLRenderer::NeedRedraw( int x, int y, int width, int height )
+{
+    m_drawingSurface->NeedRedraw( x, y, width, height );
 }

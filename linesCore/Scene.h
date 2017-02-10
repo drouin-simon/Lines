@@ -7,7 +7,7 @@
 #include "Frame.h"
 #include "drwCommand.h"
 
-class drwCursor;
+class drwGLRenderer;
 
 class Scene : public QObject
 {
@@ -19,6 +19,7 @@ public:
 	Scene( QObject * parent = 0 );
 	~Scene();
 	
+    void SetRenderer( drwGLRenderer * r ) { m_renderer = r; }
 	void Clear();
 	
     void DrawFrame( int frame, drwDrawingContext & context );
@@ -31,26 +32,23 @@ public:
     void UnlockNode( int frameIndex, int nodeIndex );
 	
 	void SetNumberOfFrames( int nbFrames );
-	int GetNumberOfFrames() { return Frames.size(); }
-	
+    int GetNumberOfFrames() { return m_frames.size(); }
+    void InsertFrame( int beforeThisFrame );
+
 	// used by other classes to mark end of modification and notify clients they can re-render
 	void MarkModified();
 	
 signals:
 	
-	void Modified();
 	void NumberOfFramesChanged(int);
     void CommandExecuted( drwCommand::s_ptr command );
 	
-public slots:
-	
-	void InsertFrame( int beforeThisFrame );
-	
 protected:
 	
+    drwGLRenderer * m_renderer;
     QReadWriteLock m_framesLock;
     typedef std::vector<Frame*> FrameCont;
-    FrameCont Frames;
+    FrameCont m_frames;
 };
 
 #endif

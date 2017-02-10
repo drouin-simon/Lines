@@ -89,6 +89,15 @@ MainWindow::MainWindow()
     rightPanelLayout->setSpacing( 15 );
     m_rightPanelDock->setWidget( m_rightPanelWidget );
     m_rightPanelDock->setHidden( m_simplifiedGui ); // by default, this is hidden
+
+    // Set default OpenGL surface format that will be applied to all openGL windows
+    QSurfaceFormat format;
+    format.setDepthBufferSize(24);
+    format.setStencilBufferSize(8);
+    //format.setVersion(3, 2);
+    //format.setProfile(QSurfaceFormat::CoreProfile);
+    format.setSwapBehavior( QSurfaceFormat::DoubleBuffer );
+    QSurfaceFormat::setDefaultFormat(format);
 	
 	// Create Drawing window
     m_glWidget = new drwDrawingWidget(m_mainWidget);
@@ -107,7 +116,6 @@ MainWindow::MainWindow()
     m_glWidget->SetViewportWidget( m_viewportWidget );
     m_cursor = new drwCursor( lineTool, m_glWidget );
     m_glWidget->SetCursor( m_cursor );
-    m_linesApp->SetCursor( m_cursor );
 
     // Create Drawing engine (for testing only for now)
     m_drawingEngine = new drwDrawingEngine;
@@ -334,7 +342,7 @@ void MainWindow::editSetNumberOfFrames()
 void MainWindow::editWhiteOnBlackToggled( bool wob )
 {
     SetWhiteOnBlack( wob );
-    m_glWidget->RequestRedraw();
+    m_glWidget->NeedRedraw();
 }
 
 void MainWindow::NetShareSession()
@@ -683,19 +691,19 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
         else if ( keyEvent->key() == Qt::Key_B )
         {
             m_linesApp->ToggleBigSmallBrush();
-            m_glWidget->RequestRedraw();
+            m_glWidget->NeedRedraw();
             handled = true;
         }
         else if ( keyEvent->key() == Qt::Key_M )
         {
             m_linesApp->IncreaseBrushSize();
-            m_glWidget->RequestRedraw();
+            m_glWidget->NeedRedraw();
             handled = true;
         }
         else if ( keyEvent->key() == Qt::Key_N )
         {
             m_linesApp->DecreaseBrushSize();
-            m_glWidget->RequestRedraw();
+            m_glWidget->NeedRedraw();
             handled = true;
         }
         // For testing paint speed
@@ -719,7 +727,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
             {
                 m_eraseToggled = true;
                 m_linesApp->ToggleErasing();
-                m_glWidget->RequestRedraw();
+                m_glWidget->NeedRedraw();
             }
             handled = true;
         }
@@ -759,7 +767,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
                 m_linesApp->ToggleErasing();
                 m_eraseToggled = false;
             }
-            m_glWidget->RequestRedraw();
+            m_glWidget->NeedRedraw();
             handled = true;
         }
     }

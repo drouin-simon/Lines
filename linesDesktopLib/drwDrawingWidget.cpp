@@ -1,4 +1,5 @@
 #include "drwDrawingWidget.h"
+#include <iostream>
 #include <QtGui>
 #include <QtOpenGL>
 #include "Vec4.h"
@@ -19,6 +20,7 @@ drwDrawingWidget::drwDrawingWidget( QWidget * parent )
 , m_cursor(0)
 , m_showCursor(false)
 , m_tabletHasControl(false)
+, m_sceneModified(true)
 {
     // Display Settings
     m_onionSkinFramesBefore = 1;
@@ -31,44 +33,42 @@ drwDrawingWidget::drwDrawingWidget( QWidget * parent )
     m_fpsCounter = 0;
 
     m_renderer = new drwGLRenderer;
-    connect( m_renderer, SIGNAL(NeedRenderSignal()), this, SLOT(RequestRedraw()) );
+    m_renderer->SetDrawingSurface( this );
+
+    //PrintGLInfo();
 
     setAcceptDrops(true);
 	setMouseTracking(true);
 	setAutoFillBackground(false);
     setCursor( QCursor( Qt::BlankCursor ) );
+    setUpdateBehavior( QOpenGLWidget::PartialUpdate );  // allows to redraw only part of the window
+    EnableVSync( false );
 }
 
 drwDrawingWidget::~drwDrawingWidget()
 {
 }
 
-drwCommand::s_ptr drwDrawingWidget::CreateMouseCommand( drwMouseCommand::MouseCommandType commandType, QMouseEvent * e )
+void drwDrawingWidget::NeedRedraw()
 {
-    int ratio = this->devicePixelRatio();
-    double xWin = ratio * (double)e->x();
-    double yWin = ratio * (double)e->y();
-	double xWorld = 0.0;
-	double yWorld = 0.0;
-    m_renderer->WindowToWorld( xWin, yWin, xWorld, yWorld );
-    drwCommand::s_ptr command( new drwMouseCommand( commandType, xWorld, yWorld, 0.0, xWin, yWin, 0, 0, 1.0, 0.0, 0.0 ) );
-	return command;
+    m_sceneModified = true;
+    update();
 }
 
-#include <iostream>
-
-drwCommand::s_ptr drwDrawingWidget::CreateMouseCommand( drwMouseCommand::MouseCommandType commandType, QTabletEvent * e )
+void drwDrawingWidget::NeedRedraw( int x, int y, int width, int height )
 {
-    int ratio = this->devicePixelRatio();
-	double deltaX = e->hiResGlobalX() - e->globalX();
-    double xWin = ratio * ((double)e->x() + deltaX);
-	double deltaY = e->hiResGlobalY() - e->globalY();
-    double yWin = ratio * ((double)e->y() + deltaY);
-	double xWorld = 0.0;
-	double yWorld = 0.0;
-    m_renderer->WindowToWorld( xWin, yWin, xWorld, yWorld );
-    drwCommand::s_ptr command( new drwMouseCommand( commandType, xWorld, yWorld, 0.0, xWin, yWin, e->xTilt(), e->yTilt(), e->pressure(), e->rotation(), e->tangentialPressure() ) );
-	return command;
+    m_sceneModified = true;
+    update( x, y, width, height );
+}
+
+void drwDrawingWidget::NeedRedrawOverlay()
+{
+    update();
+}
+
+void drwDrawingWidget::NeedRedrawOverlay( int x, int y, int width, int height )
+{
+    update( x, y, width, height );
 }
 
 void drwDrawingWidget::SimulateTabletEvent( drwMouseCommand::MouseCommandType type, double xWorld, double yWorld, double pressure )
@@ -78,7 +78,6 @@ void drwDrawingWidget::SimulateTabletEvent( drwMouseCommand::MouseCommandType ty
     drwCommand::s_ptr command( new drwMouseCommand( type, xWorld, yWorld, 0.0, xWin, yWin, 0, 0, pressure, 0, 0 ) );
     Observer->ExecuteCommand( command );
 }
-
 
 void drwDrawingWidget::SetBackgroundColor( Vec4 & color )
 {
@@ -105,7 +104,11 @@ void drwDrawingWidget::SetViewportWidget( drwLineToolViewportWidget * w )
 void drwDrawingWidget::SetCursor( drwCursor * cursor )
 {
     m_cursor = cursor;
-    connect( m_cursor, SIGNAL(Modified()), this, SLOT(RequestRedraw()) );
+}
+
+void drwDrawingWidget::SetCursorColor( QString colorName )
+{
+    m_cursor->SetColor( colorName );
 }
 
 void drwDrawingWidget::ToggleComputeFps()
@@ -122,13 +125,9 @@ void drwDrawingWidget::ToggleComputeFps()
     }
 }
 
-void drwDrawingWidget::RequestRedraw()
-{
-    update();
-}
-
 void drwDrawingWidget::CurrentFrameChanged()
 {
+    m_sceneModified = true;
 	update();
 	Observer->SetCurrentFrame( Controler->GetCurrentFrame() );
 }
@@ -172,7 +171,8 @@ void drwDrawingWidget::resizeGL( int w, int h )
 void drwDrawingWidget::paintEvent( QPaintEvent * event )
 {
 	makeCurrent();
-	
+
+    // Figure out how many onion skins we want
     int onionSkinBefore = 0;
     int onionSkinAfter = 0;
     if( !Controler->IsPlaying() )
@@ -185,9 +185,22 @@ void drwDrawingWidget::paintEvent( QPaintEvent * event )
             onionSkinAfter = 0;
         }
     }
+
+    // Find out the area of the images that has to be updated (on macOS, rect is always the whole window)
+    QRect dr = event->rect();
+    int ratio = this->devicePixelRatio();
+    int x = dr.x() * ratio;
+    int y = dr.y() * ratio;
+    int w = dr.width() * ratio;
+    int h = dr.height() * ratio;
     
-    m_renderer->RenderToTexture( Controler->GetCurrentFrame(), onionSkinBefore, onionSkinAfter );
-    m_renderer->RenderTextureToScreen();
+    // Render scene to texture if modified
+    if( m_sceneModified )
+        m_renderer->RenderToTexture( Controler->GetCurrentFrame(), onionSkinBefore, onionSkinAfter );
+    m_sceneModified = false;
+
+    // Paste texture to screen
+    m_renderer->RenderTextureToScreen( x, y, w, h );
 
     if( GetShowCameraFrame() )
         m_renderer->RenderCameraFrame();
@@ -411,4 +424,65 @@ bool drwDrawingWidget::event( QEvent * e )
     }
 	
     return QOpenGLWidget::event(e);
+}
+
+void drwDrawingWidget::PrintGLInfo()
+{
+    QSurfaceFormat f = this->format();
+
+    // OpenGL version
+    std::cout << "OpenGL version: " << f.majorVersion() << "." << f.minorVersion() << std::endl;
+
+    // OpenGL profile
+    std::cout << "OpenGL profile: ";
+    if( f.profile() == QSurfaceFormat::NoProfile )
+        std::cout << "NoProfile" << std::endl;
+    else if( f.profile() == QSurfaceFormat::CoreProfile )
+        std::cout << "CoreProfile" << std::endl;
+    else if( f.profile() == QSurfaceFormat::CompatibilityProfile )
+        std::cout << "CompatibilityProfile" << std::endl;
+
+    // Swap behavior
+    std::cout << "Swap behavior: ";
+    if( f.swapBehavior() == QSurfaceFormat::DefaultSwapBehavior )
+        std::cout << "DefaultSwapBehavior" << std::endl;
+    else if( f.swapBehavior() == QSurfaceFormat::SingleBuffer )
+        std::cout << "SingleBuffer" << std::endl;
+    else if( f.swapBehavior() == QSurfaceFormat::DoubleBuffer )
+        std::cout << "DoubleBuffer" << std::endl;
+    else if( f.swapBehavior() == QSurfaceFormat::TripleBuffer )
+        std::cout << "TripleBuffer" << std::endl;
+
+    // Update behavior
+    std::cout << "Update behavior: ";
+    if( this->updateBehavior() == QOpenGLWidget::NoPartialUpdate )
+        std::cout << "NoPartialUpdate" << std::endl;
+    else if( this->updateBehavior() == QOpenGLWidget::PartialUpdate )
+        std::cout << "PartialUpdate" << std::endl;
+}
+
+drwCommand::s_ptr drwDrawingWidget::CreateMouseCommand( drwMouseCommand::MouseCommandType commandType, QMouseEvent * e )
+{
+    int ratio = this->devicePixelRatio();
+    double xWin = ratio * (double)e->x();
+    double yWin = ratio * (double)e->y();
+    double xWorld = 0.0;
+    double yWorld = 0.0;
+    m_renderer->WindowToWorld( xWin, yWin, xWorld, yWorld );
+    drwCommand::s_ptr command( new drwMouseCommand( commandType, xWorld, yWorld, 0.0, xWin, yWin, 0, 0, 1.0, 0.0, 0.0 ) );
+    return command;
+}
+
+drwCommand::s_ptr drwDrawingWidget::CreateMouseCommand( drwMouseCommand::MouseCommandType commandType, QTabletEvent * e )
+{
+    int ratio = this->devicePixelRatio();
+    double deltaX = e->hiResGlobalX() - e->globalX();
+    double xWin = ratio * ((double)e->x() + deltaX);
+    double deltaY = e->hiResGlobalY() - e->globalY();
+    double yWin = ratio * ((double)e->y() + deltaY);
+    double xWorld = 0.0;
+    double yWorld = 0.0;
+    m_renderer->WindowToWorld( xWin, yWin, xWorld, yWorld );
+    drwCommand::s_ptr command( new drwMouseCommand( commandType, xWorld, yWorld, 0.0, xWin, yWin, e->xTilt(), e->yTilt(), e->pressure(), e->rotation(), e->tangentialPressure() ) );
+    return command;
 }

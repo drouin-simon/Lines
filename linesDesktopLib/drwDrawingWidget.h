@@ -13,6 +13,7 @@ class drwWidgetObserver;
 class drwLineToolViewportWidget;
 class drwFpsCounter;
 class PlaybackControler;
+class drwCursor;
 
 class drwDrawingWidget : public QOpenGLWidget, public drwDrawingSurface
 {
@@ -23,6 +24,12 @@ public:
     drwDrawingWidget( QWidget * parent );
 	~drwDrawingWidget();
 
+    // Implement drwDrawingSurface interface
+    void NeedRedraw();
+    void NeedRedraw( int x, int y, int width, int height );
+    void NeedRedrawOverlay();
+    void NeedRedrawOverlay( int x, int y, int width, int height );
+
     void SetBackgroundColor( Vec4 & color );
     void SetCurrentScene( Scene * scene );
     SetMacro( Observer, drwWidgetObserver* );
@@ -30,13 +37,12 @@ public:
     GetMacro( Controler, PlaybackControler* );
     void SetViewportWidget( drwLineToolViewportWidget * w );
     void SetCursor( drwCursor * cursor );
+    void SetCursorColor( QString colorName );
     void UpdatePosition( int x, int y );
     void ToggleComputeFps();
     void ActivateViewportWidget( bool active );
     double PixelsPerUnit();
 
-	drwCommand::s_ptr CreateMouseCommand( drwMouseCommand::MouseCommandType commandType, QMouseEvent * e );
-	drwCommand::s_ptr CreateMouseCommand( drwMouseCommand::MouseCommandType commandType, QTabletEvent * e );
     void SimulateTabletEvent( drwMouseCommand::MouseCommandType type, double xWorld, double yWorld, double pressure );
 
     // Display settings
@@ -50,8 +56,7 @@ public:
     void SetShowCameraFrame( bool );
 	
 public slots:
-	
-	void RequestRedraw();
+
     void CurrentFrameChanged();
 	void PlaybackStartStop( bool isStart );
 
@@ -69,6 +74,9 @@ protected:
 	virtual void mouseReleaseEvent(QMouseEvent*);
 	virtual void mouseMoveEvent(QMouseEvent*);
 	virtual void tabletEvent ( QTabletEvent * event );
+
+    drwCommand::s_ptr CreateMouseCommand( drwMouseCommand::MouseCommandType commandType, QMouseEvent * e );
+    drwCommand::s_ptr CreateMouseCommand( drwMouseCommand::MouseCommandType commandType, QTabletEvent * e );
 	
 	// Manage timer that generates updateGL in playback mode
 	int m_timerId;
@@ -82,6 +90,8 @@ protected:
     void EnableVSync( bool enable );
   
 private:
+
+    void PrintGLInfo();
 
     // Display settings
     int m_onionSkinFramesBefore;
@@ -97,6 +107,7 @@ private:
     drwCursor * m_cursor;
     bool m_showCursor;
     bool m_tabletHasControl;  // make sur not to generate both mouse and tablet events
+    bool m_sceneModified;
 }; 
 
 #endif

@@ -127,7 +127,7 @@ bool drwLineToolViewportWidget::MouseMove( int x, int y )
             m_lastX = x;
             m_lastY = y;
             swallowEvent = true;
-            m_drawingWidget->RequestRedraw();
+            m_drawingWidget->NeedRedraw();
         }
     }
     return swallowEvent;
@@ -204,7 +204,7 @@ void drwLineToolViewportWidget::ModifyColor( int y )
     //Vec4 newColor( color, color, color, 1.0 );
     Vec4 newColor( 1.0, 1.0, 1.0, color );
     m_lineTool->SetColor( newColor );
-    m_drawingWidget->RequestRedraw();
+    m_drawingWidget->NeedRedraw();
 }
 
 double drwLineToolViewportWidget::GetCurrentIntensity()

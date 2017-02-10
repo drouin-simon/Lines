@@ -8,7 +8,6 @@
 class drwDrawingWidget;
 class drwToolbox;
 class drwLineTool;
-class drwCursor;
 
 class LinesApp : public QObject
 {
@@ -21,7 +20,6 @@ public:
     ~LinesApp();
 
     void SetDrawingWidget( drwDrawingWidget * w );
-    void SetCursor( drwCursor * cursor ) { m_cursor = cursor; }
 
     // Line brush
     bool IsSmallBrush();
@@ -81,7 +79,6 @@ private:
     drwEditionState * m_editionState;
     drwToolbox * m_localToolbox;
     drwDrawingWidget * m_drawingWidget;
-    drwCursor * m_cursor;
 
 };
 

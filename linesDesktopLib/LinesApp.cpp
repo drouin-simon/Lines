@@ -1,7 +1,6 @@
 #include "LinesApp.h"
 #include "drwToolbox.h"
 #include "drwLineTool.h"
-#include "drwCursor.h"
 #include "drwDrawingWidget.h"
 
 static double smallBrushWidth = 6.0;
@@ -21,7 +20,7 @@ LinesApp::LinesApp( drwEditionState * edState, drwToolbox * toolbox )
     , m_backupBrushOpacity( smallBrushAlpha )
     , m_editionState( edState )
     , m_localToolbox( toolbox )
-    , m_cursor(0)
+    , m_drawingWidget( 0 )
 {
     connect( m_editionState, SIGNAL(ModifiedSignal()), this, SLOT(EditParamsModifiedSlot()) );
     drwLineTool * lineTool = dynamic_cast<drwLineTool*>(m_localToolbox->GetTool( 0 ));
@@ -53,7 +52,7 @@ void LinesApp::SetSmallBrush()
     Vec4 col( 1.0, 1.0, 1.0, smallBrushAlpha );
     SetLineColor( col );
     GetLineTool()->SetErase( false );
-    m_cursor->SetColor( "yellowgreen" );
+    m_drawingWidget->SetCursorColor( "yellowgreen" );
 }
 
 bool LinesApp::IsBigBrush()
@@ -70,7 +69,7 @@ void LinesApp::SetBigBrush()
     Vec4 col( 1.0, 1.0, 1.0, bigBrushAlpha );
     SetLineColor( col );
     GetLineTool()->SetErase( false );
-    m_cursor->SetColor( "yellowgreen" );
+    m_drawingWidget->SetCursorColor( "yellowgreen" );
 }
 
 void LinesApp::ToggleBigSmallBrush()
@@ -119,7 +118,7 @@ void LinesApp::SetErasing()
     SetLineWidth( eraserWidth );
     Vec4 color( 1.0, 1.0, 1.0, eraserAlpha );
     SetLineColor( color );
-    m_cursor->SetColor( "orange" );
+    m_drawingWidget->SetCursorColor( "orange" );
 }
 
 bool LinesApp::IsErasing()
@@ -135,7 +134,7 @@ void LinesApp::ToggleErasing()
         Vec4 col( 1.0, 1.0, 1.0, m_backupBrushOpacity );
         SetLineColor( col );
         GetLineTool()->SetErase( false );
-        m_cursor->SetColor( "yellowgreen" );
+        m_drawingWidget->SetCursorColor( "yellowgreen" );
     }
     else
     {
