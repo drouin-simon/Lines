@@ -11,10 +11,13 @@ public:
     void SetWindowSize( int w, int h );
     int * GetWindowSize() { return m_winSizePix; }
     void SetFrameSize( double w, double h );
-    void GetFrameSizePix( double frameSize[2] ) { frameSize[0] = m_frameSizePix[0]; frameSize[1] = m_frameSizePix[1]; }
+    void GetFrameSizePix( int frameSize[2] ) { frameSize[0] = m_frameSizePix[0]; frameSize[1] = m_frameSizePix[1]; }
 
-    void WindowToWorld( int xwin, int ywin, double & xworld, double & yworld );
+    void NativeWindowToWorld( int xwin, int ywin, double & xworld, double & yworld );
+    void GLWindowToWorld( int xwin, int ywin, double & xworld, double & yworld );
+    void GLWindowToGLFrame( int xwin, int ywin, int & xworld, int & yworld );
     void WorldToGLWindow( double xworld, double yworld, int & xwin, int & ywin );
+    void WorldToGLFrame( double xworld, double yworld, int & xwin, int & ywin );
     double PixelsPerUnit();
     double UnitsPerPixel();
 

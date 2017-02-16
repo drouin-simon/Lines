@@ -6,6 +6,7 @@
 #include "Scene.h"
 #include "drwCommand.h"
 #include "drwDrawingSurface.h"
+#include "Box2i.h"
 
 class QPushButton;
 class drwGLRenderer;
@@ -26,7 +27,7 @@ public:
 
     // Implement drwDrawingSurface interface
     void NeedRedraw();
-    void NeedRedraw( int x, int y, int width, int height );
+    void NeedRedraw( int frame, Box2i & rect );
     void NeedRedrawOverlay();
     void NeedRedrawOverlay( int x, int y, int width, int height );
 
@@ -88,6 +89,7 @@ protected:
 	bool event ( QEvent * event );
 
     void EnableVSync( bool enable );
+    bool IsFrameDisplayed( int frame );
   
 private:
 
@@ -108,6 +110,7 @@ private:
     bool m_showCursor;
     bool m_tabletHasControl;  // make sur not to generate both mouse and tablet events
     bool m_sceneModified;
+    Box2i m_modifiedRect;
 }; 
 
 #endif

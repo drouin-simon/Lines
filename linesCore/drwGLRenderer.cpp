@@ -6,6 +6,7 @@
 #include "drwDrawingContext.h"
 #include "drwGlslShader.h"
 #include "drwDrawingSurface.h"
+#include "Box2i.h"
 
 drwGLRenderer::drwGLRenderer()
 {
@@ -32,10 +33,10 @@ drwGLRenderer::~drwGLRenderer()
         delete m_widelineShader;
 }
 
-void drwGLRenderer::RenderToTexture( int currentFrame, int onionSkinBefore, int onionSkinAfter )
+void drwGLRenderer::RenderToTexture( int currentFrame, int onionSkinBefore, int onionSkinAfter, Box2i & rect )
 {
     Q_ASSERT( m_scene );
-    
+
     // State setup
     glDisable( GL_DEPTH_TEST );
     glEnable( GL_LINE_SMOOTH );
@@ -49,7 +50,7 @@ void drwGLRenderer::RenderToTexture( int currentFrame, int onionSkinBefore, int 
     glLoadIdentity();
     
     // Resize textures if needed
-    double frameSize[2];
+    int frameSize[2];
     m_camera->GetFrameSizePix( frameSize );
     m_renderTexture->Resize( frameSize[0], frameSize[1] );
     m_layerTexture->Resize( frameSize[0], frameSize[1] );
@@ -60,13 +61,22 @@ void drwGLRenderer::RenderToTexture( int currentFrame, int onionSkinBefore, int 
     
     // Place virtual camera
     m_camera->SetupForFrame();
+
+    // Only update specified region. rect is specified in window coordinate system,
+    // we need to change it to frame (texture) coordinate system.
+    glEnable( GL_SCISSOR_TEST );
+    Box2i frameRect;
+    GLWindowToGLFrame( rect, frameRect );
+    glScissor( frameRect.XMin(), frameRect.YMin(), frameRect.GetWidth(), frameRect.GetHeight() );
     
     // Clear texture
     glClearColor( m_clearColor[0], m_clearColor[1], m_clearColor[2], 0.0 );
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     
     // Create a drawing context
-    drwDrawingContext context(this);
+    Box2d worldRect;
+    GLWindowToWorld( rect, worldRect );
+    drwDrawingContext context(this,worldRect);
     
     int maxFrames = std::max( onionSkinBefore, onionSkinAfter );
     for( int dist = maxFrames; dist > 0; --dist )
@@ -99,6 +109,14 @@ void drwGLRenderer::RenderToTexture( int currentFrame, int onionSkinBefore, int 
     
     // stop drawing to texture
     m_renderTexture->DrawToTexture( false );
+
+    glDisable( GL_SCISSOR_TEST );
+}
+
+void drwGLRenderer::RenderToTexture( int currentFrame )
+{
+    Box2i rect( 0, GetRenderSize()[0] - 1, 0, GetRenderSize()[1] - 1 );
+    RenderToTexture( currentFrame, 0, 0, rect );
 }
 
 void drwGLRenderer::RenderLayer( int frame, drwDrawingContext & context )
@@ -187,12 +205,80 @@ int * drwGLRenderer::GetRenderSize()
 
 void drwGLRenderer::WindowToWorld( double xWin, double yWin, double & xWorld, double & yWorld )
 {
-    m_camera->WindowToWorld( xWin, yWin, xWorld, yWorld );
+    m_camera->NativeWindowToWorld( xWin, yWin, xWorld, yWorld );
+}
+
+void drwGLRenderer::WindowToWorld( const Box2i & winRect, Box2d & worldRect )
+{
+    double xMin, yMin;
+    WindowToWorld( winRect.XMin(), winRect.YMin(), xMin, yMin );
+    double xMax, yMax;
+    WindowToWorld( winRect.XMax(), winRect.YMax(), xMax, yMax );
+    worldRect.Init( xMin, xMax, yMin, yMax );
+}
+
+void drwGLRenderer::GLWindowToWorld( double xWin, double yWin, double & xWorld, double & yWorld )
+{
+    m_camera->GLWindowToWorld( xWin, yWin, xWorld, yWorld );
+}
+
+void drwGLRenderer::GLWindowToWorld( const Box2i & winRect, Box2d & worldRect )
+{
+    double xMin, yMin;
+    GLWindowToWorld( winRect.XMin(), winRect.YMin(), xMin, yMin );
+    double xMax, yMax;
+    GLWindowToWorld( winRect.XMax(), winRect.YMax(), xMax, yMax );
+    worldRect.Init( xMin, xMax, yMin, yMax );
+}
+
+void drwGLRenderer::GLWindowToGLFrame( int xwin, int ywin, int & xframe, int & yframe )
+{
+    m_camera->GLWindowToGLFrame( xwin, ywin, xframe, yframe );
+}
+
+void drwGLRenderer::GLWindowToGLFrame( const Box2i & winRect, Box2i & frameRect )
+{
+    int xMin, yMin;
+    GLWindowToGLFrame( winRect.XMin(), winRect.YMin(), xMin, yMin );
+    int xMax, yMax;
+    GLWindowToGLFrame( winRect.XMax(), winRect.YMax(), xMax, yMax );
+    frameRect.Init( xMin, xMax, yMin, yMax );
+}
+
+void drwGLRenderer::WorldToGLFrame( double xworld, double yworld, int & xwin, int & ywin )
+{
+    m_camera->WorldToGLFrame( xworld, yworld, xwin, ywin );
+}
+
+void drwGLRenderer::WorldToGLFrame( const Box2d & worldRect, Box2i & winRect )
+{
+    int xMin, yMin;
+    WorldToGLFrame( worldRect.XMin(), worldRect.YMin(), xMin, yMin );
+    xMin = std::max( xMin - 1, 0 );
+    yMin = std::max( yMin - 1, 0 );
+    int xMax, yMax;
+    WorldToGLFrame( worldRect.XMax(), worldRect.YMax(), xMax, yMax );
+    xMax = std::min( xMax + 1, GetRenderSize()[0] - 1 );
+    yMax = std::min( yMax + 1, GetRenderSize()[1] - 1 );
+    winRect.Init( xMin, xMax, yMin, yMax );
 }
 
 void drwGLRenderer::WorldToGLWindow( double xworld, double yworld, int & xwin, int & ywin )
 {
     m_camera->WorldToGLWindow( xworld, yworld, xwin, ywin );
+}
+
+void drwGLRenderer::WorldToGLWindow( const Box2d & worldRect, Box2i & winRect )
+{
+    int xMin, yMin;
+    WorldToGLWindow( worldRect.XMin(), worldRect.YMin(), xMin, yMin );
+    xMin = std::max( xMin - 1, 0 );
+    yMin = std::max( yMin - 1, 0 );
+    int xMax, yMax;
+    WorldToGLWindow( worldRect.XMax(), worldRect.YMax(), xMax, yMax );
+    xMax = std::min( xMax + 1, GetRenderSize()[0] - 1 );
+    yMax = std::min( yMax + 1, GetRenderSize()[1] - 1 );
+    winRect.Init( xMin, xMax, yMin, yMax );
 }
 
 double drwGLRenderer::PixelsPerUnit()
@@ -219,7 +305,9 @@ void drwGLRenderer::NeedRedraw()
     m_drawingSurface->NeedRedraw();
 }
 
-void drwGLRenderer::NeedRedraw( int x, int y, int width, int height )
+void drwGLRenderer::NeedRedraw( int frame, Box2d & rect )
 {
-    m_drawingSurface->NeedRedraw( x, y, width, height );
+    Box2i winRect;
+    WorldToGLWindow( rect, winRect );
+    m_drawingSurface->NeedRedraw( frame, winRect );
 }

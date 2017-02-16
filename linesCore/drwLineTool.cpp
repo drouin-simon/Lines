@@ -116,7 +116,10 @@ void drwLineTool::ExecuteMouseCommand( drwCommand::s_ptr command )
         m_lastXPix = mouseCom->XPix();
         m_lastYPix = mouseCom->YPix();
 		CreateNewNodes();
-        CurrentScene->MarkModified();
+
+        // Mark rect modified in scene
+        MarkPointModified( m_lastXWorld, m_lastYWorld );
+
 		emit CommandExecuted( command );
 		emit StartInteraction();
 	}
@@ -136,8 +139,8 @@ void drwLineTool::ExecuteMouseCommand( drwCommand::s_ptr command )
 
 			++it;
 		}
+        MarkSegmentModified( m_lastXWorld, m_lastYWorld, mouseCom->X(), mouseCom->Y() );
 		CurrentNodes.clear();
-        CurrentScene->MarkModified();
 		IsDrawing = false;
 
         m_lastXWorld = mouseCom->X();
@@ -164,7 +167,7 @@ void drwLineTool::ExecuteMouseCommand( drwCommand::s_ptr command )
                 
                 ++it;
             }
-            CurrentScene->MarkModified();
+            MarkSegmentModified( m_lastXWorld, m_lastYWorld, mouseCom->X(), mouseCom->Y() );
             m_lastXWorld = mouseCom->X();
             m_lastYWorld = mouseCom->Y();
             m_lastPressure = mouseCom->Pressure();
@@ -173,6 +176,42 @@ void drwLineTool::ExecuteMouseCommand( drwCommand::s_ptr command )
             emit CommandExecuted( command );
 		}
 	}
+}
+
+void drwLineTool::MarkPointModified( double x, double y )
+{
+    double xMin = x - 0.5 * m_baseWidth;
+    double xMax = x + 0.5 * m_baseWidth;
+    double yMin = y - 0.5 * m_baseWidth;
+    double yMax = y + 0.5 * m_baseWidth;
+    Box2d modifiedRect( xMin, xMax, yMin, yMax );
+    CurrentNodesCont::iterator it = CurrentNodes.begin();
+    while( it != CurrentNodes.end() )
+    {
+        int frameIndex = it->first;
+        CurrentScene->MarkModified( frameIndex, modifiedRect );
+        ++it;
+    }
+}
+
+void drwLineTool::MarkSegmentModified( double x1, double y1, double x2, double y2 )
+{
+    double xMin = std::min( x1, x2 );
+    double xMax = std::max( x1, x2 );
+    double yMin = std::min( y1, y2 );
+    double yMax = std::max( y1, y2 );
+    double xBoxMin = xMin - 0.5 * m_baseWidth;
+    double xBoxMax = xMax + 0.5 * m_baseWidth;
+    double yBoxMin = yMin - 0.5 * m_baseWidth;
+    double yBoxMax = yMax + 0.5 * m_baseWidth;
+    Box2d modifiedRect( xBoxMin, xBoxMax, yBoxMin, yBoxMax );
+    CurrentNodesCont::iterator it = CurrentNodes.begin();
+    while( it != CurrentNodes.end() )
+    {
+        int frameIndex = it->first;
+        CurrentScene->MarkModified( frameIndex, modifiedRect );
+        ++it;
+    }
 }
 
 void drwLineTool::SetCurrentFrame( int frame )
@@ -361,5 +400,3 @@ void drwLineTool::CreateNewNodes( )
 		}	
     }
 }
-
-

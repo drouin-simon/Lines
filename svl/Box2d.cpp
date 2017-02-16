@@ -34,9 +34,7 @@ void Box2d::Init( double xmin, double xmax, double ymin, double ymax )
 
 bool Box2d::IsInside( double x, double y ) const
 {
-    if( x >= m_xMin && x <= m_xMax && y >= m_yMin && y <= m_yMax )
-        return true;
-    return false;
+    return x >= m_xMin && x <= m_xMax && y >= m_yMin && y <= m_yMax;
 }	
 
 void Box2d::IncludePoint( double x, double y )
@@ -51,19 +49,36 @@ void Box2d::IncludePoint( double x, double y )
         m_yMax = y;
 }	
 
-bool Box2d::Intersect( const Box2d & other ) const
+bool Box2d::XRangeIntersect( const Box2d & b ) const
 {
-    if( IsInside( other.m_xMin, other.m_yMin ) ||
-        IsInside( other.m_xMax, other.m_yMin ) ||
-        IsInside( other.m_xMin, other.m_yMax ) ||
-        IsInside( other.m_xMax, other.m_yMax ) )
-        return true;
-    return false;
+    return ( m_xMin >= b.m_xMin && m_xMin <= b.m_xMax ) ||
+            ( m_xMax >= b.m_xMin && m_xMax <= b.m_xMax ) ||
+            ( b.m_xMin >= m_xMin && b.m_xMin <= m_xMax ) ||
+            ( b.m_xMax >= m_xMin && b.m_xMax <= m_xMax );
+}
+
+bool Box2d::YRangeIntersect( const Box2d & b ) const
+{
+    return ( m_yMin >= b.m_yMin && m_yMin <= b.m_yMax ) ||
+            ( m_yMax >= b.m_yMin && m_yMax <= b.m_yMax ) ||
+            ( b.m_yMin >= m_yMin && b.m_yMin <= m_yMax ) ||
+            ( b.m_yMax >= m_yMin && b.m_yMax <= m_yMax );
+}
+
+// Two boxes intersect if at leas
+bool Box2d::Intersect( const Box2d & b ) const
+{
+    return XRangeIntersect( b ) && YRangeIntersect( b );
 }
 
 bool Box2d::Intersect( const Box2d & b1, const Box2d & b2 )
 {
-    if( b1.Intersect( b2 ) )
-        return true;
-    return false;
+    return b1.Intersect( b2 );
 }	
+
+std::ostream &operator << (std::ostream &s, const Box2d &b )
+{
+    s << "Origin: ( " << b.XMin() << ", " << b.YMin() << ") ";
+    s << "Size: ( " << b.GetWidth() << "," << b.GetHeight() << " )";
+    return s;
+}

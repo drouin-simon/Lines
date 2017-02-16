@@ -121,4 +121,9 @@ void Scene::MarkModified()
     m_renderer->NeedRedraw();
 }
 
+void Scene::MarkModified( int frame, Box2d & rect )
+{
+    m_renderer->NeedRedraw( frame, rect );
+}
+
 

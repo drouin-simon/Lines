@@ -8,6 +8,7 @@
 #include "drwCommand.h"
 
 class drwGLRenderer;
+class Box2d;
 
 class Scene : public QObject
 {
@@ -37,6 +38,7 @@ public:
 
 	// used by other classes to mark end of modification and notify clients they can re-render
 	void MarkModified();
+    void MarkModified( int frame, Box2d & rect );
 	
 signals:
 	

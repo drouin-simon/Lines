@@ -52,13 +52,18 @@ drwDrawingWidget::~drwDrawingWidget()
 void drwDrawingWidget::NeedRedraw()
 {
     m_sceneModified = true;
+    m_modifiedRect = Box2i( 0, m_renderer->GetRenderSize()[0] - 1, 0, m_renderer->GetRenderSize()[1] - 1 );
     update();
 }
 
-void drwDrawingWidget::NeedRedraw( int x, int y, int width, int height )
+void drwDrawingWidget::NeedRedraw( int frame, Box2i & rect )
 {
-    m_sceneModified = true;
-    update( x, y, width, height );
+    if( IsFrameDisplayed( frame ) )
+    {
+        m_sceneModified = true;
+        m_modifiedRect.AdjustBound( rect );
+        update( rect.XMin(), rect.YMin(), rect.GetWidth(), rect.GetHeight() );
+    }
 }
 
 void drwDrawingWidget::NeedRedrawOverlay()
@@ -127,8 +132,7 @@ void drwDrawingWidget::ToggleComputeFps()
 
 void drwDrawingWidget::CurrentFrameChanged()
 {
-    m_sceneModified = true;
-	update();
+    NeedRedraw();
 	Observer->SetCurrentFrame( Controler->GetCurrentFrame() );
 }
 
@@ -138,7 +142,7 @@ void drwDrawingWidget::PlaybackStartStop( bool isStarting )
 	if( isStarting )
 	{
         // render current frame to texture, generate sound from frame
-        m_renderer->RenderToTexture( Controler->GetCurrentFrame(), 0, 0 );
+        m_renderer->RenderToTexture( Controler->GetCurrentFrame() );
 
         // start timer
 		if( m_timerId == -1 )
@@ -166,6 +170,7 @@ void drwDrawingWidget::resizeGL( int w, int h )
 {
     int ratio = this->devicePixelRatio();
     m_renderer->SetRenderSize( ratio*w, ratio*h );
+    NeedRedraw();
 }
 
 void drwDrawingWidget::paintEvent( QPaintEvent * event )
@@ -185,21 +190,23 @@ void drwDrawingWidget::paintEvent( QPaintEvent * event )
             onionSkinAfter = 0;
         }
     }
+    
+    // Render scene to texture if modified
+    if( m_sceneModified )
+    {
+        m_renderer->RenderToTexture( Controler->GetCurrentFrame(), onionSkinBefore, onionSkinAfter, m_modifiedRect );
+        m_sceneModified = false;
+    }
 
-    // Find out the area of the images that has to be updated (on macOS, rect is always the whole window)
+    // Paste texture to screen and find out the area of the
+    // images that has to be updated (on macOS, rect is always the whole window)
+    // we would use this rect for everything, but it is not reliable.
     QRect dr = event->rect();
     int ratio = this->devicePixelRatio();
     int x = dr.x() * ratio;
     int y = dr.y() * ratio;
     int w = dr.width() * ratio;
     int h = dr.height() * ratio;
-    
-    // Render scene to texture if modified
-    if( m_sceneModified )
-        m_renderer->RenderToTexture( Controler->GetCurrentFrame(), onionSkinBefore, onionSkinAfter );
-    m_sceneModified = false;
-
-    // Paste texture to screen
     m_renderer->RenderTextureToScreen( x, y, w, h );
 
     if( GetShowCameraFrame() )
@@ -232,6 +239,8 @@ void drwDrawingWidget::paintEvent( QPaintEvent * event )
 
     painter.end();
 
+    m_sceneModified = false;
+    m_modifiedRect.Reset();
     emit FinishedPainting();
 }
 
@@ -253,6 +262,32 @@ void drwDrawingWidget::EnableVSync( bool enable )
     CGLContextObj cgl_context = CGLGetCurrentContext();
     CGLSetParameter( cgl_context, kCGLCPSwapInterval, &swap_interval );
 #endif
+}
+
+bool drwDrawingWidget::IsFrameDisplayed( int frame )
+{
+    int curFrame = Controler->GetCurrentFrame();
+    if( GetInhibitOnionSkin() )
+    {
+        return frame == curFrame;
+    }
+    else
+    {
+        int nbFrames = Controler->GetNumberOfFrames();
+        int lastFrame = curFrame + GetOnionSkinAfter();
+        int lastFrameClamp = std::max( lastFrame, nbFrames - 1 );
+        int lastFrameOver = lastFrame % nbFrames;
+        int firstFrame = curFrame - GetOnionSkinBefore();
+        int firstFrameClamp = std::max( firstFrame, 0 );
+        int firstFrameUnder = nbFrames + firstFrame;
+        if( frame >= firstFrameClamp && frame <= lastFrameClamp )
+            return true;
+        if( frame <= lastFrameOver )
+            return true;
+        if( frame >= firstFrameUnder )
+            return true;
+        return false;
+    }
 }
 
 void drwDrawingWidget::mousePressEvent( QMouseEvent * e )
@@ -359,13 +394,12 @@ void drwDrawingWidget::ActivateViewportWidget( bool active )
     {
         QPoint p = this->mapFromGlobal(QCursor::pos());
         m_viewportWidget->Activate( p.x(), p.y() );
-        update();
     }
     else
     {
         m_viewportWidget->Deactivate();
-        update();
     }
+    NeedRedrawOverlay();
 }
 
 double drwDrawingWidget::PixelsPerUnit()
@@ -377,28 +411,28 @@ void drwDrawingWidget::SetOnionSkinBefore( int value )
 {
     m_onionSkinFramesBefore = value;
     emit DisplaySettingsModified();
-    update();
+    NeedRedraw();
 }
 
 void drwDrawingWidget::SetOnionSkinAfter( int value )
 {
     m_onionSkinFramesAfter = value;
     emit DisplaySettingsModified();
-    update();
+    NeedRedraw();
 }
 
 void drwDrawingWidget::SetInhibitOnionSkin( bool isOn )
 {
     m_inhibitOnionSkin = isOn;
     emit DisplaySettingsModified();
-    update();
+    NeedRedraw();
 }
 
 void drwDrawingWidget::SetShowCameraFrame( bool isOn )
 {
     m_showCameraFrame = isOn;
     emit DisplaySettingsModified();
-    update();
+    NeedRedrawOverlay();
 }
 
 void drwDrawingWidget::enterEvent( QEvent * e )
@@ -411,7 +445,7 @@ void drwDrawingWidget::leaveEvent( QEvent * e )
     m_showCursor = false;
     if( m_viewportWidget )
         m_viewportWidget->Deactivate();
-	update();
+    NeedRedrawOverlay();
 }
 
 bool drwDrawingWidget::event( QEvent * e )

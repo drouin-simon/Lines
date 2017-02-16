@@ -40,4 +40,7 @@
 
 #include "Transform.h"
 
+#include "Box2i.h"
+#include "Box2d.h"
+
 #endif

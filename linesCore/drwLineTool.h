@@ -67,6 +67,8 @@ protected:
 	void ParametersChanged();
 	void CreateNewNodes();
 	Node * CreateNewNode();
+    void MarkSegmentModified( double x1, double y1, double x2, double y2 );
+    void MarkPointModified( double x, double y );
 	
     double m_lastXWorld;
     double m_lastYWorld;

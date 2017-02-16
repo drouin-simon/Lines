@@ -16,9 +16,9 @@ void drwDrawingContext::SetWidelineShader( drwGlslShader * shader )
     m_renderer->SetWidelineShader( shader );
 }
 
-void drwDrawingContext::WorldToGLWindow( double xworld, double yworld, int & xwin, int & ywin ) const
+void drwDrawingContext::WorldToGLFrame( double xworld, double yworld, int & xwin, int & ywin ) const
 {
-    m_renderer->WorldToGLWindow( xworld, yworld, xwin, ywin );
+    m_renderer->WorldToGLFrame( xworld, yworld, xwin, ywin );
 }
 
 double drwDrawingContext::PixelsPerUnit() const

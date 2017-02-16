@@ -8,6 +8,8 @@ class drwGlslShader;
 class drwCamera;
 class drwDrawingContext;
 class drwDrawingSurface;
+class Box2i;
+class Box2d;
 
 class drwGLRenderer
 {
@@ -19,7 +21,8 @@ public:
 
     void SetDrawingSurface( drwDrawingSurface * s ) { m_drawingSurface = s; }
 
-    void RenderToTexture( int currentFrame, int onionSkinBefore, int onionSkinAfter );
+    void RenderToTexture( int currentFrame, int onionSkinBefore, int onionSkinAfter, Box2i & rect );
+    void RenderToTexture( int currentFrame );
     drwDrawableTexture * GetRenderTexture() { return m_renderTexture; }
     void RenderTextureToScreen();
     void RenderTextureToScreen( int x, int y, int width, int height );
@@ -34,12 +37,20 @@ public:
     void SetWidelineShader( drwGlslShader * shader ) { m_widelineShader = shader; }
 
     void WindowToWorld( double xWin, double yWin, double & xWorld, double & yWorld );
+    void WindowToWorld( const Box2i & winRect, Box2d & worldRect );
+    void GLWindowToWorld( double xWin, double yWin, double & xWorld, double & yWorld );
+    void GLWindowToWorld( const Box2i & winRect, Box2d & worldRect );
+    void GLWindowToGLFrame( int xwin, int ywin, int & xframe, int & yframe );
+    void GLWindowToGLFrame( const Box2i & winRect, Box2i & frameRect );
     void WorldToGLWindow( double xworld, double yworld, int & xwin, int & ywin );
+    void WorldToGLWindow( const Box2d & worldRect, Box2i & winRect );
+    void WorldToGLFrame( double xworld, double yworld, int & xwin, int & ywin );
+    void WorldToGLFrame( const Box2d & worldRect, Box2i & winRect );
     double PixelsPerUnit();
     void SetClearColor( double r, double g, double b, double a );
 
     void NeedRedraw();
-    void NeedRedraw( int x, int y, int width, int height );
+    void NeedRedraw( int frame, Box2d & rect );
     
 protected:
 

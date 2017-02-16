@@ -40,15 +40,35 @@ void drwCamera::SetFrameSize( double w, double h )
 
 // WARNING: here, window coord are in window-system coordinate space (y=0 at the top of the window) and
 // world coordinates are in OpenGL space (y=0 at the bottom of the window). WorldToGLWindow (next function) is not the inverse operation.
-void drwCamera::WindowToWorld( int xwin, int ywin, double & xworld, double & yworld )
+void drwCamera::NativeWindowToWorld( int xwin, int ywin, double & xworld, double & yworld )
 {
     xworld = m_winPosWorld[0] + UnitsPerPixel() * xwin;
     yworld = m_winPosWorld[1] + UnitsPerPixel() * ( m_winSizePix[1] - ywin - 1 );
 }
 
 // WARNING: here, window coordinates are in the OpenGL window space (y=0 at the bottom of the window)
-// this is not the inverse of the previous function (WindowToWorld)
+void drwCamera::GLWindowToWorld( int xwin, int ywin, double & xworld, double & yworld )
+{
+    xworld = m_winPosWorld[0] + UnitsPerPixel() * xwin;
+    yworld = m_winPosWorld[1] + UnitsPerPixel() * ywin;
+}
+
+void drwCamera::GLWindowToGLFrame( int xwin, int ywin, int & xframe, int & yframe )
+{
+    xframe = xwin - m_framePosPix[0];
+    yframe = ywin - m_framePosPix[1];
+}
+
 void drwCamera::WorldToGLWindow( double xworld, double yworld, int & xwin, int & ywin )
+{
+    double scaleFactor = PixelsPerUnit();
+    xwin = m_framePosPix[0] + (int)round( scaleFactor * xworld );
+    ywin = m_framePosPix[1] + (int)round( scaleFactor * yworld );
+}
+
+// WARNING: here, window coordinates are in the OpenGL window space (y=0 at the bottom of the window)
+// this is not the inverse of the previous function (WindowToWorld)
+void drwCamera::WorldToGLFrame( double xworld, double yworld, int & xwin, int & ywin )
 {
     double scaleFactor = PixelsPerUnit();
     xwin = (int)round( scaleFactor * xworld );

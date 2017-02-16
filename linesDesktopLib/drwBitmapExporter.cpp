@@ -82,7 +82,7 @@ void drwBitmapExporter::run()
 
 		emit WritingFrame( i );
 		
-        ren.RenderToTexture( i, 0, 0 );
+        ren.RenderToTexture( i );
         ren.RenderTextureToScreen();
 
         glFlush();

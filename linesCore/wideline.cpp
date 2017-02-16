@@ -32,6 +32,11 @@ WideLine::~WideLine()
 
 void WideLine::InternDraw( drwDrawingContext & context )
 {
+    // Don't draw if the area of the screen to repaint doesn't intersect
+    // this line's bounding box
+    if( !m_boundingBox.Intersect( context.DrawingRect() ) )
+        return;
+
 	// Draw mask to texture
     drwDrawableTexture * tex = context.GetWorkingTexture();
     tex->DrawToTexture( true );
@@ -101,10 +106,10 @@ void WideLine::InternDraw( drwDrawingContext & context )
 
     int xWinMin = 0;
     int yWinMin = 0;
-    context.WorldToGLWindow( m_boundingBox.GetXMin(), m_boundingBox.GetYMin(), xWinMin, yWinMin );
+    context.WorldToGLFrame( m_boundingBox.XMin(), m_boundingBox.YMin(), xWinMin, yWinMin );
     int xWinMax = 1;
     int yWinMax = 1;
-    context.WorldToGLWindow( m_boundingBox.GetXMax(), m_boundingBox.GetYMax(), xWinMax, yWinMax );
+    context.WorldToGLFrame( m_boundingBox.XMax(), m_boundingBox.YMax(), xWinMax, yWinMax );
     int width = xWinMax - xWinMin + 1;
     int height = yWinMax - yWinMin + 1;
     tex->PasteToScreen( xWinMin, yWinMin, width, height );
