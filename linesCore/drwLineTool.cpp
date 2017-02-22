@@ -180,10 +180,10 @@ void drwLineTool::ExecuteMouseCommand( drwCommand::s_ptr command )
 
 void drwLineTool::MarkPointModified( double x, double y )
 {
-    double xMin = x - 0.5 * m_baseWidth;
-    double xMax = x + 0.5 * m_baseWidth;
-    double yMin = y - 0.5 * m_baseWidth;
-    double yMax = y + 0.5 * m_baseWidth;
+    double xMin = x - m_baseWidth;
+    double xMax = x + m_baseWidth;
+    double yMin = y - m_baseWidth;
+    double yMax = y + m_baseWidth;
     Box2d modifiedRect( xMin, xMax, yMin, yMax );
     CurrentNodesCont::iterator it = CurrentNodes.begin();
     while( it != CurrentNodes.end() )
@@ -200,10 +200,10 @@ void drwLineTool::MarkSegmentModified( double x1, double y1, double x2, double y
     double xMax = std::max( x1, x2 );
     double yMin = std::min( y1, y2 );
     double yMax = std::max( y1, y2 );
-    double xBoxMin = xMin - 0.5 * m_baseWidth;
-    double xBoxMax = xMax + 0.5 * m_baseWidth;
-    double yBoxMin = yMin - 0.5 * m_baseWidth;
-    double yBoxMax = yMax + 0.5 * m_baseWidth;
+    double xBoxMin = xMin - m_baseWidth;
+    double xBoxMax = xMax + m_baseWidth;
+    double yBoxMin = yMin - m_baseWidth;
+    double yBoxMax = yMax + m_baseWidth;
     Box2d modifiedRect( xBoxMin, xBoxMax, yBoxMin, yBoxMax );
     CurrentNodesCont::iterator it = CurrentNodes.begin();
     while( it != CurrentNodes.end() )
