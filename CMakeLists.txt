@@ -3,8 +3,13 @@ PROJECT( Lines )
 cmake_minimum_required(VERSION 2.6)
 
 #----------------------------------------
-# Include BOOST dir if available
-include_directories( ${BOOST_ROOT} )
+# Include BOOST dir if needed (eg. osx < 10.9 )
+OPTION( LINES_USE_BOOST "Use boost to build lines. This is needed with older compiler without shared_ptr" OFF )
+if( LINES_USE_BOOST )
+    find_package( Boost 1.63 REQUIRED )
+    include_directories( ${Boost_INCLUDE_DIRS} )
+    add_definitions(-DUSE_BOOST)
+endif()
 
 #----------------------------------------
 # Use Svl
