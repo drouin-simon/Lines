@@ -13,13 +13,25 @@ public:
 	
 	TabletStateWidget( QWidget * parent = 0 );
 	~TabletStateWidget();
+
+    void LogMouseEvent( QMouseEvent * e );
+    void LogTabletEvent( QTabletEvent * e );
+    void LogEnterEvent();
+    void LogLeaveEvent();
 	
-	void tabletEvent ( QTabletEvent * event );
-	
+private slots:
+
+    void on_clearLogButton_clicked();
+
 private:
 			 
 	void UpdateUi( QTabletEvent * e );
-	
+
+    QString MouseEventTypeToString( QMouseEvent * e );
+    QString TabletEventTypeToString( QTabletEvent * e );
+    QString MouseEventButtonsToString( QMouseEvent * e );
+    QString TabletEventButtonsToString( QTabletEvent * e );
+
 	Ui::TabletStateWidget ui;
 	
 };
