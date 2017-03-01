@@ -179,6 +179,20 @@
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_2">
        <item>
+        <widget class="QCheckBox" name="mouseTrackingCheckBox">
+         <property name="text">
+          <string>Mouse tracking</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="moveEventsCheckBox">
+         <property name="text">
+          <string>Move Events</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <spacer name="horizontalSpacer_4">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>

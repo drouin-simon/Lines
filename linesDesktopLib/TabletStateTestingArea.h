@@ -14,6 +14,8 @@ public:
     explicit TabletStateTestingArea(QWidget *parent = 0);
 
     void SetTabletStateWidget( TabletStateWidget * w ) { m_parent = w; }
+    bool GetLogMoveEvents() { return m_logMoveEvents; }
+    void SetLogMoveEvents( bool l ) { m_logMoveEvents = l; }
 
 protected:
 
@@ -29,6 +31,7 @@ protected:
     bool event( QEvent * event );
 
     TabletStateWidget * m_parent;
+    bool m_logMoveEvents;
 };
 
 #endif

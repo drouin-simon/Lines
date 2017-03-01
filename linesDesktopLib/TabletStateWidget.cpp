@@ -16,7 +16,7 @@ TabletStateWidget::~TabletStateWidget()
 void TabletStateWidget::LogMouseEvent( QMouseEvent * e )
 {
     QString logText;
-    logText += QString("Event: %1;").arg( MouseEventTypeToString( e ) );
+    logText += QString("Mouse: %1;").arg( MouseEventTypeToString( e ) );
     logText += QString(" buttons: %1;").arg( MouseEventButtonsToString( e ) );
     logText += QString(" pos: ( %1, %2 );").arg( e->x() ).arg( e->y() );
 
@@ -26,7 +26,7 @@ void TabletStateWidget::LogMouseEvent( QMouseEvent * e )
 void TabletStateWidget::LogTabletEvent( QTabletEvent * e )
 {
     QString logText;
-    logText += QString("Event: %1;").arg( TabletEventTypeToString( e ) );
+    logText += QString("Tablet: %1;").arg( TabletEventTypeToString( e ) );
     logText += QString(" buttons: %1;").arg( TabletEventButtonsToString( e ) );
     logText += QString(" pos: ( %1, %2 );").arg( e->x() ).arg( e->y() );
     logText += QString(" presure: %1").arg( e->pressure() );
@@ -54,6 +54,14 @@ void TabletStateWidget::on_clearLogButton_clicked()
 
 void TabletStateWidget::UpdateUi( QTabletEvent * e )
 {
+    ui.moveEventsCheckBox->blockSignals( true );
+    ui.moveEventsCheckBox->setChecked( ui.openGLWidget->GetLogMoveEvents() );
+    ui.moveEventsCheckBox->blockSignals( false );
+
+    ui.mouseTrackingCheckBox->blockSignals( true );
+    ui.mouseTrackingCheckBox->setChecked( ui.openGLWidget->hasMouseTracking() );
+    ui.mouseTrackingCheckBox->blockSignals( false );
+
     if( e->type() == QEvent::TabletPress )
     {
         ui.PressStateLabel->setText( "Pressed" );
@@ -194,4 +202,14 @@ QString TabletStateWidget::TabletEventButtonsToString( QTabletEvent * e )
     if( s.isEmpty() )
         s += "Unknown";
     return s;
+}
+
+void TabletStateWidget::on_moveEventsCheckBox_toggled(bool checked)
+{
+    ui.openGLWidget->SetLogMoveEvents( checked );
+}
+
+void TabletStateWidget::on_mouseTrackingCheckBox_toggled(bool checked)
+{
+    ui.openGLWidget->setMouseTracking( checked );
 }

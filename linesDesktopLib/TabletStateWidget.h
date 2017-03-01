@@ -23,6 +23,10 @@ private slots:
 
     void on_clearLogButton_clicked();
 
+    void on_moveEventsCheckBox_toggled(bool checked);
+
+    void on_mouseTrackingCheckBox_toggled(bool checked);
+
 private:
 			 
 	void UpdateUi( QTabletEvent * e );
