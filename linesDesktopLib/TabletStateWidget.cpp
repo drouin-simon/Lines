@@ -26,7 +26,7 @@ void TabletStateWidget::LogMouseEvent( QMouseEvent * e )
 void TabletStateWidget::LogTabletEvent( QTabletEvent * e )
 {
     QString logText;
-    logText += QString("Tablet: %1;").arg( TabletEventTypeToString( e ) );
+    logText += QString("Tablet: %1 (id:%2);").arg( TabletEventTypeToString( e ) ).arg(e->uniqueId());
     logText += QString(" buttons: %1;").arg( TabletEventButtonsToString( e ) );
     logText += QString(" pos: ( %1, %2 );").arg( e->x() ).arg( e->y() );
     logText += QString(" presure: %1").arg( e->pressure() );
