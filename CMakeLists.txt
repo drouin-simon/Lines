@@ -1,6 +1,6 @@
 PROJECT( Lines )
 
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.1)
 
 #----------------------------------------
 # Include BOOST dir if needed (eg. osx < 10.9 )
@@ -23,6 +23,13 @@ find_package( Qt5 COMPONENTS Widgets OpenGL Network REQUIRED )
 include_directories( ${Qt5Widgets_INCLUDE_DIRS} )
 include_directories( ${Qt5OpenGL_INCLUDE_DIRS} )
 include_directories( ${Qt5Network_INCLUDE_DIRS} )
+#----------------------------------------
+
+#----------------------------------------
+# Tell the compiler to use c++11 which is required with Qt >= 5.7
+if( Qt5_VERSION VERSION_GREATER 5.7 OR Qt5_VERSION VERSION_EQUAL 5.7 )
+    set( CMAKE_CXX_STANDARD 11 )
+endif()
 #----------------------------------------
 
 #----------------------------------------
