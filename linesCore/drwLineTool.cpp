@@ -6,6 +6,7 @@
 #include "drwEditionState.h"
 #include <QTabletEvent>
 #include <QSettings>
+#include <algorithm>
 
 drwLineTool::drwLineTool( Scene * scene, drwEditionState * editionState, QObject * parent )
 : drwWidgetObserver( scene, parent )
