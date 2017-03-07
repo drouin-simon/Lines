@@ -152,6 +152,7 @@ MainWindow::MainWindow()
 	// Create tablet state dock
 	m_dockTabletState = new QDockWidget(tr("Tablet State"));
 	m_tabletStateWidget = new TabletStateWidget( m_dockTabletState );
+    m_tabletStateWidget->SetDrawingWiget( m_glWidget );
 	m_dockTabletState->setWidget(m_tabletStateWidget);
 	m_viewMenu->addAction(m_dockTabletState->toggleViewAction());
 	m_dockTabletState->setFeatures( QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetMovable );

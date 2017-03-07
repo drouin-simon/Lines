@@ -40,6 +40,8 @@ public:
     void SetCursor( drwCursor * cursor );
     void SetCursorColor( QString colorName );
     void UpdatePosition( int x, int y );
+    void SetMuteMouse( bool mute ) { m_muteMouse = mute; }
+    bool IsMutingMouse() { return m_muteMouse; }
     void ToggleComputeFps();
     void ActivateViewportWidget( bool active );
     double PixelsPerUnit();
@@ -108,6 +110,7 @@ private:
     drwFpsCounter * m_fpsCounter;
     drwCursor * m_cursor;
     bool m_showCursor;
+    bool m_muteMouse;
     bool m_tabletHasControl;  // make sur not to generate both mouse and tablet events
     bool m_sceneModified;
     Box2i m_modifiedRect;

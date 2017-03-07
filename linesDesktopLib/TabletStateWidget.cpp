@@ -1,8 +1,10 @@
 #include "TabletStateWidget.h"
 #include "TabletStateTestingArea.h"
+#include "drwDrawingWidget.h"
 
 TabletStateWidget::TabletStateWidget( QWidget * parent ) : QWidget( parent )
 {
+    m_drawingWidget = 0;
 	ui.setupUi(this);
     ui.openGLWidget->SetTabletStateWidget( this );
     QTabletEvent event( QEvent::TabletEnterProximity, QPoint(0,0), QPointF( 0, 0 ), QTabletEvent::NoDevice, QTabletEvent::UnknownPointer, 0, 0, 0, 0, 0, 0, 0, 0 );
@@ -11,6 +13,13 @@ TabletStateWidget::TabletStateWidget( QWidget * parent ) : QWidget( parent )
 
 TabletStateWidget::~TabletStateWidget()
 {
+}
+
+void TabletStateWidget::SetDrawingWiget( drwDrawingWidget * w )
+{
+    m_drawingWidget = w;
+    QTabletEvent event( QEvent::TabletEnterProximity, QPoint(0,0), QPointF( 0, 0 ), QTabletEvent::NoDevice, QTabletEvent::UnknownPointer, 0, 0, 0, 0, 0, 0, 0, 0 );
+    UpdateUi(&event);
 }
 
 void TabletStateWidget::LogMouseEvent( QMouseEvent * e )
@@ -27,9 +36,11 @@ void TabletStateWidget::LogTabletEvent( QTabletEvent * e )
 {
     QString logText;
     logText += QString("Tablet: %1 (id:%2);").arg( TabletEventTypeToString( e ) ).arg(e->uniqueId());
-    logText += QString(" buttons: %1;").arg( TabletEventButtonsToString( e ) );
+    logText += QString(" ptype: %1;").arg( TabletEventToPointerType( e ) );
+    logText += QString(" dtype: %1").arg( TabletEventToDeviceType( e ) );
+    logText += QString(" but: %1;").arg( TabletEventButtonsToString( e ) );
     logText += QString(" pos: ( %1, %2 );").arg( e->x() ).arg( e->y() );
-    logText += QString(" presure: %1").arg( e->pressure() );
+    logText += QString(" pres: %1").arg( e->pressure() );
     ui.logWidget->appendPlainText( logText );
 
     UpdateUi( e );
@@ -61,6 +72,13 @@ void TabletStateWidget::UpdateUi( QTabletEvent * e )
     ui.mouseTrackingCheckBox->blockSignals( true );
     ui.mouseTrackingCheckBox->setChecked( ui.openGLWidget->hasMouseTracking() );
     ui.mouseTrackingCheckBox->blockSignals( false );
+
+    if( m_drawingWidget )
+    {
+        ui.muteMouseCheckBox->blockSignals( true );
+        ui.muteMouseCheckBox->setChecked( m_drawingWidget->IsMutingMouse() );
+        ui.muteMouseCheckBox->blockSignals( false );
+    }
 
     if( e->type() == QEvent::TabletPress )
     {
@@ -204,6 +222,38 @@ QString TabletStateWidget::TabletEventButtonsToString( QTabletEvent * e )
     return s;
 }
 
+QString TabletStateWidget::TabletEventToPointerType( QTabletEvent * e )
+{
+    QString s = "";
+    if( e->pointerType() == QTabletEvent::UnknownPointer )
+        s = "Unknown";
+    else if( e->pointerType() == QTabletEvent::Pen )
+        s = "Pen";
+    else if( e->pointerType() == QTabletEvent::Cursor )
+        s = "Cursor";
+    else if( e->pointerType() == QTabletEvent::Eraser )
+        s = "Eraser";
+    return s;
+}
+
+QString TabletStateWidget::TabletEventToDeviceType( QTabletEvent * e )
+{
+    QString s = "";
+    if( e->device() == QTabletEvent::NoDevice )
+        s = "NoDevice";
+    else if( e->device() == QTabletEvent::Puck )
+        s = "Puck";
+    else if( e->device() == QTabletEvent::Stylus )
+        s = "Stylus";
+    else if( e->device() == QTabletEvent::Airbrush )
+        s = "Airbrush";
+    else if( e->device() == QTabletEvent::FourDMouse )
+        s = "FourDMouse";
+    else if( e->device() == QTabletEvent::RotationStylus )
+        s = "RotationStylus";
+    return s;
+}
+
 void TabletStateWidget::on_moveEventsCheckBox_toggled(bool checked)
 {
     ui.openGLWidget->SetLogMoveEvents( checked );
@@ -212,4 +262,14 @@ void TabletStateWidget::on_moveEventsCheckBox_toggled(bool checked)
 void TabletStateWidget::on_mouseTrackingCheckBox_toggled(bool checked)
 {
     ui.openGLWidget->setMouseTracking( checked );
+}
+
+void TabletStateWidget::on_muteMouseCheckBox_toggled(bool checked)
+{
+    m_drawingWidget->SetMuteMouse( checked );
+}
+
+void TabletStateWidget::on_nativeEventCheckBox_toggled(bool checked)
+{
+
 }

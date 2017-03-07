@@ -8,6 +8,7 @@
 #include "drwGlslShader.h"
 #include "drwDrawingSurface.h"
 #include "Box2i.h"
+#include <algorithm>
 
 drwGLRenderer::drwGLRenderer()
 {
@@ -269,16 +270,23 @@ void drwGLRenderer::WorldToGLWindow( double xworld, double yworld, int & xwin, i
     m_camera->WorldToGLWindow( xworld, yworld, xwin, ywin );
 }
 
+int clip(int n, int lower, int upper)
+{
+    return std::max(lower, std::min(n, upper));
+}
+
 void drwGLRenderer::WorldToGLWindow( const Box2d & worldRect, Box2i & winRect )
 {
     int xMin, yMin;
     WorldToGLWindow( worldRect.XMin(), worldRect.YMin(), xMin, yMin );
-    xMin = std::max( xMin - 1, 0 );
-    yMin = std::max( yMin - 1, 0 );
+    int winXMax = GetRenderSize()[0] - 1;
+    int winYMax = GetRenderSize()[1] - 1;
+    xMin = clip( xMin - 1, 0, winXMax );
+    yMin = clip( yMin - 1, 0, winYMax );
     int xMax, yMax;
     WorldToGLWindow( worldRect.XMax(), worldRect.YMax(), xMax, yMax );
-    xMax = std::min( xMax + 1, GetRenderSize()[0] - 1 );
-    yMax = std::min( yMax + 1, GetRenderSize()[1] - 1 );
+    xMax = clip( xMax + 1, 0, winXMax );
+    yMax = clip( yMax + 1, 0, winYMax );
     winRect.Init( xMin, xMax, yMin, yMax );
 }
 

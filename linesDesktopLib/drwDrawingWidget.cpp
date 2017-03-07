@@ -19,6 +19,7 @@ drwDrawingWidget::drwDrawingWidget( QWidget * parent )
 , m_viewportWidget(0)
 , m_cursor(0)
 , m_showCursor(false)
+, m_muteMouse(false)
 , m_tabletHasControl(false)
 , m_sceneModified(true)
 {
@@ -196,6 +197,7 @@ void drwDrawingWidget::paintEvent( QPaintEvent * event )
     {
         m_renderer->RenderToTexture( Controler->GetCurrentFrame(), onionSkinBefore, onionSkinAfter, m_modifiedRect );
         m_sceneModified = false;
+        m_modifiedRect.Reset();
     }
 
     // Paste texture to screen and find out the area of the
@@ -239,8 +241,6 @@ void drwDrawingWidget::paintEvent( QPaintEvent * event )
 
     painter.end();
 
-    m_sceneModified = false;
-    m_modifiedRect.Reset();
     emit FinishedPainting();
 }
 
@@ -301,7 +301,7 @@ void drwDrawingWidget::mousePressEvent( QMouseEvent * e )
 		return;
 	
 	// now send the event to observer ( drawing tools)
-    if( e->button() == Qt::LeftButton && Observer && !m_tabletHasControl )
+    if( e->button() == Qt::LeftButton && Observer && !m_tabletHasControl  && !m_muteMouse )
 	{
         drwCommand::s_ptr command = CreateMouseCommand( drwMouseCommand::Press, e );
         Observer->ExecuteCommand( command );
@@ -319,7 +319,7 @@ void drwDrawingWidget::mouseReleaseEvent( QMouseEvent * e )
 	if( widgetSwallows )
 		return;
 	
-    if ( e->button() == Qt::LeftButton && Observer && !m_tabletHasControl)
+    if ( e->button() == Qt::LeftButton && Observer && !m_tabletHasControl  && !m_muteMouse )
     {
         drwCommand::s_ptr command = CreateMouseCommand( drwMouseCommand::Release, e );
         Observer->ExecuteCommand( command );
@@ -328,7 +328,7 @@ void drwDrawingWidget::mouseReleaseEvent( QMouseEvent * e )
 
 
 void drwDrawingWidget::mouseMoveEvent( QMouseEvent * e )
-{
+{   
     // update the cursor position and all that stuff
     UpdatePosition( e->x(), e->y() );
 
@@ -337,7 +337,7 @@ void drwDrawingWidget::mouseMoveEvent( QMouseEvent * e )
 	if( widgetSwallows )
 		return;
 	
-    if ( Observer && !m_tabletHasControl )
+    if ( Observer && !m_tabletHasControl && !m_muteMouse )
     {
         drwCommand::s_ptr command = CreateMouseCommand( drwMouseCommand::Move, e );
         Observer->ExecuteCommand( command );
