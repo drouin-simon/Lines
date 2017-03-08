@@ -58,7 +58,6 @@ protected:
 	bool m_pressureOpacity;
 	bool m_fill;
     bool m_erase;
-    Box2d m_boundingBox;
     
     // Global attributes for all lines
     static float m_pix_margin;

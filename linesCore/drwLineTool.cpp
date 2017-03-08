@@ -140,7 +140,10 @@ void drwLineTool::ExecuteMouseCommand( drwCommand::s_ptr command )
 
 			++it;
 		}
-        MarkSegmentModified( m_lastXWorld, m_lastYWorld, mouseCom->X(), mouseCom->Y() );
+        if( !m_fill )
+            MarkSegmentModified( m_lastXWorld, m_lastYWorld, mouseCom->X(), mouseCom->Y() );
+        else
+            MarkWholePrimitiveModified();
 		CurrentNodes.clear();
 		IsDrawing = false;
 
@@ -211,6 +214,23 @@ void drwLineTool::MarkSegmentModified( double x1, double y1, double x2, double y
     {
         int frameIndex = it->first;
         CurrentScene->MarkModified( frameIndex, modifiedRect );
+        ++it;
+    }
+}
+
+void drwLineTool::MarkWholePrimitiveModified()
+{
+    CurrentNodesCont::iterator it = CurrentNodes.begin();
+    while( it != CurrentNodes.end() )
+    {
+        int nodeId = it->second;
+        int frameIndex = it->first;
+        Node * n = CurrentScene->LockNode( frameIndex, nodeId );
+        LinePrimitive * prim = dynamic_cast<LinePrimitive*> (n->GetPrimitive());
+        Q_ASSERT( prim );
+        Box2d modRect = prim->BoundingBox();
+        CurrentScene->MarkModified( frameIndex, modRect );
+        CurrentScene->UnlockNode( frameIndex, nodeId );
         ++it;
     }
 }
