@@ -40,9 +40,9 @@ find_package(OpenGL)
 #----------------------------------------
 # configure version and git hash
 set( LINES_MAJOR_VERSION 1 )
-set( LINES_MINOR_VERSION 1 )
+set( LINES_MINOR_VERSION 2 )
 set( LINES_PATCH_VERSION 0 )
-set( LINES_VERSION_QUALIFIER “” )
+set( LINES_VERSION_QUALIFIER “Dev” )
 set( LINES_BUILD_QUALIFIER "" )
 set( LINES_PROTOCOL_VERSION 0 )
 set( LINES_COPYRIGHT "2010 Simon Drouin" )
