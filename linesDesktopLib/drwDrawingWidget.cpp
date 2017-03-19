@@ -27,7 +27,6 @@ drwDrawingWidget::drwDrawingWidget( QWidget * parent )
     m_onionSkinFramesBefore = 1;
     m_onionSkinFramesAfter = 0;
     m_inhibitOnionSkin = false;
-    m_showCameraFrame = true;
 
     m_timerId = -1;
     this->Controler = 0;
@@ -210,9 +209,6 @@ void drwDrawingWidget::paintEvent( QPaintEvent * event )
     int w = dr.width() * ratio;
     int h = dr.height() * ratio;
     m_renderer->RenderTextureToScreen( x, y, w, h );
-
-    if( GetShowCameraFrame() )
-        m_renderer->RenderCameraFrame();
 
     QPainter painter;
     painter.begin( this );
@@ -426,13 +422,6 @@ void drwDrawingWidget::SetInhibitOnionSkin( bool isOn )
     m_inhibitOnionSkin = isOn;
     emit DisplaySettingsModified();
     NeedRedraw();
-}
-
-void drwDrawingWidget::SetShowCameraFrame( bool isOn )
-{
-    m_showCameraFrame = isOn;
-    emit DisplaySettingsModified();
-    NeedRedrawOverlay();
 }
 
 void drwDrawingWidget::enterEvent( QEvent * e )

@@ -25,7 +25,6 @@ private slots:
 	
 	void OnFramesBeforeValueChanged(int);
 	void OnFramesAfterValueChanged(int);
-	void OnDisplayCameraFrameChecked( bool );
     void UpdateUI();
 	
 private:
@@ -45,7 +44,6 @@ private:
 	QHBoxLayout * framesAfterLayout;
 	QLabel		* framesAfterLabel;
 	QSpinBox	* framesAfterSpinBox;
-	QCheckBox	* displayCameraFrameCheckBox;
 	
 };
 

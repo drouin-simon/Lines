@@ -24,8 +24,6 @@ public:
     void SetupForWindow();
     void SetupForFrame();
     void SetupToRenderTextureToScreen();
-    
-    void RenderCameraFrame();
 	    
 private:
     

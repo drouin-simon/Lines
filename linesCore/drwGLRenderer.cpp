@@ -189,12 +189,6 @@ void drwGLRenderer::RenderRect()
     glPopAttrib();
 }
 
-void drwGLRenderer::RenderCameraFrame()
-{
-    m_camera->SetupForWindow();
-    m_camera->RenderCameraFrame();
-}
-
 void drwGLRenderer::SetRenderSize( int width, int height )
 {
     m_camera->SetWindowSize( width, height );

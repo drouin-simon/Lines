@@ -55,8 +55,6 @@ public:
     void SetOnionSkinAfter( int );
     bool GetInhibitOnionSkin() { return m_inhibitOnionSkin; }
     void SetInhibitOnionSkin( bool isOn );
-    bool GetShowCameraFrame() { return m_showCameraFrame; }
-    void SetShowCameraFrame( bool );
 	
 public slots:
 
@@ -101,7 +99,6 @@ private:
     int m_onionSkinFramesBefore;
     int m_onionSkinFramesAfter;
     bool m_inhibitOnionSkin;
-    bool m_showCameraFrame;
 	
     drwGLRenderer * m_renderer;
     PlaybackControler * Controler;

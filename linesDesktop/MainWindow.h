@@ -12,6 +12,7 @@ class QAction;
 class QProgressDialog;
 class QLabel;
 
+class drwAspectRatioWidget;
 class drwDrawingWidget;
 class Scene;
 class drwLineTool;
@@ -94,6 +95,7 @@ private:
 	QString m_exportDefaultPath;
 	QSize m_exportRes;
 
+    drwAspectRatioWidget * m_drawingWidgetContainer;
 	drwDrawingWidget    * m_glWidget;
     drwSimplifiedToolbar * m_simplifiedToolbar;
     LinesApp * m_linesApp;

@@ -9,7 +9,7 @@ drwCamera::drwCamera()
     m_winSizePix[1] = 600;
     m_frameSizeWorld[0] = 1920.0;
     m_frameSizeWorld[1] = 1080.0;
-    m_framePadding = 0.005;
+    m_framePadding = 0.0;
     
     // Computed vars -> will be updated in UpdateSize()
     m_frameSizePix[0] = 0;
@@ -108,62 +108,6 @@ void drwCamera::SetupForFrame()
 void drwCamera::SetupToRenderTextureToScreen()
 {
     glViewport( m_framePosPix[0], m_framePosPix[1], m_frameSizePix[0], m_frameSizePix[1] );
-}
-
-// This function is assuming that SetupForWindow has been called before
-void drwCamera::RenderCameraFrame()
-{
-    // Compute the screen bound in world coordinates
-    double topLeft[2] = { 0.0,0.0};
-    topLeft[0] = m_winPosWorld[0];
-    topLeft[1] = m_winPosWorld[1] + m_winSizeWorld[1];
-    double bottomRight[2] = {0.0,0.0};
-    bottomRight[0] = m_winPosWorld[0] + m_winSizeWorld[0];
-    bottomRight[1] = m_winPosWorld[1];
-    
-    double frameTopLeft[2];
-    frameTopLeft[0] = 0.0;
-    frameTopLeft[1] = m_frameSizeWorld[1];
-    double frameBottomRight[2];
-    frameBottomRight[0] = m_frameSizeWorld[0];
-    frameBottomRight[1] = 0.0;
-    
-    glColor4d( .24, .24, .24, 1.0 );
-    glBegin( GL_QUADS );
-    {
-        // Top
-        glVertex2d( topLeft[0], topLeft[1] );
-        glVertex2d( topLeft[0], frameTopLeft[1] );
-        glVertex2d( bottomRight[0], frameTopLeft[1] );
-        glVertex2d( bottomRight[0], topLeft[1] );
-        // Left
-        glVertex2d( topLeft[0], frameTopLeft[1] );
-        glVertex2d( topLeft[0], frameBottomRight[1] );
-        glVertex2d( frameTopLeft[0], frameBottomRight[1] );
-        glVertex2d( frameTopLeft[0], frameTopLeft[1] );
-        // Bottom
-        glVertex2d( topLeft[0], frameBottomRight[1] );
-        glVertex2d( topLeft[0], bottomRight[1] );
-        glVertex2d( bottomRight[0], bottomRight[1] );
-        glVertex2d( bottomRight[0], frameBottomRight[1] );
-        // Right
-        glVertex2d( frameBottomRight[0], frameTopLeft[1] );
-        glVertex2d( frameBottomRight[0], frameBottomRight[1] );
-        glVertex2d( bottomRight[0], frameBottomRight[1] );
-        glVertex2d( bottomRight[0], frameTopLeft[1] );
-    }
-    glEnd();
-    
-    glColor4d( .25, .25, .25, 1.0 );
-    glBegin( GL_LINE_STRIP );
-    {
-        glVertex2d( frameTopLeft[0], frameTopLeft[1] );
-        glVertex2d( frameTopLeft[0], frameBottomRight[1] );
-        glVertex2d( frameBottomRight[0], frameBottomRight[1] );
-        glVertex2d( frameBottomRight[0], frameTopLeft[1] );
-        glVertex2d( frameTopLeft[0], frameTopLeft[1] );
-    }
-    glEnd();
 }
 
 void drwCamera::UpdateSizes()

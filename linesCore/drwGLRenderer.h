@@ -27,7 +27,6 @@ public:
     void RenderTextureToScreen();
     void RenderTextureToScreen( int x, int y, int width, int height );
     void RenderRect();
-    void RenderCameraFrame();
 
     void SetRenderSize( int width, int height );
     int * GetRenderSize();

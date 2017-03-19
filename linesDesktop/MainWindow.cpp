@@ -1,5 +1,6 @@
 #include "MainWindow.h"
 #include "drwDrawingWidget.h"
+#include "drwAspectRatioWidget.h"
 #include "Scene.h"
 #include "drwLineTool.h"
 #include "PlaybackControler.h"
@@ -98,14 +99,18 @@ MainWindow::MainWindow()
     //format.setProfile(QSurfaceFormat::CoreProfile);
     format.setSwapBehavior( QSurfaceFormat::DoubleBuffer );
     QSurfaceFormat::setDefaultFormat(format);
+
+    // Create Drawing window container that maintains a 16:9 aspect ratio
+    m_drawingWidgetContainer = new drwAspectRatioWidget( m_mainWidget );
+    drawingAreaLayout->addWidget( m_drawingWidgetContainer );
 	
 	// Create Drawing window
-    m_glWidget = new drwDrawingWidget(m_mainWidget);
-	m_glWidget->setMinimumSize( 400, 300 );
+    m_glWidget = new drwDrawingWidget( m_drawingWidgetContainer );
+    m_drawingWidgetContainer->setClientWidget( m_glWidget );
+    m_glWidget->setMinimumSize( 480, 270 );
 	m_glWidget->SetCurrentScene( m_scene );
 	m_glWidget->SetObserver( m_localToolbox );
-	m_glWidget->SetControler( m_controler );
-	drawingAreaLayout->addWidget( m_glWidget );
+    m_glWidget->SetControler( m_controler );
     m_globalLineParams->SetDrawingWidget( m_glWidget );
     m_linesApp->SetDrawingWidget( m_glWidget );
 
@@ -502,7 +507,8 @@ void MainWindow::toggleShowGui()
     m_simplifiedToolbar->setHidden( m_guiHidden || !m_simplifiedGui );
     m_playbackControlerWidget->setHidden( m_guiHidden );
     m_rightPanelDock->setHidden( m_guiHidden || m_simplifiedGui );
-    m_glWidget->SetShowCameraFrame( !m_guiHidden );
+    m_drawingWidgetContainer->setAspectRatioEnabled( !m_guiHidden );
+    //m_glWidget->SetShowCameraFrame( !m_guiHidden );
 }
 
 void MainWindow::toggleRightPanel()

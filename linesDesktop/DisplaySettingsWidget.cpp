@@ -31,17 +31,11 @@ void DisplaySettingsWidget::OnFramesAfterValueChanged( int value )
     m_drawingWidget->SetOnionSkinAfter( value );
 }
 
-void DisplaySettingsWidget::OnDisplayCameraFrameChecked( bool isOn )
-{
-    m_drawingWidget->SetShowCameraFrame( isOn );
-}
-
 void DisplaySettingsWidget::UpdateUI()
 {
     BlockSigs( true );
     framesBeforeSpinBox->setValue( m_drawingWidget->GetOnionSkinBefore() );
     framesAfterSpinBox->setValue( m_drawingWidget->GetOnionSkinAfter() );
-    displayCameraFrameCheckBox->setChecked( m_drawingWidget->GetShowCameraFrame() );
     BlockSigs( false );
 }
 
@@ -82,15 +76,10 @@ void DisplaySettingsWidget::SetupUi()
 		onionSkinLayout->addLayout( framesAfterLayout );
 	}
 	mainLayout->addWidget(onionSkinGroupBox);
-	
-	displayCameraFrameCheckBox = new QCheckBox(tr("Display Camera frame"));
-	connect( displayCameraFrameCheckBox, SIGNAL(toggled(bool)), this, SLOT(OnDisplayCameraFrameChecked( bool )) );
-	mainLayout->addWidget( displayCameraFrameCheckBox );	
 }
 
 void DisplaySettingsWidget::BlockSigs( bool block )
 {
     framesBeforeSpinBox->blockSignals( block );
     framesAfterSpinBox->blockSignals( block );
-    displayCameraFrameCheckBox->blockSignals( block );
 }
