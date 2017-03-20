@@ -18,7 +18,6 @@
 #include "drwBitmapExporter.h"
 #include "drwLineToolViewportWidget.h"
 #include "drwCursor.h"
-#include "drwDrawingEngine.h"
 #include "drwGlobalLineParams.h"
 #include "Vec4.h"
 #include <QtWidgets>
@@ -121,11 +120,6 @@ MainWindow::MainWindow()
     m_glWidget->SetViewportWidget( m_viewportWidget );
     m_cursor = new drwCursor( lineTool, m_glWidget );
     m_glWidget->SetCursor( m_cursor );
-
-    // Create Drawing engine (for testing only for now)
-    m_drawingEngine = new drwDrawingEngine;
-    m_drawingEngine->SetLineTool( lineTool );
-    m_drawingEngine->SetDrawingWidget( m_glWidget );
 	
 	// Create playback control widget
     m_playbackControlerWidget = new PlaybackControlerWidget( m_glWidget->GetControler(), m_mainWidget );
@@ -179,7 +173,6 @@ MainWindow::~MainWindow()
 {
     delete m_viewportWidget;
     delete m_cursor;
-    delete m_drawingEngine;
     delete m_linesApp;
 }
 
@@ -713,16 +706,6 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
             m_glWidget->NeedRedraw();
             handled = true;
         }
-        // For testing paint speed
-        /*else if( keyEvent->key() == Qt::Key_E )
-        {
-            if( m_drawingEngine->IsRunning() )
-                m_drawingEngine->Stop();
-            else
-                m_drawingEngine->Start();
-            m_glWidget->ToggleComputeFps();
-            handled = true;
-        }*/
         else if( keyEvent->key() == Qt::Key_Alt )
         {
             m_glWidget->ActivateViewportWidget( true );
