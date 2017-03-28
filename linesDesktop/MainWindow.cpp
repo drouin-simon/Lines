@@ -12,7 +12,6 @@
 #include "DisplaySettingsWidget.h"
 #include "ExportDialog.h"
 #include "drwNetworkConnectDialog.h"
-#include "drwEditionState.h"
 #include "drwCommandDispatcher.h"
 #include "drwNetworkManager.h"
 #include "drwBitmapExporter.h"
@@ -39,8 +38,9 @@ MainWindow::MainWindow()
 
 	// Create a Scene and a tool
 	m_scene = new Scene(this);
-	m_controler = new PlaybackControler(m_scene, this);
-	m_localToolbox = new drwToolbox( m_scene, m_controler->GetEditionState(), this );
+    m_controler = new PlaybackControler( m_scene );
+    m_localToolbox = new drwToolbox( m_scene, m_controler );
+    m_controler->SetToolbox( m_localToolbox );
 	m_commandDb = new drwCommandDatabase(this);
 	m_networkManager = new drwNetworkManager();
 	m_commandDispatcher = new drwCommandDispatcher( m_networkManager, m_commandDb, m_localToolbox, m_scene, this );
@@ -50,7 +50,7 @@ MainWindow::MainWindow()
     m_globalLineParams = new drwGlobalLineParams( this );
     m_globalLineParamsDock = 0;
 
-    m_linesApp = new LinesApp( m_controler->GetEditionState(), m_localToolbox );
+    m_linesApp = new LinesApp( m_localToolbox );
 
 	// Create main widget  (just a frame to put the viewing widget and the playback control widget)
     m_mainWidget = new QWidget(this);
@@ -108,7 +108,7 @@ MainWindow::MainWindow()
     m_drawingWidgetContainer->setClientWidget( m_glWidget );
     m_glWidget->setMinimumSize( 480, 270 );
 	m_glWidget->SetCurrentScene( m_scene );
-	m_glWidget->SetObserver( m_localToolbox );
+    m_glWidget->SetToolbox( m_localToolbox );
     m_glWidget->SetControler( m_controler );
     m_globalLineParams->SetDrawingWidget( m_glWidget );
     m_linesApp->SetDrawingWidget( m_glWidget );
@@ -127,7 +127,7 @@ MainWindow::MainWindow()
     m_playbackControlerWidget->SetHideFrameRate( true );
 
 	// Alternative right panel
-    m_toolOptionWidget = new PrimitiveToolOptionWidget( m_controler->GetEditionState(), lineTool, m_rightPanelWidget );
+    m_toolOptionWidget = new PrimitiveToolOptionWidget( lineTool, m_rightPanelWidget );
 	rightPanelLayout->addWidget( m_toolOptionWidget );
     m_displaySettingsWidget = new DisplaySettingsWidget( m_glWidget, m_rightPanelWidget );
 	rightPanelLayout->addWidget( m_displaySettingsWidget );
@@ -155,10 +155,6 @@ MainWindow::MainWindow()
 	m_dockTabletState->setWidget(m_tabletStateWidget);
 	m_viewMenu->addAction(m_dockTabletState->toggleViewAction());
 	m_dockTabletState->setFeatures( QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetMovable );
-
-	// connect objects
-	connect( m_localToolbox, SIGNAL(StartInteraction()), m_controler, SLOT(StartInteraction()) );
-	connect( m_localToolbox, SIGNAL(EndInteraction()), m_controler, SLOT(EndInteraction()) );
 	
 	// Read Application settings
 	readSettings();

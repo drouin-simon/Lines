@@ -20,7 +20,6 @@ void drwSimplifiedToolbar::SetApp( LinesApp * app )
 {
     m_app = app;
     connect( m_app, SIGNAL(DisplayParamsModified()), this, SLOT(UpdateUI()) );
-    connect( m_app, SIGNAL(EditParamsModified()), this, SLOT(UpdateUI()) );
     connect( m_app, SIGNAL(LineParamsModified()), this, SLOT(UpdateUI()) );
 }
 

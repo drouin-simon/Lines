@@ -31,9 +31,8 @@ PlaybackControlerWidget::PlaybackControlerWidget( PlaybackControler * controler,
 	SetupUi();
 	UpdateUi();
 	
-    //connect( m_controler, SIGNAL( ModifiedSignal() ), this, SLOT(PlaybackControlerModifiedSlot()) );
 	connect( m_controler, SIGNAL( StartStop(bool) ), this, SLOT(PlaybackStartStopSlot(bool)) );
-    connect( m_controler, SIGNAL( FrameChanged(int) ), this, SLOT(UpdateCurrentFrame()) );
+    connect( m_controler, SIGNAL( FrameChanged() ), this, SLOT(UpdateCurrentFrame()) );
 }
 
 PlaybackControlerWidget::~PlaybackControlerWidget()

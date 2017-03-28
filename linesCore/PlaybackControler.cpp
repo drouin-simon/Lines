@@ -1,73 +1,72 @@
 #include "PlaybackControler.h"
 #include "Scene.h"
+#include "drwToolbox.h"
 
-PlaybackControler::PlaybackControler( Scene * scene, QObject * parent ) 
-: QObject( parent )
-, m_scene(scene)
+PlaybackControler::PlaybackControler( Scene * scene )
+: m_scene(scene)
 , frameInterval(83)  // number of miliseconds between frames
 , isPlaying(false)
 , loop(true)
-, interactionStartFrame(0)
-, insertFrameMode(false)
 {
-    m_backupFrameChangeMode = Manual;
-	m_editionState = new drwEditionState( this );
 	time.start();
 	connect( m_scene, SIGNAL( NumberOfFramesChanged(int) ), this, SLOT( NumberOfFramesChangedSlot( int ) ) );
 }
 
-
 PlaybackControler::~PlaybackControler()
 {
 	if( isPlaying )
-		PlayPause( false );
+        StopPlaying();
 }
 
+void PlaybackControler::SetToolbox( drwToolbox * t )
+{
+    m_toolbox = t;
+}
 
-void PlaybackControler::PlayPause( bool manual )
+void PlaybackControler::StartPlaying()
+{
+    if( GetCurrentFrame() == GetNumberOfFrames() - 1 )
+        SetCurrentFrame( 0 );
+    isPlaying = true;
+    time.restart();
+    m_lastFrameWantedTime = 0;
+    m_toolbox->OnStartPlaying();
+    emit StartStop( true );
+}
+
+void PlaybackControler::StopPlaying()
+{
+    isPlaying = false;
+    m_toolbox->OnStopPlaying();
+    emit StartStop( false );
+}
+
+void PlaybackControler::PlayPause()
 {
 	if( isPlaying )
 	{
-        if( manual )
-            m_editionState->SetFrameChangeMode( m_backupFrameChangeMode );
-		isPlaying = false;
-        m_editionState->SetPersistenceEnabled( false );
-		emit StartStop( false );
+        StopPlaying();
 	}
 	else
 	{
-        if( manual )
-        {
-            m_backupFrameChangeMode = m_editionState->GetFrameChangeMode();
-            m_editionState->SetFrameChangeMode( Manual );
-        }
-		if( GetCurrentFrame() == GetNumberOfFrames() - 1 )
-			SetCurrentFrame( 0 );
-		isPlaying = true;
-        m_editionState->SetPersistenceEnabled( true );
-		time.restart();
-		m_lastFrameWantedTime = 0;
-		emit StartStop( true );
+        StartPlaying();
 	}
 }
 
 void PlaybackControler::SetCurrentFrame( int frame )
 {
-	if( frame != m_editionState->GetCurrentFrame() )
-	{
-		if( frame >= GetNumberOfFrames() )
-			frame = GetNumberOfFrames() - 1;
-		else if( frame < 0 )
-			frame = 0;
-		m_editionState->SetCurrentFrame( frame );
-		emit FrameChanged( frame );
-		emit ModifiedSignal();
-	}
+    m_toolbox->SetCurrentFrame( frame );
+}
+
+void PlaybackControler::NotifyFrameChanged()
+{
+    emit FrameChanged();
+    emit ModifiedSignal();
 }
 
 int PlaybackControler::GetCurrentFrame() 
 { 
-	return m_editionState->GetCurrentFrame(); 
+    return m_toolbox->GetCurrentFrame();
 }
 
 int PlaybackControler::GetNextFrame()
@@ -97,7 +96,6 @@ void PlaybackControler::NextFrame()
     if( nextFrame != GetCurrentFrame() )
         SetCurrentFrame( nextFrame );
 }
-
 
 void PlaybackControler::PrevFrame()
 {
@@ -148,7 +146,7 @@ bool PlaybackControler::Tick()
 			if( newFrame >= GetNumberOfFrames() )
 			{
 				if( loop )
-					newFrame = newFrame - GetNumberOfFrames();
+                    newFrame = newFrame % GetNumberOfFrames();
 				else 
 				{
 					PlayPause();
@@ -172,26 +170,4 @@ void PlaybackControler::SetFrameInterval( int msecPerFrame )
 	frameInterval = msecPerFrame;
 }
 
-
-void PlaybackControler::StartInteraction( )
-{
-	if( m_editionState->GetFrameChangeMode() == Play && !IsPlaying() )
-	{
-		interactionStartFrame = GetCurrentFrame();
-		PlayPause( false );
-	}
-}
-
-
-void PlaybackControler::EndInteraction()
-{
-	if( m_editionState->GetFrameChangeMode() == Play && IsPlaying() )
-	{
-		PlayPause( false );
-		SetCurrentFrame( interactionStartFrame );
-	}
-	
-	if( m_editionState->GetFrameChangeMode() == AfterIntervention && !IsPlaying() )
-		NextFrame();
-}
 

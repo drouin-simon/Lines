@@ -10,7 +10,7 @@
 
 class QPushButton;
 class drwGLRenderer;
-class drwWidgetObserver;
+class drwToolbox;
 class drwLineToolViewportWidget;
 class drwFpsCounter;
 class PlaybackControler;
@@ -33,7 +33,7 @@ public:
 
     void SetBackgroundColor( Vec4 & color );
     void SetCurrentScene( Scene * scene );
-    SetMacro( Observer, drwWidgetObserver* );
+    void SetToolbox( drwToolbox * t ) { m_toolbox = t; }
     void SetControler( PlaybackControler * controler );
     GetMacro( Controler, PlaybackControler* );
     void SetViewportWidget( drwLineToolViewportWidget * w );
@@ -102,7 +102,7 @@ private:
 	
     drwGLRenderer * m_renderer;
     PlaybackControler * Controler;
-    drwWidgetObserver * Observer;
+    drwToolbox * m_toolbox;
     drwLineToolViewportWidget * m_viewportWidget;
     drwFpsCounter * m_fpsCounter;
     drwCursor * m_cursor;

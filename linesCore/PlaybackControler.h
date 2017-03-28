@@ -3,10 +3,9 @@
 
 #include <QObject>
 #include <QTime>
-#include "drwEditionState.h"
 
 class Scene;
-class drwEditionState;
+class drwToolbox;
 
 class PlaybackControler : public QObject
 {
@@ -14,15 +13,18 @@ class PlaybackControler : public QObject
 	
 public:
 	
-	PlaybackControler( Scene * scene, QObject * parent = 0 );
+    PlaybackControler( Scene * scene );
 	~PlaybackControler();
 	
-	drwEditionState * GetEditionState() { return m_editionState; }
-	
-	void PlayPause( bool manual = true );
+    void SetToolbox( drwToolbox * t );
+
+    void StartPlaying();
+    void StopPlaying();
+    void PlayPause();
 	bool IsPlaying() { return isPlaying; }
 	
 	void SetCurrentFrame( int frame );
+    void NotifyFrameChanged();
 	int GetCurrentFrame();
     int GetNextFrame();
 	int GetNumberOfFrames();
@@ -44,27 +46,22 @@ public:
 public slots:
 	
 	void NumberOfFramesChangedSlot( int nbFrames );
-	void SetFrameInterval( int msecPerFrame );
-	void StartInteraction();
-	void EndInteraction();
+    void SetFrameInterval( int msecPerFrame );
 	
 signals:
 	
 	void ModifiedSignal();
-	void FrameChanged( int newFrame );
+    void FrameChanged();
 	void StartStop( bool isStart );
 	
 protected:
 	
 	Scene			* m_scene;
-	drwEditionState * m_editionState;
-    drwFrameChangeMode m_backupFrameChangeMode;
+    drwToolbox      * m_toolbox;
 	QTime			time;
 	int				frameInterval;  // number of miliseconds between frames
 	bool			isPlaying;
 	bool			loop;
-	int				interactionStartFrame;
-	bool			insertFrameMode;
 	int				m_lastFrameWantedTime;
 };
 

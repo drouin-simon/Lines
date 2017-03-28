@@ -1,19 +1,19 @@
 #include "drwLineTool.h"
+#include "drwToolbox.h"
 #include "line.h"
 #include "wideline.h"
 #include "Scene.h"
 #include "Node.h"
-#include "drwEditionState.h"
 #include <QTabletEvent>
 #include <QSettings>
 #include <algorithm>
 
-drwLineTool::drwLineTool( Scene * scene, drwEditionState * editionState, QObject * parent )
-: drwWidgetObserver( scene, parent )
+drwLineTool::drwLineTool( Scene * scene, drwToolbox * toolbox )
+: drwTool( scene, toolbox )
 , m_lastXWorld( 0.0 )
 , m_lastYWorld( 0.0 )
 , m_lastPressure( 1.0 )
-, IsDrawing( false )
+, m_isDrawing( false )
 , m_tabletHasControl( false )
 , Color(1.0,1.0,1.0,1.0)
 , Type( TypeWideLine )
@@ -22,16 +22,15 @@ drwLineTool::drwLineTool( Scene * scene, drwEditionState * editionState, QObject
 , m_pressureOpacity(true)
 , m_fill(false)
 , m_erase(false)
+, m_frameChangeMode( Manual )
+, m_backupFrameChangeMode( Manual )
+, m_persistenceEnabled( false )
 , m_persistence( 0 )
-, m_minDistanceBetweenPoints( 4.0 )
 , m_minWidth( 2.0 )
 , m_maxWidth( 100.0 )
-, m_editionState(editionState)
 {	
 	// Make sure the Reset function is the only one driving initial param values
 	Reset();
-
-    connect( m_editionState, SIGNAL(ModifiedSignal()), this, SLOT(OnEditionStateParamsModified()) );
 }
 
 void drwLineTool::ReadSettings( QSettings & s )
@@ -46,6 +45,7 @@ void drwLineTool::ReadSettings( QSettings & s )
     m_pressureOpacity = s.value( "PressureOpacity", QVariant(m_pressureOpacity) ).toBool();
     m_fill = s.value( "Fill", QVariant(m_fill) ).toBool();
     m_erase = s.value( "Erase", QVariant(m_erase) ).toBool();
+    m_persistence = s.value( "Persistence", QVariant(m_persistence) ).toInt();
     
     ParametersChanged();
 }
@@ -62,6 +62,20 @@ void drwLineTool::WriteSettings( QSettings & s )
     s.setValue( "PressureOpacity", QVariant(m_pressureOpacity) );
     s.setValue( "Fill", QVariant(m_fill) );
     s.setValue( "Erase", QVariant(m_erase) );
+    s.setValue( "Persistence", QVariant(m_persistence) );
+}
+
+void drwLineTool::OnStartPlaying()
+{
+    m_backupFrameChangeMode = GetFrameChangeMode();
+    SetFrameChangeMode( Manual );
+    SetPersistenceEnabled( true );
+}
+
+void drwLineTool::OnStopPlaying()
+{
+    SetFrameChangeMode( m_backupFrameChangeMode );
+    SetPersistenceEnabled( false );
 }
 
 void drwLineTool::StartLine( double xWorld, double yWorld, double pressure )
@@ -110,21 +124,28 @@ void drwLineTool::ExecuteMouseCommand( drwCommand::s_ptr command )
 
 	if( mouseCom->GetType() == drwMouseCommand::Press )
 	{
-		IsDrawing = true;
+        m_isDrawing = true;
         m_lastXWorld = mouseCom->X();
         m_lastYWorld = mouseCom->Y();
         m_lastPressure = mouseCom->Pressure();
         m_lastXPix = mouseCom->XPix();
         m_lastYPix = mouseCom->YPix();
+
+        // Start interaction
+        if( m_frameChangeMode == Play )
+        {
+            m_interactionStartFrame = m_toolbox->GetCurrentFrame();
+            m_toolbox->StartPlaying();
+        }
+
 		CreateNewNodes();
 
         // Mark rect modified in scene
         MarkPointModified( m_lastXWorld, m_lastYWorld );
 
 		emit CommandExecuted( command );
-		emit StartInteraction();
 	}
-    else if( mouseCom->GetType() == drwMouseCommand::Release && IsDrawing )
+    else if( mouseCom->GetType() == drwMouseCommand::Release && m_isDrawing )
 	{
 		CurrentNodesCont::iterator it = CurrentNodes.begin();
 		while( it != CurrentNodes.end() )
@@ -132,11 +153,11 @@ void drwLineTool::ExecuteMouseCommand( drwCommand::s_ptr command )
             int nodeId = it->second;
             int frameIndex = it->first;
 
-            Node * n = CurrentScene->LockNode( frameIndex, nodeId );
+            Node * n = m_scene->LockNode( frameIndex, nodeId );
             LinePrimitive * prim = dynamic_cast<LinePrimitive*> (n->GetPrimitive());
             Q_ASSERT( prim );
             prim->EndPoint( mouseCom->X(), mouseCom->Y(), mouseCom->Pressure() );
-            CurrentScene->UnlockNode( frameIndex, nodeId );
+            m_scene->UnlockNode( frameIndex, nodeId );
 
 			++it;
 		}
@@ -145,17 +166,25 @@ void drwLineTool::ExecuteMouseCommand( drwCommand::s_ptr command )
         else
             MarkWholePrimitiveModified();
 		CurrentNodes.clear();
-		IsDrawing = false;
+        m_isDrawing = false;
 
         m_lastXWorld = mouseCom->X();
         m_lastYWorld = mouseCom->Y();
         m_lastPressure = mouseCom->Pressure();
 		emit CommandExecuted( command );
-		emit EndInteraction();
+
+        // End interaction
+        if( m_frameChangeMode == Play )
+        {
+            m_toolbox->StopPlaying();
+            m_toolbox->SetCurrentFrame( m_interactionStartFrame );
+        }
+        if( m_frameChangeMode == AfterIntervention )
+            m_toolbox->GotoNextFrame();
 	}
 	else if( mouseCom->GetType() == drwMouseCommand::Move )
 	{
-		if( IsDrawing )
+        if( m_isDrawing )
 		{
             CurrentNodesCont::iterator it = CurrentNodes.begin();
             while( it != CurrentNodes.end() )
@@ -163,11 +192,11 @@ void drwLineTool::ExecuteMouseCommand( drwCommand::s_ptr command )
                 int nodeId = it->second;
                 int frameIndex = it->first;
                 
-                Node * n = CurrentScene->LockNode( frameIndex, nodeId );
+                Node * n = m_scene->LockNode( frameIndex, nodeId );
                 LinePrimitive * prim = dynamic_cast<LinePrimitive*> (n->GetPrimitive());
                 Q_ASSERT( prim );
                 prim->AddPoint( mouseCom->X(), mouseCom->Y(), mouseCom->Pressure() );
-                CurrentScene->UnlockNode( frameIndex, nodeId );
+                m_scene->UnlockNode( frameIndex, nodeId );
                 
                 ++it;
             }
@@ -193,7 +222,7 @@ void drwLineTool::MarkPointModified( double x, double y )
     while( it != CurrentNodes.end() )
     {
         int frameIndex = it->first;
-        CurrentScene->MarkModified( frameIndex, modifiedRect );
+        m_scene->MarkModified( frameIndex, modifiedRect );
         ++it;
     }
 }
@@ -213,7 +242,7 @@ void drwLineTool::MarkSegmentModified( double x1, double y1, double x2, double y
     while( it != CurrentNodes.end() )
     {
         int frameIndex = it->first;
-        CurrentScene->MarkModified( frameIndex, modifiedRect );
+        m_scene->MarkModified( frameIndex, modifiedRect );
         ++it;
     }
 }
@@ -225,25 +254,25 @@ void drwLineTool::MarkWholePrimitiveModified()
     {
         int nodeId = it->second;
         int frameIndex = it->first;
-        Node * n = CurrentScene->LockNode( frameIndex, nodeId );
+        Node * n = m_scene->LockNode( frameIndex, nodeId );
         LinePrimitive * prim = dynamic_cast<LinePrimitive*> (n->GetPrimitive());
         Q_ASSERT( prim );
         Box2d modRect = prim->BoundingBox();
-        CurrentScene->MarkModified( frameIndex, modRect );
-        CurrentScene->UnlockNode( frameIndex, nodeId );
+        m_scene->MarkModified( frameIndex, modRect );
+        m_scene->UnlockNode( frameIndex, nodeId );
         ++it;
     }
 }
 
-void drwLineTool::SetCurrentFrame( int frame )
+void drwLineTool::NotifyFrameChanged( int frame )
 {
 	// This is for the case where we are drawing while animating
-	if( IsDrawing )
+    if( m_isDrawing )
 	{
 		// Terminate line on previous frames that are not active anymore
 		int newInterval[2];
-		newInterval[0] = m_editionState->GetCurrentFrame();
-		newInterval[1] = m_editionState->GetCurrentFrame() + m_persistence;
+        newInterval[0] = m_toolbox->GetCurrentFrame();
+        newInterval[1] = m_toolbox->GetCurrentFrame() + m_persistence;
 		CurrentNodesCont::iterator it = CurrentNodes.begin();
 		while( it != CurrentNodes.end() )
 		{
@@ -257,11 +286,11 @@ void drwLineTool::SetCurrentFrame( int frame )
                 int nodeId = it->second;
 
                 // Lock node and make changes
-                Node * n = CurrentScene->LockNode( frame, nodeId );
+                Node * n = m_scene->LockNode( frame, nodeId );
                 LinePrimitive * prim = dynamic_cast<LinePrimitive*> (n->GetPrimitive());
                 Q_ASSERT( prim );
                 prim->EndPoint( m_lastXWorld, m_lastYWorld, m_lastPressure );
-                CurrentScene->UnlockNode( frame, nodeId );
+                m_scene->UnlockNode( frame, nodeId );
 
                 CurrentNodesCont::iterator temp = it;
 				++it;
@@ -279,15 +308,18 @@ void drwLineTool::Reset()
     m_lastXWorld = 0.0;
     m_lastYWorld = 0.0;
     m_lastPressure = 1.0;
-	IsDrawing = false;
+    m_isDrawing = false;
 	Color = Vec4(1.0,1.0,1.0,1.0);
 	Type = TypeWideLine;
 	m_baseWidth = 10.0;
 	m_pressureWidth = true;
 	m_pressureOpacity = true;
 	m_fill = false;
+    m_frameChangeMode = Manual;
+    m_persistenceEnabled = false;
     m_persistence = 0;
     CurrentNodes.clear();
+    ParametersChanged();
 }
 
 void drwLineTool::SetPressureWidth( bool w )
@@ -325,10 +357,21 @@ void drwLineTool::SetColor( Vec4 & c )
 	ParametersChanged();
 }
 
+void drwLineTool::SetFrameChangeMode( drwFrameChangeMode mode )
+{
+    m_frameChangeMode = mode;
+    ParametersChanged();
+}
+
 void drwLineTool::SetPersistence( int p )
 {
 	m_persistence = p;
 	ParametersChanged();
+}
+
+void drwLineTool::SetPersistenceEnabled( bool enable )
+{
+    m_persistenceEnabled = enable;
 }
 
 void drwLineTool::SetBaseWidth( double newBaseWidth )
@@ -339,14 +382,6 @@ void drwLineTool::SetBaseWidth( double newBaseWidth )
     if( m_baseWidth > m_maxWidth )
         m_baseWidth = m_maxWidth;
     ParametersChanged();
-}
-
-void drwLineTool::OnEditionStateParamsModified()
-{
-    if( m_editionState->IsPersistenceEnabled() )
-        SetPersistence( m_editionState->GetPersistence() );
-    else
-        SetPersistence( 0 );
 }
 
 void drwLineTool::ParametersChanged()
@@ -407,16 +442,17 @@ Node * drwLineTool::CreateNewNode()
 
 void drwLineTool::CreateNewNodes( )
 {
-    int lastFrame = m_editionState->GetCurrentFrame() + m_persistence;
-    if( lastFrame >= CurrentScene->GetNumberOfFrames() )
-        lastFrame = CurrentScene->GetNumberOfFrames() - 1;
-	for( int frame = m_editionState->GetCurrentFrame(); frame <= lastFrame; ++frame )
+    int persistence = m_persistenceEnabled ? m_persistence : 0;
+    int lastFrame = m_toolbox->GetCurrentFrame() + persistence;
+    if( lastFrame >= m_scene->GetNumberOfFrames() )
+        lastFrame = m_scene->GetNumberOfFrames() - 1;
+    for( int frame = m_toolbox->GetCurrentFrame(); frame <= lastFrame; ++frame )
 	{
 		CurrentNodesCont::iterator it = CurrentNodes.find( frame );
 		if( it == CurrentNodes.end() )
 		{
 			Node * newNode = CreateNewNode();
-            int nodeId = CurrentScene->AddNodeToFrame( newNode, frame );
+            int nodeId = m_scene->AddNodeToFrame( newNode, frame );
             CurrentNodes[frame] = nodeId;
 		}	
     }

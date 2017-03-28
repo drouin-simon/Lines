@@ -4,31 +4,40 @@
 #include <QObject>
 #include <vector>
 #include "drwCommand.h"
-#include "drwWidgetObserver.h"
 
 class Scene;
-class drwEditionState;
+class PlaybackControler;
+class drwTool;
+class QSettings;
 
-class drwToolbox : public drwWidgetObserver
+class drwToolbox : public QObject
 {
 	
 Q_OBJECT
 	
 public:
 	
-	drwToolbox( Scene * scene, drwEditionState * editionState, QObject * parent = 0 );
+    drwToolbox( Scene * scene, PlaybackControler * c );
 	virtual ~drwToolbox();
 	
-	void AddTool( drwWidgetObserver * tool );
-	drwWidgetObserver * GetTool( int index );
+    void AddTool( drwTool * tool );
+    drwTool * GetTool( int index );
     
     // Read and Write settings
     void ReadSettings( QSettings & s );
     void WriteSettings( QSettings & s );
 
-	virtual void SetCurrentFrame( int frame );
-	virtual void Reset();
-    drwEditionState * GetEditionState() { return m_editionState; }
+    void StartPlaying();
+    void OnStartPlaying();
+    void StopPlaying();
+    void OnStopPlaying();
+    void SetCurrentFrame( int frame );
+    int GetCurrentFrame() { return m_currentFrame; }
+    void GotoNextFrame();
+    void GotoPrevFrame();
+    int GetNumberOfFrames();
+
+    void Reset();
 	
 	void blockSignals( bool block );
 	
@@ -37,16 +46,18 @@ public:
 private slots:
 	
 	void NotifyCommandExecuted( drwCommand::s_ptr command );
-	void NotifyStartInteraction();
-	void NotifyEndInteraction();
+
+signals:
+
+    void CommandExecuted( drwCommand::s_ptr command );
 	
 protected:
 	
-    int CurrentTool;
-	std::vector<drwWidgetObserver*> Tools;
-	
-	drwEditionState * m_editionState;
-	
+    int m_currentFrame;
+    int m_currentTool;
+    std::vector<drwTool*> Tools;
+    Scene * m_scene;
+    PlaybackControler * m_controller;
 };
 
 #endif

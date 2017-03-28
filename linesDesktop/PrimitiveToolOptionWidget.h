@@ -10,7 +10,6 @@ class QSpinBox;
 class QGroupBox;
 class QRadioButton;
 class QCheckBox;
-class drwEditionState;
 class drwLineTool;
 class drwGradientWidget;
 
@@ -21,7 +20,7 @@ class PrimitiveToolOptionWidget : public QWidget
 	
 public:
 	
-	PrimitiveToolOptionWidget( drwEditionState * editionState, drwLineTool * lineTool, QWidget * parent = 0 );
+    PrimitiveToolOptionWidget( drwLineTool * lineTool, QWidget * parent = 0 );
 	~PrimitiveToolOptionWidget();
 	
 private slots:
@@ -36,15 +35,9 @@ private slots:
 	
 private:
 	
-	void timerEvent(QTimerEvent *event);
-	
 	void SetupUi();
 	void UpdateUi();
-	
-	int m_timerId;
-	bool m_updating;
-	
-	drwEditionState * m_editionState;
+
 	drwLineTool * m_lineTool;
 	
 	// UI elements

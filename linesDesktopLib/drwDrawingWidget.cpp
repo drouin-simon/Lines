@@ -4,7 +4,6 @@
 #include <QtOpenGL>
 #include "Vec4.h"
 #include "Scene.h"
-#include "drwWidgetObserver.h"
 #include "PlaybackControler.h"
 #include "drwDrawingContext.h"
 #include "drwDrawableTexture.h"
@@ -12,10 +11,11 @@
 #include "drwCursor.h"
 #include "drwFpsCounter.h"
 #include "drwGLRenderer.h"
+#include "drwToolbox.h"
 
 drwDrawingWidget::drwDrawingWidget( QWidget * parent )
 : QOpenGLWidget( parent )
-, Observer(0)
+, m_toolbox(0)
 , m_viewportWidget(0)
 , m_cursor(0)
 , m_showCursor(false)
@@ -81,7 +81,7 @@ void drwDrawingWidget::SimulateTabletEvent( drwMouseCommand::MouseCommandType ty
     int xWin, yWin;
     m_renderer->WorldToGLWindow( xWorld, yWorld, xWin, yWin );
     drwCommand::s_ptr command( new drwMouseCommand( type, xWorld, yWorld, 0.0, xWin, yWin, 0, 0, pressure, 0, 0 ) );
-    Observer->ExecuteCommand( command );
+    m_toolbox->ExecuteCommand( command );
 }
 
 void drwDrawingWidget::SetBackgroundColor( Vec4 & color )
@@ -97,7 +97,7 @@ void drwDrawingWidget::SetCurrentScene( Scene * scene )
 void drwDrawingWidget::SetControler( PlaybackControler * controler )
 {
     Controler = controler;
-    connect(Controler, SIGNAL(FrameChanged(int)), SLOT(CurrentFrameChanged()) );
+    connect(Controler, SIGNAL(FrameChanged()), SLOT(CurrentFrameChanged()) );
     connect(Controler, SIGNAL(StartStop(bool)), SLOT(PlaybackStartStop(bool)) );
 }
 
@@ -133,7 +133,7 @@ void drwDrawingWidget::ToggleComputeFps()
 void drwDrawingWidget::CurrentFrameChanged()
 {
     NeedRedraw();
-	Observer->SetCurrentFrame( Controler->GetCurrentFrame() );
+    m_toolbox->SetCurrentFrame( Controler->GetCurrentFrame() );
 }
 
 void drwDrawingWidget::PlaybackStartStop( bool isStarting )
@@ -297,10 +297,10 @@ void drwDrawingWidget::mousePressEvent( QMouseEvent * e )
 		return;
 	
 	// now send the event to observer ( drawing tools)
-    if( e->button() == Qt::LeftButton && Observer && !m_tabletHasControl  && !m_muteMouse )
+    if( e->button() == Qt::LeftButton && m_toolbox && !m_tabletHasControl  && !m_muteMouse )
 	{
         drwCommand::s_ptr command = CreateMouseCommand( drwMouseCommand::Press, e );
-        Observer->ExecuteCommand( command );
+        m_toolbox->ExecuteCommand( command );
 	}
 }
 
@@ -315,10 +315,10 @@ void drwDrawingWidget::mouseReleaseEvent( QMouseEvent * e )
 	if( widgetSwallows )
 		return;
 	
-    if ( e->button() == Qt::LeftButton && Observer && !m_tabletHasControl  && !m_muteMouse )
+    if ( e->button() == Qt::LeftButton && m_toolbox && !m_tabletHasControl  && !m_muteMouse )
     {
         drwCommand::s_ptr command = CreateMouseCommand( drwMouseCommand::Release, e );
-        Observer->ExecuteCommand( command );
+        m_toolbox->ExecuteCommand( command );
     }
 }
 
@@ -333,10 +333,10 @@ void drwDrawingWidget::mouseMoveEvent( QMouseEvent * e )
 	if( widgetSwallows )
 		return;
 	
-    if ( Observer && !m_tabletHasControl && !m_muteMouse )
+    if ( m_toolbox && !m_tabletHasControl && !m_muteMouse )
     {
         drwCommand::s_ptr command = CreateMouseCommand( drwMouseCommand::Move, e );
-        Observer->ExecuteCommand( command );
+        m_toolbox->ExecuteCommand( command );
     }
 }
 
@@ -359,26 +359,26 @@ void drwDrawingWidget::tabletEvent ( QTabletEvent * e )
         return;
     }
 	
-	if( Observer )
+    if( m_toolbox )
     {
         if( e->type() == QEvent::TabletPress )
         {
             m_tabletHasControl = true;
             drwCommand::s_ptr command = CreateMouseCommand( drwMouseCommand::Press, e );
-            Observer->ExecuteCommand( command );
+            m_toolbox->ExecuteCommand( command );
             e->accept();
         }
         else if( e->type() == QEvent::TabletRelease )
         {
             drwCommand::s_ptr command = CreateMouseCommand( drwMouseCommand::Release, e );
-            Observer->ExecuteCommand( command );
+            m_toolbox->ExecuteCommand( command );
             e->accept();
             m_tabletHasControl = false;
         }
         else if( e->type() == QEvent::TabletMove )
         {
             drwCommand::s_ptr command = CreateMouseCommand( drwMouseCommand::Move, e );
-            Observer->ExecuteCommand( command );
+            m_toolbox->ExecuteCommand( command );
             e->accept();
         }
     }

@@ -2,12 +2,12 @@
 #define __LinesApp_h_
 
 #include <QObject>
-#include "drwEditionState.h"
 #include <SVL.h>
+
+#include "drwLineTool.h"
 
 class drwDrawingWidget;
 class drwToolbox;
-class drwLineTool;
 
 class LinesApp : public QObject
 {
@@ -16,7 +16,7 @@ class LinesApp : public QObject
 
 public:
 
-    LinesApp( drwEditionState * edState, drwToolbox * toolbox );
+    LinesApp( drwToolbox * toolbox );
     ~LinesApp();
 
     void SetDrawingWidget( drwDrawingWidget * w );
@@ -60,13 +60,11 @@ public:
 signals:
 
     void LineParamsModified();
-    void EditParamsModified();
     void DisplayParamsModified();
 
 private slots:
 
     void LineParamsModifiedSlot();
-    void EditParamsModifiedSlot();
     void DisplayParamsModifiedSlot();
 
 private:
@@ -76,7 +74,6 @@ private:
     double m_backupBrushWidth;
     double m_backupBrushOpacity;
 
-    drwEditionState * m_editionState;
     drwToolbox * m_localToolbox;
     drwDrawingWidget * m_drawingWidget;
 

@@ -1,16 +1,16 @@
 #include "drwToolbox.h"
-#include "drwEditionState.h"
 #include "drwLineTool.h"
+#include "PlaybackControler.h"
+#include "Scene.h"
+#include <cassert>
 
-drwToolbox::drwToolbox( Scene * scene, drwEditionState * editionState, QObject * parent )
-: drwWidgetObserver( scene, parent )
-, m_editionState( editionState )
+drwToolbox::drwToolbox( Scene * scene, PlaybackControler * controller )
+: m_scene( scene ), m_controller( controller )
 {
-	if( !m_editionState )
-		m_editionState = new drwEditionState(this);
-	drwLineTool * drawTool = new drwLineTool( CurrentScene, m_editionState, this );
+    drwLineTool * drawTool = new drwLineTool( m_scene, this );
 	AddTool( drawTool );
-	CurrentTool = 0;
+    m_currentTool = 0;
+    m_currentFrame = 0;
 }
 
 drwToolbox::~drwToolbox()
@@ -19,15 +19,13 @@ drwToolbox::~drwToolbox()
 		delete Tools[i];
 }
 
-void drwToolbox::AddTool( drwWidgetObserver * tool )
+void drwToolbox::AddTool( drwTool * tool )
 {
 	connect( tool, SIGNAL(CommandExecuted(drwCommand::s_ptr)), SLOT(NotifyCommandExecuted(drwCommand::s_ptr)) );
-	connect( tool, SIGNAL(StartInteraction()), SLOT(NotifyStartInteraction()) );
-	connect( tool, SIGNAL(EndInteraction()), SLOT(NotifyEndInteraction()) );
 	Tools.push_back( tool );
 }
 
-drwWidgetObserver * drwToolbox::GetTool( int index )
+drwTool * drwToolbox::GetTool( int index )
 {
 	if( index >= 0 && index < Tools.size() )
 		return Tools[ index ];
@@ -38,37 +36,85 @@ void drwToolbox::ReadSettings( QSettings & s )
 {
     for( unsigned i = 0; i < Tools.size(); ++i )
         Tools[i]->ReadSettings( s );
-
-    m_editionState->ReadSettings( s );
 }
 
 void drwToolbox::WriteSettings( QSettings & s )
 {
     for( unsigned i = 0; i < Tools.size(); ++i )
         Tools[i]->WriteSettings( s );
-    m_editionState->WriteSettings( s );
+}
+
+void drwToolbox::StartPlaying()
+{
+    if( m_controller )
+        m_controller->StartPlaying();
+}
+
+void drwToolbox::OnStartPlaying()
+{
+    for( unsigned i = 0; i < Tools.size(); ++i )
+        Tools[i]->OnStartPlaying();
+}
+
+void drwToolbox::StopPlaying()
+{
+    if( m_controller )
+        m_controller->StopPlaying();
+}
+
+void drwToolbox::OnStopPlaying()
+{
+    for( unsigned i = 0; i < Tools.size(); ++i )
+        Tools[i]->OnStopPlaying();
 }
 
 void drwToolbox::SetCurrentFrame( int frame )
 {
-	if( CurrentTool >= 0 && CurrentTool < Tools.size() )
-		Tools[CurrentTool]->SetCurrentFrame( frame );
+    assert( frame < GetNumberOfFrames() );
+    assert( frame >= 0 );
+    if( frame == m_currentFrame )
+        return;
+
+    m_currentFrame = frame;
+
+    // Tell current tool the frame has changed
+    if( m_currentTool >= 0 && m_currentTool < Tools.size() )
+        Tools[m_currentTool]->NotifyFrameChanged( frame );
+
+    // Tell controller the frame changed
+    if( m_controller )
+        m_controller->NotifyFrameChanged();
 	
-	if( m_editionState )
-		m_editionState->SetCurrentFrame( frame );
-	
+    // Create a command to mark the frame has changed
 	drwSetFrameCommand * com = new drwSetFrameCommand();
 	com->SetNewFrame(frame);
 	drwCommand::s_ptr command( com );
 	emit CommandExecuted( command );
 }
 
+void drwToolbox::GotoNextFrame()
+{
+    int nextFrame = ( m_currentFrame + 1 ) % GetNumberOfFrames();
+    SetCurrentFrame( nextFrame );
+}
+
+void drwToolbox::GotoPrevFrame()
+{
+    int prevFrame = m_currentFrame == 0 ? GetNumberOfFrames() : m_currentFrame - 1;
+    SetCurrentFrame( prevFrame );
+}
+
+int drwToolbox::GetNumberOfFrames()
+{
+    return m_scene->GetNumberOfFrames();
+}
+
 void drwToolbox::Reset()
 {
-	CurrentTool = 0;
+    m_currentFrame = 0;
+    m_currentTool = 0;
 	for( unsigned i = 0; i < Tools.size(); ++i )
-		Tools[i]->Reset();
-	m_editionState->Reset();
+        Tools[i]->Reset();
 }
 
 void drwToolbox::blockSignals( bool block )
@@ -83,16 +129,6 @@ void drwToolbox::NotifyCommandExecuted( drwCommand::s_ptr command )
 	emit CommandExecuted( command );
 }
 
-void drwToolbox::NotifyStartInteraction()
-{
-	emit StartInteraction();
-}
-
-void drwToolbox::NotifyEndInteraction()
-{
-	emit EndInteraction();
-}
-
 void drwToolbox::ExecuteCommand( drwCommand::s_ptr command )
 {
 	if( command->GetCommandId() == drwIdSetFrameCommand )
@@ -100,7 +136,7 @@ void drwToolbox::ExecuteCommand( drwCommand::s_ptr command )
 		drwSetFrameCommand * setFrameCom = dynamic_cast<drwSetFrameCommand*> (command.get());
 		SetCurrentFrame( setFrameCom->GetNewFrame() );
 	}
-	else if( CurrentTool >= 0 && CurrentTool < Tools.size() )
-		Tools[CurrentTool]->ExecuteCommand( command );
+    else if( m_currentTool >= 0 && m_currentTool < Tools.size() )
+        Tools[m_currentTool]->ExecuteCommand( command );
 }
 

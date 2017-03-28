@@ -1,6 +1,5 @@
 #include "LinesApp.h"
 #include "drwToolbox.h"
-#include "drwLineTool.h"
 #include "drwDrawingWidget.h"
 
 static double smallBrushWidth = 6.0;
@@ -15,14 +14,12 @@ static int nbOnionOneAfter = 0;
 static int nbOnionManyBefore = 5;
 static int nbOnionManyAfter = 5;
 
-LinesApp::LinesApp( drwEditionState * edState, drwToolbox * toolbox )
+LinesApp::LinesApp( drwToolbox * toolbox )
     : m_backupBrushWidth( smallBrushWidth )
     , m_backupBrushOpacity( smallBrushAlpha )
-    , m_editionState( edState )
     , m_localToolbox( toolbox )
     , m_drawingWidget( 0 )
 {
-    connect( m_editionState, SIGNAL(ModifiedSignal()), this, SLOT(EditParamsModifiedSlot()) );
     drwLineTool * lineTool = dynamic_cast<drwLineTool*>(m_localToolbox->GetTool( 0 ));
     Q_ASSERT(lineTool);
     connect( lineTool, SIGNAL(ParametersChangedSignal()), this, SLOT(LineParamsModifiedSlot()) );
@@ -166,12 +163,12 @@ void LinesApp::SetFrameChangeJumpAfter()
 
 drwFrameChangeMode LinesApp::GetFrameChangeMode()
 {
-    return m_editionState->GetFrameChangeMode();
+    return GetLineTool()->GetFrameChangeMode();
 }
 
 void LinesApp::SetFrameChangeMode( drwFrameChangeMode mode )
 {
-    m_editionState->SetFrameChangeMode( mode );
+    GetLineTool()->SetFrameChangeMode( mode );
 }
 
 bool LinesApp::IsNoOnionSkin() { return GetOnionSkinBefore() == 0 && GetOnionSkinAfter() == 0; }
@@ -190,11 +187,6 @@ int LinesApp::GetOnionSkinAfter() { return m_drawingWidget->GetOnionSkinAfter();
 void LinesApp::LineParamsModifiedSlot()
 {
     emit LineParamsModified();
-}
-
-void LinesApp::EditParamsModifiedSlot()
-{
-    emit EditParamsModified();
 }
 
 void LinesApp::DisplayParamsModifiedSlot()

@@ -6,21 +6,15 @@
 #include <QGroupBox>
 #include <QRadioButton>
 #include <QCheckBox>
-#include "drwEditionState.h"
 #include "drwLineTool.h"
 #include "drwGradientWidget.h"
 
-PrimitiveToolOptionWidget::PrimitiveToolOptionWidget( drwEditionState * editionState, drwLineTool * lineTool, QWidget * parent )
-: m_timerId(-1)
-, m_updating(false)
-, m_editionState(editionState)
-, m_lineTool(lineTool)
+PrimitiveToolOptionWidget::PrimitiveToolOptionWidget( drwLineTool * lineTool, QWidget * parent )
+: m_lineTool(lineTool)
 {
 	SetupUi();
 	UpdateUi();
-	
 	connect( m_lineTool, SIGNAL(ParametersChangedSignal()), this, SLOT( ToolModified() ) );
-	connect( m_editionState, SIGNAL(ModifiedSignal()), this, SLOT(ToolModified()) );
 }
 
 PrimitiveToolOptionWidget::~PrimitiveToolOptionWidget()
@@ -29,33 +23,24 @@ PrimitiveToolOptionWidget::~PrimitiveToolOptionWidget()
 
 void PrimitiveToolOptionWidget::OnColorSliderValueChanged( double newSliderValue )
 {
-	if( !m_updating )
-	{
-		Vec4 newColor( newSliderValue, newSliderValue, newSliderValue, 1.0 );
-		m_lineTool->SetColor( newColor );
-	}
+    Vec4 newColor( newSliderValue, newSliderValue, newSliderValue, 1.0 );
+    m_lineTool->SetColor( newColor );
 }
 
 void PrimitiveToolOptionWidget::pressureWidthCheckBoxStateChanged( int state )
 {
-	if( !m_updating )
-	{
-		if( state == Qt::Unchecked )
-			m_lineTool->SetPressureWidth( false );
-		else if( state == Qt::Checked )
-			m_lineTool->SetPressureWidth( true );
-	}
+    if( state == Qt::Unchecked )
+        m_lineTool->SetPressureWidth( false );
+    else if( state == Qt::Checked )
+        m_lineTool->SetPressureWidth( true );
 }
 
 void PrimitiveToolOptionWidget::pressureOpacityCheckBoxStateChanged( int state )
 {
-	if( !m_updating )
-	{
-		if( state == Qt::Unchecked )
-			m_lineTool->SetPressureOpacity( false );
-		else if( state == Qt::Checked )
-			m_lineTool->SetPressureOpacity( true );
-	}
+    if( state == Qt::Unchecked )
+        m_lineTool->SetPressureOpacity( false );
+    else if( state == Qt::Checked )
+        m_lineTool->SetPressureOpacity( true );
 }
 
 void PrimitiveToolOptionWidget::fillCheckBoxStateChanged( int state )
@@ -69,38 +54,27 @@ void PrimitiveToolOptionWidget::fillCheckBoxStateChanged( int state )
 
 void PrimitiveToolOptionWidget::FrameChangeRadioToggled( bool isOn )
 {
-	if( isOn && !m_updating )
+    if( isOn )
 	{
 		// find which button is on
 		if( manualFrameChangeRadio->isChecked() )
-			m_editionState->SetFrameChangeMode( Manual );
+            m_lineTool->SetFrameChangeMode( Manual );
 		else if( jumpAfterFrameChangeRadio->isChecked() )
-			m_editionState->SetFrameChangeMode( AfterIntervention );
+            m_lineTool->SetFrameChangeMode( AfterIntervention );
 		else 
-			m_editionState->SetFrameChangeMode( Play );
+            m_lineTool->SetFrameChangeMode( Play );
         UpdateUi();
 	}
 }
 
 void PrimitiveToolOptionWidget::OnPersistenceSpinBoxValueChanged( int value )
 {
-	if( !m_updating )
-	{
-        m_editionState->SetPersistence( value );
-	}
+    m_lineTool->SetPersistence( value );
 }
 
 void PrimitiveToolOptionWidget::ToolModified()
 {
-	if( m_timerId == -1 )
-		m_timerId = startTimer(0);
-}
-
-void PrimitiveToolOptionWidget::timerEvent(QTimerEvent *event)
-{
-	killTimer( m_timerId );
-	m_timerId = -1;
-	UpdateUi();
+    UpdateUi();
 }
 
 void PrimitiveToolOptionWidget::SetupUi()
@@ -172,24 +146,36 @@ void PrimitiveToolOptionWidget::SetupUi()
 
 void PrimitiveToolOptionWidget::UpdateUi()
 {
-	m_updating = true;
-	
-	if( m_editionState->GetFrameChangeMode() == Manual )
+    manualFrameChangeRadio->blockSignals( true );
+    jumpAfterFrameChangeRadio->blockSignals( true );
+    playFrameChangeRadio->blockSignals( true );
+
+    if( m_lineTool->GetFrameChangeMode() == Manual )
 		manualFrameChangeRadio->setChecked( true );
-	else if( m_editionState->GetFrameChangeMode() == AfterIntervention )
+    else if( m_lineTool->GetFrameChangeMode() == AfterIntervention )
 		jumpAfterFrameChangeRadio->setChecked( true );
-	else if( m_editionState->GetFrameChangeMode() == Play )
+    else if( m_lineTool->GetFrameChangeMode() == Play )
 		playFrameChangeRadio->setChecked( true );
+
+    manualFrameChangeRadio->blockSignals( false );
+    jumpAfterFrameChangeRadio->blockSignals( false );
+    playFrameChangeRadio->blockSignals( false );
 	
+    pressureWidthCheckBox->blockSignals( true );
 	pressureWidthCheckBox->setChecked( m_lineTool->GetPressureWidth() );
     pressureWidthCheckBox->setEnabled( m_lineTool->IsPerssureWidthAndOpacityEnabled() );
+    pressureWidthCheckBox->blockSignals( false );
+
+    pressureOpacityCheckBox->blockSignals( true );
 	pressureOpacityCheckBox->setChecked( m_lineTool->GetPressureOpacity() );
     pressureOpacityCheckBox->setEnabled( m_lineTool->IsPerssureWidthAndOpacityEnabled() );
-	fillCheckBox->setChecked( m_lineTool->GetFill() );
+    pressureOpacityCheckBox->blockSignals( false );
+
+    fillCheckBox->blockSignals( true );
+    fillCheckBox->setChecked( m_lineTool->GetFill() );
+    fillCheckBox->blockSignals( false );
 
     persistenceSpinBox->blockSignals( true );
-    persistenceSpinBox->setValue( m_editionState->GetPersistence() );
+    persistenceSpinBox->setValue( m_lineTool->GetPersistence() );
     persistenceSpinBox->blockSignals( false );
-	
-	m_updating = false;
 }
