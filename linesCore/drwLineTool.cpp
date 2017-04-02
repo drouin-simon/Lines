@@ -1,5 +1,6 @@
 #include "drwLineTool.h"
 #include "drwToolbox.h"
+#include "drwGLRenderer.h"
 #include "line.h"
 #include "wideline.h"
 #include "Scene.h"
@@ -122,31 +123,34 @@ void drwLineTool::ExecuteMouseCommand( drwCommand::s_ptr command )
 	drwMouseCommand * mouseCom = dynamic_cast<drwMouseCommand*>(command.get());
 	Q_ASSERT( mouseCom );
 
+    double xWorld = mouseCom->X();
+    double yWorld = mouseCom->Y();
+    double pressure = mouseCom->Pressure();
+
 	if( mouseCom->GetType() == drwMouseCommand::Press )
 	{
+        // Start drawing
         m_isDrawing = true;
-        m_lastXWorld = mouseCom->X();
-        m_lastYWorld = mouseCom->Y();
-        m_lastPressure = mouseCom->Pressure();
-        m_lastXPix = mouseCom->XPix();
-        m_lastYPix = mouseCom->YPix();
 
-        // Start interaction
+        // Start playback in play mode
         if( m_frameChangeMode == Play )
         {
             m_interactionStartFrame = m_toolbox->GetCurrentFrame();
             m_toolbox->StartPlaying();
         }
 
+        // Create nodes that contain new line primitives
 		CreateNewNodes();
 
         // Mark rect modified in scene
-        MarkPointModified( m_lastXWorld, m_lastYWorld );
+        MarkPointModified( xWorld, yWorld );
 
+        // Propagate command
 		emit CommandExecuted( command );
 	}
     else if( mouseCom->GetType() == drwMouseCommand::Release && m_isDrawing )
 	{
+        // Complete all lines started
 		CurrentNodesCont::iterator it = CurrentNodes.begin();
 		while( it != CurrentNodes.end() )
 		{
@@ -156,24 +160,28 @@ void drwLineTool::ExecuteMouseCommand( drwCommand::s_ptr command )
             Node * n = m_scene->LockNode( frameIndex, nodeId );
             LinePrimitive * prim = dynamic_cast<LinePrimitive*> (n->GetPrimitive());
             Q_ASSERT( prim );
-            prim->EndPoint( mouseCom->X(), mouseCom->Y(), mouseCom->Pressure() );
+            prim->EndPoint( xWorld, yWorld, pressure );
             m_scene->UnlockNode( frameIndex, nodeId );
 
 			++it;
 		}
+
+        // Mark modified rect
         if( !m_fill )
-            MarkSegmentModified( m_lastXWorld, m_lastYWorld, mouseCom->X(), mouseCom->Y() );
+            MarkSegmentModified( m_lastXWorld, m_lastYWorld, xWorld, yWorld );
         else
             MarkWholePrimitiveModified();
-		CurrentNodes.clear();
+
+        // Clear the list of nodes where drawing
+        CurrentNodes.clear();
+
+        // Stop drawing
         m_isDrawing = false;
 
-        m_lastXWorld = mouseCom->X();
-        m_lastYWorld = mouseCom->Y();
-        m_lastPressure = mouseCom->Pressure();
-		emit CommandExecuted( command );
+        // Propagate command
+        emit CommandExecuted( command );
 
-        // End interaction
+        // Adjust playback and current frame according to the drawing mode
         if( m_frameChangeMode == Play )
         {
             m_toolbox->StopPlaying();
@@ -186,6 +194,7 @@ void drwLineTool::ExecuteMouseCommand( drwCommand::s_ptr command )
 	{
         if( m_isDrawing )
 		{
+            // Add segments to all ongoing lines
             CurrentNodesCont::iterator it = CurrentNodes.begin();
             while( it != CurrentNodes.end() )
             {
@@ -195,20 +204,27 @@ void drwLineTool::ExecuteMouseCommand( drwCommand::s_ptr command )
                 Node * n = m_scene->LockNode( frameIndex, nodeId );
                 LinePrimitive * prim = dynamic_cast<LinePrimitive*> (n->GetPrimitive());
                 Q_ASSERT( prim );
-                prim->AddPoint( mouseCom->X(), mouseCom->Y(), mouseCom->Pressure() );
+                prim->AddPoint( xWorld, yWorld, pressure );
                 m_scene->UnlockNode( frameIndex, nodeId );
                 
                 ++it;
             }
-            MarkSegmentModified( m_lastXWorld, m_lastYWorld, mouseCom->X(), mouseCom->Y() );
-            m_lastXWorld = mouseCom->X();
-            m_lastYWorld = mouseCom->Y();
-            m_lastPressure = mouseCom->Pressure();
-            m_lastXPix = mouseCom->XPix();
-            m_lastYPix = mouseCom->YPix();
+
+            // Mark modified part of the scene
+            MarkSegmentModified( m_lastXWorld, m_lastYWorld, xWorld, yWorld );
+
+            // Propagate command
             emit CommandExecuted( command );
 		}
+        else
+        {
+            MarkOverlaySegmentModified( m_lastXWorld, m_lastYWorld, xWorld, yWorld );
+        }
 	}
+
+    m_lastXWorld = xWorld;
+    m_lastYWorld = yWorld;
+    m_lastPressure = pressure;
 }
 
 void drwLineTool::MarkPointModified( double x, double y )
@@ -245,6 +261,22 @@ void drwLineTool::MarkSegmentModified( double x1, double y1, double x2, double y
         m_scene->MarkModified( frameIndex, modifiedRect );
         ++it;
     }
+}
+
+void drwLineTool::MarkOverlaySegmentModified( double x1, double y1, double x2, double y2 )
+{
+    double xMin = std::min( x1, x2 );
+    double xMax = std::max( x1, x2 );
+    double yMin = std::min( y1, y2 );
+    double yMax = std::max( y1, y2 );
+    double xBoxMin = xMin - m_baseWidth;
+    double xBoxMax = xMax + m_baseWidth;
+    double yBoxMin = yMin - m_baseWidth;
+    double yBoxMax = yMax + m_baseWidth;
+    Box2d modifiedRect( xBoxMin, xBoxMax, yBoxMin, yBoxMax );
+    drwGLRenderer * ren = m_toolbox->GetRenderer();
+    if( ren )
+        ren->MarkOverlayModified( modifiedRect );
 }
 
 void drwLineTool::MarkWholePrimitiveModified()

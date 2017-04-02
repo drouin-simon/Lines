@@ -7,6 +7,7 @@
 #include "drwLineTool.h"
 
 class drwDrawingWidget;
+class drwGLRenderer;
 class drwToolbox;
 
 class LinesApp : public QObject
@@ -76,6 +77,7 @@ private:
 
     drwToolbox * m_localToolbox;
     drwDrawingWidget * m_drawingWidget;
+    drwGLRenderer * m_renderer;
 
 };
 

@@ -12,6 +12,14 @@
 
 drwGLRenderer::drwGLRenderer()
 {
+    // Onion Skin
+    m_onionSkinFramesBefore = 1;
+    m_onionSkinFramesAfter = 0;
+    m_inhibitOnionSkin = false;
+
+    m_renderFrame = 0;
+    m_overlayModified = true;
+    m_sceneModified = true;
     m_drawingSurface = 0;
     m_camera = new drwCamera;
     m_scene = 0;
@@ -33,6 +41,57 @@ drwGLRenderer::~drwGLRenderer()
     delete m_workTexture;
     if( m_widelineShader )
         delete m_widelineShader;
+}
+
+void drwGLRenderer::SetOnionSkinBefore( int value )
+{
+    m_onionSkinFramesBefore = value;
+    m_drawingSurface->NotifyDisplaySettingsModified();
+    NeedRedraw();
+}
+
+void drwGLRenderer::SetOnionSkinAfter( int value )
+{
+    m_onionSkinFramesAfter = value;
+    m_drawingSurface->NotifyDisplaySettingsModified();
+    NeedRedraw();
+}
+
+void drwGLRenderer::SetInhibitOnionSkin( bool isOn )
+{
+    m_inhibitOnionSkin = isOn;
+    m_drawingSurface->NotifyDisplaySettingsModified();
+    NeedRedraw();
+}
+
+void drwGLRenderer::Render()
+{
+    if( !m_sceneModified && !m_overlayModified )
+        return;
+
+    // Render scene to texture
+    if( m_sceneModified )
+    {
+        Box2i modifiedRectWin;
+        WorldToGLWindow( m_sceneModifiedRect, modifiedRectWin );
+
+        int onionSkinBefore = GetInhibitOnionSkin() ? 0 : GetOnionSkinBefore();
+        int onionSkinAfter = GetInhibitOnionSkin() ? 0 : GetOnionSkinAfter();
+        RenderToTexture( m_renderFrame, onionSkinBefore, onionSkinAfter, modifiedRectWin );
+        m_sceneModified = false;
+        m_sceneModifiedRect.Reset();
+    }
+
+    // Paste texture to screen
+    Box2i overlayModifiedRectWin;
+    WorldToGLWindow( m_overlayModifiedRect, overlayModifiedRectWin );
+    int x = overlayModifiedRectWin.XMin();
+    int y = overlayModifiedRectWin.YMin();
+    int w = overlayModifiedRectWin.GetWidth();
+    int h = overlayModifiedRectWin.GetHeight();
+    RenderTextureToScreen( x, y, w, h );
+    m_overlayModified = false;
+    m_overlayModifiedRect.Reset();
 }
 
 void drwGLRenderer::RenderToTexture( int currentFrame, int onionSkinBefore, int onionSkinAfter, Box2i & rect )
@@ -121,6 +180,31 @@ void drwGLRenderer::RenderToTexture( int currentFrame )
     RenderToTexture( currentFrame, 0, 0, rect );
 }
 
+bool drwGLRenderer::IsFrameDisplayed( int frame )
+{
+    if( GetInhibitOnionSkin() )
+    {
+        return frame == m_renderFrame;
+    }
+    else
+    {
+        int nbFrames = m_scene->GetNumberOfFrames();
+        int lastFrame = m_renderFrame + GetOnionSkinAfter();
+        int lastFrameClamp = std::max( lastFrame, nbFrames - 1 );
+        int lastFrameOver = lastFrame % nbFrames;
+        int firstFrame = m_renderFrame - GetOnionSkinBefore();
+        int firstFrameClamp = std::max( firstFrame, 0 );
+        int firstFrameUnder = nbFrames + firstFrame;
+        if( frame >= firstFrameClamp && frame <= lastFrameClamp )
+            return true;
+        if( frame <= lastFrameOver )
+            return true;
+        if( frame >= firstFrameUnder )
+            return true;
+        return false;
+    }
+}
+
 void drwGLRenderer::RenderLayer( int frame, drwDrawingContext & context )
 {
     m_layerTexture->DrawToTexture( true );
@@ -192,6 +276,7 @@ void drwGLRenderer::RenderRect()
 void drwGLRenderer::SetRenderSize( int width, int height )
 {
     m_camera->SetWindowSize( width, height );
+    NeedRedraw();
 }
 
 int * drwGLRenderer::GetRenderSize()
@@ -303,14 +388,39 @@ void drwGLRenderer::SetCurrentScene( Scene * s )
     m_scene->SetRenderer( this );
 }
 
+void drwGLRenderer::SetRenderFrame( int frame )
+{
+    if( frame == m_renderFrame )
+        return;
+    m_renderFrame = frame;
+    NeedRedraw();
+}
+
 void drwGLRenderer::NeedRedraw()
 {
+    m_sceneModified = true;
+    Box2d modifiedRect( 0.0, m_camera->GetFrameSize()[0], 0.0, m_camera->GetFrameSize()[1] );
+    m_sceneModifiedRect.AdjustBound( modifiedRect );
+    m_overlayModified = true;
+    m_overlayModifiedRect.AdjustBound( modifiedRect );
     m_drawingSurface->NeedRedraw();
 }
 
 void drwGLRenderer::NeedRedraw( int frame, Box2d & rect )
 {
-    Box2i winRect;
-    WorldToGLWindow( rect, winRect );
-    m_drawingSurface->NeedRedraw( frame, winRect );
+    if( IsFrameDisplayed( frame ) )
+    {
+        m_sceneModified = true;
+        m_sceneModifiedRect.AdjustBound( rect );
+        m_overlayModified = true;
+        m_overlayModifiedRect.AdjustBound( rect );
+        m_drawingSurface->NeedRedraw();
+    }
+}
+
+void drwGLRenderer::MarkOverlayModified( Box2d & rect )
+{
+    m_overlayModified = true;
+    m_overlayModifiedRect.AdjustBound( rect );
+    m_drawingSurface->NeedRedraw();
 }

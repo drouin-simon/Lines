@@ -25,15 +25,7 @@ void drwCursor::SetPosition( int x, int y )
 {
     m_position[0] = x;
     m_position[1] = y;
-
-    // Need to paint over last draw cursor
-    m_drawingWidget->NeedRedrawOverlay( m_lastDrawnRect[0], m_lastDrawnRect[1], m_lastDrawnRect[2], m_lastDrawnRect[3]);
-
-    // Need to paint around new cursor position
-    int rect[4];
-    double baseWidthPix = ComputeBaseWidthPix();
-    ComputeCursorRect( baseWidthPix, m_position, rect );
-    m_drawingWidget->NeedRedrawOverlay( rect[0], rect[1], rect[2], rect[3] );
+    m_drawingWidget->NeedRedraw();
 }
 
 void drwCursor::Draw( QPainter & painter )

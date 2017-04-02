@@ -7,6 +7,7 @@
 
 class Scene;
 class PlaybackControler;
+class drwGLRenderer;
 class drwTool;
 class QSettings;
 
@@ -20,6 +21,9 @@ public:
     drwToolbox( Scene * scene, PlaybackControler * c );
 	virtual ~drwToolbox();
 	
+    void SetRenderer( drwGLRenderer * r ) { m_renderer = r; }
+    drwGLRenderer * GetRenderer() { return m_renderer; }
+
     void AddTool( drwTool * tool );
     drwTool * GetTool( int index );
     
@@ -58,6 +62,7 @@ protected:
     std::vector<drwTool*> Tools;
     Scene * m_scene;
     PlaybackControler * m_controller;
+    drwGLRenderer * m_renderer;
 };
 
 #endif

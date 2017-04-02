@@ -1,5 +1,6 @@
 #include "DisplaySettingsWidget.h"
 #include "drwDrawingWidget.h"
+#include "drwGLRenderer.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -23,19 +24,19 @@ DisplaySettingsWidget::~DisplaySettingsWidget()
 
 void DisplaySettingsWidget::OnFramesBeforeValueChanged( int value )
 {
-    m_drawingWidget->SetOnionSkinBefore( value );
+    m_drawingWidget->GetRenderer()->SetOnionSkinBefore( value );
 }
 
 void DisplaySettingsWidget::OnFramesAfterValueChanged( int value )
 {
-    m_drawingWidget->SetOnionSkinAfter( value );
+    m_drawingWidget->GetRenderer()->SetOnionSkinAfter( value );
 }
 
 void DisplaySettingsWidget::UpdateUI()
 {
     BlockSigs( true );
-    framesBeforeSpinBox->setValue( m_drawingWidget->GetOnionSkinBefore() );
-    framesAfterSpinBox->setValue( m_drawingWidget->GetOnionSkinAfter() );
+    framesBeforeSpinBox->setValue( m_drawingWidget->GetRenderer()->GetOnionSkinBefore() );
+    framesAfterSpinBox->setValue( m_drawingWidget->GetRenderer()->GetOnionSkinAfter() );
     BlockSigs( false );
 }
 

@@ -113,6 +113,8 @@ MainWindow::MainWindow()
     m_globalLineParams->SetDrawingWidget( m_glWidget );
     m_linesApp->SetDrawingWidget( m_glWidget );
 
+    m_localToolbox->SetRenderer( m_glWidget->GetRenderer() );
+
     // Create special widget to go inside drawing widget
     drwLineTool * lineTool = dynamic_cast<drwLineTool*>(m_localToolbox->GetTool( 0 ));
     Q_ASSERT(lineTool);

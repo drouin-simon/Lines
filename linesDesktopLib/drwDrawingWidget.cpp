@@ -9,7 +9,6 @@
 #include "drwDrawableTexture.h"
 #include "drwLineToolViewportWidget.h"
 #include "drwCursor.h"
-#include "drwFpsCounter.h"
 #include "drwGLRenderer.h"
 #include "drwToolbox.h"
 
@@ -21,16 +20,9 @@ drwDrawingWidget::drwDrawingWidget( QWidget * parent )
 , m_showCursor(false)
 , m_muteMouse(false)
 , m_tabletHasControl(false)
-, m_sceneModified(true)
 {
-    // Display Settings
-    m_onionSkinFramesBefore = 1;
-    m_onionSkinFramesAfter = 0;
-    m_inhibitOnionSkin = false;
-
     m_timerId = -1;
     this->Controler = 0;
-    m_fpsCounter = 0;
 
     m_renderer = new drwGLRenderer;
     m_renderer->SetDrawingSurface( this );
@@ -51,29 +43,12 @@ drwDrawingWidget::~drwDrawingWidget()
 
 void drwDrawingWidget::NeedRedraw()
 {
-    m_sceneModified = true;
-    m_modifiedRect = Box2i( 0, m_renderer->GetRenderSize()[0] - 1, 0, m_renderer->GetRenderSize()[1] - 1 );
     update();
 }
 
-void drwDrawingWidget::NeedRedraw( int frame, Box2i & rect )
+void drwDrawingWidget::NotifyDisplaySettingsModified()
 {
-    if( IsFrameDisplayed( frame ) )
-    {
-        m_sceneModified = true;
-        m_modifiedRect.AdjustBound( rect );
-        update( rect.XMin(), rect.YMin(), rect.GetWidth(), rect.GetHeight() );
-    }
-}
-
-void drwDrawingWidget::NeedRedrawOverlay()
-{
-    update();
-}
-
-void drwDrawingWidget::NeedRedrawOverlay( int x, int y, int width, int height )
-{
-    update( x, y, width, height );
+    emit DisplaySettingsModified();
 }
 
 void drwDrawingWidget::SimulateTabletEvent( drwMouseCommand::MouseCommandType type, double xWorld, double yWorld, double pressure )
@@ -116,24 +91,9 @@ void drwDrawingWidget::SetCursorColor( QString colorName )
     m_cursor->SetColor( colorName );
 }
 
-void drwDrawingWidget::ToggleComputeFps()
-{
-    if( m_fpsCounter )
-    {
-        delete m_fpsCounter;
-        m_fpsCounter = 0;
-    }
-    else
-    {
-        m_fpsCounter = new drwFpsCounter;
-        m_fpsCounter->Start();
-    }
-}
-
 void drwDrawingWidget::CurrentFrameChanged()
 {
     NeedRedraw();
-    m_toolbox->SetCurrentFrame( Controler->GetCurrentFrame() );
 }
 
 void drwDrawingWidget::PlaybackStartStop( bool isStarting )
@@ -141,9 +101,6 @@ void drwDrawingWidget::PlaybackStartStop( bool isStarting )
 	// Start/stop generating idle events that are used to make sure we redraw during playback
 	if( isStarting )
 	{
-        // render current frame to texture, generate sound from frame
-        m_renderer->RenderToTexture( Controler->GetCurrentFrame() );
-
         // start timer
 		if( m_timerId == -1 )
 			m_timerId = startTimer(0);
@@ -158,8 +115,6 @@ void drwDrawingWidget::PlaybackStartStop( bool isStarting )
 		}
         EnableVSync( false );
 	}
-	
-    SetInhibitOnionSkin( isStarting );
 }
 
 void drwDrawingWidget::initializeGL()
@@ -177,38 +132,7 @@ void drwDrawingWidget::paintEvent( QPaintEvent * event )
 {
 	makeCurrent();
 
-    // Figure out how many onion skins we want
-    int onionSkinBefore = 0;
-    int onionSkinAfter = 0;
-    if( !Controler->IsPlaying() )
-    {
-        onionSkinBefore = GetOnionSkinBefore();
-        onionSkinAfter = GetOnionSkinAfter();
-        if( GetInhibitOnionSkin() )
-        {
-            onionSkinBefore = 0;
-            onionSkinAfter = 0;
-        }
-    }
-    
-    // Render scene to texture if modified
-    if( m_sceneModified )
-    {
-        m_renderer->RenderToTexture( Controler->GetCurrentFrame(), onionSkinBefore, onionSkinAfter, m_modifiedRect );
-        m_sceneModified = false;
-        m_modifiedRect.Reset();
-    }
-
-    // Paste texture to screen and find out the area of the
-    // images that has to be updated (on macOS, rect is always the whole window)
-    // we would use this rect for everything, but it is not reliable.
-    QRect dr = event->rect();
-    int ratio = this->devicePixelRatio();
-    int x = dr.x() * ratio;
-    int y = dr.y() * ratio;
-    int w = dr.width() * ratio;
-    int h = dr.height() * ratio;
-    m_renderer->RenderTextureToScreen( x, y, w, h );
+    m_renderer->Render();
 
     QPainter painter;
     painter.begin( this );
@@ -219,14 +143,6 @@ void drwDrawingWidget::paintEvent( QPaintEvent * event )
     if( m_viewportWidget )
     {
         m_viewportWidget->Draw( painter );
-    }
-
-    // Draw fps counter if needed
-    if( m_fpsCounter && m_fpsCounter->IsRunning() )
-    {
-        m_fpsCounter->Tick();
-        QString text = QString("fps: %1").arg( m_fpsCounter->GetFps() );
-        painter.drawText( 5, this->height() - 5, text );
     }
 
     // draw the cursor if needed
@@ -258,32 +174,6 @@ void drwDrawingWidget::EnableVSync( bool enable )
     CGLContextObj cgl_context = CGLGetCurrentContext();
     CGLSetParameter( cgl_context, kCGLCPSwapInterval, &swap_interval );
 #endif
-}
-
-bool drwDrawingWidget::IsFrameDisplayed( int frame )
-{
-    int curFrame = Controler->GetCurrentFrame();
-    if( GetInhibitOnionSkin() )
-    {
-        return frame == curFrame;
-    }
-    else
-    {
-        int nbFrames = Controler->GetNumberOfFrames();
-        int lastFrame = curFrame + GetOnionSkinAfter();
-        int lastFrameClamp = std::max( lastFrame, nbFrames - 1 );
-        int lastFrameOver = lastFrame % nbFrames;
-        int firstFrame = curFrame - GetOnionSkinBefore();
-        int firstFrameClamp = std::max( firstFrame, 0 );
-        int firstFrameUnder = nbFrames + firstFrame;
-        if( frame >= firstFrameClamp && frame <= lastFrameClamp )
-            return true;
-        if( frame <= lastFrameOver )
-            return true;
-        if( frame >= firstFrameUnder )
-            return true;
-        return false;
-    }
 }
 
 void drwDrawingWidget::mousePressEvent( QMouseEvent * e )
@@ -395,33 +285,12 @@ void drwDrawingWidget::ActivateViewportWidget( bool active )
     {
         m_viewportWidget->Deactivate();
     }
-    NeedRedrawOverlay();
+    NeedRedraw();
 }
 
 double drwDrawingWidget::PixelsPerUnit()
 {
     return m_renderer->PixelsPerUnit();
-}
-
-void drwDrawingWidget::SetOnionSkinBefore( int value )
-{
-    m_onionSkinFramesBefore = value;
-    emit DisplaySettingsModified();
-    NeedRedraw();
-}
-
-void drwDrawingWidget::SetOnionSkinAfter( int value )
-{
-    m_onionSkinFramesAfter = value;
-    emit DisplaySettingsModified();
-    NeedRedraw();
-}
-
-void drwDrawingWidget::SetInhibitOnionSkin( bool isOn )
-{
-    m_inhibitOnionSkin = isOn;
-    emit DisplaySettingsModified();
-    NeedRedraw();
 }
 
 void drwDrawingWidget::enterEvent( QEvent * e )
@@ -434,7 +303,7 @@ void drwDrawingWidget::leaveEvent( QEvent * e )
     m_showCursor = false;
     if( m_viewportWidget )
         m_viewportWidget->Deactivate();
-    NeedRedrawOverlay();
+    NeedRedraw();
 }
 
 bool drwDrawingWidget::event( QEvent * e )

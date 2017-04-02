@@ -12,7 +12,6 @@ class QPushButton;
 class drwGLRenderer;
 class drwToolbox;
 class drwLineToolViewportWidget;
-class drwFpsCounter;
 class PlaybackControler;
 class drwCursor;
 
@@ -27,9 +26,6 @@ public:
 
     // Implement drwDrawingSurface interface
     void NeedRedraw();
-    void NeedRedraw( int frame, Box2i & rect );
-    void NeedRedrawOverlay();
-    void NeedRedrawOverlay( int x, int y, int width, int height );
 
     void SetBackgroundColor( Vec4 & color );
     void SetCurrentScene( Scene * scene );
@@ -42,19 +38,13 @@ public:
     void UpdatePosition( int x, int y );
     void SetMuteMouse( bool mute ) { m_muteMouse = mute; }
     bool IsMutingMouse() { return m_muteMouse; }
-    void ToggleComputeFps();
     void ActivateViewportWidget( bool active );
     double PixelsPerUnit();
+    drwGLRenderer * GetRenderer() { return m_renderer; }
 
     void SimulateTabletEvent( drwMouseCommand::MouseCommandType type, double xWorld, double yWorld, double pressure );
 
-    // Display settings
-    int GetOnionSkinBefore() { return m_onionSkinFramesBefore; }
-    void SetOnionSkinBefore( int );
-    int GetOnionSkinAfter() { return m_onionSkinFramesAfter; }
-    void SetOnionSkinAfter( int );
-    bool GetInhibitOnionSkin() { return m_inhibitOnionSkin; }
-    void SetInhibitOnionSkin( bool isOn );
+    virtual void NotifyDisplaySettingsModified();
 	
 public slots:
 
@@ -89,28 +79,19 @@ protected:
 	bool event ( QEvent * event );
 
     void EnableVSync( bool enable );
-    bool IsFrameDisplayed( int frame );
   
 private:
 
     void PrintGLInfo();
-
-    // Display settings
-    int m_onionSkinFramesBefore;
-    int m_onionSkinFramesAfter;
-    bool m_inhibitOnionSkin;
 	
     drwGLRenderer * m_renderer;
     PlaybackControler * Controler;
     drwToolbox * m_toolbox;
     drwLineToolViewportWidget * m_viewportWidget;
-    drwFpsCounter * m_fpsCounter;
     drwCursor * m_cursor;
     bool m_showCursor;
     bool m_muteMouse;
     bool m_tabletHasControl;  // make sur not to generate both mouse and tablet events
-    bool m_sceneModified;
-    Box2i m_modifiedRect;
 }; 
 
 #endif

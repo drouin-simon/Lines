@@ -9,9 +9,7 @@ public:
     drwDrawingSurface() {}
     ~drwDrawingSurface() {}
     virtual void NeedRedraw() = 0;
-    virtual void NeedRedraw( int frame, Box2i & rect ) = 0;
-    virtual void NeedRedrawOverlay() = 0;
-    virtual void NeedRedrawOverlay( int x, int y, int width, int height ) = 0;
+    virtual void NotifyDisplaySettingsModified() = 0;
 };
 
 #endif

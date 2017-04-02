@@ -1,11 +1,12 @@
 #include "drwToolbox.h"
 #include "drwLineTool.h"
 #include "PlaybackControler.h"
+#include "drwGLRenderer.h"
 #include "Scene.h"
 #include <cassert>
 
 drwToolbox::drwToolbox( Scene * scene, PlaybackControler * controller )
-: m_scene( scene ), m_controller( controller )
+: m_scene( scene ), m_controller( controller ), m_renderer( 0 )
 {
     drwLineTool * drawTool = new drwLineTool( m_scene, this );
 	AddTool( drawTool );
@@ -52,6 +53,7 @@ void drwToolbox::StartPlaying()
 
 void drwToolbox::OnStartPlaying()
 {
+    m_renderer->SetInhibitOnionSkin( true );
     for( unsigned i = 0; i < Tools.size(); ++i )
         Tools[i]->OnStartPlaying();
 }
@@ -64,6 +66,7 @@ void drwToolbox::StopPlaying()
 
 void drwToolbox::OnStopPlaying()
 {
+    m_renderer->SetInhibitOnionSkin( false );
     for( unsigned i = 0; i < Tools.size(); ++i )
         Tools[i]->OnStopPlaying();
 }
@@ -84,6 +87,9 @@ void drwToolbox::SetCurrentFrame( int frame )
     // Tell controller the frame changed
     if( m_controller )
         m_controller->NotifyFrameChanged();
+
+    if( m_renderer )
+        m_renderer->SetRenderFrame( frame );
 	
     // Create a command to mark the frame has changed
 	drwSetFrameCommand * com = new drwSetFrameCommand();

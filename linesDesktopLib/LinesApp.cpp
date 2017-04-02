@@ -1,6 +1,7 @@
 #include "LinesApp.h"
 #include "drwToolbox.h"
 #include "drwDrawingWidget.h"
+#include "drwGLRenderer.h"
 
 static double smallBrushWidth = 6.0;
 static double smallBrushAlpha = 1.0;
@@ -19,6 +20,7 @@ LinesApp::LinesApp( drwToolbox * toolbox )
     , m_backupBrushOpacity( smallBrushAlpha )
     , m_localToolbox( toolbox )
     , m_drawingWidget( 0 )
+    , m_renderer( 0 )
 {
     drwLineTool * lineTool = dynamic_cast<drwLineTool*>(m_localToolbox->GetTool( 0 ));
     Q_ASSERT(lineTool);
@@ -33,6 +35,7 @@ LinesApp::~LinesApp()
 void LinesApp::SetDrawingWidget( drwDrawingWidget * w )
 {
     m_drawingWidget = w;
+    m_renderer = m_drawingWidget->GetRenderer();
     connect( m_drawingWidget, SIGNAL(DisplaySettingsModified()), this, SLOT(DisplayParamsModifiedSlot()) );
 }
 
@@ -178,11 +181,11 @@ void LinesApp::SetOneOnionSkin() { SetOnionSkinBefore( nbOnionOneBefore ); SetOn
 bool LinesApp::IsManyOnionSkin() { return GetOnionSkinBefore() == nbOnionManyBefore && GetOnionSkinAfter() == nbOnionManyAfter; }
 void LinesApp::SetManyOnionSkin() { SetOnionSkinBefore( nbOnionManyBefore ); SetOnionSkinAfter( nbOnionManyAfter ); }
 
-void LinesApp::SetOnionSkinBefore( int nbFrames ) { m_drawingWidget->SetOnionSkinBefore( nbFrames ); }
-int LinesApp::GetOnionSkinBefore() { return m_drawingWidget->GetOnionSkinBefore(); }
+void LinesApp::SetOnionSkinBefore( int nbFrames ) { m_renderer->SetOnionSkinBefore( nbFrames ); }
+int LinesApp::GetOnionSkinBefore() { return m_renderer->GetOnionSkinBefore(); }
 
-void LinesApp::SetOnionSkinAfter( int nbFrames ) { m_drawingWidget->SetOnionSkinAfter( nbFrames ); }
-int LinesApp::GetOnionSkinAfter() { return m_drawingWidget->GetOnionSkinAfter(); }
+void LinesApp::SetOnionSkinAfter( int nbFrames ) { m_renderer->SetOnionSkinAfter( nbFrames ); }
+int LinesApp::GetOnionSkinAfter() { return m_renderer->GetOnionSkinAfter(); }
 
 void LinesApp::LineParamsModifiedSlot()
 {

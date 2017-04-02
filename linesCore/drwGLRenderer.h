@@ -1,6 +1,8 @@
 #ifndef __drwGLRenderer_h_
 #define __drwGLRenderer_h_
 
+#include "Box2d.h"
+
 class Scene;
 class Node;
 class drwDrawableTexture;
@@ -9,7 +11,6 @@ class drwCamera;
 class drwDrawingContext;
 class drwDrawingSurface;
 class Box2i;
-class Box2d;
 
 class drwGLRenderer
 {
@@ -21,6 +22,15 @@ public:
 
     void SetDrawingSurface( drwDrawingSurface * s ) { m_drawingSurface = s; }
 
+    // Onion Skins
+    int GetOnionSkinBefore() { return m_onionSkinFramesBefore; }
+    void SetOnionSkinBefore( int );
+    int GetOnionSkinAfter() { return m_onionSkinFramesAfter; }
+    void SetOnionSkinAfter( int );
+    bool GetInhibitOnionSkin() { return m_inhibitOnionSkin; }
+    void SetInhibitOnionSkin( bool isOn );
+
+    void Render();
     void RenderToTexture( int currentFrame, int onionSkinBefore, int onionSkinAfter, Box2i & rect );
     void RenderToTexture( int currentFrame );
     drwDrawableTexture * GetRenderTexture() { return m_renderTexture; }
@@ -31,6 +41,7 @@ public:
     void SetRenderSize( int width, int height );
     int * GetRenderSize();
     void SetCurrentScene( Scene * cur );
+    void SetRenderFrame( int frame );
     drwDrawableTexture * GetWorkTexture() { return m_workTexture; }
     drwGlslShader * GetWidelineShader() { return m_widelineShader; }
     void SetWidelineShader( drwGlslShader * shader ) { m_widelineShader = shader; }
@@ -50,10 +61,24 @@ public:
 
     void NeedRedraw();
     void NeedRedraw( int frame, Box2d & rect );
+    void MarkOverlayModified( Box2d & rect );
     
 protected:
 
+    bool IsFrameDisplayed( int frame );
     void RenderLayer( int frame, drwDrawingContext & context );
+
+    // Onion skin params
+    int m_onionSkinFramesBefore;
+    int m_onionSkinFramesAfter;
+    bool m_inhibitOnionSkin;
+
+    bool m_overlayModified;
+    Box2d m_overlayModifiedRect;
+
+    bool m_sceneModified;
+    Box2d m_sceneModifiedRect;
+    int m_renderFrame;
 
     drwDrawingSurface   * m_drawingSurface;
     drwCamera           * m_camera;

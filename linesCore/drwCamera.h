@@ -11,6 +11,7 @@ public:
     void SetWindowSize( int w, int h );
     int * GetWindowSize() { return m_winSizePix; }
     void SetFrameSize( double w, double h );
+    double * GetFrameSize() { return m_frameSizeWorld; }
     void GetFrameSizePix( int frameSize[2] ) { frameSize[0] = m_frameSizePix[0]; frameSize[1] = m_frameSizePix[1]; }
 
     void NativeWindowToWorld( int xwin, int ywin, double & xworld, double & yworld );
