@@ -21,7 +21,7 @@ public:
     drwToolbox( Scene * scene, PlaybackControler * c );
 	virtual ~drwToolbox();
 	
-    void SetRenderer( drwGLRenderer * r ) { m_renderer = r; }
+    void SetRenderer( drwGLRenderer * r );
     drwGLRenderer * GetRenderer() { return m_renderer; }
 
     void AddTool( drwTool * tool );

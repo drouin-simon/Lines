@@ -27,6 +27,8 @@ public:
 	
     virtual void NotifyFrameChanged( int frame ) {}
     virtual void Reset() {}
+
+    virtual void NotifyRendererChanged() {}
 	
 	virtual void ExecuteCommand( drwCommand::s_ptr command ) {}
 	

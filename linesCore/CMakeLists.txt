@@ -5,14 +5,14 @@ project( ${LibName} )
 set( ${LibName}_src drwToolbox.cpp drwLineTool.cpp drwGlslShader.cpp drwCamera.cpp
         Scene.cpp Frame.cpp Node.cpp line.cpp wideline.cpp drwDrawableTexture.cpp
 	drwDrawingContext.cpp PlaybackControler.cpp drwCommand.cpp drwCommandDatabase.cpp
-        drwCommandDispatcher.cpp drwGLRenderer.cpp )
+        drwCommandDispatcher.cpp drwGLRenderer.cpp lcCircle.cpp )
 
 set( ${LibName}_hdr_moc drwToolbox.h drwTool.h drwLineTool.h PlaybackControler.h drwCommandDatabase.h
         Scene.h drwCommandDispatcher.h )
 
 set( ${LibName}_hdr drwGLRenderer.h drwDrawingSurface.h drwRemoteCommandIO.h drwGlslShader.h drwCamera.h Frame.h line.h Node.h Primitive.h LinePrimitive.h
 	wideline.h drwDrawableTexture.h drwDrawingContext.h drwCommand.h drwDataArray.h
-	PolygonData.h IncludeGl.h IncludeGlee.h )
+        PolygonData.h IncludeGl.h IncludeGlee.h lcCircle.h )
 
 # moc Qt source file without a ui file
 qt5_wrap_cpp( ${LibName}_moc ${${LibName}_hdr_moc} )

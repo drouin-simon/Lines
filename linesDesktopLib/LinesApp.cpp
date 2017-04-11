@@ -52,7 +52,6 @@ void LinesApp::SetSmallBrush()
     Vec4 col( 1.0, 1.0, 1.0, smallBrushAlpha );
     SetLineColor( col );
     GetLineTool()->SetErase( false );
-    m_drawingWidget->SetCursorColor( "yellowgreen" );
 }
 
 bool LinesApp::IsBigBrush()
@@ -69,7 +68,6 @@ void LinesApp::SetBigBrush()
     Vec4 col( 1.0, 1.0, 1.0, bigBrushAlpha );
     SetLineColor( col );
     GetLineTool()->SetErase( false );
-    m_drawingWidget->SetCursorColor( "yellowgreen" );
 }
 
 void LinesApp::ToggleBigSmallBrush()
@@ -118,7 +116,6 @@ void LinesApp::SetErasing()
     SetLineWidth( eraserWidth );
     Vec4 color( 1.0, 1.0, 1.0, eraserAlpha );
     SetLineColor( color );
-    m_drawingWidget->SetCursorColor( "orange" );
 }
 
 bool LinesApp::IsErasing()
@@ -134,7 +131,6 @@ void LinesApp::ToggleErasing()
         Vec4 col( 1.0, 1.0, 1.0, m_backupBrushOpacity );
         SetLineColor( col );
         GetLineTool()->SetErase( false );
-        m_drawingWidget->SetCursorColor( "yellowgreen" );
     }
     else
     {

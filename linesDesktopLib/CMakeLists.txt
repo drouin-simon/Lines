@@ -5,7 +5,7 @@ include_directories( ${linesNetworkIncludeDirs} )
 
 set( DrawLib_src LinesApp.cpp drwDrawingWidget.cpp drwsimplifiedtoolbar.cpp
         TabletStateWidget.cpp drwNetworkConnectDialog.cpp
-	drwBitmapExporter.cpp drwCursor.cpp drwGradientWidget.cpp
+        drwBitmapExporter.cpp drwGradientWidget.cpp
         drwLineToolViewportWidget.cpp drwFpsCounter.cpp
         drwGlobalLineParams.cpp drwAutoGui.cpp TabletStateTestingArea.cpp drwAspectRatioWidget.cpp )
 
@@ -13,7 +13,7 @@ set( DrawLib_hdr_moc LinesApp.h drwDrawingWidget.h drwsimplifiedtoolbar.h Tablet
         drwNetworkConnectDialog.h drwBitmapExporter.h drwGradientWidget.h
         drwGlobalLineParams.h drwAutoGui.h TabletStateTestingArea.h drwAspectRatioWidget.h )
 
-set( DrawLib_hdr drwLineToolViewportWidget.h drwCursor.h drwFpsCounter.h )
+set( DrawLib_hdr drwLineToolViewportWidget.h drwFpsCounter.h )
 
 # Include bin directory for ui_ files
 include_directories(${CMAKE_CURRENT_BINARY_DIR})

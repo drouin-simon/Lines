@@ -5,6 +5,7 @@
 
 class Scene;
 class Node;
+class Primitive;
 class drwDrawableTexture;
 class drwGlslShader;
 class drwCamera;
@@ -21,6 +22,7 @@ public:
     ~drwGLRenderer();
 
     void SetDrawingSurface( drwDrawingSurface * s ) { m_drawingSurface = s; }
+    void SetCursor( Primitive * p ) { m_cursor = p; }
 
     // Onion Skins
     int GetOnionSkinBefore() { return m_onionSkinFramesBefore; }
@@ -83,6 +85,7 @@ protected:
     drwDrawingSurface   * m_drawingSurface;
     drwCamera           * m_camera;
     Scene				* m_scene;
+    Primitive           * m_cursor;
     drwDrawableTexture  * m_renderTexture;
     drwDrawableTexture  * m_layerTexture;
     drwDrawableTexture  * m_workTexture;

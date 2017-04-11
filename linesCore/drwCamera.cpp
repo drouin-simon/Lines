@@ -110,6 +110,17 @@ void drwCamera::SetupToRenderTextureToScreen()
     glViewport( m_framePosPix[0], m_framePosPix[1], m_frameSizePix[0], m_frameSizePix[1] );
 }
 
+#include <iostream>
+
+void drwCamera::Print()
+{
+    std::cout << "Window size " << m_winSizePix[0] << " x " << m_winSizePix[1] << " pix" << std::endl;
+    std::cout << "Frame size (world): " << m_frameSizeWorld[0] << " x " << m_frameSizeWorld[1] << " units" << std::endl;
+    std::cout << "Frame padding: " << m_framePadding << std::endl;
+    std::cout << "Frame size (pix): " << m_frameSizePix[0] << " x " << m_frameSizePix[1] << std::endl;
+    std::cout << "Frame pos (pix): ( " << m_framePosPix[0] << ", " << m_framePosPix[1] << " )" << std::endl;
+}
+
 void drwCamera::UpdateSizes()
 {
     // Compute m_frameSizePix : find the rectangle with same proportion as the frame that fits inside the window

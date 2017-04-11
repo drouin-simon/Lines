@@ -13,7 +13,6 @@ class drwGLRenderer;
 class drwToolbox;
 class drwLineToolViewportWidget;
 class PlaybackControler;
-class drwCursor;
 
 class drwDrawingWidget : public QOpenGLWidget, public drwDrawingSurface
 {
@@ -33,9 +32,6 @@ public:
     void SetControler( PlaybackControler * controler );
     GetMacro( Controler, PlaybackControler* );
     void SetViewportWidget( drwLineToolViewportWidget * w );
-    void SetCursor( drwCursor * cursor );
-    void SetCursorColor( QString colorName );
-    void UpdatePosition( int x, int y );
     void SetMuteMouse( bool mute ) { m_muteMouse = mute; }
     bool IsMutingMouse() { return m_muteMouse; }
     void ActivateViewportWidget( bool active );
@@ -88,8 +84,6 @@ private:
     PlaybackControler * Controler;
     drwToolbox * m_toolbox;
     drwLineToolViewportWidget * m_viewportWidget;
-    drwCursor * m_cursor;
-    bool m_showCursor;
     bool m_muteMouse;
     bool m_tabletHasControl;  // make sur not to generate both mouse and tablet events
 }; 

@@ -9,6 +9,7 @@
 class Node;
 class LinePrimitive;
 class drwToolbox;
+class Circle;
 
 enum PrimitiveType { TypeLine = 0, TypeWideLine, EndType };
 enum drwFrameChangeMode{ Manual, AfterIntervention, Play };
@@ -39,6 +40,8 @@ public:
 	virtual void ExecuteCommand( drwCommand::s_ptr command );
     virtual void NotifyFrameChanged( int frame );
 	virtual void Reset();
+
+    virtual void NotifyRendererChanged();
 
 	// Get/Set brush properties - will all generate a line tool attribute command
 	bool GetPressureWidth() { return m_pressureWidth; }
@@ -108,6 +111,9 @@ protected:
 	
     typedef std::map< int, int > CurrentNodesCont;  // ( frame, nodeId )
 	CurrentNodesCont CurrentNodes;
+
+    // Cursor for this tool
+    Circle * m_cursor;
 };
 
 #endif

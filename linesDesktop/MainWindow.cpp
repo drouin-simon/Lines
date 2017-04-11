@@ -16,7 +16,6 @@
 #include "drwNetworkManager.h"
 #include "drwBitmapExporter.h"
 #include "drwLineToolViewportWidget.h"
-#include "drwCursor.h"
 #include "drwGlobalLineParams.h"
 #include "Vec4.h"
 #include <QtWidgets>
@@ -120,8 +119,6 @@ MainWindow::MainWindow()
     Q_ASSERT(lineTool);
     m_viewportWidget = new drwLineToolViewportWidget( m_glWidget, lineTool );
     m_glWidget->SetViewportWidget( m_viewportWidget );
-    m_cursor = new drwCursor( lineTool, m_glWidget );
-    m_glWidget->SetCursor( m_cursor );
 	
 	// Create playback control widget
     m_playbackControlerWidget = new PlaybackControlerWidget( m_glWidget->GetControler(), m_mainWidget );
@@ -170,7 +167,6 @@ MainWindow::MainWindow()
 MainWindow::~MainWindow()
 {
     delete m_viewportWidget;
-    delete m_cursor;
     delete m_linesApp;
 }
 

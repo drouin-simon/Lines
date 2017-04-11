@@ -26,7 +26,6 @@ class PlaybackControler;
 class drwCommandDispatcher;
 class drwNetworkManager;
 class drwLineToolViewportWidget;
-class drwCursor;
 class drwGlobalLineParams;
 class drwSimplifiedToolbar;
 class LinesApp;
@@ -132,7 +131,6 @@ private:
     drwCommandDispatcher	* m_commandDispatcher;
 	drwNetworkManager		* m_networkManager;
     drwLineToolViewportWidget * m_viewportWidget;
-    drwCursor              * m_cursor;
 
 	QProgressDialog * m_progressDialog;
 

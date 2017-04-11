@@ -5,6 +5,7 @@
 #include "wideline.h"
 #include "Scene.h"
 #include "Node.h"
+#include "lcCircle.h"
 #include <QTabletEvent>
 #include <QSettings>
 #include <algorithm>
@@ -30,6 +31,12 @@ drwLineTool::drwLineTool( Scene * scene, drwToolbox * toolbox )
 , m_minWidth( 2.0 )
 , m_maxWidth( 100.0 )
 {	
+    m_cursor = new Circle;
+    m_cursor->SetContour( true );
+    m_cursor->SetFill( false );
+    m_cursor->SetRadius( m_baseWidth );
+    m_cursor->SetColor( 0.5, 1.0, 0.0 );  // light green
+
 	// Make sure the Reset function is the only one driving initial param values
 	Reset();
 }
@@ -41,7 +48,8 @@ void drwLineTool::ReadSettings( QSettings & s )
     Color[2] = s.value( "Color.B", Color[2] ).toDouble();
     Color[3] = s.value( "Color.A", Color[3] ).toDouble();
     
-    m_baseWidth = s.value( "BaseWidth", QVariant(m_baseWidth) ).toDouble();
+    double baseWidth = s.value( "BaseWidth", QVariant(m_baseWidth) ).toDouble();
+    SetBaseWidth( baseWidth );
     m_pressureWidth = s.value( "PressureWidth", QVariant(m_pressureWidth) ).toBool();
     m_pressureOpacity = s.value( "PressureOpacity", QVariant(m_pressureOpacity) ).toBool();
     m_fill = s.value( "Fill", QVariant(m_fill) ).toBool();
@@ -110,7 +118,7 @@ void drwLineTool::ExecuteLineToolParamCommand( drwCommand::s_ptr command )
 	drwLineToolParamsCommand * paramCom = dynamic_cast<drwLineToolParamsCommand*>(command.get());
 	Q_ASSERT( paramCom );
 	Color = paramCom->GetColor();
-	m_baseWidth = paramCom->GetBaseWidth();
+    SetBaseWidth( paramCom->GetBaseWidth() );
 	m_pressureWidth = paramCom->GetPressureWidth();
 	m_pressureOpacity = paramCom->GetPressureOpacity();
 	m_fill = paramCom->GetFill();
@@ -126,6 +134,8 @@ void drwLineTool::ExecuteMouseCommand( drwCommand::s_ptr command )
     double xWorld = mouseCom->X();
     double yWorld = mouseCom->Y();
     double pressure = mouseCom->Pressure();
+
+    m_cursor->SetCenter( xWorld, yWorld );
 
 	if( mouseCom->GetType() == drwMouseCommand::Press )
 	{
@@ -343,7 +353,7 @@ void drwLineTool::Reset()
     m_isDrawing = false;
 	Color = Vec4(1.0,1.0,1.0,1.0);
 	Type = TypeWideLine;
-	m_baseWidth = 10.0;
+    SetBaseWidth( 10.0 );
 	m_pressureWidth = true;
 	m_pressureOpacity = true;
 	m_fill = false;
@@ -352,6 +362,13 @@ void drwLineTool::Reset()
     m_persistence = 0;
     CurrentNodes.clear();
     ParametersChanged();
+}
+
+void drwLineTool::NotifyRendererChanged()
+{
+    drwGLRenderer * ren = m_toolbox->GetRenderer();
+    if( ren )
+        m_toolbox->GetRenderer()->SetCursor( m_cursor );
 }
 
 void drwLineTool::SetPressureWidth( bool w )
@@ -414,6 +431,7 @@ void drwLineTool::SetBaseWidth( double newBaseWidth )
     if( m_baseWidth > m_maxWidth )
         m_baseWidth = m_maxWidth;
     ParametersChanged();
+    m_cursor->SetRadius( m_baseWidth );
 }
 
 void drwLineTool::ParametersChanged()

@@ -6,6 +6,7 @@
 #include "drwDrawableTexture.h"
 #include "drwDrawingContext.h"
 #include "drwGlslShader.h"
+#include "Primitive.h"
 #include "drwDrawingSurface.h"
 #include "Box2i.h"
 #include <algorithm>
@@ -23,6 +24,7 @@ drwGLRenderer::drwGLRenderer()
     m_drawingSurface = 0;
     m_camera = new drwCamera;
     m_scene = 0;
+    m_cursor = 0;
     m_renderTexture = new drwDrawableTexture;
     m_layerTexture = new drwDrawableTexture;
     m_workTexture = new drwDrawableTexture;
@@ -69,6 +71,9 @@ void drwGLRenderer::Render()
     if( !m_sceneModified && !m_overlayModified )
         return;
 
+    // Debug: print cam
+    m_camera->Print();
+
     // Render scene to texture
     if( m_sceneModified )
     {
@@ -92,6 +97,13 @@ void drwGLRenderer::Render()
     RenderTextureToScreen( x, y, w, h );
     m_overlayModified = false;
     m_overlayModifiedRect.Reset();
+
+    // Render cursor
+    if( m_cursor )
+    {
+        drwDrawingContext context( this, m_overlayModifiedRect );
+        m_cursor->Draw( context );
+    }
 }
 
 void drwGLRenderer::RenderToTexture( int currentFrame, int onionSkinBefore, int onionSkinAfter, Box2i & rect )

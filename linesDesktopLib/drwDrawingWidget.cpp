@@ -8,7 +8,6 @@
 #include "drwDrawingContext.h"
 #include "drwDrawableTexture.h"
 #include "drwLineToolViewportWidget.h"
-#include "drwCursor.h"
 #include "drwGLRenderer.h"
 #include "drwToolbox.h"
 
@@ -16,8 +15,6 @@ drwDrawingWidget::drwDrawingWidget( QWidget * parent )
 : QOpenGLWidget( parent )
 , m_toolbox(0)
 , m_viewportWidget(0)
-, m_cursor(0)
-, m_showCursor(false)
 , m_muteMouse(false)
 , m_tabletHasControl(false)
 {
@@ -81,16 +78,6 @@ void drwDrawingWidget::SetViewportWidget( drwLineToolViewportWidget * w )
     m_viewportWidget = w;
 }
 
-void drwDrawingWidget::SetCursor( drwCursor * cursor )
-{
-    m_cursor = cursor;
-}
-
-void drwDrawingWidget::SetCursorColor( QString colorName )
-{
-    m_cursor->SetColor( colorName );
-}
-
 void drwDrawingWidget::CurrentFrameChanged()
 {
     NeedRedraw();
@@ -134,31 +121,18 @@ void drwDrawingWidget::paintEvent( QPaintEvent * event )
 
     m_renderer->Render();
 
-    QPainter painter;
-    painter.begin( this );
-    painter.setRenderHint(QPainter::Antialiasing);
-    painter.setRenderHint(QPainter::TextAntialiasing);
-
     // Draw the viewport widget if needed
     if( m_viewportWidget )
     {
+        QPainter painter;
+        painter.begin( this );
+        painter.setRenderHint(QPainter::Antialiasing);
+        painter.setRenderHint(QPainter::TextAntialiasing);
         m_viewportWidget->Draw( painter );
+        painter.end();
     }
-
-    // draw the cursor if needed
-    if( m_cursor && m_showCursor )
-    {
-        m_cursor->Draw( painter );
-    }
-
-    painter.end();
 
     emit FinishedPainting();
-}
-
-void drwDrawingWidget::UpdatePosition( int x, int y )
-{
-    m_cursor->SetPosition( x, y );
 }
 
 #ifdef Q_WS_MAC
@@ -178,9 +152,6 @@ void drwDrawingWidget::EnableVSync( bool enable )
 
 void drwDrawingWidget::mousePressEvent( QMouseEvent * e )
 {
-    // update the cursor position and all that stuff
-    UpdatePosition( e->x(), e->y() );
-
 	// Try the widget
 	bool widgetSwallows = m_viewportWidget->MousePress( e->x(), e->y() );
 	if( widgetSwallows )
@@ -197,9 +168,6 @@ void drwDrawingWidget::mousePressEvent( QMouseEvent * e )
 
 void drwDrawingWidget::mouseReleaseEvent( QMouseEvent * e )
 {
-    // update the cursor position and all that stuff
-    UpdatePosition( e->x(), e->y() );
-
 	// Try the widget
 	bool widgetSwallows = m_viewportWidget->MouseRelease( e->x(), e->y() );
 	if( widgetSwallows )
@@ -215,9 +183,6 @@ void drwDrawingWidget::mouseReleaseEvent( QMouseEvent * e )
 
 void drwDrawingWidget::mouseMoveEvent( QMouseEvent * e )
 {   
-    // update the cursor position and all that stuff
-    UpdatePosition( e->x(), e->y() );
-
 	// Try the widget
 	bool widgetSwallows = m_viewportWidget->MouseMove( e->x(), e->y() );
 	if( widgetSwallows )
@@ -232,9 +197,6 @@ void drwDrawingWidget::mouseMoveEvent( QMouseEvent * e )
 
 void drwDrawingWidget::tabletEvent ( QTabletEvent * e )
 {
-    // update the cursor position and all that stuff
-    UpdatePosition( e->x(), e->y() );
-
     // Try the widget
     bool widgetSwallows = false;
     if( e->type() == QEvent::TabletPress )
@@ -295,12 +257,10 @@ double drwDrawingWidget::PixelsPerUnit()
 
 void drwDrawingWidget::enterEvent( QEvent * e )
 {
-    m_showCursor = true;
 }
 
 void drwDrawingWidget::leaveEvent( QEvent * e )
 {
-    m_showCursor = false;
     if( m_viewportWidget )
         m_viewportWidget->Deactivate();
     NeedRedraw();

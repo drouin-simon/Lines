@@ -25,6 +25,8 @@ public:
     void SetupForWindow();
     void SetupForFrame();
     void SetupToRenderTextureToScreen();
+
+    void Print();
 	    
 private:
     

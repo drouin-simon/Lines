@@ -20,6 +20,8 @@ public:
 		InternDraw( context );
 	}
 
+    void SetColor( double r, double g, double b ) { SetColor( r, g, b, 1.0 ); }
+    void SetColor( double r, double g, double b, double a ) { SetColor( Vec4( r, g, b, a) ); }
 	void SetColor( const Vec4 & col ) { m_color = col; }
     void SetRenderState( RenderState state ) { m_renderState = state; }
 	

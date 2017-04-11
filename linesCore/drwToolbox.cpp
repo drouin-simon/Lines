@@ -20,6 +20,13 @@ drwToolbox::~drwToolbox()
 		delete Tools[i];
 }
 
+void drwToolbox::SetRenderer( drwGLRenderer * r )
+{
+    m_renderer = r;
+    for( unsigned i = 0; i < Tools.size(); ++i )
+        Tools[i]->NotifyRendererChanged();
+}
+
 void drwToolbox::AddTool( drwTool * tool )
 {
 	connect( tool, SIGNAL(CommandExecuted(drwCommand::s_ptr)), SLOT(NotifyCommandExecuted(drwCommand::s_ptr)) );
