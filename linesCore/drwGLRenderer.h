@@ -23,6 +23,7 @@ public:
 
     void SetDrawingSurface( drwDrawingSurface * s ) { m_drawingSurface = s; }
     void SetCursor( Primitive * p ) { m_cursor = p; }
+    void SetShowCursor( bool show ) { m_showCursor = show; }
 
     // Onion Skins
     int GetOnionSkinBefore() { return m_onionSkinFramesBefore; }
@@ -86,6 +87,7 @@ protected:
     drwCamera           * m_camera;
     Scene				* m_scene;
     Primitive           * m_cursor;
+    bool                  m_showCursor;
     drwDrawableTexture  * m_renderTexture;
     drwDrawableTexture  * m_layerTexture;
     drwDrawableTexture  * m_workTexture;

@@ -99,7 +99,7 @@ void drwGLRenderer::Render()
     m_overlayModifiedRect.Reset();
 
     // Render cursor
-    if( m_cursor )
+    if( m_cursor && m_showCursor )
     {
         drwDrawingContext context( this, m_overlayModifiedRect );
         m_cursor->Draw( context );

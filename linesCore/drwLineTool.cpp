@@ -371,6 +371,21 @@ void drwLineTool::NotifyRendererChanged()
         m_toolbox->GetRenderer()->SetCursor( m_cursor );
 }
 
+void drwLineTool::SetShowCursor( bool show )
+{
+    drwGLRenderer * ren = m_toolbox->GetRenderer();
+    if( ren )
+    {
+        m_toolbox->GetRenderer()->SetShowCursor( show );
+        double xBoxMin = m_lastXWorld - m_baseWidth;
+        double xBoxMax = m_lastXWorld + m_baseWidth;
+        double yBoxMin = m_lastYWorld - m_baseWidth;
+        double yBoxMax = m_lastYWorld + m_baseWidth;
+        Box2d modifiedRect( xBoxMin, xBoxMax, yBoxMin, yBoxMax );
+        ren->MarkOverlayModified( modifiedRect );
+    }
+}
+
 void drwLineTool::SetPressureWidth( bool w )
 {
 	m_pressureWidth = w;

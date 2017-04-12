@@ -153,3 +153,8 @@ void drwToolbox::ExecuteCommand( drwCommand::s_ptr command )
         Tools[m_currentTool]->ExecuteCommand( command );
 }
 
+void drwToolbox::SetShowCursor( bool show )
+{
+    for( unsigned i = 0; i < Tools.size(); ++i )
+        Tools[i]->SetShowCursor( show );
+}

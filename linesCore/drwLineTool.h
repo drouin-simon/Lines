@@ -42,6 +42,7 @@ public:
 	virtual void Reset();
 
     virtual void NotifyRendererChanged();
+    virtual void SetShowCursor( bool show );
 
 	// Get/Set brush properties - will all generate a line tool attribute command
 	bool GetPressureWidth() { return m_pressureWidth; }

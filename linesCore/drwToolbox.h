@@ -46,6 +46,7 @@ public:
 	void blockSignals( bool block );
 	
 	void ExecuteCommand( drwCommand::s_ptr );
+    void SetShowCursor( bool show );
 	
 private slots:
 	

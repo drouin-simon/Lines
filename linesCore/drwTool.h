@@ -29,6 +29,7 @@ public:
     virtual void Reset() {}
 
     virtual void NotifyRendererChanged() {}
+    virtual void SetShowCursor( bool show ) {}
 	
 	virtual void ExecuteCommand( drwCommand::s_ptr command ) {}
 	

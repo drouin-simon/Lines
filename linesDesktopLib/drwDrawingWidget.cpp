@@ -257,12 +257,14 @@ double drwDrawingWidget::PixelsPerUnit()
 
 void drwDrawingWidget::enterEvent( QEvent * e )
 {
+    m_toolbox->SetShowCursor( true );
 }
 
 void drwDrawingWidget::leaveEvent( QEvent * e )
 {
     if( m_viewportWidget )
         m_viewportWidget->Deactivate();
+    m_toolbox->SetShowCursor( false );
     NeedRedraw();
 }
 
