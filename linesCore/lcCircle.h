@@ -15,7 +15,7 @@ public:
 
     void SetCenter( Vec2 center );
     void SetCenter( double x, double y );
-    SetMacro( Radius, double );
+    void SetRadius( double r );
     SetMacro( Angle1, double );
     SetMacro( Angle2, double );
     SetMacro( NumberOfSubdiv, int );
@@ -30,6 +30,7 @@ protected:
 	void GeneratePolygonData();
 	void GenerateContour();
     void GeneratePoints( drwVec2Array & points );
+    void MarkModified();
 
     Vec2   Center;
     double Radius;

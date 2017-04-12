@@ -23,9 +23,15 @@ void Circle::SetCenter( Vec2 center )
 
 void Circle::SetCenter( double x, double y )
 {
-    m_poly.Clear();
     Center[0] = x;
     Center[1] = y;
+    MarkModified();
+}
+
+void Circle::SetRadius( double r )
+{
+    Radius = r;
+    MarkModified();
 }
 
 void Circle::InternDraw( drwDrawingContext & context )
@@ -120,4 +126,9 @@ void Circle::GeneratePoints( drwVec2Array & points )
         newVertex += Center;
         points.push_back( newVertex );
     }
+}
+
+void Circle::MarkModified()
+{
+    m_poly.Clear();
 }

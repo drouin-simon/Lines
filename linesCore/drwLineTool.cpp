@@ -425,6 +425,7 @@ void drwLineTool::SetPersistenceEnabled( bool enable )
 
 void drwLineTool::SetBaseWidth( double newBaseWidth )
 {
+    double maxWidth = std::max( m_baseWidth, newBaseWidth );
     m_baseWidth = newBaseWidth;
     if( m_baseWidth < m_minWidth )
         m_baseWidth = m_minWidth;
@@ -432,6 +433,17 @@ void drwLineTool::SetBaseWidth( double newBaseWidth )
         m_baseWidth = m_maxWidth;
     ParametersChanged();
     m_cursor->SetRadius( m_baseWidth );
+
+    // Mark overlay modified
+    drwGLRenderer * ren = m_toolbox->GetRenderer();
+    if( !ren )
+        return;
+    double xBoxMin = m_lastXWorld - maxWidth;
+    double xBoxMax = m_lastXWorld + maxWidth;
+    double yBoxMin = m_lastYWorld - maxWidth;
+    double yBoxMax = m_lastYWorld + maxWidth;
+    Box2d modifiedRect( xBoxMin, xBoxMax, yBoxMin, yBoxMax );
+    ren->MarkOverlayModified( modifiedRect );
 }
 
 void drwLineTool::ParametersChanged()
