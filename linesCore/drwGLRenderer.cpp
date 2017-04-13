@@ -115,7 +115,6 @@ void drwGLRenderer::RenderToTexture( int currentFrame, int onionSkinBefore, int 
 
     // State setup
     glDisable( GL_DEPTH_TEST );
-    glEnable( GL_LINE_SMOOTH );
     glEnableClientState( GL_VERTEX_ARRAY );
     glEnable( GL_TEXTURE_RECTANGLE_ARB );
     glEnable( GL_BLEND );
