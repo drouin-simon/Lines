@@ -101,8 +101,11 @@ void drwGLRenderer::Render()
     // Render cursor
     if( m_cursor && m_showCursor )
     {
+        glEnable( GL_SCISSOR_TEST );
+        glScissor( x, y, w, h );
         drwDrawingContext context( this, m_overlayModifiedRect );
         m_cursor->Draw( context );
+        glDisable( GL_SCISSOR_TEST );
     }
 }
 
@@ -384,6 +387,11 @@ void drwGLRenderer::WorldToGLWindow( const Box2d & worldRect, Box2i & winRect )
 double drwGLRenderer::PixelsPerUnit()
 {
     return m_camera->PixelsPerUnit();
+}
+
+double drwGLRenderer::UnitsPerPixel()
+{
+    return m_camera->UnitsPerPixel();
 }
 
 void drwGLRenderer::SetClearColor( double r, double g, double b, double a )

@@ -60,6 +60,7 @@ public:
     void WorldToGLFrame( double xworld, double yworld, int & xwin, int & ywin );
     void WorldToGLFrame( const Box2d & worldRect, Box2i & winRect );
     double PixelsPerUnit();
+    double UnitsPerPixel();
     void SetClearColor( double r, double g, double b, double a );
 
     void NeedRedraw();

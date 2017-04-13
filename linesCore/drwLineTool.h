@@ -81,6 +81,7 @@ protected:
     void MarkOverlaySegmentModified( double x1, double y1, double x2, double y2 );
     void MarkPointModified( double x, double y );
     void MarkWholePrimitiveModified();
+    void UpdateCursorColor();
 	
     double m_lastXWorld;
     double m_lastYWorld;
