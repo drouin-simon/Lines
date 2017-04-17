@@ -9,7 +9,7 @@
 #include "drwCommand.h"
 #include "drwRemoteCommandIO.h"
 
-class drwCommandDispatcher;
+class LinesCore;
 class drwNetworkClient;
 class drwNetworkServer;
 class QWidget;
@@ -31,7 +31,7 @@ public:
 	drwNetworkManager();
 	~drwNetworkManager();
 
-	void SetDispatcher( drwCommandDispatcher * disp ) { m_dispatcher = disp; }
+    void SetLinesCore( LinesCore * lc ) { m_lines = lc; }
 	NetworkState GetState() { return m_state; }
     QString GetErrorMessage();
     void ResetState();
@@ -72,7 +72,7 @@ protected:
 	// Function called when thread starts. It is started when the class is instanciated
 	void run();
 
-	drwCommandDispatcher * m_dispatcher;
+    LinesCore * m_lines;
 	
 	// Queued commands to send and mutex to protect it since it is accessed by main and net threads
 	QMutex m_queueMutex;

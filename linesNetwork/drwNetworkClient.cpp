@@ -1,12 +1,12 @@
 #include <QtNetwork>
 #include "drwNetworkClient.h"
-#include "drwCommandDispatcher.h"
+#include "LinesCore.h"
 #include "drwNetworkConnection.h"
 
 
-drwNetworkClient::drwNetworkClient( QString & peerUserName, QHostAddress & peerAddress, drwCommandDispatcher * dispatcher )
+drwNetworkClient::drwNetworkClient( QString & peerUserName, QHostAddress & peerAddress, LinesCore * lc )
 	: m_connection(0)
-	, m_dispatcher( dispatcher )
+    , m_lines( lc )
 	, m_peerUserName( peerUserName )
 	, m_peerAddress( peerAddress )
 	, m_numberOfCommandsToRead(0)
@@ -89,12 +89,12 @@ void drwNetworkClient::CommandReceivedSlot( drwCommand::s_ptr command )
                 SetState( ReceivingScene );
             else
                 SetState( Operating );
-            m_dispatcher->IncomingNetCommand( command );
+            m_lines->IncomingNetCommand( command );
 		}
 	}
 	else
 	{
-		m_dispatcher->IncomingNetCommand( command );
+        m_lines->IncomingNetCommand( command );
 		if( m_state == ReceivingScene )
 		{
             if( m_numberOfCommandsToRead == 1 )

@@ -4,7 +4,7 @@
 #include "drwCommand.h"
 
 drwNetworkManager::drwNetworkManager()
-	: m_dispatcher(0)
+    : m_lines(0)
 	, m_inThread(0)
 	, m_state( Idle )
 {
@@ -214,7 +214,7 @@ void drwInThreadAgent::MessageToThreadSlot()
 	{
 		if( !m_server )
 		{
-			m_server = new drwNetworkServer( m_manager->m_dispatcher );
+            m_server = new drwNetworkServer( m_manager->m_lines );
 			m_server->Start();
 		}
 	}
@@ -227,7 +227,7 @@ void drwInThreadAgent::MessageToThreadSlot()
 		if( !m_client )
 		{
 			m_attributesMutex.lock();
-			m_client = new drwNetworkClient( m_userName, m_remoteIp, m_manager->m_dispatcher );
+            m_client = new drwNetworkClient( m_userName, m_remoteIp, m_manager->m_lines );
 			m_attributesMutex.unlock();
 			connect( m_client, SIGNAL(StateChanged()), this, SLOT(ClientStateChanged()) );
 			m_client->Connect();

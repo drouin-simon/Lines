@@ -4,7 +4,7 @@
 #include <QWidget>
 #include <QIcon>
 
-class PlaybackControler;
+class LinesCore;
 class QHBoxLayout;
 class QLineEdit;
 class QSlider;
@@ -20,7 +20,7 @@ class PlaybackControlerWidget : public QWidget
 	
 public:
 	
-	PlaybackControlerWidget( PlaybackControler * controler, QWidget * parent = 0 );
+    PlaybackControlerWidget( LinesCore * lc, QWidget * parent = 0 );
 	~PlaybackControlerWidget();
 
     void SetHideFrameRate( bool hide );
@@ -42,7 +42,7 @@ private:
 	void SetupUi();
     void UpdateUi();
 	
-	PlaybackControler * m_controler;
+    LinesCore * m_lines;
 	int m_frameRateIndex;
 	static const int NumberOfFrameRates;
 	static const int AvailableFrameRates[8];	

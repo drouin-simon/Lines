@@ -11,7 +11,7 @@ class QTcpServer;
 class QTimer;
 QT_END_NAMESPACE
 class drwNetworkConnection;
-class drwCommandDispatcher;
+class LinesCore;
 
 class drwNetworkServer : public QObject
 {
@@ -20,7 +20,7 @@ class drwNetworkServer : public QObject
 	
 public:
 	
-	drwNetworkServer( drwCommandDispatcher * dispatcher, QObject * parent = 0 );
+    drwNetworkServer( LinesCore * lc, QObject * parent = 0 );
 	~drwNetworkServer();
 	
 	void Start();
@@ -53,7 +53,7 @@ private:
 	ConnectionsContainer m_connections;
 
 	int m_translatedLocalUserId;
-	drwCommandDispatcher * m_dispatcher;
+    LinesCore * m_lines;
 	
 };
 

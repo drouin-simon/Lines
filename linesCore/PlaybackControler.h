@@ -18,6 +18,7 @@ public:
 	
     void SetToolbox( drwToolbox * t );
 
+    void SetPlaying( bool play );
     void StartPlaying();
     void StopPlaying();
     void PlayPause();

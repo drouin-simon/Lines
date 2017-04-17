@@ -5,7 +5,7 @@
 #include <QHostAddress>
 #include "drwCommand.h"
 
-class drwCommandDispatcher;
+class LinesCore;
 class drwNetworkConnection;
 
 class drwNetworkClient : public QObject
@@ -17,7 +17,7 @@ public:
 
 	enum ClientState{ Init, WaitingForServer, WaitingForNbCommands, ReceivingScene, Operating, ConnectionLost, ConnectionTimedOut };
 	
-	drwNetworkClient( QString & userName, QHostAddress & address, drwCommandDispatcher * dispatcher );
+    drwNetworkClient( QString & userName, QHostAddress & address, LinesCore * lc );
 	~drwNetworkClient();
 
 	int GetPercentRead();
@@ -49,7 +49,7 @@ protected:
 	void timerEvent( QTimerEvent * e );
 	
 	drwNetworkConnection * m_connection;
-	drwCommandDispatcher * m_dispatcher;
+    LinesCore * m_lines;
 	
 	QString m_userName;
 	QString m_peerUserName;

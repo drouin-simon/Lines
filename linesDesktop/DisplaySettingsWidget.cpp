@@ -1,6 +1,5 @@
 #include "DisplaySettingsWidget.h"
-#include "drwDrawingWidget.h"
-#include "drwGLRenderer.h"
+#include "LinesCore.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -9,12 +8,12 @@
 #include <QGroupBox>
 
 
-DisplaySettingsWidget::DisplaySettingsWidget( drwDrawingWidget * widget, QWidget * parent )
+DisplaySettingsWidget::DisplaySettingsWidget( LinesCore * lc, QWidget * parent )
 : QWidget( parent )
-, m_drawingWidget( widget )
+, m_lines( lc )
 {
 	SetupUi();
-    connect( m_drawingWidget, SIGNAL(DisplaySettingsModified()), this, SLOT(UpdateUI()) );
+    connect( m_lines, SIGNAL(DisplaySettingsModified()), this, SLOT(UpdateUI()) );
     UpdateUI();
 }
 
@@ -24,19 +23,19 @@ DisplaySettingsWidget::~DisplaySettingsWidget()
 
 void DisplaySettingsWidget::OnFramesBeforeValueChanged( int value )
 {
-    m_drawingWidget->GetRenderer()->SetOnionSkinBefore( value );
+    m_lines->SetOnionSkinBefore( value );
 }
 
 void DisplaySettingsWidget::OnFramesAfterValueChanged( int value )
 {
-    m_drawingWidget->GetRenderer()->SetOnionSkinAfter( value );
+    m_lines->SetOnionSkinAfter( value );
 }
 
 void DisplaySettingsWidget::UpdateUI()
 {
     BlockSigs( true );
-    framesBeforeSpinBox->setValue( m_drawingWidget->GetRenderer()->GetOnionSkinBefore() );
-    framesAfterSpinBox->setValue( m_drawingWidget->GetRenderer()->GetOnionSkinAfter() );
+    framesBeforeSpinBox->setValue( m_lines->GetOnionSkinBefore() );
+    framesAfterSpinBox->setValue( m_lines->GetOnionSkinAfter() );
     BlockSigs( false );
 }
 

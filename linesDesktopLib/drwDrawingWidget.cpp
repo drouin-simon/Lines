@@ -2,28 +2,16 @@
 #include <iostream>
 #include <QtGui>
 #include <QtOpenGL>
-#include "Vec4.h"
-#include "Scene.h"
-#include "PlaybackControler.h"
-#include "drwDrawingContext.h"
-#include "drwDrawableTexture.h"
 #include "drwLineToolViewportWidget.h"
-#include "drwGLRenderer.h"
-#include "drwToolbox.h"
+#include "LinesCore.h"
 
 drwDrawingWidget::drwDrawingWidget( QWidget * parent )
 : QOpenGLWidget( parent )
-, m_toolbox(0)
 , m_viewportWidget(0)
 , m_muteMouse(false)
 , m_tabletHasControl(false)
 {
     m_timerId = -1;
-    this->Controler = 0;
-
-    m_renderer = new drwGLRenderer;
-    m_renderer->SetDrawingSurface( this );
-
     //PrintGLInfo();
 
     setAcceptDrops(true);
@@ -43,65 +31,30 @@ void drwDrawingWidget::NeedRedraw()
     update();
 }
 
-void drwDrawingWidget::NotifyDisplaySettingsModified()
+void drwDrawingWidget::NotifyPlaybackStartStop( bool isStarting )
 {
-    emit DisplaySettingsModified();
-}
-
-void drwDrawingWidget::SimulateTabletEvent( drwMouseCommand::MouseCommandType type, double xWorld, double yWorld, double pressure )
-{
-    int xWin, yWin;
-    m_renderer->WorldToGLWindow( xWorld, yWorld, xWin, yWin );
-    drwCommand::s_ptr command( new drwMouseCommand( type, xWorld, yWorld, 0.0, xWin, yWin, 0, 0, pressure, 0, 0 ) );
-    m_toolbox->ExecuteCommand( command );
-}
-
-void drwDrawingWidget::SetBackgroundColor( Vec4 & color )
-{
-    m_renderer->SetClearColor( color[0], color[1], color[2], color[3] );
-}
-
-void drwDrawingWidget::SetCurrentScene( Scene * scene )
-{
-    m_renderer->SetCurrentScene( scene );
-}
-
-void drwDrawingWidget::SetControler( PlaybackControler * controler )
-{
-    Controler = controler;
-    connect(Controler, SIGNAL(FrameChanged()), SLOT(CurrentFrameChanged()) );
-    connect(Controler, SIGNAL(StartStop(bool)), SLOT(PlaybackStartStop(bool)) );
+    // Start/stop generating idle events that are used to make sure we redraw during playback
+    if( isStarting )
+    {
+        // start timer
+        if( m_timerId == -1 )
+            m_timerId = startTimer(0);
+        EnableVSync( true );
+    }
+    else
+    {
+        if( m_timerId != -1 )
+        {
+            killTimer( m_timerId );
+            m_timerId = -1;
+        }
+        EnableVSync( false );
+    }
 }
 
 void drwDrawingWidget::SetViewportWidget( drwLineToolViewportWidget * w )
 {
     m_viewportWidget = w;
-}
-
-void drwDrawingWidget::CurrentFrameChanged()
-{
-    NeedRedraw();
-}
-
-void drwDrawingWidget::PlaybackStartStop( bool isStarting )
-{
-	// Start/stop generating idle events that are used to make sure we redraw during playback
-	if( isStarting )
-	{
-        // start timer
-		if( m_timerId == -1 )
-			m_timerId = startTimer(0);
-        EnableVSync( true );
-	}
-	else
-	{
-		if( m_timerId != -1 )
-		{
-			killTimer( m_timerId );
-			m_timerId = -1;
-		}
-        EnableVSync( false );
-	}
 }
 
 void drwDrawingWidget::initializeGL()
@@ -111,7 +64,7 @@ void drwDrawingWidget::initializeGL()
 void drwDrawingWidget::resizeGL( int w, int h )
 {
     int ratio = this->devicePixelRatio();
-    m_renderer->SetRenderSize( ratio*w, ratio*h );
+    m_lines->SetRenderSize( ratio*w, ratio*h );
     NeedRedraw();
 }
 
@@ -119,7 +72,7 @@ void drwDrawingWidget::paintEvent( QPaintEvent * event )
 {
 	makeCurrent();
 
-    m_renderer->Render();
+    m_lines->Render();
 
     // Draw the viewport widget if needed
     if( m_viewportWidget )
@@ -158,13 +111,11 @@ void drwDrawingWidget::mousePressEvent( QMouseEvent * e )
 		return;
 	
 	// now send the event to observer ( drawing tools)
-    if( e->button() == Qt::LeftButton && m_toolbox && !m_tabletHasControl  && !m_muteMouse )
+    if( e->button() == Qt::LeftButton && !m_tabletHasControl  && !m_muteMouse )
 	{
-        drwCommand::s_ptr command = CreateMouseCommand( drwMouseCommand::Press, e );
-        m_toolbox->ExecuteCommand( command );
+        MouseCommand( drwMouseCommand::Press, e );
 	}
 }
-
 
 void drwDrawingWidget::mouseReleaseEvent( QMouseEvent * e )
 {
@@ -173,10 +124,9 @@ void drwDrawingWidget::mouseReleaseEvent( QMouseEvent * e )
 	if( widgetSwallows )
 		return;
 	
-    if ( e->button() == Qt::LeftButton && m_toolbox && !m_tabletHasControl  && !m_muteMouse )
+    if ( e->button() == Qt::LeftButton && !m_tabletHasControl  && !m_muteMouse )
     {
-        drwCommand::s_ptr command = CreateMouseCommand( drwMouseCommand::Release, e );
-        m_toolbox->ExecuteCommand( command );
+        MouseCommand( drwMouseCommand::Release, e );
     }
 }
 
@@ -188,10 +138,9 @@ void drwDrawingWidget::mouseMoveEvent( QMouseEvent * e )
 	if( widgetSwallows )
 		return;
 	
-    if ( m_toolbox && !m_tabletHasControl && !m_muteMouse )
+    if( !m_tabletHasControl && !m_muteMouse )
     {
-        drwCommand::s_ptr command = CreateMouseCommand( drwMouseCommand::Move, e );
-        m_toolbox->ExecuteCommand( command );
+        MouseCommand( drwMouseCommand::Move, e );
     }
 }
 
@@ -211,28 +160,22 @@ void drwDrawingWidget::tabletEvent ( QTabletEvent * e )
         return;
     }
 	
-    if( m_toolbox )
+    if( e->type() == QEvent::TabletPress )
     {
-        if( e->type() == QEvent::TabletPress )
-        {
-            m_tabletHasControl = true;
-            drwCommand::s_ptr command = CreateMouseCommand( drwMouseCommand::Press, e );
-            m_toolbox->ExecuteCommand( command );
-            e->accept();
-        }
-        else if( e->type() == QEvent::TabletRelease )
-        {
-            drwCommand::s_ptr command = CreateMouseCommand( drwMouseCommand::Release, e );
-            m_toolbox->ExecuteCommand( command );
-            e->accept();
-            m_tabletHasControl = false;
-        }
-        else if( e->type() == QEvent::TabletMove )
-        {
-            drwCommand::s_ptr command = CreateMouseCommand( drwMouseCommand::Move, e );
-            m_toolbox->ExecuteCommand( command );
-            e->accept();
-        }
+        m_tabletHasControl = true;
+        MouseCommand( drwMouseCommand::Press, e );
+        e->accept();
+    }
+    else if( e->type() == QEvent::TabletRelease )
+    {
+        MouseCommand( drwMouseCommand::Release, e );
+        e->accept();
+        m_tabletHasControl = false;
+    }
+    else if( e->type() == QEvent::TabletMove )
+    {
+        MouseCommand( drwMouseCommand::Move, e );
+        e->accept();
     }
 }
 
@@ -250,33 +193,23 @@ void drwDrawingWidget::ActivateViewportWidget( bool active )
     NeedRedraw();
 }
 
-double drwDrawingWidget::PixelsPerUnit()
-{
-    return m_renderer->PixelsPerUnit();
-}
-
 void drwDrawingWidget::enterEvent( QEvent * e )
 {
-    m_toolbox->SetShowCursor( true );
+    m_lines->SetShowCursor( true );
 }
 
 void drwDrawingWidget::leaveEvent( QEvent * e )
 {
     if( m_viewportWidget )
         m_viewportWidget->Deactivate();
-    m_toolbox->SetShowCursor( false );
+    m_lines->SetShowCursor( false );
     NeedRedraw();
 }
 
 bool drwDrawingWidget::event( QEvent * e )
 {
 	// Give a chance to the controler to change frame. A frame change triggers an updateGL
-	bool controlerUpdated = false;
-	if( Controler )
-	{
-		controlerUpdated = Controler->Tick();
-    }
-	
+    m_lines->Tick();
     return QOpenGLWidget::event(e);
 }
 
@@ -315,28 +248,20 @@ void drwDrawingWidget::PrintGLInfo()
         std::cout << "PartialUpdate" << std::endl;
 }
 
-drwCommand::s_ptr drwDrawingWidget::CreateMouseCommand( drwMouseCommand::MouseCommandType commandType, QMouseEvent * e )
+void drwDrawingWidget::MouseCommand( drwMouseCommand::MouseCommandType commandType, QMouseEvent * e )
 {
     int ratio = this->devicePixelRatio();
     double xWin = ratio * (double)e->x();
     double yWin = ratio * (double)e->y();
-    double xWorld = 0.0;
-    double yWorld = 0.0;
-    m_renderer->WindowToWorld( xWin, yWin, xWorld, yWorld );
-    drwCommand::s_ptr command( new drwMouseCommand( commandType, xWorld, yWorld, 0.0, xWin, yWin, 0, 0, 1.0, 0.0, 0.0 ) );
-    return command;
+    m_lines->MouseEvent( commandType, xWin, yWin );
 }
 
-drwCommand::s_ptr drwDrawingWidget::CreateMouseCommand( drwMouseCommand::MouseCommandType commandType, QTabletEvent * e )
+void drwDrawingWidget::MouseCommand( drwMouseCommand::MouseCommandType commandType, QTabletEvent * e )
 {
     int ratio = this->devicePixelRatio();
     double deltaX = e->hiResGlobalX() - e->globalX();
     double xWin = ratio * ((double)e->x() + deltaX);
     double deltaY = e->hiResGlobalY() - e->globalY();
     double yWin = ratio * ((double)e->y() + deltaY);
-    double xWorld = 0.0;
-    double yWorld = 0.0;
-    m_renderer->WindowToWorld( xWin, yWin, xWorld, yWorld );
-    drwCommand::s_ptr command( new drwMouseCommand( commandType, xWorld, yWorld, 0.0, xWin, yWin, e->xTilt(), e->yTilt(), e->pressure(), e->rotation(), e->tangentialPressure() ) );
-    return command;
+    m_lines->MouseEvent( commandType, xWin, yWin, e->pressure(), e->xTilt(), e->yTilt(), e->rotation(), e->tangentialPressure() );
 }

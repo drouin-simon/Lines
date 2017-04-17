@@ -1,12 +1,11 @@
 #include "drwGlobalLineParams.h"
 #include "drwAutoGui.h"
 #include "wideline.h"
-#include "drwDrawingWidget.h"
+#include "LinesCore.h"
 
 drwGlobalLineParams::drwGlobalLineParams(QObject *parent) :
     QObject(parent)
 {
-    m_drawingWidget = 0;
 }
 
 QWidget * drwGlobalLineParams::CreateGui()
@@ -66,7 +65,7 @@ double drwGlobalLineParams::GetSigmaSmall()
 
 void drwGlobalLineParams::MarkModified()
 {
-    Q_ASSERT( m_drawingWidget );
-    m_drawingWidget->NeedRedraw();
+    Q_ASSERT( m_lines );
+    m_lines->NotifyNeedRender();
     emit Modified();
 }

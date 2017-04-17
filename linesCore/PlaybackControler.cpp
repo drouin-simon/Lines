@@ -23,6 +23,16 @@ void PlaybackControler::SetToolbox( drwToolbox * t )
     m_toolbox = t;
 }
 
+void PlaybackControler::SetPlaying( bool play )
+{
+    if( IsPlaying() == play )
+        return;
+    if( play )
+        StartPlaying();
+    else
+        StopPlaying();
+}
+
 void PlaybackControler::StartPlaying()
 {
     if( GetCurrentFrame() == GetNumberOfFrames() - 1 )

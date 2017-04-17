@@ -2,20 +2,20 @@
 #include <QtNetwork>
 #include "drwNetworkConnection.h"
 #include "drwCommandDatabase.h"
-#include "drwCommandDispatcher.h"
+#include "LinesCore.h"
 
 const int BroadcastTimeout = 2000;
 
-drwNetworkServer::drwNetworkServer( drwCommandDispatcher * dispatcher, QObject * parent )
+drwNetworkServer::drwNetworkServer( LinesCore * lc, QObject * parent )
 : QObject(parent)
 , m_isOn(false)
 , m_broadcastTimer(0)
 , m_broadcastSocket(0)
 , m_tcpServer(0)
-, m_dispatcher( dispatcher )
+, m_lines( lc )
 {
 	m_userName = drwNetworkConnection::ComputeUserName();
-	m_translatedLocalUserId = m_dispatcher->RequestNewUserId();
+    m_translatedLocalUserId = m_lines->RequestNewUserId();
 	
 	m_broadcastSocket = new QUdpSocket(this);
 	
@@ -104,35 +104,34 @@ void drwNetworkServer::NewIncomingConnection()
 		connect( connection, SIGNAL(ConnectionReady(drwNetworkConnection*)), this, SLOT(ConnectionReadySlot(drwNetworkConnection*)));
 		connect( connection, SIGNAL(CommandReceived(drwCommand::s_ptr)), this, SLOT(CommandReceivedSlot(drwCommand::s_ptr)), Qt::DirectConnection );
 
-		int connectionId = m_dispatcher->RequestNewUserId();
+        int connectionId = m_lines->RequestNewUserId();
 		m_connections[ connection ] = connectionId;
 	}
 }
 
 void drwNetworkServer::ConnectionReadySlot( drwNetworkConnection * connection )
 {
-	// Send the initial command
-	drwCommandDatabase * db = m_dispatcher->GetDb();
-    drwCommand::s_ptr command( new drwServerInitialCommand( db->GetNumberOfCommands() ) );
+    // Send the initial command
+    drwCommand::s_ptr command( new drwServerInitialCommand( m_lines->GetNumberOfDbCommands() ) );
 	connection->SendCommand( command );
 
 	// Send all commands in the database.
-    db->LockDb( true );
-    int nbCommands = db->GetNumberOfCommands();
+    m_lines->LockDb( true );
+    int nbCommands = m_lines->GetNumberOfDbCommands();
     for( int i = 0; i < nbCommands; ++i )
     {
         // Get a copy of the next command
-        drwCommand::s_ptr com = db->GetCommand( i );
+        drwCommand::s_ptr com = m_lines->GetDbCommand( i );
 
         // Translate local user id if needed
         int commandId = com->GetUserId();
-        if( commandId == m_dispatcher->GetLocalUserId() )
+        if( commandId == m_lines->GetLocalUserId() )
             com->SetUserId( m_translatedLocalUserId );
 
         // Send
         connection->SendCommand( com );
     }
-    db->LockDb( false );
+    m_lines->LockDb( false );
 }
 
 void drwNetworkServer::ConnectionLost( drwNetworkConnection * connection )
@@ -166,7 +165,7 @@ void drwNetworkServer::CommandReceivedSlot( drwCommand::s_ptr com )
 	}
 	
 	// execute it here
-	m_dispatcher->IncomingNetCommand( com );
+    m_lines->IncomingNetCommand( com );
 }
 
 // Local command, must be sent to all connected clients
@@ -174,7 +173,7 @@ void drwNetworkServer::SendCommand( drwCommand::s_ptr command )
 {
 	// Translate local command Ids
 	int commandId = command->GetUserId();
-	if( commandId == m_dispatcher->GetLocalUserId() )
+    if( commandId == m_lines->GetLocalUserId() )
 		command->SetUserId( m_translatedLocalUserId );
 	
 	// Send the command to all connections

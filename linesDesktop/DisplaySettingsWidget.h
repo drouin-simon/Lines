@@ -3,12 +3,13 @@
 
 #include <QWidget>
 
+class LinesCore;
+
 class QVBoxLayout;
 class QHBoxLayout;
 class QLabel;
 class QCheckBox;
 class QSpinBox;
-class drwDrawingWidget;
 class QGroupBox;
 
 class DisplaySettingsWidget : public QWidget
@@ -18,7 +19,7 @@ class DisplaySettingsWidget : public QWidget
 	
 public:
 	
-    DisplaySettingsWidget( drwDrawingWidget * widget, QWidget * parent = 0 );
+    DisplaySettingsWidget( LinesCore * lc, QWidget * parent = 0 );
 	~DisplaySettingsWidget();
 	
 private slots:
@@ -32,7 +33,7 @@ private:
     void SetupUi();
     void BlockSigs( bool block );
 	
-    drwDrawingWidget * m_drawingWidget;
+    LinesCore * m_lines;
 	
 	// UI elements
 	QVBoxLayout * mainLayout;

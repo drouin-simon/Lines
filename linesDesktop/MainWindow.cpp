@@ -1,26 +1,19 @@
 #include "MainWindow.h"
 #include "drwDrawingWidget.h"
 #include "drwAspectRatioWidget.h"
-#include "Scene.h"
-#include "drwLineTool.h"
-#include "PlaybackControler.h"
-#include "drwToolbox.h"
-#include "drwCommandDatabase.h"
 #include "PlaybackControlerWidget.h"
 #include "PrimitiveToolOptionWidget.h"
 #include "TabletStateWidget.h"
 #include "DisplaySettingsWidget.h"
 #include "ExportDialog.h"
 #include "drwNetworkConnectDialog.h"
-#include "drwCommandDispatcher.h"
 #include "drwNetworkManager.h"
 #include "drwBitmapExporter.h"
-#include "drwLineToolViewportWidget.h"
 #include "drwGlobalLineParams.h"
-#include "Vec4.h"
 #include <QtWidgets>
 #include "drwsimplifiedtoolbar.h"
 #include "LinesApp.h"
+#include "LinesCore.h"
 
 const QString MainWindow::m_appName( "Lines" );
 
@@ -35,21 +28,19 @@ MainWindow::MainWindow()
 
 	CreateActions();
 
-	// Create a Scene and a tool
-	m_scene = new Scene(this);
-    m_controler = new PlaybackControler( m_scene );
-    m_localToolbox = new drwToolbox( m_scene, m_controler );
-    m_controler->SetToolbox( m_localToolbox );
-	m_commandDb = new drwCommandDatabase(this);
+    // Create main interface with linesCore
+    m_lines = new LinesCore;
+
+    // Create the network manager and connect it to the core
 	m_networkManager = new drwNetworkManager();
-	m_commandDispatcher = new drwCommandDispatcher( m_networkManager, m_commandDb, m_localToolbox, m_scene, this );
-	m_networkManager->SetDispatcher( m_commandDispatcher );
+    m_networkManager->SetLinesCore( m_lines );
+    m_lines->SetRemoteIO( m_networkManager );
     connect( m_networkManager, SIGNAL(StateChangedSignal()), this, SLOT(NetStateChanged()) );
-    m_scene->SetNumberOfFrames( 24 ); // do this after everything else is initialized to make sure we generate a command for the db.
+
     m_globalLineParams = new drwGlobalLineParams( this );
     m_globalLineParamsDock = 0;
 
-    m_linesApp = new LinesApp( m_localToolbox );
+    m_linesApp = new LinesApp( m_lines );
 
 	// Create main widget  (just a frame to put the viewing widget and the playback control widget)
     m_mainWidget = new QWidget(this);
@@ -106,29 +97,18 @@ MainWindow::MainWindow()
     m_glWidget = new drwDrawingWidget( m_drawingWidgetContainer );
     m_drawingWidgetContainer->setClientWidget( m_glWidget );
     m_glWidget->setMinimumSize( 480, 270 );
-	m_glWidget->SetCurrentScene( m_scene );
-    m_glWidget->SetToolbox( m_localToolbox );
-    m_glWidget->SetControler( m_controler );
-    m_globalLineParams->SetDrawingWidget( m_glWidget );
-    m_linesApp->SetDrawingWidget( m_glWidget );
-
-    m_localToolbox->SetRenderer( m_glWidget->GetRenderer() );
-
-    // Create special widget to go inside drawing widget
-    drwLineTool * lineTool = dynamic_cast<drwLineTool*>(m_localToolbox->GetTool( 0 ));
-    Q_ASSERT(lineTool);
-    m_viewportWidget = new drwLineToolViewportWidget( m_glWidget, lineTool );
-    m_glWidget->SetViewportWidget( m_viewportWidget );
+    m_globalLineParams->SetLinesCore( m_lines );
 	
 	// Create playback control widget
-    m_playbackControlerWidget = new PlaybackControlerWidget( m_glWidget->GetControler(), m_mainWidget );
+    m_playbackControlerWidget = new PlaybackControlerWidget( m_lines, m_mainWidget );
 	drawingAreaLayout->addWidget( m_playbackControlerWidget );
     m_playbackControlerWidget->SetHideFrameRate( true );
 
 	// Alternative right panel
+    drwLineTool * lineTool = m_lines->GetLineTool();
     m_toolOptionWidget = new PrimitiveToolOptionWidget( lineTool, m_rightPanelWidget );
 	rightPanelLayout->addWidget( m_toolOptionWidget );
-    m_displaySettingsWidget = new DisplaySettingsWidget( m_glWidget, m_rightPanelWidget );
+    m_displaySettingsWidget = new DisplaySettingsWidget( m_lines, m_rightPanelWidget );
 	rightPanelLayout->addWidget( m_displaySettingsWidget );
 
     QHBoxLayout * networkStateLayout = new QHBoxLayout();
@@ -166,8 +146,8 @@ MainWindow::MainWindow()
 
 MainWindow::~MainWindow()
 {
-    delete m_viewportWidget;
     delete m_linesApp;
+    delete m_lines;
 }
 
 void MainWindow::CreateActions()
@@ -239,27 +219,8 @@ void MainWindow::fileOpen()
 	// remember path
 	m_fileDialogStartPath = m_filename;
 	
-	// block signal transmission before reading
-	m_scene->blockSignals( true );
-	m_localToolbox->blockSignals( true );
-	
-    // Read commands from the file
-    m_commandDb->Read( m_filename.toUtf8().data() );
-
-    // Dispatch commands
-    m_commandDb->LockDb( true );
-    for( int i = 0; i < m_commandDb->GetNumberOfCommands(); ++i )
-    {
-        drwCommand::s_ptr com = m_commandDb->GetCommand( i );
-        m_commandDispatcher->IncomingDbCommand( com );
-    }
-    m_commandDb->LockDb( false );
-
-	// Re-enable signal transmission
-	m_localToolbox->blockSignals( false );
-	m_scene->blockSignals( false );
-	
-	m_scene->MarkModified();
+    // Load animation
+    m_lines->LoadAnimation( m_filename.toUtf8().data() );
 }
 
 bool MainWindow::fileSave()
@@ -270,7 +231,8 @@ bool MainWindow::fileSave()
 			return false;
 	}
 	
-    m_commandDb->Write( m_filename.toUtf8().data() );
+    m_lines->SaveAnimation( m_filename.toUtf8().data() );
+
 	return true;
 }
 
@@ -279,7 +241,7 @@ void MainWindow::fileSaveAs()
 	if( !GetSaveFilename() )
 		return;
 	
-    m_commandDb->Write( m_filename.toUtf8().data() );
+    m_lines->SaveAnimation( m_filename.toUtf8().data() );
 }
 
 bool MainWindow::fileExport()
@@ -297,7 +259,7 @@ bool MainWindow::fileExport()
 		// Create the exporter and start it
 		drwBitmapExporter * exporter = new drwBitmapExporter;
 		exporter->SetFilename( path );
-        exporter->SetScene( m_scene );
+        exporter->SetScene( m_lines->GetScene() );
 		exporter->SetSize( m_exportRes );
         exporter->SetExportAlpha( dlg.IsExportingAlpha() );
 		bool res = exporter->StartWriting();
@@ -307,7 +269,7 @@ bool MainWindow::fileExport()
 		{
 			QProgressDialog dialog;
 			dialog.setLabelText("Exporting animation to bitmap");
-			dialog.setRange( 0, m_scene->GetNumberOfFrames() - 1 );
+            dialog.setRange( 0, m_lines->GetNumberOfFrames() - 1 );
 			connect( exporter, SIGNAL(WritingFrame(int)), &dialog, SLOT(setValue(int)), Qt::QueuedConnection );
 			dialog.exec();
 		
@@ -328,8 +290,8 @@ void MainWindow::editMenuAboutToShow()
 
 void MainWindow::editSetNumberOfFrames()
 {
-	int nbFrames = QInputDialog::getInt( this, "Set Number of Frames" , "Number of Frames", m_scene->GetNumberOfFrames(), 0 );
-	m_scene->SetNumberOfFrames( nbFrames );
+    int nbFrames = QInputDialog::getInt( this, "Set Number of Frames" , "Number of Frames", m_lines->GetNumberOfFrames(), 0 );
+    m_lines->SetNumberOfFrames( nbFrames );
 }
 
 void MainWindow::editWhiteOnBlackToggled( bool wob )
@@ -374,7 +336,7 @@ void MainWindow::NetConnect()
 
         // Now we have a valid username and ip, try to connect
         Reset();
-        m_scene->blockSignals( true );
+        m_lines->EnableRendering( false );
         m_networkManager->Connect( name, address );
 
         // Create a timer to update a progress dialog
@@ -387,7 +349,7 @@ void MainWindow::NetConnect()
         m_progressDialog->setLabelText("Waiting for server...");
         m_progressDialog->exec();
 
-        m_scene->blockSignals( false );
+        m_lines->EnableRendering( true );
 
         if( m_progressDialog->wasCanceled() )
         {
@@ -538,7 +500,7 @@ void MainWindow::SetWhiteOnBlack( bool wob )
     m_whiteOnBlackAction->setChecked( wob );
     m_whiteOnBlackAction->blockSignals( false );
     
-    drwLineTool * lineTool = dynamic_cast<drwLineTool*>(m_localToolbox->GetTool( 0 ));
+    drwLineTool * lineTool = m_lines->GetLineTool();
     Q_ASSERT(lineTool);
     
     // set new fg color as inverse of previous
@@ -549,13 +511,11 @@ void MainWindow::SetWhiteOnBlack( bool wob )
     // Set new bg color depending on scheme
     if( m_whiteOnBlack )
     {
-        Vec4 bg( 0.0, 0.0, 0.0, 1.0 );
-        m_glWidget->SetBackgroundColor( bg );
+        m_lines->SetBackgroundColor( 0.0, 0.0, 0.0, 1.0 );
     }
     else
     {
-        Vec4 bg( 1.0, 1.0, 1.0, 1.0 );
-        m_glWidget->SetBackgroundColor( bg );
+        m_lines->SetBackgroundColor( 1.0, 1.0, 1.0, 1.0 );
     }
 }
 
@@ -570,7 +530,7 @@ bool MainWindow::GetSaveFilename()
 
 bool MainWindow::maybeSave()
 {
-	if( m_commandDb->IsModified() ) 
+    if( m_lines->IsAnimationModified() )
 	{
 		QMessageBox::StandardButton ret;
 		ret = QMessageBox::warning(this, m_appName, tr("The document has been modified.\nDo you want to save your changes?"), QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
@@ -605,7 +565,7 @@ void MainWindow::readSettings()
     SetWhiteOnBlack( wob );
     
     // Allow toolbox and all tools to read their settings
-    m_localToolbox->ReadSettings( settings );
+    m_lines->ReadSettings( settings );
 }
 
 
@@ -630,12 +590,12 @@ void MainWindow::writeSettings()
     settings.setValue( "WhiteOnBlack", m_whiteOnBlack );
     
     // Allow toolbox and all tools to save their settings
-    m_localToolbox->WriteSettings( settings );
+    m_lines->WriteSettings( settings );
 }
 
 void MainWindow::Reset()
 {
-	m_commandDispatcher->Reset();
+    m_lines->Reset();
 	m_filename = "";
 }
 
@@ -659,50 +619,42 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 		QKeyEvent * keyEvent = static_cast<QKeyEvent *>(event);
 		if( keyEvent->key() == Qt::Key_Right )
 		{
-			m_glWidget->GetControler()->NextFrame();
+            m_lines->NextFrame();
 			handled = true;
 		}
 		else if( keyEvent->key() == Qt::Key_Left )
 		{
-			m_glWidget->GetControler()->PrevFrame();
+            m_lines->PrevFrame();
 			handled = true;
 		}
 		else if( keyEvent->key() == Qt::Key_Space )
 		{
-			m_glWidget->GetControler()->PlayPause();
+            m_lines->PlayPause();
 			handled = true;
 		}
 		else if ( keyEvent->key() == Qt::Key_Up )
 		{
-            m_glWidget->GetControler()->GotoStart();
+            m_lines->GotoStart();
 			handled = true;
 		}
 		else if ( keyEvent->key() == Qt::Key_Down )
 		{
-            m_glWidget->GetControler()->GotoEnd();
+            m_lines->GotoEnd();
 			handled = true;
 		}
         else if ( keyEvent->key() == Qt::Key_B )
         {
             m_linesApp->ToggleBigSmallBrush();
-            m_glWidget->NeedRedraw();
             handled = true;
         }
         else if ( keyEvent->key() == Qt::Key_M )
         {
             m_linesApp->IncreaseBrushSize();
-            m_glWidget->NeedRedraw();
             handled = true;
         }
         else if ( keyEvent->key() == Qt::Key_N )
         {
             m_linesApp->DecreaseBrushSize();
-            m_glWidget->NeedRedraw();
-            handled = true;
-        }
-        else if( keyEvent->key() == Qt::Key_Alt )
-        {
-            m_glWidget->ActivateViewportWidget( true );
             handled = true;
         }
         else if( keyEvent->key() == Qt::Key_Shift )
@@ -711,7 +663,6 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
             {
                 m_eraseToggled = true;
                 m_linesApp->ToggleErasing();
-                m_glWidget->NeedRedraw();
             }
             handled = true;
         }
@@ -739,19 +690,13 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
     else if( event->type() == QEvent::KeyRelease )
     {
         QKeyEvent * keyEvent = static_cast<QKeyEvent *>(event);
-        if( keyEvent->key() == Qt::Key_Alt )
-        {
-            m_glWidget->ActivateViewportWidget( false );
-            handled = true;
-        }
-        else if( keyEvent->key() == Qt::Key_Shift )
+        if( keyEvent->key() == Qt::Key_Shift )
         {
             if( m_linesApp->IsErasing() && m_eraseToggled )
             {
                 m_linesApp->ToggleErasing();
                 m_eraseToggled = false;
             }
-            m_glWidget->NeedRedraw();
             handled = true;
         }
     }
@@ -796,16 +741,16 @@ void MainWindow::DrawSinusoidLine()
     double interval = 5.0;
     double amp = 200.0;
     double per = 150;
-    m_glWidget->SimulateTabletEvent( drwMouseCommand::Press, xstart, ystart, 0.0 );
+    m_lines->MouseEventWorld( drwMouseCommand::Press, xstart, ystart, 0.0 );
     double x = xstart;
     double y = 0.0;
     while( x < 1800.0 )
     {
         double y = ystart + amp * sin( (x - xstart) / per * 6.2 );
         double pressure = std::abs( sin( (x - xstart) / per * 6.2 ) );
-        m_glWidget->SimulateTabletEvent( drwMouseCommand::Move, x, y, pressure );
+        m_lines->MouseEventWorld( drwMouseCommand::Move, x, y, pressure );
         QApplication::processEvents();
         x += interval;
     }
-    m_glWidget->SimulateTabletEvent( drwMouseCommand::Release, x, y, 1.0 );
+    m_lines->MouseEventWorld( drwMouseCommand::Release, x, y, 1.0 );
 }

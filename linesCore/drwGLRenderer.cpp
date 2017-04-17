@@ -48,21 +48,18 @@ drwGLRenderer::~drwGLRenderer()
 void drwGLRenderer::SetOnionSkinBefore( int value )
 {
     m_onionSkinFramesBefore = value;
-    m_drawingSurface->NotifyDisplaySettingsModified();
     NeedRedraw();
 }
 
 void drwGLRenderer::SetOnionSkinAfter( int value )
 {
     m_onionSkinFramesAfter = value;
-    m_drawingSurface->NotifyDisplaySettingsModified();
     NeedRedraw();
 }
 
 void drwGLRenderer::SetInhibitOnionSkin( bool isOn )
 {
     m_inhibitOnionSkin = isOn;
-    m_drawingSurface->NotifyDisplaySettingsModified();
     NeedRedraw();
 }
 

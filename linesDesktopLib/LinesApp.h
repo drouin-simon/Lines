@@ -6,9 +6,7 @@
 
 #include "drwLineTool.h"
 
-class drwDrawingWidget;
-class drwGLRenderer;
-class drwToolbox;
+class LinesCore;
 
 class LinesApp : public QObject
 {
@@ -17,10 +15,8 @@ class LinesApp : public QObject
 
 public:
 
-    LinesApp( drwToolbox * toolbox );
+    LinesApp( LinesCore * lc );
     ~LinesApp();
-
-    void SetDrawingWidget( drwDrawingWidget * w );
 
     // Line brush
     bool IsSmallBrush();
@@ -75,9 +71,7 @@ private:
     double m_backupBrushWidth;
     double m_backupBrushOpacity;
 
-    drwToolbox * m_localToolbox;
-    drwDrawingWidget * m_drawingWidget;
-    drwGLRenderer * m_renderer;
+    LinesCore * m_lines;
 
 };
 

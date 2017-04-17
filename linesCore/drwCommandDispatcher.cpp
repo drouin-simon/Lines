@@ -6,15 +6,14 @@
 
 const int drwCommandDispatcher::m_localToolboxId = 0;
 
-drwCommandDispatcher::drwCommandDispatcher( drwRemoteCommandIO * remote,
-											drwCommandDatabase * db,
+drwCommandDispatcher::drwCommandDispatcher( drwCommandDatabase * db,
 											drwToolbox * local,
 											Scene * scene,
 											QObject * parent )
 : QObject(parent)
 , m_scene( scene )
 , m_db( db )
-, m_remoteIO( remote )
+, m_remoteIO( 0 )
 , m_lastUsedUserId( 0 ) // last used is local
 {
 	connect( local, SIGNAL(CommandExecuted(drwCommand::s_ptr)), this, SLOT(IncomingLocalCommand(drwCommand::s_ptr)));

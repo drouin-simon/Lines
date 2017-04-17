@@ -14,21 +14,15 @@ class QLabel;
 
 class drwAspectRatioWidget;
 class drwDrawingWidget;
-class Scene;
-class drwLineTool;
-class drwToolbox;
-class drwCommandDatabase;
 class PrimitiveToolOptionWidget;
 class PlaybackControlerWidget;
 class TabletStateWidget;
 class DisplaySettingsWidget;
-class PlaybackControler;
-class drwCommandDispatcher;
 class drwNetworkManager;
-class drwLineToolViewportWidget;
 class drwGlobalLineParams;
 class drwSimplifiedToolbar;
 class LinesApp;
+class LinesCore;
 
 class MainWindow : public QMainWindow
 {
@@ -124,13 +118,8 @@ private:
     drwGlobalLineParams * m_globalLineParams;
     QDockWidget * m_globalLineParamsDock;
 	
-	Scene					* m_scene;
-	PlaybackControler		* m_controler;
-	drwToolbox				* m_localToolbox;
-	drwCommandDatabase		* m_commandDb;
-    drwCommandDispatcher	* m_commandDispatcher;
+    LinesCore * m_lines;
 	drwNetworkManager		* m_networkManager;
-    drwLineToolViewportWidget * m_viewportWidget;
 
 	QProgressDialog * m_progressDialog;
 

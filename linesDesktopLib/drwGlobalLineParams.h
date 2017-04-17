@@ -3,7 +3,7 @@
 
 #include <QObject>
 
-class drwDrawingWidget;
+class LinesCore;
 
 class drwGlobalLineParams : public QObject
 {
@@ -15,7 +15,7 @@ class drwGlobalLineParams : public QObject
 
 public:
     
-    void SetDrawingWidget( drwDrawingWidget * w ) { m_drawingWidget = w; }
+    void SetLinesCore( LinesCore * lc ) { m_lines = lc; }
     
     void SetPixMargin( double pixMarging );
     double GetPixMargin();
@@ -37,7 +37,7 @@ protected:
     
     void MarkModified();
     
-    drwDrawingWidget * m_drawingWidget;
+    LinesCore * m_lines;
 
 };
 

@@ -1,7 +1,5 @@
 #include "LinesApp.h"
-#include "drwToolbox.h"
-#include "drwDrawingWidget.h"
-#include "drwGLRenderer.h"
+#include "LinesCore.h"
 
 static double smallBrushWidth = 6.0;
 static double smallBrushAlpha = 1.0;
@@ -15,28 +13,18 @@ static int nbOnionOneAfter = 0;
 static int nbOnionManyBefore = 5;
 static int nbOnionManyAfter = 5;
 
-LinesApp::LinesApp( drwToolbox * toolbox )
+LinesApp::LinesApp( LinesCore * lc )
     : m_backupBrushWidth( smallBrushWidth )
     , m_backupBrushOpacity( smallBrushAlpha )
-    , m_localToolbox( toolbox )
-    , m_drawingWidget( 0 )
-    , m_renderer( 0 )
+    , m_lines( lc )
 {
-    drwLineTool * lineTool = dynamic_cast<drwLineTool*>(m_localToolbox->GetTool( 0 ));
-    Q_ASSERT(lineTool);
+    drwLineTool * lineTool = GetLineTool();
     connect( lineTool, SIGNAL(ParametersChangedSignal()), this, SLOT(LineParamsModifiedSlot()) );
+    connect( m_lines, SIGNAL(DisplaySettingsModified()), this, SLOT(DisplayParamsModifiedSlot()) );
 }
 
 LinesApp::~LinesApp()
 {
-
-}
-
-void LinesApp::SetDrawingWidget( drwDrawingWidget * w )
-{
-    m_drawingWidget = w;
-    m_renderer = m_drawingWidget->GetRenderer();
-    connect( m_drawingWidget, SIGNAL(DisplaySettingsModified()), this, SLOT(DisplayParamsModifiedSlot()) );
 }
 
 bool LinesApp::IsSmallBrush()
@@ -177,11 +165,11 @@ void LinesApp::SetOneOnionSkin() { SetOnionSkinBefore( nbOnionOneBefore ); SetOn
 bool LinesApp::IsManyOnionSkin() { return GetOnionSkinBefore() == nbOnionManyBefore && GetOnionSkinAfter() == nbOnionManyAfter; }
 void LinesApp::SetManyOnionSkin() { SetOnionSkinBefore( nbOnionManyBefore ); SetOnionSkinAfter( nbOnionManyAfter ); }
 
-void LinesApp::SetOnionSkinBefore( int nbFrames ) { m_renderer->SetOnionSkinBefore( nbFrames ); }
-int LinesApp::GetOnionSkinBefore() { return m_renderer->GetOnionSkinBefore(); }
+void LinesApp::SetOnionSkinBefore( int nbFrames ) { m_lines->SetOnionSkinBefore( nbFrames ); }
+int LinesApp::GetOnionSkinBefore() { return m_lines->GetOnionSkinBefore(); }
 
-void LinesApp::SetOnionSkinAfter( int nbFrames ) { m_renderer->SetOnionSkinAfter( nbFrames ); }
-int LinesApp::GetOnionSkinAfter() { return m_renderer->GetOnionSkinAfter(); }
+void LinesApp::SetOnionSkinAfter( int nbFrames ) { m_lines->SetOnionSkinAfter( nbFrames ); }
+int LinesApp::GetOnionSkinAfter() { return m_lines->GetOnionSkinAfter(); }
 
 void LinesApp::LineParamsModifiedSlot()
 {
@@ -195,7 +183,5 @@ void LinesApp::DisplayParamsModifiedSlot()
 
 drwLineTool * LinesApp::GetLineTool()
 {
-    drwLineTool * lineTool = dynamic_cast<drwLineTool*>(m_localToolbox->GetTool( 0 ));
-    Q_ASSERT(lineTool);
-    return lineTool;
+    return m_lines->GetLineTool();
 }

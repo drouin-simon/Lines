@@ -9,7 +9,7 @@ public:
     drwDrawingSurface() {}
     ~drwDrawingSurface() {}
     virtual void NeedRedraw() = 0;
-    virtual void NotifyDisplaySettingsModified() = 0;
+    virtual void NotifyPlaybackStartStop( bool isStart ) = 0;
 };
 
 #endif

@@ -1,5 +1,5 @@
 #include "PlaybackControlerWidget.h"
-#include "PlaybackControler.h"
+#include "LinesCore.h"
 #include <QCheckBox>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -21,9 +21,9 @@ const int PlaybackControlerWidget::AvailableFrameRates[8] =  \
 	42    // 24 fps
 };
 
-PlaybackControlerWidget::PlaybackControlerWidget( PlaybackControler * controler, QWidget * parent )
+PlaybackControlerWidget::PlaybackControlerWidget( LinesCore * lc, QWidget * parent )
 : QWidget( parent )
-, m_controler( controler )
+, m_lines( lc )
 , m_frameRateIndex(6)
 , playIcon("://lines-icons-48x48/play-white.png")
 , pauseIcon("://lines-icons-48x48/pause-white.png")
@@ -31,8 +31,8 @@ PlaybackControlerWidget::PlaybackControlerWidget( PlaybackControler * controler,
 	SetupUi();
 	UpdateUi();
 	
-	connect( m_controler, SIGNAL( StartStop(bool) ), this, SLOT(PlaybackStartStopSlot(bool)) );
-    connect( m_controler, SIGNAL( FrameChanged() ), this, SLOT(UpdateCurrentFrame()) );
+    connect( m_lines, SIGNAL( StartStop(bool) ), this, SLOT(PlaybackStartStopSlot(bool)) );
+    connect( m_lines, SIGNAL( FrameChanged() ), this, SLOT(UpdateCurrentFrame()) );
 }
 
 PlaybackControlerWidget::~PlaybackControlerWidget()
@@ -48,24 +48,24 @@ void PlaybackControlerWidget::SetHideFrameRate( bool hide )
 
 void PlaybackControlerWidget::OnCurrentFrameSliderValueChanged( int value )
 {
-    m_controler->SetCurrentFrame( value );
+    m_lines->SetCurrentFrame( value );
 }
 
 void PlaybackControlerWidget::OnFrameRateSliderValueChanged( int value )
 {
     m_frameRateIndex = value;
     int ms = AvailableFrameRates[ m_frameRateIndex ];
-    m_controler->SetFrameInterval( ms );
+    m_lines->SetFrameInterval( ms );
 }
 
 void PlaybackControlerWidget::OnLoopCheckBoxToggled( bool isOn )
 {
-    m_controler->SetLooping( isOn );
+    m_lines->SetLooping( isOn );
 }
 
 void PlaybackControlerWidget::PlayPauseButtonClicked()
 {
-    m_controler->PlayPause();
+    m_lines->PlayPause();
 }
 
 void PlaybackControlerWidget::PlaybackStartStopSlot( bool isStart )
@@ -157,14 +157,14 @@ void PlaybackControlerWidget::UpdateUi()
 	UpdateCurrentFrame();
 	
 	// Play/Pause button
-	if( m_controler->IsPlaying() )
+    if( m_lines->IsPlaying() )
         playPauseButton->setIcon( pauseIcon );
 	else
         playPauseButton->setIcon( playIcon );
 	
 	// Loop check box
     loopCheckBox->blockSignals( true );
-	loopCheckBox->setChecked( m_controler->GetLooping() );
+    loopCheckBox->setChecked( m_lines->IsLooping() );
     loopCheckBox->blockSignals( false );
 	
 	// Frame rate slider
@@ -182,11 +182,11 @@ void PlaybackControlerWidget::UpdateCurrentFrame()
 {
     currentFrameSlider->blockSignals( true );
 
-	int numberOfFrames = m_controler->GetNumberOfFrames();
+    int numberOfFrames = m_lines->GetNumberOfFrames();
 	currentFrameSlider->setRange( 0, numberOfFrames - 1 );
 	
 	// Current frame slider
-	int currentFrame = m_controler->GetCurrentFrame();
+    int currentFrame = m_lines->GetCurrentFrame();
 	currentFrameSlider->setValue( currentFrame );
 
     currentFrameSlider->blockSignals( false );

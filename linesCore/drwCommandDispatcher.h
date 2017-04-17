@@ -17,8 +17,9 @@ class drwCommandDispatcher : public QObject
 	
 public:
 	
-    drwCommandDispatcher( drwRemoteCommandIO * remote, drwCommandDatabase * db, drwToolbox * local, Scene * scene, QObject * parent );
+    drwCommandDispatcher( drwCommandDatabase * db, drwToolbox * local, Scene * scene, QObject * parent );
 	~drwCommandDispatcher();
+    void SetRemoteIO( drwRemoteCommandIO * io ) { m_remoteIO = io; }
 	drwCommandDatabase * GetDb() { return m_db; }
 	int RequestNewUserId();
 	int GetLocalUserId() { return m_localToolboxId; }
