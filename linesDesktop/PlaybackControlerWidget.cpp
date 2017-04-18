@@ -31,8 +31,8 @@ PlaybackControlerWidget::PlaybackControlerWidget( LinesCore * lc, QWidget * pare
 	SetupUi();
 	UpdateUi();
 	
-    connect( m_lines, SIGNAL( StartStop(bool) ), this, SLOT(PlaybackStartStopSlot(bool)) );
-    connect( m_lines, SIGNAL( FrameChanged() ), this, SLOT(UpdateCurrentFrame()) );
+    connect( m_lines, SIGNAL( PlaybackStartStop(bool) ), this, SLOT(PlaybackStartStopSlot(bool)) );
+    connect( m_lines, SIGNAL( PlaybackSettingsChangedSignal() ), this, SLOT(UpdateUi()) );
 }
 
 PlaybackControlerWidget::~PlaybackControlerWidget()

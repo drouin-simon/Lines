@@ -35,12 +35,12 @@ private slots:
 	
 	// Controler-connected slots
 	void PlaybackStartStopSlot( bool isStart );
+    void UpdateUi();
     void UpdateCurrentFrame();
 
 private:
 
 	void SetupUi();
-    void UpdateUi();
 	
     LinesCore * m_lines;
 	int m_frameRateIndex;

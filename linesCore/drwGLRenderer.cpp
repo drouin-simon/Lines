@@ -419,7 +419,8 @@ void drwGLRenderer::NeedRedraw()
     m_sceneModifiedRect.AdjustBound( modifiedRect );
     m_overlayModified = true;
     m_overlayModifiedRect.AdjustBound( modifiedRect );
-    m_drawingSurface->NeedRedraw();
+    if( m_drawingSurface )
+        m_drawingSurface->NeedRedraw();
 }
 
 void drwGLRenderer::NeedRedraw( int frame, Box2d & rect )
@@ -430,7 +431,8 @@ void drwGLRenderer::NeedRedraw( int frame, Box2d & rect )
         m_sceneModifiedRect.AdjustBound( rect );
         m_overlayModified = true;
         m_overlayModifiedRect.AdjustBound( rect );
-        m_drawingSurface->NeedRedraw();
+        if( m_drawingSurface )
+            m_drawingSurface->NeedRedraw();
     }
 }
 
@@ -438,5 +440,6 @@ void drwGLRenderer::MarkOverlayModified( Box2d & rect )
 {
     m_overlayModified = true;
     m_overlayModifiedRect.AdjustBound( rect );
-    m_drawingSurface->NeedRedraw();
+    if( m_drawingSurface )
+        m_drawingSurface->NeedRedraw();
 }

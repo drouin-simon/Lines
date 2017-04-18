@@ -2,14 +2,14 @@
 #include <iostream>
 #include <QtGui>
 #include <QtOpenGL>
-#include "drwLineToolViewportWidget.h"
 #include "LinesCore.h"
 
 drwDrawingWidget::drwDrawingWidget( QWidget * parent )
 : QOpenGLWidget( parent )
-, m_viewportWidget(0)
+, m_isPlaying( false )
 , m_muteMouse(false)
 , m_tabletHasControl(false)
+, m_lines( 0 )
 {
     m_timerId = -1;
     //PrintGLInfo();
@@ -36,6 +36,8 @@ void drwDrawingWidget::NotifyPlaybackStartStop( bool isStarting )
     // Start/stop generating idle events that are used to make sure we redraw during playback
     if( isStarting )
     {
+        m_isPlaying = true;
+
         // start timer
         if( m_timerId == -1 )
             m_timerId = startTimer(0);
@@ -43,6 +45,7 @@ void drwDrawingWidget::NotifyPlaybackStartStop( bool isStarting )
     }
     else
     {
+        m_isPlaying = false;
         if( m_timerId != -1 )
         {
             killTimer( m_timerId );
@@ -50,11 +53,6 @@ void drwDrawingWidget::NotifyPlaybackStartStop( bool isStarting )
         }
         EnableVSync( false );
     }
-}
-
-void drwDrawingWidget::SetViewportWidget( drwLineToolViewportWidget * w )
-{
-    m_viewportWidget = w;
 }
 
 void drwDrawingWidget::initializeGL()
@@ -65,26 +63,13 @@ void drwDrawingWidget::resizeGL( int w, int h )
 {
     int ratio = this->devicePixelRatio();
     m_lines->SetRenderSize( ratio*w, ratio*h );
-    NeedRedraw();
 }
 
 void drwDrawingWidget::paintEvent( QPaintEvent * event )
 {
 	makeCurrent();
-
     m_lines->Render();
-
-    // Draw the viewport widget if needed
-    if( m_viewportWidget )
-    {
-        QPainter painter;
-        painter.begin( this );
-        painter.setRenderHint(QPainter::Antialiasing);
-        painter.setRenderHint(QPainter::TextAntialiasing);
-        m_viewportWidget->Draw( painter );
-        painter.end();
-    }
-
+    glFlush();
     emit FinishedPainting();
 }
 
@@ -105,12 +90,6 @@ void drwDrawingWidget::EnableVSync( bool enable )
 
 void drwDrawingWidget::mousePressEvent( QMouseEvent * e )
 {
-	// Try the widget
-	bool widgetSwallows = m_viewportWidget->MousePress( e->x(), e->y() );
-	if( widgetSwallows )
-		return;
-	
-	// now send the event to observer ( drawing tools)
     if( e->button() == Qt::LeftButton && !m_tabletHasControl  && !m_muteMouse )
 	{
         MouseCommand( drwMouseCommand::Press, e );
@@ -119,11 +98,6 @@ void drwDrawingWidget::mousePressEvent( QMouseEvent * e )
 
 void drwDrawingWidget::mouseReleaseEvent( QMouseEvent * e )
 {
-	// Try the widget
-	bool widgetSwallows = m_viewportWidget->MouseRelease( e->x(), e->y() );
-	if( widgetSwallows )
-		return;
-	
     if ( e->button() == Qt::LeftButton && !m_tabletHasControl  && !m_muteMouse )
     {
         MouseCommand( drwMouseCommand::Release, e );
@@ -133,11 +107,6 @@ void drwDrawingWidget::mouseReleaseEvent( QMouseEvent * e )
 
 void drwDrawingWidget::mouseMoveEvent( QMouseEvent * e )
 {   
-	// Try the widget
-	bool widgetSwallows = m_viewportWidget->MouseMove( e->x(), e->y() );
-	if( widgetSwallows )
-		return;
-	
     if( !m_tabletHasControl && !m_muteMouse )
     {
         MouseCommand( drwMouseCommand::Move, e );
@@ -146,20 +115,6 @@ void drwDrawingWidget::mouseMoveEvent( QMouseEvent * e )
 
 void drwDrawingWidget::tabletEvent ( QTabletEvent * e )
 {
-    // Try the widget
-    bool widgetSwallows = false;
-    if( e->type() == QEvent::TabletPress )
-        widgetSwallows = m_viewportWidget->MousePress( e->x(), e->y() );
-    else if( e->type() == QEvent::TabletRelease )
-        widgetSwallows = m_viewportWidget->MouseRelease( e->x(), e->y() );
-    else if( e->type() == QEvent::TabletMove )
-        widgetSwallows = m_viewportWidget->MouseMove( e->x(), e->y() );
-    if( widgetSwallows )
-    {
-        e->accept();
-        return;
-    }
-	
     if( e->type() == QEvent::TabletPress )
     {
         m_tabletHasControl = true;
@@ -179,20 +134,6 @@ void drwDrawingWidget::tabletEvent ( QTabletEvent * e )
     }
 }
 
-void drwDrawingWidget::ActivateViewportWidget( bool active )
-{
-    if( active )
-    {
-        QPoint p = this->mapFromGlobal(QCursor::pos());
-        m_viewportWidget->Activate( p.x(), p.y() );
-    }
-    else
-    {
-        m_viewportWidget->Deactivate();
-    }
-    NeedRedraw();
-}
-
 void drwDrawingWidget::enterEvent( QEvent * e )
 {
     m_lines->SetShowCursor( true );
@@ -200,16 +141,14 @@ void drwDrawingWidget::enterEvent( QEvent * e )
 
 void drwDrawingWidget::leaveEvent( QEvent * e )
 {
-    if( m_viewportWidget )
-        m_viewportWidget->Deactivate();
     m_lines->SetShowCursor( false );
-    NeedRedraw();
 }
 
 bool drwDrawingWidget::event( QEvent * e )
 {
 	// Give a chance to the controler to change frame. A frame change triggers an updateGL
-    m_lines->Tick();
+    if( m_isPlaying )
+        m_lines->Tick();
     return QOpenGLWidget::event(e);
 }
 

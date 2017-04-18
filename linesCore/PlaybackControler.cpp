@@ -70,7 +70,6 @@ void PlaybackControler::SetCurrentFrame( int frame )
 
 void PlaybackControler::NotifyFrameChanged()
 {
-    emit FrameChanged();
     emit ModifiedSignal();
 }
 

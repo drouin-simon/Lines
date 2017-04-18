@@ -85,10 +85,12 @@ public:
 protected slots:
 
     void PlaybackStartStop( bool isStarting );
+    void PlaybackSettingsChangedSlot();
 
 signals:
 
     void DisplaySettingsModified();
+    void PlaybackSettingsChangedSignal();
 
 private:
 

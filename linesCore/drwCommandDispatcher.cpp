@@ -123,7 +123,8 @@ void drwCommandDispatcher::IncomingLocalCommand( drwCommand::s_ptr command )
 		m_cachedStateCommands.clear();
 
 		// Send it to the network
-        m_remoteIO->SendCommand( command );
+        if( m_remoteIO )
+            m_remoteIO->SendCommand( command );
 
 		// Store it in the database
 		m_db->PushCommand( command );

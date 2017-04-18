@@ -8,7 +8,6 @@
 class LinesCore;
 class drwGLRenderer;
 class drwToolbox;
-class drwLineToolViewportWidget;
 class PlaybackControler;
 
 class drwDrawingWidget : public QOpenGLWidget, public drwDrawingSurface
@@ -20,14 +19,14 @@ public:
     drwDrawingWidget( QWidget * parent );
 	~drwDrawingWidget();
 
+    void SetLinesCore( LinesCore * lc ) { m_lines = lc; }
+
     // Implement drwDrawingSurface interface
     void NeedRedraw();
     void NotifyPlaybackStartStop( bool isStart );
 
-    void SetViewportWidget( drwLineToolViewportWidget * w );
     void SetMuteMouse( bool mute ) { m_muteMouse = mute; }
     bool IsMutingMouse() { return m_muteMouse; }
-    void ActivateViewportWidget( bool active );
 
 signals:
 
@@ -63,7 +62,8 @@ private:
 	
     LinesCore * m_lines;
 
-    drwLineToolViewportWidget * m_viewportWidget;
+    bool m_isPlaying;
+
     bool m_muteMouse;
     bool m_tabletHasControl;  // make sur not to generate both mouse and tablet events
 }; 

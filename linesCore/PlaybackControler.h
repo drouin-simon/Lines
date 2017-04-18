@@ -52,7 +52,6 @@ public slots:
 signals:
 	
 	void ModifiedSignal();
-    void FrameChanged();
 	void StartStop( bool isStart );
 	
 protected:

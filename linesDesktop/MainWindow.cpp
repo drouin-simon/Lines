@@ -95,6 +95,8 @@ MainWindow::MainWindow()
 	
 	// Create Drawing window
     m_glWidget = new drwDrawingWidget( m_drawingWidgetContainer );
+    m_glWidget->SetLinesCore( m_lines );
+    m_lines->SetDrawingSurface( m_glWidget );
     m_drawingWidgetContainer->setClientWidget( m_glWidget );
     m_glWidget->setMinimumSize( 480, 270 );
     m_globalLineParams->SetLinesCore( m_lines );
