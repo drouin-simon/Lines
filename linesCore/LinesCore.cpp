@@ -17,6 +17,7 @@ LinesCore::LinesCore()
     m_localToolbox = new drwToolbox( m_scene, m_controler );
     m_controler->SetToolbox( m_localToolbox );
     connect( m_controler, SIGNAL(ModifiedSignal()), this, SLOT(PlaybackSettingsChangedSlot()) );
+    connect( m_controler, SIGNAL(StartStop(bool)), this, SLOT(PlaybackStartStop(bool)) );
     m_commandDb = new drwCommandDatabase(this);
     m_commandDispatcher = new drwCommandDispatcher( m_commandDb, m_localToolbox, m_scene, this );
     m_scene->SetNumberOfFrames( defaultNumberOfFrames ); // do this after everything else is initialized to make sure we generate a command for the db.
