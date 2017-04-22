@@ -32,6 +32,7 @@ public:
     void WriteSettings( QSettings & s );
 
     void StartPlaying();
+    bool IsPlaying();
     void OnStartPlaying();
     void StopPlaying();
     void OnStopPlaying();

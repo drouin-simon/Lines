@@ -58,6 +58,13 @@ void drwToolbox::StartPlaying()
         m_controller->StartPlaying();
 }
 
+bool drwToolbox::IsPlaying()
+{
+    if( m_controller )
+        return m_controller->IsPlaying();
+    return false;
+}
+
 void drwToolbox::OnStartPlaying()
 {
     m_renderer->SetInhibitOnionSkin( true );

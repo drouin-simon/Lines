@@ -28,7 +28,6 @@ drwLineTool::drwLineTool( Scene * scene, drwToolbox * toolbox )
 , m_fill(false)
 , m_erase(false)
 , m_frameChangeMode( Manual )
-, m_backupFrameChangeMode( Manual )
 , m_persistenceEnabled( false )
 , m_persistence( 0 )
 , m_minWidth( 2.0 )
@@ -80,14 +79,11 @@ void drwLineTool::WriteSettings( QSettings & s )
 
 void drwLineTool::OnStartPlaying()
 {
-    m_backupFrameChangeMode = GetFrameChangeMode();
-    SetFrameChangeMode( Manual );
     SetPersistenceEnabled( true );
 }
 
 void drwLineTool::OnStopPlaying()
 {
-    SetFrameChangeMode( m_backupFrameChangeMode );
     SetPersistenceEnabled( false );
 }
 
@@ -147,7 +143,7 @@ void drwLineTool::ExecuteMouseCommand( drwCommand::s_ptr command )
         m_isDrawing = true;
 
         // Start playback in play mode
-        if( m_frameChangeMode == Play )
+        if( m_frameChangeMode == Play && !m_toolbox->IsPlaying() )
         {
             m_interactionStartFrame = m_toolbox->GetCurrentFrame();
             m_toolbox->StartPlaying();
@@ -201,7 +197,7 @@ void drwLineTool::ExecuteMouseCommand( drwCommand::s_ptr command )
             m_toolbox->StopPlaying();
             m_toolbox->SetCurrentFrame( m_interactionStartFrame );
         }
-        if( m_frameChangeMode == AfterIntervention )
+        if( m_frameChangeMode == AfterIntervention && !m_toolbox->IsPlaying() )
             m_toolbox->GotoNextFrame();
 	}
 	else if( mouseCom->GetType() == drwMouseCommand::Move )
@@ -374,6 +370,7 @@ void drwLineTool::SetPersistence( int p )
 void drwLineTool::SetPersistenceEnabled( bool enable )
 {
     m_persistenceEnabled = enable;
+    ParametersChanged();
 }
 
 void drwLineTool::SetBaseWidth( double newBaseWidth )
@@ -408,7 +405,7 @@ void drwLineTool::ParametersChanged()
 	c->SetPressureOpacity( m_pressureOpacity );
 	c->SetFill( m_fill );
     c->SetErase( m_erase );
-	c->SetPersistence( m_persistence );
+    c->SetPersistence( m_persistenceEnabled ? m_persistence : 0 );
 	drwCommand::s_ptr command( c );
 	emit CommandExecuted( command );
 	emit ParametersChangedSignal();

@@ -103,7 +103,6 @@ protected:
     bool m_erase;
 
     drwFrameChangeMode m_frameChangeMode;
-    drwFrameChangeMode m_backupFrameChangeMode;
     bool m_persistenceEnabled;
     int m_persistence;
     int m_interactionStartFrame;
