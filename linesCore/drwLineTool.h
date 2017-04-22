@@ -75,8 +75,8 @@ protected:
 	void ExecuteLineToolParamCommand( drwCommand::s_ptr command );
 	void ExecuteMouseCommand( drwCommand::s_ptr command );
 	void ParametersChanged();
-	void CreateNewNodes();
-	Node * CreateNewNode();
+    void CreateNewNodes( double x, double y, double pressure );
+    Node * CreateNewNode( double x, double y, double pressure );
     void MarkSegmentModified( double x1, double y1, double x2, double y2 );
     void MarkOverlaySegmentModified( double x1, double y1, double x2, double y2 );
     void MarkPointModified( double x, double y );

@@ -154,7 +154,7 @@ void drwLineTool::ExecuteMouseCommand( drwCommand::s_ptr command )
         }
 
         // Create nodes that contain new line primitives
-		CreateNewNodes();
+        CreateNewNodes( xWorld, yWorld, pressure );
 
         // Mark rect modified in scene
         MarkPointModified( xWorld, yWorld );
@@ -278,7 +278,7 @@ void drwLineTool::NotifyFrameChanged( int frame )
 		}
 		
 		// Create a new line for new frame
-		CreateNewNodes();
+        CreateNewNodes( m_lastXWorld, m_lastYWorld, m_lastPressure );
 	}
 }
 
@@ -414,7 +414,7 @@ void drwLineTool::ParametersChanged()
 	emit ParametersChangedSignal();
 }
 
-Node * drwLineTool::CreateNewNode()
+Node * drwLineTool::CreateNewNode( double x, double y, double pressure )
 {
 	LinePrimitive * newPrimitive = 0;
 	switch( Type )
@@ -440,14 +440,14 @@ Node * drwLineTool::CreateNewNode()
 			break;
 	}
 	newPrimitive->SetColor( Color );
-    newPrimitive->StartPoint( m_lastXWorld, m_lastYWorld, m_lastPressure );
+    newPrimitive->StartPoint( x, y, pressure );
 	Node * CurrentNode = new Node;
 	CurrentNode->SetPrimitive( newPrimitive );
 	return CurrentNode;
 }
 
 
-void drwLineTool::CreateNewNodes( )
+void drwLineTool::CreateNewNodes( double x, double y, double pressure )
 {
     int persistence = m_persistenceEnabled ? m_persistence : 0;
     int lastFrame = m_toolbox->GetCurrentFrame() + persistence;
@@ -458,7 +458,7 @@ void drwLineTool::CreateNewNodes( )
 		CurrentNodesCont::iterator it = CurrentNodes.find( frame );
 		if( it == CurrentNodes.end() )
 		{
-			Node * newNode = CreateNewNode();
+            Node * newNode = CreateNewNode( x, y, pressure );
             int nodeId = m_scene->AddNodeToFrame( newNode, frame );
             CurrentNodes[frame] = nodeId;
 		}	
