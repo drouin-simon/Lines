@@ -63,6 +63,7 @@ public:
     double UnitsPerPixel();
     void SetClearColor( double r, double g, double b, double a );
 
+    void EnableRendering( bool enable );
     void NeedRedraw();
     void NeedRedraw( int frame, Box2d & rect );
     void MarkOverlayModified( Box2d & rect );
@@ -80,6 +81,7 @@ protected:
     bool m_overlayModified;
     Box2d m_overlayModifiedRect;
 
+    bool m_renderingEnabled;
     bool m_sceneModified;
     Box2d m_sceneModifiedRect;
     int m_renderFrame;

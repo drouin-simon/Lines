@@ -18,6 +18,7 @@ drwGLRenderer::drwGLRenderer()
     m_onionSkinFramesAfter = 0;
     m_inhibitOnionSkin = false;
 
+    m_renderingEnabled = true;
     m_renderFrame = 0;
     m_overlayModified = true;
     m_sceneModified = true;
@@ -67,9 +68,6 @@ void drwGLRenderer::Render()
 {
     if( !m_sceneModified && !m_overlayModified )
         return;
-
-    // Debug: print cam
-    m_camera->Print();
 
     // Render scene to texture
     if( m_sceneModified )
@@ -412,6 +410,13 @@ void drwGLRenderer::SetRenderFrame( int frame )
     NeedRedraw();
 }
 
+void drwGLRenderer::EnableRendering( bool enable )
+{
+    m_renderingEnabled = enable;
+    if( m_renderingEnabled && m_drawingSurface )
+        m_drawingSurface->NeedRedraw();
+}
+
 void drwGLRenderer::NeedRedraw()
 {
     m_sceneModified = true;
@@ -419,7 +424,7 @@ void drwGLRenderer::NeedRedraw()
     m_sceneModifiedRect.AdjustBound( modifiedRect );
     m_overlayModified = true;
     m_overlayModifiedRect.AdjustBound( modifiedRect );
-    if( m_drawingSurface )
+    if( m_drawingSurface && m_renderingEnabled )
         m_drawingSurface->NeedRedraw();
 }
 
@@ -431,7 +436,7 @@ void drwGLRenderer::NeedRedraw( int frame, Box2d & rect )
         m_sceneModifiedRect.AdjustBound( rect );
         m_overlayModified = true;
         m_overlayModifiedRect.AdjustBound( rect );
-        if( m_drawingSurface )
+        if( m_drawingSurface && m_renderingEnabled )
             m_drawingSurface->NeedRedraw();
     }
 }
@@ -440,6 +445,6 @@ void drwGLRenderer::MarkOverlayModified( Box2d & rect )
 {
     m_overlayModified = true;
     m_overlayModifiedRect.AdjustBound( rect );
-    if( m_drawingSurface )
+    if( m_drawingSurface && m_renderingEnabled )
         m_drawingSurface->NeedRedraw();
 }

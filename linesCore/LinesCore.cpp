@@ -47,6 +47,7 @@ drwLineTool * LinesCore::GetLineTool()
 void LinesCore::LoadAnimation( const char * filename )
 {
     // block signal transmission before reading
+    m_renderer->EnableRendering( false );
     m_scene->blockSignals( true );
     m_localToolbox->blockSignals( true );
 
@@ -65,6 +66,7 @@ void LinesCore::LoadAnimation( const char * filename )
     // Re-enable signal transmission
     m_localToolbox->blockSignals( false );
     m_scene->blockSignals( false );
+    m_renderer->EnableRendering( true );
 
     m_scene->MarkModified();
 }
@@ -224,7 +226,7 @@ void LinesCore::NotifyNeedRender()
 
 void LinesCore::EnableRendering( bool enable )
 {
-    m_scene->blockSignals( !enable );
+    m_renderer->EnableRendering( enable );
 }
 
 void LinesCore::SetRemoteIO( drwRemoteCommandIO * io )
