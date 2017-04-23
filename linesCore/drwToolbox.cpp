@@ -5,8 +5,8 @@
 #include "Scene.h"
 #include <cassert>
 
-drwToolbox::drwToolbox( Scene * scene, PlaybackControler * controller )
-: m_scene( scene ), m_controller( controller ), m_renderer( 0 )
+drwToolbox::drwToolbox( Scene * scene, PlaybackControler * controller, bool local )
+: m_scene( scene ), m_controller( controller ), m_renderer( 0 ), m_isLocal( local )
 {
     drwLineTool * drawTool = new drwLineTool( m_scene, this );
 	AddTool( drawTool );

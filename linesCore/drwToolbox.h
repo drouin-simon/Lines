@@ -18,8 +18,10 @@ Q_OBJECT
 	
 public:
 	
-    drwToolbox( Scene * scene, PlaybackControler * c );
+    drwToolbox( Scene * scene, PlaybackControler * c, bool local );
 	virtual ~drwToolbox();
+
+    bool IsLocal() { return m_isLocal; }
 	
     void SetRenderer( drwGLRenderer * r );
     drwGLRenderer * GetRenderer() { return m_renderer; }
@@ -59,6 +61,7 @@ signals:
 	
 protected:
 	
+    bool m_isLocal;
     int m_currentFrame;
     int m_currentTool;
     std::vector<drwTool*> Tools;

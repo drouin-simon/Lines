@@ -3,10 +3,10 @@
 
 #include <QObject>
 #include "drwCommand.h"
+#include "drwToolbox.h"
 
 class Scene;
 class QSettings;
-class drwToolbox;
 
 class drwTool : public QObject
 {
@@ -20,6 +20,8 @@ public:
 
     virtual void OnStartPlaying() {}
     virtual void OnStopPlaying() {}
+
+    bool IsLocal() { return m_toolbox->IsLocal(); }
     
     // Read and Write settings
     virtual void ReadSettings( QSettings & s ) {}
@@ -38,7 +40,7 @@ signals:
 	void CommandExecuted( drwCommand::s_ptr command );
 	
 protected:
-	
+
     Scene * m_scene;
     drwToolbox * m_toolbox;
 };

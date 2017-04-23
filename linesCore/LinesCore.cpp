@@ -14,7 +14,7 @@ LinesCore::LinesCore()
 {
     m_scene = new Scene(this);
     m_controler = new PlaybackControler( m_scene );
-    m_localToolbox = new drwToolbox( m_scene, m_controler );
+    m_localToolbox = new drwToolbox( m_scene, m_controler, true );
     m_controler->SetToolbox( m_localToolbox );
     connect( m_controler, SIGNAL(ModifiedSignal()), this, SLOT(PlaybackSettingsChangedSlot()) );
     connect( m_controler, SIGNAL(StartStop(bool)), this, SLOT(PlaybackStartStop(bool)) );

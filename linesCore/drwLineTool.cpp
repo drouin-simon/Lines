@@ -32,12 +32,16 @@ drwLineTool::drwLineTool( Scene * scene, drwToolbox * toolbox )
 , m_persistence( 0 )
 , m_minWidth( 2.0 )
 , m_maxWidth( 100.0 )
+, m_cursor( 0 )
 {	
-    m_cursor = new Circle;
-    m_cursor->SetContour( true );
-    m_cursor->SetFill( false );
-    m_cursor->SetRadius( m_baseWidth );
-    m_cursor->SetColor( lightGreen );
+    if( IsLocal() )
+    {
+        m_cursor = new Circle;
+        m_cursor->SetContour( true );
+        m_cursor->SetFill( false );
+        m_cursor->SetRadius( m_baseWidth );
+        m_cursor->SetColor( lightGreen );
+    }
 
 	// Make sure the Reset function is the only one driving initial param values
 	Reset();
@@ -135,7 +139,8 @@ void drwLineTool::ExecuteMouseCommand( drwCommand::s_ptr command )
     double yWorld = mouseCom->Y();
     double pressure = mouseCom->Pressure();
 
-    m_cursor->SetCenter( xWorld, yWorld );
+    if( m_cursor )
+        m_cursor->SetCenter( xWorld, yWorld );
 
 	if( mouseCom->GetType() == drwMouseCommand::Press )
 	{
@@ -300,8 +305,8 @@ void drwLineTool::Reset()
 void drwLineTool::NotifyRendererChanged()
 {
     drwGLRenderer * ren = m_toolbox->GetRenderer();
-    if( ren )
-        m_toolbox->GetRenderer()->SetCursor( m_cursor );
+    if( ren && IsLocal() )
+        ren->SetCursor( m_cursor );
 }
 
 void drwLineTool::SetShowCursor( bool show )
@@ -382,7 +387,8 @@ void drwLineTool::SetBaseWidth( double newBaseWidth )
     if( m_baseWidth > m_maxWidth )
         m_baseWidth = m_maxWidth;
     ParametersChanged();
-    m_cursor->SetRadius( m_baseWidth );
+    if( m_cursor )
+        m_cursor->SetRadius( m_baseWidth );
 
     // Mark overlay modified
     drwGLRenderer * ren = m_toolbox->GetRenderer();
@@ -536,9 +542,12 @@ void drwLineTool::MarkWholePrimitiveModified()
 
 void drwLineTool::UpdateCursorColor()
 {
-    if( !m_erase )
-        m_cursor->SetColor( lightGreen );
-    else
-        m_cursor->SetColor( orange );
-    MarkOverlaySegmentModified( m_lastXWorld, m_lastYWorld, m_lastXWorld, m_lastYWorld );
+    if( m_cursor )
+    {
+        if( !m_erase )
+            m_cursor->SetColor( lightGreen );
+        else
+            m_cursor->SetColor( orange );
+        MarkOverlaySegmentModified( m_lastXWorld, m_lastYWorld, m_lastXWorld, m_lastYWorld );
+    }
 }
