@@ -3,13 +3,13 @@ set( LibName linesDesktopLib )
 include_directories( ${linesCoreIncludeDirs} )
 include_directories( ${linesNetworkIncludeDirs} )
 
-set( DrawLib_src LinesApp.cpp drwDrawingWidget.cpp drwsimplifiedtoolbar.cpp
+set( DrawLib_src LinesApp.cpp drwDrawingWidget.cpp DrawingWidgetMT.cpp drwsimplifiedtoolbar.cpp
         TabletStateWidget.cpp drwNetworkConnectDialog.cpp
         drwBitmapExporter.cpp drwGradientWidget.cpp
         drwLineToolViewportWidget.cpp drwFpsCounter.cpp
         drwGlobalLineParams.cpp drwAutoGui.cpp TabletStateTestingArea.cpp drwAspectRatioWidget.cpp )
 
-set( DrawLib_hdr_moc LinesApp.h drwDrawingWidget.h drwsimplifiedtoolbar.h TabletStateWidget.h 
+set( DrawLib_hdr_moc LinesApp.h drwDrawingWidget.h DrawingWidgetMT.h drwsimplifiedtoolbar.h TabletStateWidget.h
         drwNetworkConnectDialog.h drwBitmapExporter.h drwGradientWidget.h
         drwGlobalLineParams.h drwAutoGui.h TabletStateTestingArea.h drwAspectRatioWidget.h )
 
