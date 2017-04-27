@@ -6,7 +6,7 @@
 #include "drwCommand.h"
 
 class Scene;
-class PlaybackControler;
+class LinesCore;
 class drwGLRenderer;
 class drwTool;
 class QSettings;
@@ -18,7 +18,7 @@ Q_OBJECT
 	
 public:
 	
-    drwToolbox( Scene * scene, PlaybackControler * c, bool local );
+    drwToolbox( Scene * scene, LinesCore * lc, bool local );
 	virtual ~drwToolbox();
 
     bool IsLocal() { return m_isLocal; }
@@ -58,6 +58,7 @@ private slots:
 signals:
 
     void CommandExecuted( drwCommand::s_ptr command );
+    void FrameChanged();
 	
 protected:
 	
@@ -66,7 +67,7 @@ protected:
     int m_currentTool;
     std::vector<drwTool*> Tools;
     Scene * m_scene;
-    PlaybackControler * m_controller;
+    LinesCore * m_lines;
     drwGLRenderer * m_renderer;
 };
 

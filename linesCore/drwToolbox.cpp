@@ -1,12 +1,12 @@
 #include "drwToolbox.h"
 #include "drwLineTool.h"
-#include "PlaybackControler.h"
 #include "drwGLRenderer.h"
 #include "Scene.h"
+#include "LinesCore.h"
 #include <cassert>
 
-drwToolbox::drwToolbox( Scene * scene, PlaybackControler * controller, bool local )
-: m_scene( scene ), m_controller( controller ), m_renderer( 0 ), m_isLocal( local )
+drwToolbox::drwToolbox( Scene * scene, LinesCore * lc, bool local )
+: m_scene( scene ), m_lines( lc ), m_renderer( 0 ), m_isLocal( local )
 {
     drwLineTool * drawTool = new drwLineTool( m_scene, this );
 	AddTool( drawTool );
@@ -54,14 +54,14 @@ void drwToolbox::WriteSettings( QSettings & s )
 
 void drwToolbox::StartPlaying()
 {
-    if( m_controller )
-        m_controller->StartPlaying();
+    if( m_lines )
+        m_lines->StartPlaying();
 }
 
 bool drwToolbox::IsPlaying()
 {
-    if( m_controller )
-        return m_controller->IsPlaying();
+    if( m_lines )
+        return m_lines->IsPlaying();
     return false;
 }
 
@@ -74,8 +74,8 @@ void drwToolbox::OnStartPlaying()
 
 void drwToolbox::StopPlaying()
 {
-    if( m_controller )
-        m_controller->StopPlaying();
+    if( m_lines )
+        m_lines->StopPlaying();
 }
 
 void drwToolbox::OnStopPlaying()
@@ -98,9 +98,7 @@ void drwToolbox::SetCurrentFrame( int frame )
     if( m_currentTool >= 0 && m_currentTool < Tools.size() )
         Tools[m_currentTool]->NotifyFrameChanged( frame );
 
-    // Tell controller the frame changed
-    if( m_controller )
-        m_controller->NotifyFrameChanged();
+    emit FrameChanged();
 
     if( m_renderer )
         m_renderer->SetRenderFrame( frame );

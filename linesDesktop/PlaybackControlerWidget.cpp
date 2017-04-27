@@ -58,11 +58,6 @@ void PlaybackControlerWidget::OnFrameRateSliderValueChanged( int value )
     m_lines->SetFrameInterval( ms );
 }
 
-void PlaybackControlerWidget::OnLoopCheckBoxToggled( bool isOn )
-{
-    m_lines->SetLooping( isOn );
-}
-
 void PlaybackControlerWidget::PlayPauseButtonClicked()
 {
     m_lines->PlayPause();
@@ -108,10 +103,6 @@ void PlaybackControlerWidget::SetupUi()
 	}
     mainLayout->addWidget( playPauseButton );
 	
-	// Loop playback checkbox
-	loopCheckBox = new QCheckBox(tr("Loop"),this);
-	mainLayout->addWidget(loopCheckBox);
-	
 	// Space
 	postLoopSpacer = new QSpacerItem(28, 20, QSizePolicy::Fixed, QSizePolicy::Minimum);
 	mainLayout->addItem(postLoopSpacer);
@@ -148,7 +139,6 @@ void PlaybackControlerWidget::SetupUi()
 	connect( currentFrameSlider, SIGNAL(valueChanged(int)), this, SLOT(OnCurrentFrameSliderValueChanged(int)) );
 	connect( frameRateSlider, SIGNAL(valueChanged(int)), this, SLOT(OnFrameRateSliderValueChanged(int)) );
     connect( playPauseButton, SIGNAL(clicked()), this, SLOT(PlayPauseButtonClicked()) );
-	connect( loopCheckBox, SIGNAL(toggled(bool)), this, SLOT(OnLoopCheckBoxToggled(bool)) );
 }
 
 void PlaybackControlerWidget::UpdateUi()
@@ -161,11 +151,6 @@ void PlaybackControlerWidget::UpdateUi()
         playPauseButton->setIcon( pauseIcon );
 	else
         playPauseButton->setIcon( playIcon );
-	
-	// Loop check box
-    loopCheckBox->blockSignals( true );
-    loopCheckBox->setChecked( m_lines->IsLooping() );
-    loopCheckBox->blockSignals( false );
 	
 	// Frame rate slider
     frameRateSlider->blockSignals( true );

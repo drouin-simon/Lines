@@ -3,7 +3,6 @@
 #include "drwGLRenderer.h"
 #include "drwToolbox.h"
 #include "drwLineTool.h"
-#include "PlaybackControler.h"
 #include "drwCommandDispatcher.h"
 #include "drwCommandDatabase.h"
 #include "drwDrawingSurface.h"
@@ -12,15 +11,29 @@ static int defaultNumberOfFrames = 24;
 
 LinesCore::LinesCore()
 {
+    // initialize playback params
+    m_frameInterval = 83;
+    m_isPlaying = false;
+    m_time.start();
+
+    // Scene
     m_scene = new Scene(this);
-    m_controler = new PlaybackControler( m_scene );
-    m_localToolbox = new drwToolbox( m_scene, m_controler, true );
-    m_controler->SetToolbox( m_localToolbox );
-    connect( m_controler, SIGNAL(ModifiedSignal()), this, SLOT(PlaybackSettingsChangedSlot()) );
-    connect( m_controler, SIGNAL(StartStop(bool)), this, SLOT(PlaybackStartStop(bool)) );
+    connect( m_scene, SIGNAL(NumberOfFramesChanged(int)), this, SLOT(NumberOfFramesChangedSlot()) );
+
+    // Local toolbox
+    m_localToolbox = new drwToolbox( m_scene, this, true );
+    connect( m_localToolbox, SIGNAL(FrameChanged()), this, SLOT( FrameChangedSlot() ) );
+
+    // Command db
     m_commandDb = new drwCommandDatabase(this);
+
+    // Command dispatcher
     m_commandDispatcher = new drwCommandDispatcher( m_commandDb, m_localToolbox, m_scene, this );
-    m_scene->SetNumberOfFrames( defaultNumberOfFrames ); // do this after everything else is initialized to make sure we generate a command for the db.
+
+    // do this after everything else is initialized to make sure we generate a command for the db.
+    m_scene->SetNumberOfFrames( defaultNumberOfFrames );
+
+    // GL Renderer
     m_renderer = new drwGLRenderer;
     m_renderer->SetCurrentScene( m_scene );
     m_localToolbox->SetRenderer( m_renderer );
@@ -30,7 +43,6 @@ LinesCore::LinesCore()
 LinesCore::~LinesCore()
 {
     delete m_scene;
-    delete m_controler;
     delete m_localToolbox;
     delete m_commandDb;
     delete m_commandDispatcher;
@@ -161,62 +173,93 @@ void LinesCore::SetNumberOfFrames( int nb )
 
 int LinesCore::GetCurrentFrame()
 {
-    return m_controler->GetCurrentFrame();
+    return m_localToolbox->GetCurrentFrame();
 }
 
 void LinesCore::SetCurrentFrame( int frame )
 {
-    m_controler->SetCurrentFrame( frame );
+    m_localToolbox->SetCurrentFrame( frame );
 }
 
 void LinesCore::NextFrame()
 {
-    m_controler->NextFrame();
+    m_localToolbox->GotoNextFrame();
 }
 
 void LinesCore::PrevFrame()
 {
-    m_controler->PrevFrame();
+    m_localToolbox->GotoPrevFrame();
 }
 
 void LinesCore::GotoStart()
 {
-    m_controler->GotoStart();
+    SetCurrentFrame(0);
 }
 
 void LinesCore::GotoEnd()
 {
-    m_controler->GotoEnd();
+    SetCurrentFrame( GetNumberOfFrames() - 1 );
 }
 
 void LinesCore::SetFrameInterval( int intervalms )
 {
-    m_controler->SetFrameInterval( intervalms );
-}
-
-bool LinesCore::IsLooping()
-{
-    return m_controler->GetLooping();
-}
-
-void LinesCore::SetLooping( bool loop )
-{
-    m_controler->SetLooping( loop );
+    m_frameInterval = intervalms;
 }
 
 bool LinesCore::IsPlaying()
 {
-    return m_controler->IsPlaying();
+    return m_isPlaying;
+}
+
+void LinesCore::StartPlaying()
+{
+    if( GetCurrentFrame() == GetNumberOfFrames() - 1 )
+        SetCurrentFrame( 0 );
+    m_isPlaying = true;
+    m_time.restart();
+    m_lastFrameWantedTime = 0;
+    m_localToolbox->OnStartPlaying();
+    m_drawingSurface->NotifyPlaybackStartStop( true );
+    emit PlaybackStartStop( true );
+}
+
+void LinesCore::StopPlaying()
+{
+    m_isPlaying = false;
+    m_localToolbox->OnStopPlaying();
+    m_drawingSurface->NotifyPlaybackStartStop( false );
+    emit PlaybackStartStop( false );
 }
 
 void LinesCore::PlayPause()
 {
-    m_controler->PlayPause();
+    if( m_isPlaying )
+    {
+        StopPlaying();
+    }
+    else
+    {
+        StartPlaying();
+    }
 }
 
 void LinesCore::Tick()
 {
-    m_controler->Tick();
+    if( m_isPlaying )
+    {
+        int current = m_time.elapsed();
+        int jump = ( current - m_lastFrameWantedTime ) / m_frameInterval;
+        if( jump > 0 )
+        {
+            int newFrame = GetCurrentFrame() + jump;
+            if( newFrame >= GetNumberOfFrames() )
+            {
+                newFrame = newFrame % GetNumberOfFrames();
+            }
+            SetCurrentFrame( newFrame );
+            m_lastFrameWantedTime += jump * m_frameInterval;
+        }
+    }
 }
 
 void LinesCore::NotifyNeedRender()
@@ -264,12 +307,12 @@ void LinesCore::LockDb( bool l )
     m_commandDb->LockDb( l );
 }
 
-void LinesCore::PlaybackStartStop( bool isStarting )
+void LinesCore::NumberOfFramesChangedSlot()
 {
-    m_drawingSurface->NotifyPlaybackStartStop( isStarting );
+    emit PlaybackSettingsChangedSignal();
 }
 
-void LinesCore::PlaybackSettingsChangedSlot()
+void LinesCore::FrameChangedSlot()
 {
     emit PlaybackSettingsChangedSignal();
 }

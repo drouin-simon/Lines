@@ -30,7 +30,6 @@ private slots:
 	// Ui-connected slots
 	void OnCurrentFrameSliderValueChanged( int value );
 	void OnFrameRateSliderValueChanged( int value );
-	void OnLoopCheckBoxToggled( bool isOn );
 	void PlayPauseButtonClicked();
 	
 	// Controler-connected slots
@@ -53,7 +52,6 @@ private:
     QToolButton * playPauseButton;
     QIcon         playIcon;
     QIcon         pauseIcon;
-    QCheckBox	* loopCheckBox;
     QSpacerItem * postLoopSpacer;
     QSlider		* frameRateSlider;
     QLineEdit	* frameRateLineEdit;

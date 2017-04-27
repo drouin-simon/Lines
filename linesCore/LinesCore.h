@@ -2,11 +2,11 @@
 #define __LinesCore_h_
 
 #include <QObject>
+#include <QTime>
 #include "drwCommand.h"
 
 class drwDrawingSurface;
 class Scene;
-class PlaybackControler;
 class drwToolbox;
 class drwLineTool;
 class drwCommandDatabase;
@@ -67,9 +67,9 @@ public:
     void GotoStart();
     void GotoEnd();
     void SetFrameInterval( int intervalms );
-    bool IsLooping();
-    void SetLooping( bool loop );
     bool IsPlaying();
+    void StartPlaying();
+    void StopPlaying();
     void PlayPause();
     void Tick();
 
@@ -84,20 +84,26 @@ public:
 
 protected slots:
 
-    void PlaybackStartStop( bool isStarting );
-    void PlaybackSettingsChangedSlot();
+    void FrameChangedSlot();
+    void NumberOfFramesChangedSlot();
 
 signals:
 
     void DisplaySettingsModified();
     void PlaybackSettingsChangedSignal();
+    void PlaybackStartStop( bool );
 
 private:
+
+    // Attributes for playback
+    QTime m_time;
+    int   m_frameInterval;  // number of miliseconds between frames
+    bool  m_isPlaying;
+    int	  m_lastFrameWantedTime;
 
     Scene		 * m_scene;
     drwGLRenderer        * m_renderer;
     drwDrawingSurface    * m_drawingSurface;
-    PlaybackControler	 * m_controler;
     drwToolbox		 * m_localToolbox;
     drwCommandDatabase	 * m_commandDb;
     drwCommandDispatcher * m_commandDispatcher;
