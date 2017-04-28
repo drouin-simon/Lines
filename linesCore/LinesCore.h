@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QTime>
+#include <QMap>
 #include "drwCommand.h"
 
 class drwDrawingSurface;
@@ -10,7 +11,6 @@ class Scene;
 class drwToolbox;
 class drwLineTool;
 class drwCommandDatabase;
-class drwCommandDispatcher;
 class drwGLRenderer;
 class drwRemoteCommandIO;
 class QSettings;
@@ -77,10 +77,16 @@ public:
     void SetRemoteIO( drwRemoteCommandIO * io );
     int RequestNewUserId();
     int GetLocalUserId();
-    void IncomingNetCommand( drwCommand::s_ptr com );
     int GetNumberOfDbCommands();
     drwCommand::s_ptr GetDbCommand( int index );
     void LockDb( bool l );
+
+public slots:
+
+    // Command dispatch
+    void IncomingNetCommand( drwCommand::s_ptr );
+    void IncomingLocalCommand( drwCommand::s_ptr );
+    void IncomingDbCommand( drwCommand::s_ptr );
 
 protected slots:
 
@@ -95,18 +101,31 @@ signals:
 
 private:
 
+    drwToolbox * AddUser( int commandUserId );
+    void ClearAllToolboxesButLocal();
+
     // Attributes for playback
     QTime m_time;
     int   m_frameInterval;  // number of miliseconds between frames
     bool  m_isPlaying;
     int	  m_lastFrameWantedTime;
 
-    Scene		 * m_scene;
+    // Container to cache state commands until an effective command comes
+    typedef QList< drwCommand::s_ptr > CommandContainer;
+    CommandContainer m_cachedStateCommands;
+
+     // Attribute to used to dispatch external (Network) commands
+    static const int m_localToolboxId;
+    int m_lastUsedUserId;
+    typedef QMap< int, drwToolbox* > ToolboxContainer;
+    ToolboxContainer m_toolboxes;
+
+    Scene                * m_scene;
     drwGLRenderer        * m_renderer;
     drwDrawingSurface    * m_drawingSurface;
-    drwToolbox		 * m_localToolbox;
+    drwToolbox           * m_localToolbox;
     drwCommandDatabase	 * m_commandDb;
-    drwCommandDispatcher * m_commandDispatcher;
+    drwRemoteCommandIO   * m_remoteIO;
 
 };
 

@@ -5,10 +5,10 @@ project( ${LibName} )
 set( ${LibName}_src drwToolbox.cpp drwLineTool.cpp drwGlslShader.cpp drwCamera.cpp
         Scene.cpp Frame.cpp Node.cpp line.cpp wideline.cpp drwDrawableTexture.cpp
         drwDrawingContext.cpp drwCommand.cpp drwCommandDatabase.cpp
-        drwCommandDispatcher.cpp drwGLRenderer.cpp lcCircle.cpp LinesCore.cpp )
+        drwGLRenderer.cpp lcCircle.cpp LinesCore.cpp )
 
 set( ${LibName}_hdr_moc drwToolbox.h drwTool.h drwLineTool.h drwCommandDatabase.h
-        Scene.h drwCommandDispatcher.h LinesCore.h )
+        Scene.h LinesCore.h )
 
 set( ${LibName}_hdr drwGLRenderer.h drwDrawingSurface.h drwRemoteCommandIO.h drwGlslShader.h
         drwCamera.h Frame.h line.h Node.h Primitive.h LinePrimitive.h

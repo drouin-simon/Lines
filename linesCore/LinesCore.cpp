@@ -3,32 +3,34 @@
 #include "drwGLRenderer.h"
 #include "drwToolbox.h"
 #include "drwLineTool.h"
-#include "drwCommandDispatcher.h"
 #include "drwCommandDatabase.h"
 #include "drwDrawingSurface.h"
+#include "drwRemoteCommandIO.h"
 
 static int defaultNumberOfFrames = 24;
+const int LinesCore::m_localToolboxId = 0;
 
 LinesCore::LinesCore()
 {
-    // initialize playback params
+    // initialize params
     m_frameInterval = 83;
     m_isPlaying = false;
     m_time.start();
+    m_lastUsedUserId = 0;
 
     // Scene
     m_scene = new Scene(this);
     connect( m_scene, SIGNAL(NumberOfFramesChanged(int)), this, SLOT(NumberOfFramesChangedSlot()) );
+    connect( m_scene, SIGNAL(CommandExecuted(drwCommand::s_ptr)), this, SLOT(IncomingLocalCommand(drwCommand::s_ptr)));
 
     // Local toolbox
     m_localToolbox = new drwToolbox( m_scene, this, true );
+    m_toolboxes[ m_localToolboxId ] = m_localToolbox;
     connect( m_localToolbox, SIGNAL(FrameChanged()), this, SLOT( FrameChangedSlot() ) );
+    connect( m_localToolbox, SIGNAL(CommandExecuted(drwCommand::s_ptr)), this, SLOT(IncomingLocalCommand(drwCommand::s_ptr)));
 
     // Command db
     m_commandDb = new drwCommandDatabase(this);
-
-    // Command dispatcher
-    m_commandDispatcher = new drwCommandDispatcher( m_commandDb, m_localToolbox, m_scene, this );
 
     // do this after everything else is initialized to make sure we generate a command for the db.
     m_scene->SetNumberOfFrames( defaultNumberOfFrames );
@@ -43,9 +45,11 @@ LinesCore::LinesCore()
 LinesCore::~LinesCore()
 {
     delete m_scene;
-    delete m_localToolbox;
+    foreach( drwToolbox * current, m_toolboxes )
+    {
+        delete current;
+    }
     delete m_commandDb;
-    delete m_commandDispatcher;
     delete m_renderer;
 }
 
@@ -71,7 +75,7 @@ void LinesCore::LoadAnimation( const char * filename )
     for( int i = 0; i < m_commandDb->GetNumberOfCommands(); ++i )
     {
         drwCommand::s_ptr com = m_commandDb->GetCommand( i );
-        m_commandDispatcher->IncomingDbCommand( com );
+        IncomingDbCommand( com );
     }
     m_commandDb->LockDb( false );
 
@@ -95,7 +99,18 @@ bool LinesCore::IsAnimationModified()
 
 void LinesCore::Reset()
 {
-    m_commandDispatcher->Reset();
+    // todo : This should probably be done in network manager
+    if( m_remoteIO->IsSharing() )
+    {
+        drwCommand::s_ptr newSceneCommand( new drwNewSceneCommand );
+        m_remoteIO->SendCommand( newSceneCommand );
+    }
+    m_scene->Clear();
+    m_commandDb->Clear();
+    ClearAllToolboxesButLocal();
+    m_localToolbox->Reset();
+    m_lastUsedUserId = 0;
+    m_cachedStateCommands.clear();
 }
 
 void LinesCore::SetDrawingSurface( drwDrawingSurface * surface )
@@ -274,22 +289,17 @@ void LinesCore::EnableRendering( bool enable )
 
 void LinesCore::SetRemoteIO( drwRemoteCommandIO * io )
 {
-    m_commandDispatcher->SetRemoteIO( io );
+    m_remoteIO = io;
 }
 
 int LinesCore::RequestNewUserId()
 {
-    return m_commandDispatcher->RequestNewUserId();
+    return ++m_lastUsedUserId;
 }
 
 int LinesCore::GetLocalUserId()
 {
-    return m_commandDispatcher->GetLocalUserId();
-}
-
-void LinesCore::IncomingNetCommand( drwCommand::s_ptr com )
-{
-    m_commandDispatcher->IncomingNetCommand( com );
+    return m_localToolboxId;
 }
 
 int LinesCore::GetNumberOfDbCommands()
@@ -307,6 +317,92 @@ void LinesCore::LockDb( bool l )
     m_commandDb->LockDb( l );
 }
 
+void LinesCore::IncomingNetCommand( drwCommand::s_ptr com )
+{
+    if( com->GetCommandId() == drwIdNewSceneCommand )
+    {
+        Reset();
+    }
+    else if( com->GetCommandId() == drwIdSceneParamsCommand )
+    {
+        drwSceneParamsCommand * serverMsg = dynamic_cast<drwSceneParamsCommand*> (com.get());
+        m_scene->SetNumberOfFrames( serverMsg->GetNumberOfFrames() );
+
+        // Store it in the database
+        m_commandDb->PushCommand( com );
+    }
+    else
+    {
+        // Execute the command in the appropriate toolbox
+        int commandUserId = com->GetUserId();
+        drwToolbox * box = m_toolboxes[ commandUserId ];
+        if( !box )
+            box = AddUser( commandUserId );
+        box->ExecuteCommand( com );
+
+        // Store it in the database
+        m_commandDb->PushCommand( com );
+    }
+}
+
+void LinesCore::IncomingLocalCommand( drwCommand::s_ptr command )
+{
+    if( command->IsStateCommand() )
+    {
+        // state command, we cache it for later
+
+        // try to concatenate the command with another one in the stack
+        bool found = false;
+        for( int i = 0; i < m_cachedStateCommands.size(); ++i )
+        {
+            if( m_cachedStateCommands[i]->Concatenate(command.get()) )
+            {
+                found = true;
+                break;
+            }
+        }
+
+        // if no command of the same type is in the stack, push_back
+        if( !found )
+            m_cachedStateCommands.push_back( command );
+    }
+    else
+    {
+        // Send state commands on the stack
+        for( int i = 0; i < m_cachedStateCommands.size(); ++i )
+        {
+            m_remoteIO->SendCommand( m_cachedStateCommands[i] );
+            m_commandDb->PushCommand( m_cachedStateCommands[i] );
+        }
+        m_cachedStateCommands.clear();
+
+        // Send it to the network
+        if( m_remoteIO )
+            m_remoteIO->SendCommand( command );
+
+        // Store it in the database
+        m_commandDb->PushCommand( command );
+    }
+}
+
+void LinesCore::IncomingDbCommand( drwCommand::s_ptr command )
+{
+    if( command->GetCommandId() == drwIdSceneParamsCommand )
+    {
+        drwSceneParamsCommand * serverMsg = dynamic_cast<drwSceneParamsCommand*> (command.get());
+        m_scene->SetNumberOfFrames( serverMsg->GetNumberOfFrames() );
+    }
+    else
+    {
+        // Execute the command in the appropriate toolbox
+        int commandUserId = command->GetUserId();
+        drwToolbox * box = m_toolboxes[ commandUserId ];
+        if( !box )
+            box = AddUser( commandUserId );
+        box->ExecuteCommand( command );
+    }
+}
+
 void LinesCore::NumberOfFramesChangedSlot()
 {
     emit PlaybackSettingsChangedSignal();
@@ -315,4 +411,25 @@ void LinesCore::NumberOfFramesChangedSlot()
 void LinesCore::FrameChangedSlot()
 {
     emit PlaybackSettingsChangedSignal();
+}
+
+drwToolbox * LinesCore::AddUser( int commandUserId )
+{
+    drwToolbox * newUser = new drwToolbox( m_scene, NULL, false );
+    m_toolboxes[ commandUserId ] = newUser;
+    if( m_lastUsedUserId < commandUserId )
+        m_lastUsedUserId = commandUserId;
+    return newUser;
+}
+
+void LinesCore::ClearAllToolboxesButLocal()
+{
+    drwToolbox * local = m_toolboxes[ m_localToolboxId ];
+    foreach( drwToolbox * current, m_toolboxes )
+    {
+        if( current != local )
+            delete current;
+    }
+    m_toolboxes.clear();
+    m_toolboxes[ m_localToolboxId ] = local;
 }
