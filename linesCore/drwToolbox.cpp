@@ -118,7 +118,7 @@ void drwToolbox::GotoNextFrame()
 
 void drwToolbox::GotoPrevFrame()
 {
-    int prevFrame = m_currentFrame == 0 ? GetNumberOfFrames() : m_currentFrame - 1;
+    int prevFrame = m_currentFrame == 0 ? GetNumberOfFrames() - 1 : m_currentFrame - 1;
     SetCurrentFrame( prevFrame );
 }
 

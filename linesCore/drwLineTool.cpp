@@ -231,11 +231,10 @@ void drwLineTool::ExecuteMouseCommand( drwCommand::s_ptr command )
             // Propagate command
             emit CommandExecuted( command );
 		}
-        else
-        {
-            MarkOverlaySegmentModified( m_lastXWorld, m_lastYWorld, xWorld, yWorld );
-        }
 	}
+
+    // In all cases, we want to repaint areas where the cursor is an was
+    MarkOverlaySegmentModified( m_lastXWorld, m_lastYWorld, xWorld, yWorld );
 
     m_lastXWorld = xWorld;
     m_lastYWorld = yWorld;

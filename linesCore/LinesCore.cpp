@@ -116,7 +116,7 @@ void LinesCore::SetRenderSize( int w, int h )
 
 void LinesCore::SetShowCursor( bool show )
 {
-    m_renderer->SetShowCursor( show );
+    m_localToolbox->SetShowCursor( show );
 }
 
 int LinesCore::GetOnionSkinBefore() { return m_renderer->GetOnionSkinBefore(); }
