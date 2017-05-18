@@ -4,6 +4,7 @@
 #include <QOpenGLWidget>
 #include <QThread>
 #include "drwCommand.h"
+#include "drwDrawingSurface.h"
 
 class DrawingWidgetMT;
 class LinesCore;
@@ -26,7 +27,7 @@ protected:
     LinesCore * m_lines;
 };
 
-class DrawingWidgetMT : public QOpenGLWidget
+class DrawingWidgetMT : public QOpenGLWidget, public drwDrawingSurface
 {
 
     Q_OBJECT
@@ -36,10 +37,22 @@ public:
     DrawingWidgetMT( LinesCore * lc, QWidget * parent = 0 );
     virtual ~DrawingWidgetMT();
 
-    void NotifyPlaybackStartStop( bool isStart );
+    void NotifyPlaybackStartStop( bool isStart ) override;
 
     void SetMuteMouse( bool mute ) { m_muteMouse = mute; }
     bool IsMutingMouse() { return m_muteMouse; }
+
+    // Functions used to control rendering. For direct render, call WaitRenderFinished,
+    // then do whatever is needed to the scene and renderer and then call Render. Render
+    // assumes that render thread is not running, i.e., that wait has been called before.
+    void WaitRenderFinished() override;
+    void Render() override;
+    void TryRender() override;
+    void PostRender() override;
+
+signals:
+
+    void PostRenderSignal();
 
 protected slots:
 
@@ -47,6 +60,7 @@ protected slots:
     void finishCompositing();
     void StartResize();
     void FinishResize();
+    void PostRenderSlot();
 
 protected:
 
@@ -61,8 +75,6 @@ protected:
     void enterEvent( QEvent * ) override;
     void leaveEvent( QEvent * ) override;
     bool event ( QEvent * ) override;
-
-    void tryRender();
 
     // Convert mouse and tablet event to lines command and push them
     void MouseCommand( drwMouseCommand::MouseCommandType commandType, QMouseEvent * e );

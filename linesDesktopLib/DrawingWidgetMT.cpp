@@ -44,12 +44,6 @@ DrawingWidgetMT::DrawingWidgetMT( LinesCore * lc, QWidget * parent )
     , m_muteMouse( false )
     , m_tabletHasControl( false )
 {
-    // Basic Qt widget properties
-    setMouseTracking(true);
-    setAutoFillBackground(false);
-    setCursor( QCursor( Qt::BlankCursor ) );
-    setUpdateBehavior( QOpenGLWidget::PartialUpdate );
-
     // Create render thread instance
     m_renderThread = new RenderThread;
     m_renderThread->SetDrawingWidget( this );
@@ -59,6 +53,13 @@ DrawingWidgetMT::DrawingWidgetMT( LinesCore * lc, QWidget * parent )
     connect( this, SIGNAL(frameSwapped()), this, SLOT(finishCompositing()), Qt::DirectConnection );
     connect( this, SIGNAL(aboutToResize()), this, SLOT(StartResize()), Qt::DirectConnection );
     connect( this, SIGNAL(resized()), this, SLOT(FinishResize()), Qt::DirectConnection );
+    connect( this, SIGNAL(PostRenderSignal()), this, SLOT(PostRenderSlot()), Qt::QueuedConnection );
+
+    // Basic Qt widget properties
+    setMouseTracking(true);
+    setAutoFillBackground(false);
+    setCursor( QCursor( Qt::BlankCursor ) );
+    setUpdateBehavior( QOpenGLWidget::PartialUpdate );
 }
 
 DrawingWidgetMT::~DrawingWidgetMT()
@@ -83,6 +84,31 @@ void DrawingWidgetMT::NotifyPlaybackStartStop( bool isStarting )
     }
 }
 
+void DrawingWidgetMT::WaitRenderFinished()
+{
+    m_renderThread->wait();
+}
+
+void DrawingWidgetMT::Render()
+{
+    Q_ASSERT( !m_renderThread->isRunning() );
+    context()->moveToThread( m_renderThread );
+    m_renderThread->start();
+}
+
+void DrawingWidgetMT::TryRender()
+{
+    if( !m_renderThread->isRunning() && m_lines->NeedsRender() )
+    {
+        Render();
+    }
+}
+
+void DrawingWidgetMT::PostRender()
+{
+    emit PostRenderSignal();
+}
+
 void DrawingWidgetMT::startCompositing()
 {
     // need to wait for render thread to return context, in case it is running
@@ -92,7 +118,7 @@ void DrawingWidgetMT::startCompositing()
 void DrawingWidgetMT::finishCompositing()
 {
     // buffer has just been swapped, we can start rendering again if there are pending lines to draw
-    tryRender();
+    TryRender();
 }
 
 void DrawingWidgetMT::StartResize()
@@ -112,25 +138,21 @@ void DrawingWidgetMT::FinishResize()
     // program because the main thread doesn't own the context
     // somewhere down the line.
     m_renderThread->wait();
-    m_lines->SetRenderSize( width(), height() );
+    int ratio = this->devicePixelRatio();
+    m_lines->SetRenderSize( ratio * width(), ratio * height() );
     context()->moveToThread( m_renderThread );
     m_renderThread->start();
     m_renderThread->wait();
 }
 
+void DrawingWidgetMT::PostRenderSlot()
+{
+    TryRender();
+}
+
 void DrawingWidgetMT::initializeGL()
 {
     //cout << "Support threaded opengl: " << (this->context()->supportsThreadedOpenGL() ? "true" : "false") << endl;
-}
-
-void DrawingWidgetMT::tryRender()
-{
-    if( !m_renderThread->isRunning() )
-    {
-        // Start rendering thread
-        context()->moveToThread( m_renderThread );
-        m_renderThread->start();
-    }
 }
 
 void DrawingWidgetMT::tabletEvent( QTabletEvent * e )
@@ -179,16 +201,19 @@ void DrawingWidgetMT::mouseMoveEvent( QMouseEvent * e )
 void DrawingWidgetMT::enterEvent( QEvent * e )
 {
     m_lines->SetShowCursor( true );
+    TryRender();
 }
 
 void DrawingWidgetMT::leaveEvent( QEvent * e )
 {
     m_lines->SetShowCursor( false );
+    TryRender();
 }
 
 bool DrawingWidgetMT::event( QEvent * e )
 {
     m_lines->Tick();
+    TryRender();
     return QOpenGLWidget::event(e);
 }
 
@@ -198,6 +223,7 @@ void DrawingWidgetMT::MouseCommand( drwMouseCommand::MouseCommandType commandTyp
     double xWin = ratio * (double)e->x();
     double yWin = ratio * (double)e->y();
     m_lines->MouseEvent( commandType, xWin, yWin );
+    TryRender();
 }
 
 void DrawingWidgetMT::MouseCommand( drwMouseCommand::MouseCommandType commandType, QTabletEvent * e )
@@ -208,4 +234,5 @@ void DrawingWidgetMT::MouseCommand( drwMouseCommand::MouseCommandType commandTyp
     double deltaY = e->hiResGlobalY() - e->globalY();
     double yWin = ratio * ((double)e->y() + deltaY);
     m_lines->MouseEvent( commandType, xWin, yWin, e->pressure(), e->xTilt(), e->yTilt(), e->rotation(), e->tangentialPressure() );
+    TryRender();
 }

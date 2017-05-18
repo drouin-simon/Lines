@@ -80,7 +80,7 @@ void LinesApp::DecreaseBrushSize()
 
 void LinesApp::SetLineWidth( double w )
 {
-    GetLineTool()->SetBaseWidth( w );
+    m_lines->SetLineBaseWidth( w );
 }
 
 double LinesApp::GetLineWidth()
@@ -90,7 +90,7 @@ double LinesApp::GetLineWidth()
 
 void LinesApp::SetLineColor( Vec4 & color )
 {
-    GetLineTool()->SetColor( color );
+    m_lines->SetLineColor( color );
 }
 
 Vec4 LinesApp::GetLineColor()
@@ -100,7 +100,7 @@ Vec4 LinesApp::GetLineColor()
 
 void LinesApp::SetErasing()
 {
-    GetLineTool()->SetErase( true );
+    m_lines->SetLineErase( true );
     SetLineWidth( eraserWidth );
     Vec4 color( 1.0, 1.0, 1.0, eraserAlpha );
     SetLineColor( color );

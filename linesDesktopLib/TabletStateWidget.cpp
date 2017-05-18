@@ -1,6 +1,6 @@
 #include "TabletStateWidget.h"
 #include "TabletStateTestingArea.h"
-#include "drwDrawingWidget.h"
+#include "DrawingWidgetMT.h"
 
 TabletStateWidget::TabletStateWidget( QWidget * parent ) : QWidget( parent )
 {
@@ -15,7 +15,7 @@ TabletStateWidget::~TabletStateWidget()
 {
 }
 
-void TabletStateWidget::SetDrawingWiget( drwDrawingWidget * w )
+void TabletStateWidget::SetDrawingWiget( DrawingWidgetMT * w )
 {
     m_drawingWidget = w;
     QTabletEvent event( QEvent::TabletEnterProximity, QPoint(0,0), QPointF( 0, 0 ), QTabletEvent::NoDevice, QTabletEvent::UnknownPointer, 0, 0, 0, 0, 0, 0, 0, 0 );

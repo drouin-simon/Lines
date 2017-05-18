@@ -8,8 +8,11 @@ class drwDrawingSurface
 public:
     drwDrawingSurface() {}
     ~drwDrawingSurface() {}
-    virtual void NeedRedraw() = 0;
     virtual void NotifyPlaybackStartStop( bool isStart ) = 0;
+    virtual void WaitRenderFinished() = 0;
+    virtual void Render() = 0;
+    virtual void TryRender() = 0;
+    virtual void PostRender() = 0;
 };
 
 #endif

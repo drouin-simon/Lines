@@ -4,7 +4,7 @@
 #include <QWidget>
 #include "ui_TabletStateWidget.h"
 
-class drwDrawingWidget;
+class DrawingWidgetMT;
 
 class TabletStateWidget : public QWidget
 {
@@ -16,7 +16,7 @@ public:
 	TabletStateWidget( QWidget * parent = 0 );
 	~TabletStateWidget();
 
-    void SetDrawingWiget( drwDrawingWidget * w );
+    void SetDrawingWiget( DrawingWidgetMT * w );
 
     void LogMouseEvent( QMouseEvent * e );
     void LogTabletEvent( QTabletEvent * e );
@@ -42,7 +42,7 @@ private:
     QString TabletEventToPointerType( QTabletEvent * e );
     QString TabletEventToDeviceType( QTabletEvent * e );
 
-    drwDrawingWidget * m_drawingWidget;
+    DrawingWidgetMT * m_drawingWidget;
 
 	Ui::TabletStateWidget ui;
 	

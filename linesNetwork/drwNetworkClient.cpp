@@ -86,7 +86,9 @@ void drwNetworkClient::CommandReceivedSlot( drwCommand::s_ptr command )
 			m_totalNumberOfCommandsToRead = serverMsg->GetNumberOfCommands();
 			m_numberOfCommandsToRead = m_totalNumberOfCommandsToRead;
             if( m_numberOfCommandsToRead > 0 )
+            {
                 SetState( ReceivingScene );
+            }
             else
                 SetState( Operating );
             m_lines->IncomingNetCommand( command );
