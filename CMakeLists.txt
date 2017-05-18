@@ -57,13 +57,11 @@ set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/githash.h PROPERTIES GEN
 include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 #----------------------------------------
 
-# Set flags to make a bundle on MAC
-if(APPLE)
-  SET(EXECUTABLE_FLAG MACOSX_BUNDLE)
-else(APPLE)
+# Need Glee for OpenGL if not on MacOS
+if( NOT APPLE )
   add_subdirectory( GLee )
   include_directories( ${GLeeIncludeDir} )
-endif(APPLE)
+endif()
 
 add_subdirectory( linesCore )
 add_subdirectory( linesNetwork )

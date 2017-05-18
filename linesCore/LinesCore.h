@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QTime>
 #include <QMap>
+#include <QMutex>
 #include "drwCommand.h"
 
 class drwDrawingSurface;

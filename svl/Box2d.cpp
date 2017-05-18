@@ -1,5 +1,6 @@
 #include "Box2d.h"
 #include <limits>
+#include <algorithm>
 
 Box2d::Box2d()
     : m_xMin( std::numeric_limits<double>::max() )

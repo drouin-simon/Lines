@@ -52,12 +52,15 @@ IF(APPLE)
 ENDIF(APPLE)
 #--------------------------------------------------------------------------------
 
+if( WIN32 )
+	set( executable_flags WIN32 )
+endif()
 
 #--------------------------------------------------------------------------------
 # Create and link executable
 #
 set( Drw_all_src ${Drw_src} ${Drw_hdr} ${Drw_moc} ${Drw_hdr_ui} )
-add_executable( ${ExecName} ${EXECUTABLE_FLAG} ${Drw_all_src} )
+add_executable( ${ExecName} ${executable_flags} ${Drw_all_src} )
 target_link_libraries( ${ExecName} linesDesktopLib linesNetwork linesCore svl ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY} ${QT_LIBRARIES} )
 qt5_use_modules( ${ExecName} OpenGL Widgets Network )
 
