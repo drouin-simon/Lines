@@ -22,5 +22,7 @@ SET( include_dir_content ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}
 SET( svlIncludeDir ${include_dir_content} CACHE PATH "Include directory for svl .h files" )
 MARK_AS_ADVANCED( svlIncludeDir )
 
-INSTALL_FILES( /include/svl .*\\.h$ )
-INSTALL_TARGETS( /lib/ svl )
+if( SVL_INSTALL_DEV_FILES )
+    INSTALL_FILES( /include/svl .*\\.h$ )
+    INSTALL_TARGETS( /lib/ svl )
+endif()

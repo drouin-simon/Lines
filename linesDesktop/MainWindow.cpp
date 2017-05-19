@@ -605,6 +605,7 @@ void MainWindow::Reset()
 void MainWindow::about()
 {
     QString msg = QString( "Lines - version %1.%2.%3\n" ).arg(LINES_MAJOR_VERSION).arg(LINES_MINOR_VERSION).arg(LINES_PATCH_VERSION);
+    msg += QString("%1\n").arg(LINES_VERSION_QUALIFIER);
     msg += QString("Protocol version %1\n").arg(LINES_PROTOCOL_VERSION);
     msg += QString("Git Hash: %1\n").arg(LINES_GIT_HASH_SHORT);
     msg += QString(LINES_COPYRIGHT);

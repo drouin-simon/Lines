@@ -58,51 +58,42 @@ endif()
 
 #--------------------------------------------------------------------------------
 # Create and link executable
-#
+#--------------------------------------------------------------------------------
 set( Drw_all_src ${Drw_src} ${Drw_hdr} ${Drw_moc} ${Drw_hdr_ui} )
 add_executable( ${ExecName} ${executable_flags} ${Drw_all_src} )
 target_link_libraries( ${ExecName} linesDesktopLib linesNetwork linesCore svl ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY} ${QT_LIBRARIES} )
 qt5_use_modules( ${ExecName} OpenGL Widgets Network )
-
-if( NOT APPLE )
-	target_link_libraries( ${ExecName} GLee )
-endif( NOT APPLE )
-#--------------------------------------------------------------------------------
-
 if (APPLE)
     set_target_properties( ${ExecName} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_BINARY_DIR}/LinesInfo.plist )
+else()
+    target_link_libraries( ${ExecName} GLee )
 endif()
 
 
 #--------------------------------------------------------------------------------
 # INSTALL
-#
-set( APPS ${CMAKE_INSTALL_PREFIX}/bin/${ExecName} )
-IF(APPLE)
-  set( APPS ${CMAKE_INSTALL_PREFIX}/${ExecName}.app )
-ENDIF(APPLE)
-IF(WIN32)
-  set( APPS "\${CMAKE_INSTALL_PREFIX}/bin/\${ExecName}.exe")
-ENDIF(WIN32)
-INSTALL( TARGETS ${ExecName} BUNDLE DESTINATION . COMPONENT Runtime RUNTIME DESTINATION bin COMPONENT Runtime )
-
-# directories to look for dependencies
-SET(DIRS ${QT_LIBRARY_DIR})
-INSTALL(CODE "include(BundleUtilities) 
-    fixup_bundle(\"${APPS}\" \"\" \"${DIRS}\")" COMPONENT Runtime)
-
-IF( APPLE )
-   IF (QT_MAC_USE_COCOA)                 
-        INSTALL(CODE "execute_process(COMMAND cp -R \"${QT_QTGUI_LIBRARY}/Resources/qt_menu.nib\" \"${APPS}/Contents/Resources/\" )" )
-    ENDIF(QT_MAC_USE_COCOA)
-ENDIF(APPLE)
 #--------------------------------------------------------------------------------
 
-
-#================================
-# Explicit dependencies
-#================================
-add_dependencies( ${ExecName} svl linesDesktopLib )
+# Install executables (Windows and Linux) in CMAKE_INSTALL_PREFIX/bin - macOS is not handled by standard install
 if( NOT APPLE )
-	add_dependencies( ${ExecName} GLee )
-endif( NOT APPLE )
+    install( TARGETS ${ExecName} BUNDLE DESTINATION . COMPONENT Runtime RUNTIME DESTINATION bin COMPONENT Runtime )
+endif()
+
+# Run Qt deployment tool for each platform
+get_target_property( QMakeLocation Qt5::qmake LOCATION)
+get_filename_component( QtBinLocation ${QMakeLocation} DIRECTORY )
+if( APPLE )
+    set( MacDeployQtExec ${QtBinLocation}/macdeployqt )
+    set( BuiltExecFullPath ${CMAKE_CURRENT_BINARY_DIR}/${ExecName}.app )
+    file( TIMESTAMP ${BuiltExecFullPath} ExecDate %Y-%m-%d )
+    set( DmgFileName ${ExecName}-v${LINES_MAJOR_VERSION}.${LINES_MINOR_VERSION}.${LINES_PATCH_VERSION}-${LINES_VERSION_QUALIFIER}-${ExecDate}-macOS-${CMAKE_OSX_DEPLOYMENT_TARGET}-${GIT_COMMIT_HASH_SHORT}.dmg )
+    install( CODE "file( COPY ${BuiltExecFullPath} DESTINATION ${CMAKE_INSTALL_PREFIX} )
+        execute_process( COMMAND ${MacDeployQtExec} ${CMAKE_INSTALL_PREFIX}/${ExecName}.app -dmg )
+        execute_process( COMMAND mv ${CMAKE_INSTALL_PREFIX}/${ExecName}.dmg ${CMAKE_INSTALL_PREFIX}/${DmgFileName} )" )
+else()
+    set( WinDeployQtExec ${QtBinLocation}/windeployqt.exe )
+    install( CODE "execute_process( COMMAND ${WinDeployQtExec} ${CMAKE_CURRENT_BINARY_DIR}/${ExecName}.exe )")
+endif()
+
+#--------------------------------------------------------------------------------
+
