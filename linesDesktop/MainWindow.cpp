@@ -1,5 +1,5 @@
 #include "MainWindow.h"
-#include "DrawingWidgetMT.h"
+#include "drwDrawingWidget.h"
 #include "drwAspectRatioWidget.h"
 #include "PlaybackControlerWidget.h"
 #include "PrimitiveToolOptionWidget.h"
@@ -94,7 +94,8 @@ MainWindow::MainWindow()
     drawingAreaLayout->addWidget( m_drawingWidgetContainer );
 	
 	// Create Drawing window
-    m_glWidget = new DrawingWidgetMT( m_lines, m_drawingWidgetContainer );
+    m_glWidget = new drwDrawingWidget( m_drawingWidgetContainer );
+    m_glWidget->SetLinesCore( m_lines );
     m_lines->SetDrawingSurface( m_glWidget );
     m_drawingWidgetContainer->setClientWidget( m_glWidget );
     m_glWidget->setMinimumSize( 480, 270 );
@@ -298,6 +299,7 @@ void MainWindow::editSetNumberOfFrames()
 void MainWindow::editWhiteOnBlackToggled( bool wob )
 {
     SetWhiteOnBlack( wob );
+    m_glWidget->NeedRedraw();
 }
 
 void MainWindow::NetShareSession()
@@ -334,10 +336,9 @@ void MainWindow::NetConnect()
         }
         delete dlg;
 
-        m_lines->BeginCommandStream();
-
         // Now we have a valid username and ip, try to connect
         Reset();
+        m_lines->EnableRendering( false );
         m_networkManager->Connect( name, address );
 
         // Create a timer to update a progress dialog
@@ -349,6 +350,8 @@ void MainWindow::NetConnect()
         m_progressDialog = new QProgressDialog( "Connecting", "Cancel", 0, 100 );
         m_progressDialog->setLabelText("Waiting for server...");
         m_progressDialog->exec();
+
+        m_lines->EnableRendering( true );
 
         if( m_progressDialog->wasCanceled() )
         {
@@ -428,7 +431,6 @@ void MainWindow::NetStateChanged()
         if( m_progressDialog )
             m_progressDialog->accept();
     }
-    m_lines->EndCommandStream();
     UpdateNetworkStatus();
 }
 

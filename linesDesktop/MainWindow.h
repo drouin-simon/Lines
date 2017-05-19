@@ -13,7 +13,7 @@ class QProgressDialog;
 class QLabel;
 
 class drwAspectRatioWidget;
-class DrawingWidgetMT;
+class drwDrawingWidget;
 class PrimitiveToolOptionWidget;
 class PlaybackControlerWidget;
 class TabletStateWidget;
@@ -88,7 +88,7 @@ private:
 	QSize m_exportRes;
 
     drwAspectRatioWidget * m_drawingWidgetContainer;
-    DrawingWidgetMT    * m_glWidget;
+	drwDrawingWidget    * m_glWidget;
     drwSimplifiedToolbar * m_simplifiedToolbar;
     LinesApp * m_linesApp;
 

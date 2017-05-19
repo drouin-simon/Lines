@@ -29,7 +29,7 @@ void drwToolbox::SetRenderer( drwGLRenderer * r )
 
 void drwToolbox::AddTool( drwTool * tool )
 {
-    connect( tool, SIGNAL(CommandExecuted(drwCommand::s_ptr)), SLOT(NotifyCommandExecuted(drwCommand::s_ptr)), Qt::DirectConnection );
+	connect( tool, SIGNAL(CommandExecuted(drwCommand::s_ptr)), SLOT(NotifyCommandExecuted(drwCommand::s_ptr)) );
 	Tools.push_back( tool );
 }
 
@@ -67,6 +67,7 @@ bool drwToolbox::IsPlaying()
 
 void drwToolbox::OnStartPlaying()
 {
+    m_renderer->SetInhibitOnionSkin( true );
     for( unsigned i = 0; i < Tools.size(); ++i )
         Tools[i]->OnStartPlaying();
 }
@@ -79,6 +80,7 @@ void drwToolbox::StopPlaying()
 
 void drwToolbox::OnStopPlaying()
 {
+    m_renderer->SetInhibitOnionSkin( false );
     for( unsigned i = 0; i < Tools.size(); ++i )
         Tools[i]->OnStopPlaying();
 }

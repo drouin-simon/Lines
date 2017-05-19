@@ -34,19 +34,6 @@ public:
     bool IsAnimationModified();
     void Reset();
 
-    // Stream commands ( network and loading )
-    void BeginCommandStream();
-    void EndCommandStream();
-
-    // Modify line tool params
-    void SetLineErase( bool erase );
-    void SetLineBaseWidth( double w );
-    void SetLineColor( Vec4 color );
-    void SetLinePressureWidth( bool pw );
-    void SetLinePressureOpacity( bool po );
-    void SetLineFill( bool f );
-    void SetLinePersistence( int p );
-
     // Setting properties
     void SetDrawingSurface( drwDrawingSurface * surface );
     void SetBackgroundColor( double r, double g, double b, double a );
@@ -62,9 +49,9 @@ public:
     void WriteSettings( QSettings & s );
 
     // Rendering
-    bool NeedsRender();
     void Render();
     void NotifyNeedRender();  // only for drwGlobalLineParams. todo: We could inside LinesCore
+    void EnableRendering( bool enable );  // needed to block rendering when receiving an animation. todo: use same mechanism for loading and receiving
 
     // Local drawing
     void MouseEvent( drwMouseCommand::MouseCommandType commandType, double xPix, double yPix, double pressure = 1.0,
@@ -118,10 +105,6 @@ private:
     drwToolbox * AddUser( int commandUserId );
     void ClearAllToolboxesButLocal();
 
-    // Call before and after changing the params of a tool
-    void BeginChangeToolParams();
-    void EndChangeToolParams();
-
     // Attributes for playback
     QTime m_time;
     int   m_frameInterval;  // number of miliseconds between frames
@@ -132,32 +115,11 @@ private:
     typedef QList< drwCommand::s_ptr > CommandContainer;
     CommandContainer m_cachedStateCommands;
 
-    // List of local commands that need to be processed. This needs to be
-    // protected by a mutex because it may be accessed from both render thread
-    // and main thread.
-    void PushLocalCommand( drwCommand::s_ptr com );
-    void ExecuteLocalCommands();
-    int m_stackedCurrentFrame;
-    QMutex m_localCommandsMutex;
-    CommandContainer m_localCommandsToProcess;
-
-    // List of Network commands that need to be processed. This needs to be
-    // protected by a mutex because it may be accessed from both render thread
-    // and main thread.
-    void PushNetCommand( drwCommand::s_ptr com );
-    void ExecuteNetCommands();
-    void ExecuteOneNetCommand( drwCommand::s_ptr com );
-    QMutex m_netCommandsMutex;
-    CommandContainer m_netCommandsToProcess;
-
      // Attribute to used to dispatch external (Network) commands
     static const int m_localToolboxId;
     int m_lastUsedUserId;
     typedef QMap< int, drwToolbox* > ToolboxContainer;
     ToolboxContainer m_toolboxes;
-
-    // For loading and importing animation
-    bool m_commandsPassThrough;
 
     Scene                * m_scene;
     drwGLRenderer        * m_renderer;

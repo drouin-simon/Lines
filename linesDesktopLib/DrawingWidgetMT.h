@@ -45,10 +45,10 @@ public:
     // Functions used to control rendering. For direct render, call WaitRenderFinished,
     // then do whatever is needed to the scene and renderer and then call Render. Render
     // assumes that render thread is not running, i.e., that wait has been called before.
-    void WaitRenderFinished() override;
-    void Render() override;
-    void TryRender() override;
-    void PostRender() override;
+    void WaitRenderFinished();
+    void Render();
+    void TryRender();
+    void PostRender();
 
 signals:
 

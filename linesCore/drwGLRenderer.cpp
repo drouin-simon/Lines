@@ -7,6 +7,7 @@
 #include "drwDrawingContext.h"
 #include "drwGlslShader.h"
 #include "Primitive.h"
+#include "drwDrawingSurface.h"
 #include "Box2i.h"
 #include <algorithm>
 
@@ -21,6 +22,7 @@ drwGLRenderer::drwGLRenderer()
     m_renderFrame = 0;
     m_overlayModified = true;
     m_sceneModified = true;
+    m_drawingSurface = 0;
     m_camera = new drwCamera;
     m_scene = 0;
     m_cursor = 0;
@@ -100,8 +102,6 @@ void drwGLRenderer::Render()
         m_cursor->Draw( context );
         glDisable( GL_SCISSOR_TEST );
     }
-
-    glFlush();
 }
 
 void drwGLRenderer::RenderToTexture( int currentFrame, int onionSkinBefore, int onionSkinAfter, Box2i & rect )
@@ -413,6 +413,8 @@ void drwGLRenderer::SetRenderFrame( int frame )
 void drwGLRenderer::EnableRendering( bool enable )
 {
     m_renderingEnabled = enable;
+    if( m_renderingEnabled && m_drawingSurface )
+        m_drawingSurface->NeedRedraw();
 }
 
 void drwGLRenderer::NeedRedraw()
@@ -422,6 +424,8 @@ void drwGLRenderer::NeedRedraw()
     m_sceneModifiedRect.AdjustBound( modifiedRect );
     m_overlayModified = true;
     m_overlayModifiedRect.AdjustBound( modifiedRect );
+    if( m_drawingSurface && m_renderingEnabled )
+        m_drawingSurface->NeedRedraw();
 }
 
 void drwGLRenderer::NeedRedraw( int frame, Box2d & rect )
@@ -432,6 +436,8 @@ void drwGLRenderer::NeedRedraw( int frame, Box2d & rect )
         m_sceneModifiedRect.AdjustBound( rect );
         m_overlayModified = true;
         m_overlayModifiedRect.AdjustBound( rect );
+        if( m_drawingSurface && m_renderingEnabled )
+            m_drawingSurface->NeedRedraw();
     }
 }
 
@@ -439,4 +445,6 @@ void drwGLRenderer::MarkOverlayModified( Box2d & rect )
 {
     m_overlayModified = true;
     m_overlayModifiedRect.AdjustBound( rect );
+    if( m_drawingSurface && m_renderingEnabled )
+        m_drawingSurface->NeedRedraw();
 }

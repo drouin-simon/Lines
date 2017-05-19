@@ -4,11 +4,13 @@
 #include "Box2d.h"
 
 class Scene;
+class Node;
 class Primitive;
 class drwDrawableTexture;
 class drwGlslShader;
 class drwCamera;
 class drwDrawingContext;
+class drwDrawingSurface;
 class Box2i;
 
 class drwGLRenderer
@@ -19,6 +21,7 @@ public:
     explicit drwGLRenderer();
     ~drwGLRenderer();
 
+    void SetDrawingSurface( drwDrawingSurface * s ) { m_drawingSurface = s; }
     void SetCursor( Primitive * p ) { m_cursor = p; }
     void SetShowCursor( bool show ) { m_showCursor = show; }
 
@@ -83,6 +86,7 @@ protected:
     Box2d m_sceneModifiedRect;
     int m_renderFrame;
 
+    drwDrawingSurface   * m_drawingSurface;
     drwCamera           * m_camera;
     Scene				* m_scene;
     Primitive           * m_cursor;

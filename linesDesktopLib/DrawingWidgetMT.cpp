@@ -98,7 +98,7 @@ void DrawingWidgetMT::Render()
 
 void DrawingWidgetMT::TryRender()
 {
-    if( !m_renderThread->isRunning() && m_lines->NeedsRender() )
+    if( !m_renderThread->isRunning() /*&& m_lines->NeedsRender()*/ )
     {
         Render();
     }
