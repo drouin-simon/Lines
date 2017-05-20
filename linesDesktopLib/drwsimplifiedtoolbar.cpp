@@ -45,6 +45,7 @@ void drwSimplifiedToolbar::UpdateUI()
     ui->smallBrushButton->setChecked( m_app->IsSmallBrush() );
     ui->bigBrushButton->setChecked( m_app->IsBigBrush() );
     ui->eraserButton->setChecked( m_app->IsErasing() );
+    ui->opacityWidget->setSliderValue( m_app->GetLineColor()[3] );
 
     // Frame change mode
     allOff = !m_app->IsFrameChangeManual() && !m_app->IsFrameChangeJumpAfter();
@@ -67,6 +68,7 @@ void drwSimplifiedToolbar::BlockSigs( bool block )
     ui->smallBrushButton->blockSignals( block );
     ui->bigBrushButton->blockSignals( block );
     ui->eraserButton->blockSignals( block );
+    ui->opacityWidget->blockSignals( block );
     ui->manualModeButton->blockSignals( block );
     ui->jumpModeButton->blockSignals( block );
     ui->noOnionButton->blockSignals( block );
@@ -90,6 +92,12 @@ void drwSimplifiedToolbar::on_eraserButton_toggled(bool checked)
 {
     if( checked )
         m_app->SetErasing();
+}
+
+void drwSimplifiedToolbar::on_opacityWidget_sliderValueChanged( double val )
+{
+    Vec4 color( 1.0, 1.0, 1.0, val );
+    m_app->SetLineColor( color );
 }
 
 void drwSimplifiedToolbar::on_manualModeButton_toggled(bool checked)

@@ -50,12 +50,6 @@ MainWindow::MainWindow()
     mainLayout->setContentsMargins( 0, 0, 0, 0 );
     mainLayout->setSpacing( 0 );
 
-    // Left panel widget (simplified toolbar)
-    m_simplifiedToolbar = new drwSimplifiedToolbar( m_mainWidget );
-    m_simplifiedToolbar->SetApp( m_linesApp );
-    mainLayout->addWidget( m_simplifiedToolbar );
-    m_simplifiedToolbar->setHidden( !m_simplifiedGui );
-
     // Drawing area layout (drawing window + timeline)
     QVBoxLayout * drawingAreaLayout = new QVBoxLayout();
 	drawingAreaLayout->setContentsMargins( 0, 0, 0, 0 );
@@ -88,6 +82,11 @@ MainWindow::MainWindow()
     //format.setProfile(QSurfaceFormat::CoreProfile);
     format.setSwapBehavior( QSurfaceFormat::DoubleBuffer );
     QSurfaceFormat::setDefaultFormat(format);
+
+    // Left panel widget (simplified toolbar)
+    m_simplifiedToolbar = new drwSimplifiedToolbar( m_mainWidget );
+    m_simplifiedToolbar->SetApp( m_linesApp );
+    drawingAreaLayout->addWidget( m_simplifiedToolbar );
 
     // Create Drawing window container that maintains a 16:9 aspect ratio
     m_drawingWidgetContainer = new drwAspectRatioWidget( m_mainWidget );

@@ -29,11 +29,11 @@ private slots:
     void on_smallBrushButton_toggled(bool checked);
     void on_bigBrushButton_toggled(bool checked);
     void on_eraserButton_toggled(bool checked);
+    void on_opacityWidget_sliderValueChanged( double val );
     void on_manualModeButton_toggled(bool checked);
     void on_jumpModeButton_toggled(bool checked);
     void on_oneOnionButton_toggled(bool checked);
     void on_manyOnionButton_toggled(bool checked);
-
     void on_noOnionButton_toggled(bool checked);
 
 private:

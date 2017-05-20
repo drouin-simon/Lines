@@ -9,7 +9,7 @@ class drwGradientWidget : public QWidget
 
 public:
 
-	explicit drwGradientWidget(const QColor &color = Qt::white, QWidget *parent = 0);
+    explicit drwGradientWidget( QWidget *parent = 0);
 	~drwGradientWidget();
 
 	double sliderValue();

@@ -5,7 +5,7 @@
 
 #include "drwGradientWidget.h"
 
-drwGradientWidget::drwGradientWidget(const QColor &color, QWidget *parent) :
+drwGradientWidget::drwGradientWidget( QWidget *parent) :
 		QWidget(parent),
 		m_cursorWidth( 10 ),
 		m_cursorHeight( 5 ),
