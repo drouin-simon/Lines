@@ -94,7 +94,8 @@ void WideLine::InternDraw( drwDrawingContext & context )
     {
         glBlendEquation( GL_FUNC_ADD );
         glBlendFuncSeparate( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE );
-        glColor4d( m_color[0], m_color[1], m_color[2], m_color[3] );
+        Vec4 col = m_color * context.m_colorMultiplier;
+        glColor4d( col[0], col[1], col[2], col[3] );
     }
     else
     {

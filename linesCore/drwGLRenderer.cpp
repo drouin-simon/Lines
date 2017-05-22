@@ -157,6 +157,7 @@ void drwGLRenderer::RenderToTexture( int currentFrame, int onionSkinBefore, int 
             int f = currentFrame - dist;
             while( f < 0 )
                 f = m_scene->GetNumberOfFrames() - abs( f );
+            context.m_colorMultiplier = Vec4( 1.0, 0.0, 0.0, 1.0 );
             RenderLayer( f, context );
         }
         
@@ -166,15 +167,17 @@ void drwGLRenderer::RenderToTexture( int currentFrame, int onionSkinBefore, int 
             int f = currentFrame + dist;
             while( f > m_scene->GetNumberOfFrames() - 1 )
                 f = f - m_scene->GetNumberOfFrames();
+            context.m_colorMultiplier = Vec4( 0.0, 0.0, 1.0, 1.0 );
             RenderLayer( f, context );
         }
         
         // draw background of next layer
-        glColor4d( m_clearColor[0], m_clearColor[1], m_clearColor[2], 0.5 );
+        glColor4d( m_clearColor[0], m_clearColor[1], m_clearColor[2], 0.3 );
         RenderRect();
     }
     
     // draw current frame
+    context.m_colorMultiplier = Vec4( 1.0, 1.0, 1.0, 1.0 );
     RenderLayer( currentFrame, context );
     
     // stop drawing to texture
