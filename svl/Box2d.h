@@ -11,6 +11,7 @@ public:
 
     void Init();
     void Init( double xmin, double xmax, double ymin, double ymax );
+    void Init( const Box2d & other );
     void Reset();
 
     //  determine if (x,y) is inside the box

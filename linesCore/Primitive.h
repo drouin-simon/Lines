@@ -12,7 +12,7 @@ class Primitive
 
 public:
 	
-	Primitive() : m_color(1.0,1.0,1.0,1.0) {}
+    Primitive() : m_color(1.0,1.0,1.0,1.0), m_boundingBox( 0.0, 0.0, 0.0, 0.0 ) {}
 	virtual ~Primitive() {}
 
     void Draw( drwDrawingContext & context )
@@ -24,6 +24,7 @@ public:
     void SetColor( double r, double g, double b, double a ) { SetColor( Vec4( r, g, b, a) ); }
 	void SetColor( const Vec4 & col ) { m_color = col; }
     void SetRenderState( RenderState state ) { m_renderState = state; }
+    virtual const Box2d & BoundingBox() { return m_boundingBox; }
 	
 protected:
 	
@@ -31,6 +32,7 @@ protected:
 
 	Vec4 m_color;
     RenderState m_renderState;
+    Box2d m_boundingBox;
 
 };
 

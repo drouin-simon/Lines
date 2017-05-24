@@ -49,7 +49,8 @@ public:
 	void SetPressureWidth( bool w );
 	bool GetPressureOpacity() { return m_pressureOpacity; }
 	void SetPressureOpacity( bool o );
-    bool IsPerssureWidthAndOpacityEnabled();
+    bool IsPresureWidthEnabled();
+    bool IsPresureOpacityEnabled();
 	bool GetFill() { return m_fill; }
 	void SetFill( bool f );
     bool GetErase() { return m_erase; }
@@ -63,7 +64,7 @@ public:
     void SetPersistenceEnabled( bool enable );
     bool IsPersistenceEnabled() { return m_persistenceEnabled; }
     void SetBaseWidth( double bw );
-    double GetBaseWidth() { return m_baseWidth; }
+    double GetBaseWidth();
 
 signals:
 
@@ -78,10 +79,10 @@ protected:
     void CreateNewNodes( double x, double y, double pressure );
     Node * CreateNewNode( double x, double y, double pressure );
     void MarkSegmentModified( double x1, double y1, double x2, double y2 );
-    void MarkOverlaySegmentModified( double x1, double y1, double x2, double y2 );
     void MarkPointModified( double x, double y );
     void MarkWholePrimitiveModified();
-    void UpdateCursorColor();
+    void MarkOverlayModified();
+    void UpdateCursor();
 	
     double m_lastXWorld;
     double m_lastYWorld;
@@ -96,7 +97,8 @@ protected:
 	// configurable params
 	Vec4 Color;
 	PrimitiveType Type;
-	double m_baseWidth;
+    double m_brushWidth;
+    double m_eraseWidth;
 	bool m_pressureWidth;
 	bool m_pressureOpacity;
 	bool m_fill;

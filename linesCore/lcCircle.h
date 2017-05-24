@@ -23,6 +23,8 @@ public:
 	SetMacro( Contour, bool );
 	SetMacro( Fill, bool );
 
+    virtual const Box2d & BoundingBox();
+
 protected:
 
     virtual void InternDraw( drwDrawingContext & context );

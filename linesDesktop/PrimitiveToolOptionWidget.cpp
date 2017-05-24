@@ -163,12 +163,12 @@ void PrimitiveToolOptionWidget::UpdateUi()
 	
     pressureWidthCheckBox->blockSignals( true );
 	pressureWidthCheckBox->setChecked( m_lineTool->GetPressureWidth() );
-    pressureWidthCheckBox->setEnabled( m_lineTool->IsPerssureWidthAndOpacityEnabled() );
+    pressureWidthCheckBox->setEnabled( m_lineTool->IsPresureWidthEnabled() );
     pressureWidthCheckBox->blockSignals( false );
 
     pressureOpacityCheckBox->blockSignals( true );
 	pressureOpacityCheckBox->setChecked( m_lineTool->GetPressureOpacity() );
-    pressureOpacityCheckBox->setEnabled( m_lineTool->IsPerssureWidthAndOpacityEnabled() );
+    pressureOpacityCheckBox->setEnabled( m_lineTool->IsPresureOpacityEnabled() );
     pressureOpacityCheckBox->blockSignals( false );
 
     fillCheckBox->blockSignals( true );

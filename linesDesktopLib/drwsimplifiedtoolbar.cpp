@@ -40,15 +40,12 @@ void drwSimplifiedToolbar::UpdateUI()
     BlockSigs( true );
 
     // Line tool properties
-    bool allOff = !m_app->IsSmallBrush() && !m_app->IsBigBrush() && !m_app->IsErasing();
-    ui->paintToolButtonGroup->setExclusive( !allOff );
-    ui->smallBrushButton->setChecked( m_app->IsSmallBrush() );
-    ui->bigBrushButton->setChecked( m_app->IsBigBrush() );
+    ui->smallBrushButton->setChecked( m_app->IsBrush() );
     ui->eraserButton->setChecked( m_app->IsErasing() );
     ui->opacityWidget->setSliderValue( m_app->GetLineColor()[3] );
 
     // Frame change mode
-    allOff = !m_app->IsFrameChangeManual() && !m_app->IsFrameChangeJumpAfter();
+    bool allOff = !m_app->IsFrameChangeManual() && !m_app->IsFrameChangeJumpAfter();
     ui->frameChangeButtonGroup->setExclusive( !allOff );
     ui->manualModeButton->setChecked( m_app->IsFrameChangeManual() );
     ui->jumpModeButton->setChecked( m_app->IsFrameChangeJumpAfter() );
@@ -66,7 +63,6 @@ void drwSimplifiedToolbar::UpdateUI()
 void drwSimplifiedToolbar::BlockSigs( bool block )
 {
     ui->smallBrushButton->blockSignals( block );
-    ui->bigBrushButton->blockSignals( block );
     ui->eraserButton->blockSignals( block );
     ui->opacityWidget->blockSignals( block );
     ui->manualModeButton->blockSignals( block );
@@ -79,13 +75,7 @@ void drwSimplifiedToolbar::BlockSigs( bool block )
 void drwSimplifiedToolbar::on_smallBrushButton_toggled(bool checked)
 {
     if( checked )
-        m_app->SetSmallBrush();
-}
-
-void drwSimplifiedToolbar::on_bigBrushButton_toggled(bool checked)
-{
-    if( checked )
-        m_app->SetBigBrush();
+        m_app->UseBrush();
 }
 
 void drwSimplifiedToolbar::on_eraserButton_toggled(bool checked)

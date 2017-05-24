@@ -26,6 +26,8 @@ drwGLRenderer::drwGLRenderer()
     m_camera = new drwCamera;
     m_scene = 0;
     m_cursor = 0;
+    m_lastShowCursor = false;
+    m_showCursor = true;
     m_renderTexture = new drwDrawableTexture;
     m_layerTexture = new drwDrawableTexture;
     m_workTexture = new drwDrawableTexture;
@@ -81,6 +83,17 @@ void drwGLRenderer::Render()
         m_sceneModified = false;
         m_sceneModifiedRect.Reset();
     }
+
+    // Adjust overlay modified rect for cursor modification
+    if( m_lastShowCursor )
+        m_overlayModifiedRect.AdjustBound( m_lastCursorBox );
+    if( m_showCursor )
+    {
+        const Box2d & cursorBBox = m_cursor->BoundingBox();
+        m_overlayModifiedRect.AdjustBound( cursorBBox );
+        m_lastCursorBox.Init( cursorBBox );
+    }
+    m_lastShowCursor = m_showCursor;
 
     // Paste texture to screen
     Box2i overlayModifiedRectWin;
@@ -444,10 +457,9 @@ void drwGLRenderer::NeedRedraw( int frame, Box2d & rect )
     }
 }
 
-void drwGLRenderer::MarkOverlayModified( Box2d & rect )
+void drwGLRenderer::MarkOverlayModified()
 {
     m_overlayModified = true;
-    m_overlayModifiedRect.AdjustBound( rect );
     if( m_drawingSurface && m_renderingEnabled )
         m_drawingSurface->NeedRedraw();
 }

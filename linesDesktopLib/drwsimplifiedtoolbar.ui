@@ -59,32 +59,6 @@
     </widget>
    </item>
    <item>
-    <widget class="QToolButton" name="bigBrushButton">
-     <property name="text">
-      <string>...</string>
-     </property>
-     <property name="icon">
-      <iconset resource="lineslibresources.qrc">
-       <normaloff>:/lines-icons-48x48/big-brush-white.png</normaloff>:/lines-icons-48x48/big-brush-white.png</iconset>
-     </property>
-     <property name="iconSize">
-      <size>
-       <width>30</width>
-       <height>30</height>
-      </size>
-     </property>
-     <property name="checkable">
-      <bool>true</bool>
-     </property>
-     <property name="autoExclusive">
-      <bool>true</bool>
-     </property>
-     <attribute name="buttonGroup">
-      <string notr="true">paintToolButtonGroup</string>
-     </attribute>
-    </widget>
-   </item>
-   <item>
     <widget class="QToolButton" name="eraserButton">
      <property name="text">
       <string>...</string>

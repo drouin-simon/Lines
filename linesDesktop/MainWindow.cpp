@@ -646,7 +646,12 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 		}
         else if ( keyEvent->key() == Qt::Key_B )
         {
-            m_linesApp->ToggleBigSmallBrush();
+            m_linesApp->UseBrush();
+            handled = true;
+        }
+        else if ( keyEvent->key() == Qt::Key_E )
+        {
+            m_linesApp->SetErasing();
             handled = true;
         }
         else if ( keyEvent->key() == Qt::Key_M )
@@ -664,7 +669,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
             if( !m_linesApp->IsErasing() )
             {
                 m_eraseToggled = true;
-                m_linesApp->ToggleErasing();
+                m_linesApp->SetErasing();
             }
             handled = true;
         }
@@ -696,7 +701,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
         {
             if( m_linesApp->IsErasing() && m_eraseToggled )
             {
-                m_linesApp->ToggleErasing();
+                m_linesApp->UseBrush();
                 m_eraseToggled = false;
             }
             handled = true;

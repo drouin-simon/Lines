@@ -34,6 +34,12 @@ void Circle::SetRadius( double r )
     MarkModified();
 }
 
+const Box2d & Circle::BoundingBox()
+{
+    m_boundingBox.Init( Center[0] - Radius, Center[0] + Radius, Center[1] - Radius, Center[1] + Radius );
+    return m_boundingBox;
+}
+
 void Circle::InternDraw( drwDrawingContext & context )
 {
     // Generate the polygons if not already done

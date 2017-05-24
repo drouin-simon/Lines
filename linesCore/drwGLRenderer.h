@@ -66,7 +66,7 @@ public:
     void EnableRendering( bool enable );
     void NeedRedraw();
     void NeedRedraw( int frame, Box2d & rect );
-    void MarkOverlayModified( Box2d & rect );
+    void MarkOverlayModified();
     
 protected:
 
@@ -86,11 +86,15 @@ protected:
     Box2d m_sceneModifiedRect;
     int m_renderFrame;
 
+    // Cursor
+    Primitive * m_cursor;
+    bool        m_showCursor;
+    bool        m_lastShowCursor;
+    Box2d       m_lastCursorBox;
+
     drwDrawingSurface   * m_drawingSurface;
     drwCamera           * m_camera;
     Scene				* m_scene;
-    Primitive           * m_cursor;
-    bool                  m_showCursor;
     drwDrawableTexture  * m_renderTexture;
     drwDrawableTexture  * m_layerTexture;
     drwDrawableTexture  * m_workTexture;

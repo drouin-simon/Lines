@@ -22,7 +22,8 @@ drwLineTool::drwLineTool( Scene * scene, drwToolbox * toolbox )
 , m_tabletHasControl( false )
 , Color(1.0,1.0,1.0,1.0)
 , Type( TypeWideLine )
-, m_baseWidth( 5.0 )
+, m_brushWidth( 5.0 )
+, m_eraseWidth( 20.0 )
 , m_pressureWidth(true)
 , m_pressureOpacity(true)
 , m_fill(false)
@@ -39,7 +40,7 @@ drwLineTool::drwLineTool( Scene * scene, drwToolbox * toolbox )
         m_cursor = new Circle;
         m_cursor->SetContour( true );
         m_cursor->SetFill( false );
-        m_cursor->SetRadius( m_baseWidth );
+        m_cursor->SetRadius( GetBaseWidth() );
         m_cursor->SetColor( lightGreen );
     }
 
@@ -54,13 +55,13 @@ void drwLineTool::ReadSettings( QSettings & s )
     Color[2] = s.value( "Color.B", Color[2] ).toDouble();
     Color[3] = s.value( "Color.A", Color[3] ).toDouble();
     
-    double baseWidth = s.value( "BaseWidth", QVariant(m_baseWidth) ).toDouble();
-    SetBaseWidth( baseWidth );
+    m_brushWidth = s.value( "BrushWidth", QVariant(m_brushWidth) ).toDouble();
+    m_eraseWidth = s.value( "EraseWidth", QVariant(m_eraseWidth) ).toDouble();
     m_pressureWidth = s.value( "PressureWidth", QVariant(m_pressureWidth) ).toBool();
     m_pressureOpacity = s.value( "PressureOpacity", QVariant(m_pressureOpacity) ).toBool();
     m_fill = s.value( "Fill", QVariant(m_fill) ).toBool();
     m_erase = s.value( "Erase", QVariant(m_erase) ).toBool();
-    UpdateCursorColor();
+    UpdateCursor();
     m_persistence = s.value( "Persistence", QVariant(m_persistence) ).toInt();
     
     ParametersChanged();
@@ -73,7 +74,8 @@ void drwLineTool::WriteSettings( QSettings & s )
     s.setValue( "Color.B", QVariant(Color[2]) );
     s.setValue( "Color.A", QVariant(Color[3]) );
     
-    s.setValue( "BaseWidth", QVariant(m_baseWidth) );
+    s.setValue( "BrushWidth", QVariant(m_brushWidth) );
+    s.setValue( "EraseWidth", QVariant(m_eraseWidth) );
     s.setValue( "PressureWidth", QVariant(m_pressureWidth) );
     s.setValue( "PressureOpacity", QVariant(m_pressureOpacity) );
     s.setValue( "Fill", QVariant(m_fill) );
@@ -234,7 +236,9 @@ void drwLineTool::ExecuteMouseCommand( drwCommand::s_ptr command )
 	}
 
     // In all cases, we want to repaint areas where the cursor is an was
-    MarkOverlaySegmentModified( m_lastXWorld, m_lastYWorld, xWorld, yWorld );
+    drwGLRenderer * ren = m_toolbox->GetRenderer();
+    if( ren )
+        ren->MarkOverlayModified();
 
     m_lastXWorld = xWorld;
     m_lastYWorld = yWorld;
@@ -314,12 +318,7 @@ void drwLineTool::SetShowCursor( bool show )
     if( ren )
     {
         m_toolbox->GetRenderer()->SetShowCursor( show );
-        double xBoxMin = m_lastXWorld - m_baseWidth;
-        double xBoxMax = m_lastXWorld + m_baseWidth;
-        double yBoxMin = m_lastYWorld - m_baseWidth;
-        double yBoxMax = m_lastYWorld + m_baseWidth;
-        Box2d modifiedRect( xBoxMin, xBoxMax, yBoxMin, yBoxMax );
-        ren->MarkOverlayModified( modifiedRect );
+        ren->MarkOverlayModified();
     }
 }
 
@@ -335,9 +334,14 @@ void drwLineTool::SetPressureOpacity( bool o )
 	ParametersChanged();
 }
 
-bool drwLineTool::IsPerssureWidthAndOpacityEnabled()
+bool drwLineTool::IsPresureWidthEnabled()
 {
     return !GetFill();
+}
+
+bool drwLineTool::IsPresureOpacityEnabled()
+{
+    return !( GetFill() || GetErase() );
 }
 
 void drwLineTool::SetFill( bool f )
@@ -348,8 +352,9 @@ void drwLineTool::SetFill( bool f )
 
 void drwLineTool::SetErase( bool e )
 {
+    double prevBaseWidth = GetBaseWidth();
     m_erase = e;
-    UpdateCursorColor();
+    UpdateCursor();
     ParametersChanged();
 }
 
@@ -379,35 +384,33 @@ void drwLineTool::SetPersistenceEnabled( bool enable )
 
 void drwLineTool::SetBaseWidth( double newBaseWidth )
 {
-    double maxWidth = std::max( m_baseWidth, newBaseWidth );
-    m_baseWidth = newBaseWidth;
-    if( m_baseWidth < m_minWidth )
-        m_baseWidth = m_minWidth;
-    if( m_baseWidth > m_maxWidth )
-        m_baseWidth = m_maxWidth;
+    double curBaseWidth = GetBaseWidth();
+    double maxWidth = std::max( curBaseWidth, newBaseWidth );
+    curBaseWidth = newBaseWidth;
+    if( curBaseWidth < m_minWidth )
+        curBaseWidth = m_minWidth;
+    if( curBaseWidth > m_maxWidth )
+        curBaseWidth = m_maxWidth;
+    if( GetErase() )
+        m_eraseWidth = curBaseWidth;
+    else
+        m_brushWidth = curBaseWidth;
     ParametersChanged();
-    if( m_cursor )
-        m_cursor->SetRadius( m_baseWidth );
+    UpdateCursor();
+}
 
-    // Mark overlay modified
-    drwGLRenderer * ren = m_toolbox->GetRenderer();
-    if( !ren )
-        return;
-    double xBoxMin = m_lastXWorld - maxWidth;
-    double xBoxMax = m_lastXWorld + maxWidth;
-    double yBoxMin = m_lastYWorld - maxWidth;
-    double yBoxMax = m_lastYWorld + maxWidth;
-    Box2d modifiedRect( xBoxMin, xBoxMax, yBoxMin, yBoxMax );
-    ren->MarkOverlayModified( modifiedRect );
+double drwLineTool::GetBaseWidth()
+{
+    return m_erase ? m_eraseWidth : m_brushWidth;
 }
 
 void drwLineTool::ParametersChanged()
 {
 	drwLineToolParamsCommand * c = new drwLineToolParamsCommand();
 	c->SetColor( Color );
-	c->SetBaseWidth( m_baseWidth );
-	c->SetPressureWidth( m_pressureWidth );
-	c->SetPressureOpacity( m_pressureOpacity );
+    c->SetBaseWidth( GetBaseWidth() );
+    c->SetPressureWidth( IsPresureWidthEnabled() && m_pressureWidth );
+    c->SetPressureOpacity( IsPresureOpacityEnabled() && m_pressureOpacity );
 	c->SetFill( m_fill );
     c->SetErase( m_erase );
     c->SetPersistence( m_persistenceEnabled ? m_persistence : 0 );
@@ -430,9 +433,9 @@ Node * drwLineTool::CreateNewNode( double x, double y, double pressure )
 			break;
 		case TypeWideLine:
 		{
-			WideLine * newWideLine = new WideLine( m_baseWidth );
-            newWideLine->SetPressureWidth( m_pressureWidth && !GetFill() );
-            newWideLine->SetPressureOpacity( m_pressureOpacity && !GetFill() && !m_erase );
+            WideLine * newWideLine = new WideLine( GetBaseWidth() );
+            newWideLine->SetPressureWidth( IsPresureWidthEnabled() && m_pressureWidth );
+            newWideLine->SetPressureOpacity( IsPresureOpacityEnabled() && m_pressureOpacity );
 			newWideLine->SetFill( m_fill );
             newWideLine->SetErase( m_erase );
 			newPrimitive = newWideLine;
@@ -469,10 +472,11 @@ void drwLineTool::CreateNewNodes( double x, double y, double pressure )
 
 void drwLineTool::MarkPointModified( double x, double y )
 {
-    double xMin = x - m_baseWidth;
-    double xMax = x + m_baseWidth;
-    double yMin = y - m_baseWidth;
-    double yMax = y + m_baseWidth;
+    double baseWidth = GetBaseWidth();
+    double xMin = x - baseWidth;
+    double xMax = x + baseWidth;
+    double yMin = y - baseWidth;
+    double yMax = y + baseWidth;
     Box2d modifiedRect( xMin, xMax, yMin, yMax );
     CurrentNodesCont::iterator it = CurrentNodes.begin();
     while( it != CurrentNodes.end() )
@@ -489,10 +493,11 @@ void drwLineTool::MarkSegmentModified( double x1, double y1, double x2, double y
     double xMax = std::max( x1, x2 );
     double yMin = std::min( y1, y2 );
     double yMax = std::max( y1, y2 );
-    double xBoxMin = xMin - m_baseWidth;
-    double xBoxMax = xMax + m_baseWidth;
-    double yBoxMin = yMin - m_baseWidth;
-    double yBoxMax = yMax + m_baseWidth;
+    double baseWidth = GetBaseWidth();
+    double xBoxMin = xMin - baseWidth;
+    double xBoxMax = xMax + baseWidth;
+    double yBoxMin = yMin - baseWidth;
+    double yBoxMax = yMax + baseWidth;
     Box2d modifiedRect( xBoxMin, xBoxMax, yBoxMin, yBoxMax );
     CurrentNodesCont::iterator it = CurrentNodes.begin();
     while( it != CurrentNodes.end() )
@@ -501,25 +506,6 @@ void drwLineTool::MarkSegmentModified( double x1, double y1, double x2, double y
         m_scene->MarkModified( frameIndex, modifiedRect );
         ++it;
     }
-}
-
-void drwLineTool::MarkOverlaySegmentModified( double x1, double y1, double x2, double y2 )
-{
-    drwGLRenderer * ren = m_toolbox->GetRenderer();
-    if( !ren )
-        return;
-
-    double pixSize = ren->UnitsPerPixel();
-    double xMin = std::min( x1, x2 );
-    double xMax = std::max( x1, x2 );
-    double yMin = std::min( y1, y2 );
-    double yMax = std::max( y1, y2 );
-    double xBoxMin = xMin - m_baseWidth - pixSize;  // grow box by 1 pixel to take into account circle line width
-    double xBoxMax = xMax + m_baseWidth + pixSize;
-    double yBoxMin = yMin - m_baseWidth - pixSize;
-    double yBoxMax = yMax + m_baseWidth + pixSize;
-    Box2d modifiedRect( xBoxMin, xBoxMax, yBoxMin, yBoxMax );
-    ren->MarkOverlayModified( modifiedRect );
 }
 
 void drwLineTool::MarkWholePrimitiveModified()
@@ -539,14 +525,22 @@ void drwLineTool::MarkWholePrimitiveModified()
     }
 }
 
-void drwLineTool::UpdateCursorColor()
+void drwLineTool::MarkOverlayModified()
+{
+    drwGLRenderer * ren = m_toolbox->GetRenderer();
+    if( ren )
+        ren->MarkOverlayModified();
+}
+
+void drwLineTool::UpdateCursor()
 {
     if( m_cursor )
     {
+        m_cursor->SetRadius( GetBaseWidth() );
         if( !m_erase )
             m_cursor->SetColor( lightGreen );
         else
             m_cursor->SetColor( orange );
-        MarkOverlaySegmentModified( m_lastXWorld, m_lastYWorld, m_lastXWorld, m_lastYWorld );
+        MarkOverlayModified();
     }
 }

@@ -1,12 +1,6 @@
 #include "LinesApp.h"
 #include "LinesCore.h"
 
-static double smallBrushWidth = 6.0;
-static double smallBrushAlpha = 1.0;
-static double bigBrushWidth = 40.0;
-static double bigBrushAlpha = 0.5;
-static double eraserWidth = 40.0;
-static double eraserAlpha = 1.0;
 static double percentBrushIncrease = 0.2;
 static int nbOnionOneBefore = 1;
 static int nbOnionOneAfter = 0;
@@ -14,9 +8,7 @@ static int nbOnionManyBefore = 5;
 static int nbOnionManyAfter = 5;
 
 LinesApp::LinesApp( LinesCore * lc )
-    : m_backupBrushWidth( smallBrushWidth )
-    , m_backupBrushOpacity( smallBrushAlpha )
-    , m_lines( lc )
+    : m_lines( lc )
 {
     drwLineTool * lineTool = GetLineTool();
     connect( lineTool, SIGNAL(ParametersChangedSignal()), this, SLOT(LineParamsModifiedSlot()) );
@@ -27,43 +19,14 @@ LinesApp::~LinesApp()
 {
 }
 
-bool LinesApp::IsSmallBrush()
+bool LinesApp::IsBrush()
 {
-    double w = GetLineWidth();
-    double alpha = GetLineColor()[3];
-    return ( w == smallBrushWidth && alpha == smallBrushAlpha && !IsErasing() );
+    return !GetLineTool()->GetErase();
 }
 
-void LinesApp::SetSmallBrush()
+void LinesApp::UseBrush()
 {
-    SetLineWidth( smallBrushWidth );
-    Vec4 col( 1.0, 1.0, 1.0, smallBrushAlpha );
-    SetLineColor( col );
     GetLineTool()->SetErase( false );
-}
-
-bool LinesApp::IsBigBrush()
-{
-    double w = GetLineWidth();
-    double alpha = GetLineColor()[3];
-    bool isBig = ( w == bigBrushWidth && alpha == bigBrushAlpha && !IsErasing() );
-    return isBig;
-}
-
-void LinesApp::SetBigBrush()
-{
-    SetLineWidth( bigBrushWidth );
-    Vec4 col( 1.0, 1.0, 1.0, bigBrushAlpha );
-    SetLineColor( col );
-    GetLineTool()->SetErase( false );
-}
-
-void LinesApp::ToggleBigSmallBrush()
-{
-    if( IsSmallBrush() )
-        SetBigBrush();
-    else
-        SetSmallBrush();
 }
 
 void LinesApp::IncreaseBrushSize()
@@ -101,31 +64,11 @@ Vec4 LinesApp::GetLineColor()
 void LinesApp::SetErasing()
 {
     GetLineTool()->SetErase( true );
-    SetLineWidth( eraserWidth );
-    Vec4 color( 1.0, 1.0, 1.0, eraserAlpha );
-    SetLineColor( color );
 }
 
 bool LinesApp::IsErasing()
 {
     return GetLineTool()->GetErase();
-}
-
-void LinesApp::ToggleErasing()
-{
-    if( IsErasing() )
-    {
-        SetLineWidth( m_backupBrushWidth );
-        Vec4 col( 1.0, 1.0, 1.0, m_backupBrushOpacity );
-        SetLineColor( col );
-        GetLineTool()->SetErase( false );
-    }
-    else
-    {
-        m_backupBrushWidth = GetLineWidth();
-        m_backupBrushOpacity = GetLineColor()[3];
-        SetErasing();
-    }
 }
 
 bool LinesApp::IsFrameChangeManual()

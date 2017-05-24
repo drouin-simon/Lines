@@ -33,6 +33,14 @@ void Box2d::Init( double xmin, double xmax, double ymin, double ymax )
     m_yMax = ymax;
 }
 
+void Box2d::Init( const Box2d & other )
+{
+    m_xMin = other.m_xMin;
+    m_yMin = other.m_yMin;
+    m_xMax = other.m_xMax;
+    m_yMax = other.m_yMax;
+}
+
 void Box2d::Reset()
 {
     m_xMin = -1.0;

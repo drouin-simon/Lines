@@ -19,11 +19,8 @@ public:
     ~LinesApp();
 
     // Line brush
-    bool IsSmallBrush();
-    void SetSmallBrush();
-    bool IsBigBrush();
-    void SetBigBrush();
-    void ToggleBigSmallBrush();
+    bool IsBrush();
+    void UseBrush();
     void IncreaseBrushSize();
     void DecreaseBrushSize();
     void SetLineWidth( double w );
@@ -32,7 +29,6 @@ public:
     Vec4 GetLineColor();
     void SetErasing();
     bool IsErasing();
-    void ToggleErasing();
 
     // Frame Change mode
     bool IsFrameChangeManual();
@@ -67,9 +63,6 @@ private slots:
 private:
 
     drwLineTool * GetLineTool();
-
-    double m_backupBrushWidth;
-    double m_backupBrushOpacity;
 
     LinesCore * m_lines;
 
