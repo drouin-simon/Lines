@@ -71,6 +71,46 @@ bool LinesApp::IsErasing()
     return GetLineTool()->GetErase();
 }
 
+bool LinesApp::IsPressureWidthEnabled()
+{
+    return GetLineTool()->IsPresureWidthEnabled();
+}
+
+bool LinesApp::IsUsingPressureWidth()
+{
+    return GetLineTool()->GetPressureWidth();
+}
+
+void LinesApp::SetUsePressureWidth( bool use )
+{
+    GetLineTool()->SetPressureWidth( use );
+}
+
+bool LinesApp::IsPressureOpacityEnabled()
+{
+    return GetLineTool()->IsPresureOpacityEnabled();
+}
+
+bool LinesApp::IsUsingPressureOpacity()
+{
+    return GetLineTool()->GetPressureOpacity();
+}
+
+void LinesApp::SetUsePressureOpacity( bool use )
+{
+    GetLineTool()->SetPressureOpacity( use );
+}
+
+bool LinesApp::IsFilling()
+{
+    return GetLineTool()->GetFill();
+}
+
+void LinesApp::SetFill( bool fill )
+{
+    GetLineTool()->SetFill( fill );
+}
+
 bool LinesApp::IsFrameChangeManual()
 {
     return GetFrameChangeMode() == Manual;
@@ -91,6 +131,16 @@ void LinesApp::SetFrameChangeJumpAfter()
     SetFrameChangeMode( AfterIntervention );
 }
 
+bool LinesApp::IsFrameChangePlay()
+{
+    return GetFrameChangeMode() == Play;
+}
+
+void LinesApp::SetFrameChangePlay()
+{
+    SetFrameChangeMode( Play );
+}
+
 drwFrameChangeMode LinesApp::GetFrameChangeMode()
 {
     return GetLineTool()->GetFrameChangeMode();
@@ -101,12 +151,20 @@ void LinesApp::SetFrameChangeMode( drwFrameChangeMode mode )
     GetLineTool()->SetFrameChangeMode( mode );
 }
 
-bool LinesApp::IsNoOnionSkin() { return GetOnionSkinBefore() == 0 && GetOnionSkinAfter() == 0; }
-void LinesApp::SetNoOnionSkin() { SetOnionSkinBefore(0); SetOnionSkinAfter(0); }
-bool LinesApp::IsOneOnionSkin() { return GetOnionSkinBefore() == nbOnionOneBefore && GetOnionSkinAfter() == nbOnionOneAfter; }
-void LinesApp::SetOneOnionSkin() { SetOnionSkinBefore( nbOnionOneBefore ); SetOnionSkinAfter( nbOnionOneAfter ); }
-bool LinesApp::IsManyOnionSkin() { return GetOnionSkinBefore() == nbOnionManyBefore && GetOnionSkinAfter() == nbOnionManyAfter; }
-void LinesApp::SetManyOnionSkin() { SetOnionSkinBefore( nbOnionManyBefore ); SetOnionSkinAfter( nbOnionManyAfter ); }
+void LinesApp::ToggleOnionSkinEnabled()
+{
+    SetOnionSkinEnabled( !IsOnionSkinEnabled() );
+}
+
+bool LinesApp::IsOnionSkinEnabled()
+{
+    return m_lines->GetOnionSkinEnabled();
+}
+
+void LinesApp::SetOnionSkinEnabled( bool enabled )
+{
+    m_lines->SetOnionSkinEnabled( enabled );
+}
 
 void LinesApp::SetOnionSkinBefore( int nbFrames ) { m_lines->SetOnionSkinBefore( nbFrames ); }
 int LinesApp::GetOnionSkinBefore() { return m_lines->GetOnionSkinBefore(); }

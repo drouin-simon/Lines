@@ -664,6 +664,11 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
             m_linesApp->DecreaseBrushSize();
             handled = true;
         }
+        else if( keyEvent->key() == Qt::Key_O )
+        {
+            m_linesApp->ToggleOnionSkinEnabled();
+            handled = true;
+        }
         else if( keyEvent->key() == Qt::Key_Shift )
         {
             if( !m_linesApp->IsErasing() )

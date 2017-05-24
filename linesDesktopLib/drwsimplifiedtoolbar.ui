@@ -101,6 +101,36 @@
     </widget>
    </item>
    <item>
+    <widget class="QToolButton" name="pressureWidthButton">
+     <property name="text">
+      <string>PW</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QToolButton" name="pressureOpacityButton">
+     <property name="text">
+      <string>PO</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QToolButton" name="fillButton">
+     <property name="text">
+      <string>F</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -169,6 +199,19 @@
     </widget>
    </item>
    <item>
+    <widget class="QToolButton" name="playModeButton">
+     <property name="text">
+      <string>P</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <attribute name="buttonGroup">
+      <string notr="true">frameChangeButtonGroup</string>
+     </attribute>
+    </widget>
+   </item>
+   <item>
     <spacer name="verticalSpacer_2">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -185,30 +228,7 @@
     </spacer>
    </item>
    <item>
-    <widget class="QToolButton" name="noOnionButton">
-     <property name="text">
-      <string>...</string>
-     </property>
-     <property name="icon">
-      <iconset resource="lineslibresources.qrc">
-       <normaloff>:/lines-icons-48x48/no-onion-white.png</normaloff>:/lines-icons-48x48/no-onion-white.png</iconset>
-     </property>
-     <property name="iconSize">
-      <size>
-       <width>30</width>
-       <height>30</height>
-      </size>
-     </property>
-     <property name="checkable">
-      <bool>true</bool>
-     </property>
-     <property name="autoExclusive">
-      <bool>true</bool>
-     </property>
-     <attribute name="buttonGroup">
-      <string notr="true">OnionSkinButtonGroup</string>
-     </attribute>
-    </widget>
+    <widget class="QSpinBox" name="onionBeforeSpinBox"/>
    </item>
    <item>
     <widget class="QToolButton" name="oneOnionButton">
@@ -231,36 +251,10 @@
      <property name="autoExclusive">
       <bool>true</bool>
      </property>
-     <attribute name="buttonGroup">
-      <string notr="true">OnionSkinButtonGroup</string>
-     </attribute>
     </widget>
    </item>
    <item>
-    <widget class="QToolButton" name="manyOnionButton">
-     <property name="text">
-      <string>...</string>
-     </property>
-     <property name="icon">
-      <iconset resource="lineslibresources.qrc">
-       <normaloff>:/lines-icons-48x48/many-onions-white.png</normaloff>:/lines-icons-48x48/many-onions-white.png</iconset>
-     </property>
-     <property name="iconSize">
-      <size>
-       <width>30</width>
-       <height>30</height>
-      </size>
-     </property>
-     <property name="checkable">
-      <bool>true</bool>
-     </property>
-     <property name="autoExclusive">
-      <bool>true</bool>
-     </property>
-     <attribute name="buttonGroup">
-      <string notr="true">OnionSkinButtonGroup</string>
-     </attribute>
-    </widget>
+    <widget class="QSpinBox" name="onionAfterSpinBox"/>
    </item>
    <item>
     <spacer name="verticalSpacer_3">
@@ -290,7 +284,6 @@
  </resources>
  <connections/>
  <buttongroups>
-  <buttongroup name="OnionSkinButtonGroup"/>
   <buttongroup name="frameChangeButtonGroup"/>
   <buttongroup name="paintToolButtonGroup"/>
  </buttongroups>

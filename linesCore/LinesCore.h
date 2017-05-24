@@ -39,6 +39,8 @@ public:
     void SetBackgroundColor( double r, double g, double b, double a );
     void SetRenderSize( int w, int h );
     void SetShowCursor( bool show );
+    bool GetOnionSkinEnabled();
+    void SetOnionSkinEnabled( bool e );
     int GetOnionSkinBefore();
     void SetOnionSkinBefore( int n );
     int GetOnionSkinAfter();
@@ -110,6 +112,8 @@ private:
     int   m_frameInterval;  // number of miliseconds between frames
     bool  m_isPlaying;
     int	  m_lastFrameWantedTime;
+
+    bool m_onionSkinEnabled;
 
     // Container to cache state commands until an effective command comes
     typedef QList< drwCommand::s_ptr > CommandContainer;

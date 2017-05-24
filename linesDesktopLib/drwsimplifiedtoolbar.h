@@ -32,8 +32,15 @@ private slots:
     void on_manualModeButton_toggled(bool checked);
     void on_jumpModeButton_toggled(bool checked);
     void on_oneOnionButton_toggled(bool checked);
-    void on_manyOnionButton_toggled(bool checked);
-    void on_noOnionButton_toggled(bool checked);
+    void on_pressureWidthButton_toggled(bool checked);
+    void on_pressureOpacityButton_toggled(bool checked);
+    void on_fillButton_toggled(bool checked);
+
+    void on_onionBeforeSpinBox_valueChanged(int arg1);
+
+    void on_onionAfterSpinBox_valueChanged(int arg1);
+
+    void on_playModeButton_toggled(bool checked);
 
 private:
 

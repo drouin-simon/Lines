@@ -17,6 +17,7 @@ LinesCore::LinesCore()
     m_isPlaying = false;
     m_time.start();
     m_lastUsedUserId = 0;
+    m_onionSkinEnabled = true;
 
     // Scene
     m_scene = new Scene(this);
@@ -134,6 +135,19 @@ void LinesCore::SetShowCursor( bool show )
     m_localToolbox->SetShowCursor( show );
 }
 
+bool LinesCore::GetOnionSkinEnabled()
+{
+    return m_onionSkinEnabled;
+}
+
+void LinesCore::SetOnionSkinEnabled( bool e )
+{
+    m_onionSkinEnabled = e;
+    if( !IsPlaying() )
+        m_renderer->SetInhibitOnionSkin( !e );
+    emit DisplaySettingsModified();
+}
+
 int LinesCore::GetOnionSkinBefore() { return m_renderer->GetOnionSkinBefore(); }
 
 void LinesCore::SetOnionSkinBefore( int n )
@@ -233,6 +247,7 @@ void LinesCore::StartPlaying()
     m_isPlaying = true;
     m_time.restart();
     m_lastFrameWantedTime = 0;
+    m_renderer->SetInhibitOnionSkin( true );
     m_localToolbox->OnStartPlaying();
     m_drawingSurface->NotifyPlaybackStartStop( true );
     emit PlaybackStartStop( true );
@@ -241,6 +256,7 @@ void LinesCore::StartPlaying()
 void LinesCore::StopPlaying()
 {
     m_isPlaying = false;
+    m_renderer->SetInhibitOnionSkin( !m_onionSkinEnabled );
     m_localToolbox->OnStopPlaying();
     m_drawingSurface->NotifyPlaybackStartStop( false );
     emit PlaybackStartStop( false );
