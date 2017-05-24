@@ -73,19 +73,9 @@ void drwDrawingWidget::paintEvent( QPaintEvent * event )
     emit FinishedPainting();
 }
 
-#ifdef Q_WS_MAC
-#import <OpenGL/OpenGL.h>
-#endif
-
 void drwDrawingWidget::EnableVSync( bool enable )
 {
-#ifdef Q_WS_MAC
-    int swap_interval = 1;
-    if( !enable )
-        swap_interval = 0;
-    CGLContextObj cgl_context = CGLGetCurrentContext();
-    CGLSetParameter( cgl_context, kCGLCPSwapInterval, &swap_interval );
-#endif
+    format().setSwapInterval( enable ? 1 : 0 );
 }
 
 void drwDrawingWidget::mousePressEvent( QMouseEvent * e )
