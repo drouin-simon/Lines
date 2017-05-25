@@ -25,8 +25,8 @@ PlaybackControlerWidget::PlaybackControlerWidget( LinesCore * lc, QWidget * pare
 : QWidget( parent )
 , m_lines( lc )
 , m_frameRateIndex(6)
-, playIcon("://lines-icons-48x48/play-white.png")
-, pauseIcon("://lines-icons-48x48/pause-white.png")
+, playIcon("://icons-60x60/play.png")
+, pauseIcon("://icons-60x60/pause.png")
 {
 	SetupUi();
 	UpdateUi();

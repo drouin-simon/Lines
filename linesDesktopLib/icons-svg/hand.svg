@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="98.07431"
+   height="98.350365"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="hand.svg"
+   inkscape:export-filename="/Users/simon/lines/src/linesDesktopLib/icons-60x60/hand.png"
+   inkscape:export-xdpi="55.060001"
+   inkscape:export-ydpi="55.060001">
+  <defs
+     id="defs4">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="358.22057 : 861.65028 : 1"
+       inkscape:vp_y="-312.5061 : 1497.0658 : 1"
+       inkscape:vp_z="2128.2243 : 308.69371 : 1"
+       inkscape:persp3d-origin="27.493899 : 109.92293 : 1"
+       id="perspective3841" />
+    <inkscape:perspective
+       id="perspective10"
+       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
+       inkscape:vp_z="744.09448 : 526.18109 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 526.18109 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:path-effect
+       is_visible="true"
+       id="path-effect3598"
+       effect="spiro" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#505050"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="3.3909381"
+     inkscape:cx="49.037155"
+     inkscape:cy="49.175182"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer2"
+     showgrid="false"
+     inkscape:window-width="1436"
+     inkscape:window-height="855"
+     inkscape:window-x="4"
+     inkscape:window-y="1"
+     inkscape:window-maximized="1"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="white"
+     transform="translate(-1035.5074,-26.515827)">
+    <path
+       inkscape:export-ydpi="43.799999"
+       inkscape:export-xdpi="43.799999"
+       inkscape:export-filename="/Users/simon/Dropbox/lines-icons-48x48/manual.png"
+       sodipodi:nodetypes="ssscscssscssscssscssscs"
+       inkscape:connector-curvature="0"
+       d="m 1105.4676,50.981522 c 0.016,-3.136436 2.4996,-5.661544 5.6043,-5.661544 3.1049,0 5.6117,2.525081 5.6045,5.661544 l -0.1036,45.800982 c -0.3132,13.817666 -11.1609,23.549946 -24.3332,23.356246 -8.5126,-0.12518 -15.9169,-4.36641 -21.2342,-12.05235 l -21.6002,-27.628698 c -2.675,-3.439323 -2.182,-8.364671 1.1884,-11.110205 3.3704,-2.745546 8.2938,-2.232541 10.9792,1.198533 l 9.2607,11.83283 0.1284,-41.388321 c 0,-3.136519 2.4996,-5.661585 5.6045,-5.661585 3.1048,0 5.58,2.525162 5.6044,5.661585 l 0.2198,31.194142 0.2197,-35.63459 c 0.019,-3.136478 2.4995,-5.661571 5.6044,-5.661571 3.1048,0 5.5929,2.525066 5.6045,5.661571 l 0.1106,32.415236 0.1105,-30.861105 c 0.014,-3.136477 2.4996,-5.661584 5.6044,-5.661584 3.1047,0 5.5932,2.525107 5.6044,5.661584 l 0.1092,34.524474 z"
+       style="opacity:0.98999999;fill:none;stroke:#ffffff;stroke-width:5.55589628;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path4247" />
+  </g>
+</svg>

@@ -39,7 +39,7 @@
      </property>
      <property name="icon">
       <iconset resource="lineslibresources.qrc">
-       <normaloff>:/lines-icons-48x48/small-brush-white.png</normaloff>:/lines-icons-48x48/small-brush-white.png</iconset>
+       <normaloff>:/icons-60x60/brush.png</normaloff>:/icons-60x60/brush.png</iconset>
      </property>
      <property name="iconSize">
       <size>
@@ -65,7 +65,7 @@
      </property>
      <property name="icon">
       <iconset resource="lineslibresources.qrc">
-       <normaloff>:/lines-icons-48x48/eraser.png</normaloff>:/lines-icons-48x48/eraser.png</iconset>
+       <normaloff>:/icons-60x60/eraser.png</normaloff>:/icons-60x60/eraser.png</iconset>
      </property>
      <property name="iconSize">
       <size>
@@ -102,8 +102,15 @@
    </item>
    <item>
     <widget class="QToolButton" name="pressureWidthButton">
-     <property name="text">
-      <string>PW</string>
+     <property name="icon">
+      <iconset resource="lineslibresources.qrc">
+       <normaloff>:/icons-60x60/big-brush.png</normaloff>:/icons-60x60/big-brush.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>30</width>
+       <height>30</height>
+      </size>
      </property>
      <property name="checkable">
       <bool>true</bool>
@@ -112,8 +119,15 @@
    </item>
    <item>
     <widget class="QToolButton" name="pressureOpacityButton">
-     <property name="text">
-      <string>PO</string>
+     <property name="icon">
+      <iconset resource="lineslibresources.qrc">
+       <normaloff>:/icons-60x60/big-brush.png</normaloff>:/icons-60x60/big-brush.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>30</width>
+       <height>30</height>
+      </size>
      </property>
      <property name="checkable">
       <bool>true</bool>
@@ -153,7 +167,7 @@
      </property>
      <property name="icon">
       <iconset resource="lineslibresources.qrc">
-       <normaloff>:/lines-icons-48x48/manual-white.png</normaloff>:/lines-icons-48x48/manual-white.png</iconset>
+       <normaloff>:/icons-60x60/hand.png</normaloff>:/icons-60x60/hand.png</iconset>
      </property>
      <property name="iconSize">
       <size>
@@ -179,7 +193,7 @@
      </property>
      <property name="icon">
       <iconset resource="lineslibresources.qrc">
-       <normaloff>:/lines-icons-48x48/jump-white.png</normaloff>:/lines-icons-48x48/jump-white.png</iconset>
+       <normaloff>:/icons-60x60/jump.png</normaloff>:/icons-60x60/jump.png</iconset>
      </property>
      <property name="iconSize">
       <size>
@@ -237,7 +251,7 @@
      </property>
      <property name="icon">
       <iconset resource="lineslibresources.qrc">
-       <normaloff>:/lines-icons-48x48/one-onion-white.png</normaloff>:/lines-icons-48x48/one-onion-white.png</iconset>
+       <normaloff>:/icons-60x60/onion.png</normaloff>:/icons-60x60/onion.png</iconset>
      </property>
      <property name="iconSize">
       <size>
