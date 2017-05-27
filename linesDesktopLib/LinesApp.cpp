@@ -1,5 +1,6 @@
 #include "LinesApp.h"
 #include "LinesCore.h"
+#include "drwNetworkManager.h"
 
 static double percentBrushIncrease = 0.2;
 static int nbOnionOneBefore = 1;
@@ -7,12 +8,14 @@ static int nbOnionOneAfter = 0;
 static int nbOnionManyBefore = 5;
 static int nbOnionManyAfter = 5;
 
-LinesApp::LinesApp( LinesCore * lc )
+LinesApp::LinesApp( LinesCore * lc, drwNetworkManager * netManager )
     : m_lines( lc )
+    , m_netManager( netManager )
 {
     drwLineTool * lineTool = GetLineTool();
     connect( lineTool, SIGNAL(ParametersChangedSignal()), this, SLOT(LineParamsModifiedSlot()) );
     connect( m_lines, SIGNAL(DisplaySettingsModified()), this, SLOT(DisplayParamsModifiedSlot()) );
+    connect( m_netManager, SIGNAL(StateChangedSignal()), this, SLOT(NetworkManagerStateChangedSlot()) );
 }
 
 LinesApp::~LinesApp()
@@ -172,6 +175,21 @@ int LinesApp::GetOnionSkinBefore() { return m_lines->GetOnionSkinBefore(); }
 void LinesApp::SetOnionSkinAfter( int nbFrames ) { m_lines->SetOnionSkinAfter( nbFrames ); }
 int LinesApp::GetOnionSkinAfter() { return m_lines->GetOnionSkinAfter(); }
 
+bool LinesApp::IsSharing()
+{
+    return m_netManager->IsSharing();
+}
+
+bool LinesApp::IsConnected()
+{
+    return m_netManager->IsConnected();
+}
+
+QString LinesApp::GetServerName()
+{
+    return m_netManager->GetServerUserName();
+}
+
 void LinesApp::LineParamsModifiedSlot()
 {
     emit LineParamsModified();
@@ -180,6 +198,11 @@ void LinesApp::LineParamsModifiedSlot()
 void LinesApp::DisplayParamsModifiedSlot()
 {
     emit DisplayParamsModified();
+}
+
+void LinesApp::NetworkManagerStateChangedSlot()
+{
+    emit NetworkManagerStateChangedSignal();
 }
 
 drwLineTool * LinesApp::GetLineTool()

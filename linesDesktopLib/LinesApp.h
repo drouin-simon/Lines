@@ -7,6 +7,7 @@
 #include "drwLineTool.h"
 
 class LinesCore;
+class drwNetworkManager;
 
 class LinesApp : public QObject
 {
@@ -15,7 +16,7 @@ class LinesApp : public QObject
 
 public:
 
-    LinesApp( LinesCore * lc );
+    LinesApp( LinesCore * lc, drwNetworkManager * netManager );
     ~LinesApp();
 
     // Line brush
@@ -57,21 +58,29 @@ public:
     void SetOnionSkinAfter( int nbFrames );
     int GetOnionSkinAfter();
 
+    // Network
+    bool IsSharing();
+    bool IsConnected();
+    QString GetServerName();
+
 signals:
 
     void LineParamsModified();
     void DisplayParamsModified();
+    void NetworkManagerStateChangedSignal();
 
 private slots:
 
     void LineParamsModifiedSlot();
     void DisplayParamsModifiedSlot();
+    void NetworkManagerStateChangedSlot();
 
 private:
 
     drwLineTool * GetLineTool();
 
     LinesCore * m_lines;
+    drwNetworkManager * m_netManager;
 
 };
 

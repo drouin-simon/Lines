@@ -40,7 +40,7 @@ MainWindow::MainWindow()
     m_globalLineParams = new drwGlobalLineParams( this );
     m_globalLineParamsDock = 0;
 
-    m_linesApp = new LinesApp( m_lines );
+    m_linesApp = new LinesApp( m_lines, m_networkManager );
 
 	// Create main widget  (just a frame to put the viewing widget and the playback control widget)
     m_mainWidget = new QWidget(this);

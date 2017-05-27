@@ -21,6 +21,7 @@ void drwSimplifiedToolbar::SetApp( LinesApp * app )
     m_app = app;
     connect( m_app, SIGNAL(DisplayParamsModified()), this, SLOT(UpdateUI()) );
     connect( m_app, SIGNAL(LineParamsModified()), this, SLOT(UpdateUI()) );
+    connect( m_app, SIGNAL(NetworkManagerStateChangedSignal()), this, SLOT(UpdateUI()) );
 }
 
 void drwSimplifiedToolbar::UpdateUI()
@@ -49,6 +50,24 @@ void drwSimplifiedToolbar::UpdateUI()
     ui->onionBeforeSpinBox->setValue( m_app->GetOnionSkinBefore() );
     ui->oneOnionButton->setChecked( m_app->IsOnionSkinEnabled() );
     ui->onionAfterSpinBox->setValue( m_app->GetOnionSkinAfter() );
+
+    // Network label
+    if( m_app->IsSharing() )
+    {
+        ui->netStateLabel->setText( tr("Sharing") );
+        ui->netStateLabel->setStyleSheet("background-color: #b16b2c");
+    }
+    else if( m_app->IsConnected() )
+    {
+        QString serverUserName = m_app->GetServerName();
+        ui->netStateLabel->setText( tr("Connected to: \n") + serverUserName );
+        ui->netStateLabel->setStyleSheet("background-color: #526b2c");
+    }
+    else
+    {
+        ui->netStateLabel->setText( tr("Not Connected") );
+        ui->netStateLabel->setStyleSheet("background-color: #6e6e6e");
+    }
 
     BlockSigs( false );
 }

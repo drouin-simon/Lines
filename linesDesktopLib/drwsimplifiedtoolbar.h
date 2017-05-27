@@ -37,9 +37,7 @@ private slots:
     void on_fillButton_toggled(bool checked);
 
     void on_onionBeforeSpinBox_valueChanged(int arg1);
-
     void on_onionAfterSpinBox_valueChanged(int arg1);
-
     void on_playModeButton_toggled(bool checked);
 
 private:

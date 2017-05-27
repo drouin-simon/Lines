@@ -8,5 +8,8 @@
         <file>icons-60x60/onion.png</file>
         <file>icons-60x60/pause.png</file>
         <file>icons-60x60/play.png</file>
+        <file>icons-60x60/pressure-opacity.png</file>
+        <file>icons-60x60/pressure-width.png</file>
+        <file>icons-60x60/fill.png</file>
     </qresource>
 </RCC>
