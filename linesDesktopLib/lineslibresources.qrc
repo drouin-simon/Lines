@@ -11,5 +11,9 @@
         <file>icons-60x60/pressure-opacity.png</file>
         <file>icons-60x60/pressure-width.png</file>
         <file>icons-60x60/fill.png</file>
+        <file>icons-60x60/play-mode.png</file>
+        <file>icons-60x60/net-connected.png</file>
+        <file>icons-60x60/net-not-connected.png</file>
+        <file>icons-60x60/net-share.png</file>
     </qresource>
 </RCC>

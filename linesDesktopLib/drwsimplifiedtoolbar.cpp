@@ -5,7 +5,10 @@
 drwSimplifiedToolbar::drwSimplifiedToolbar(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::drwSimplifiedToolbar),
-    m_app(0)
+    m_app(0),
+    m_notConnectedIcon("://icons-60x60/net-not-connected.png"),
+    m_connectedIcon("://icons-60x60/net-connected.png"),
+    m_sharingIcon("://icons-60x60/net-share.png")
 {
     ui->setupUi(this);
     UpdateUI();
@@ -54,18 +57,21 @@ void drwSimplifiedToolbar::UpdateUI()
     // Network label
     if( m_app->IsSharing() )
     {
-        ui->netStateLabel->setText( tr("Sharing") );
+        ui->netStateLabel->setPixmap( m_sharingIcon );
+        ui->netStateLabel->setToolTip( tr("Sharing") );
         ui->netStateLabel->setStyleSheet("background-color: #b16b2c");
     }
     else if( m_app->IsConnected() )
     {
+        ui->netStateLabel->setPixmap( m_connectedIcon );
         QString serverUserName = m_app->GetServerName();
-        ui->netStateLabel->setText( tr("Connected to: \n") + serverUserName );
+        ui->netStateLabel->setToolTip( tr("Connected to ") + serverUserName );
         ui->netStateLabel->setStyleSheet("background-color: #526b2c");
     }
     else
     {
-        ui->netStateLabel->setText( tr("Not Connected") );
+        ui->netStateLabel->setPixmap( m_notConnectedIcon );
+        ui->netStateLabel->setToolTip( tr("Not Connected") );
         ui->netStateLabel->setStyleSheet("background-color: #6e6e6e");
     }
 

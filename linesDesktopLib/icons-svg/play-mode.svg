@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="98.07431"
+   height="98.350365"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="play-mode.svg"
+   inkscape:export-filename="/Users/simon/lines/src/linesDesktopLib/icons-60x60/play-mode.png"
+   inkscape:export-xdpi="55.060001"
+   inkscape:export-ydpi="55.060001">
+  <defs
+     id="defs4">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="358.22057 : 861.65028 : 1"
+       inkscape:vp_y="-312.5061 : 1497.0658 : 1"
+       inkscape:vp_z="2128.2243 : 308.69371 : 1"
+       inkscape:persp3d-origin="27.493899 : 109.92293 : 1"
+       id="perspective3841" />
+    <inkscape:perspective
+       id="perspective10"
+       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
+       inkscape:vp_z="744.09448 : 526.18109 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 526.18109 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:path-effect
+       is_visible="true"
+       id="path-effect3598"
+       effect="spiro" />
+    <inkscape:perspective
+       id="perspective3841-5"
+       inkscape:persp3d-origin="27.493899 : 109.92293 : 1"
+       inkscape:vp_z="2128.2243 : 308.69371 : 1"
+       inkscape:vp_y="-312.5061 : 1497.0658 : 1"
+       inkscape:vp_x="358.22057 : 861.65028 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 526.18109 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="744.09448 : 526.18109 : 1"
+       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
+       id="perspective10-7" />
+    <inkscape:path-effect
+       effect="spiro"
+       id="path-effect3598-3"
+       is_visible="true" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#505050"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.42386727"
+     inkscape:cx="61.455553"
+     inkscape:cy="51.745482"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer2"
+     showgrid="false"
+     inkscape:window-width="1436"
+     inkscape:window-height="855"
+     inkscape:window-x="4"
+     inkscape:window-y="1"
+     inkscape:window-maximized="1"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="white"
+     transform="translate(-1035.5074,-26.515827)">
+    <path
+       inkscape:export-ydpi="43.799999"
+       inkscape:export-xdpi="43.799999"
+       inkscape:export-filename="/Users/simon/Lines/src/DrawLib/lines-icons-48x48/play.png"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccccc"
+       id="path4289"
+       d="m 1085.588,35.017218 40.4585,20.013195 c 1.7435,0.834405 1.6198,3.26839 0.4124,3.973575 l -40.1393,21.032966 c -2.209,1.212603 -3.9569,1.276991 -3.9248,-1.257137 l 0.3116,-41.653178 c -0.081,-2.333385 1.1122,-2.882563 2.8816,-2.109421 z"
+       style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:16.84692574;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    <rect
+       style="opacity:0.98999999;fill:none;stroke:none;stroke-opacity:1"
+       id="rect4293"
+       width="98.07431"
+       height="98.350365"
+       x="1259.7614"
+       y="161.87627"
+       ry="1.2825775"
+       inkscape:export-filename="/Users/simon/Lines/src/DrawLib/lines-icons-48x48/pause.png"
+       inkscape:export-xdpi="43.799999"
+       inkscape:export-ydpi="43.799999" />
+    <rect
+       inkscape:export-ydpi="43.799999"
+       inkscape:export-xdpi="43.799999"
+       inkscape:export-filename="/Users/simon/Lines/src/DrawLib/lines-icons-48x48/pause.png"
+       ry="1.2825775"
+       y="161.87627"
+       x="1259.7614"
+       height="98.350365"
+       width="98.07431"
+       id="rect4295"
+       style="opacity:0.98999999;fill:none;stroke:none;stroke-opacity:1" />
+    <rect
+       style="opacity:0.98999999;fill:none;stroke:none;stroke-opacity:1"
+       id="rect4297"
+       width="98.07431"
+       height="98.350365"
+       x="1259.7614"
+       y="28.536137"
+       ry="1.2825775"
+       inkscape:export-filename="/Users/simon/Lines/src/DrawLib/lines-icons-48x48/play.png"
+       inkscape:export-xdpi="43.799999"
+       inkscape:export-ydpi="43.799999" />
+    <path
+       inkscape:connector-curvature="0"
+       d="m 1091.6935,104.16669 c -7.3082,1.88432 -10.6421,8.69609 -2.6659,15.63733 9.6889,7.79687 20.6364,2.24075 29.0738,-3.10925 -18.6211,2.30726 -15.2652,-15.40108 -26.4079,-12.52808 z m -54.3881,-61.114767 c 2.2565,-1.662599 17.9854,14.356965 35.1317,35.783208 5.4739,6.840218 10.4241,13.40422 14.5624,19.225486 -1.3922,0.401779 -2.8232,1.095677 -4.1608,2.081453 -1.2593,0.9278 -2.2847,2.00188 -3.0378,3.11427 -4.7774,-5.324824 -10.0855,-11.586801 -15.5368,-18.398812 -17.1465,-21.42625 -29.2147,-40.142995 -26.9587,-41.805605 z m 43.7161,61.416247 c 0.7227,0.82061 2.941,2.44375 3.6404,3.228 0.1826,-1.56324 3.4937,-4.03778 5.5262,-4.31498 -0.6083,-0.84941 -1.6427,-3.19423 -2.2815,-4.074542 -2.9516,0.277079 -6.0792,2.402692 -6.8851,5.161522 z"
+       style="fill:#ffffff;fill-opacity:1;stroke:none"
+       id="path4197" />
+    <rect
+       inkscape:export-ydpi="43.799999"
+       inkscape:export-xdpi="43.799999"
+       inkscape:export-filename="/Users/simon/Dropbox/lines-icons-48x48/small-brush.png"
+       ry="1.2825775"
+       y="-8.6714821"
+       x="901.29718"
+       height="98.350365"
+       width="98.07431"
+       id="rect4267"
+       style="opacity:0.98999999;fill:none;stroke:none;stroke-opacity:1" />
+    <rect
+       style="opacity:0.98999999;fill:none;stroke:none;stroke-opacity:1"
+       id="rect4291"
+       width="98.07431"
+       height="98.350365"
+       x="901.29718"
+       y="-8.6714821"
+       ry="1.2825775"
+       inkscape:export-filename="/Users/simon/Dropbox/lines-icons-48x48/small-brush.png"
+       inkscape:export-xdpi="43.799999"
+       inkscape:export-ydpi="43.799999" />
+  </g>
+</svg>

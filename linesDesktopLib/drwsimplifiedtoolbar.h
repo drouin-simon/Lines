@@ -2,6 +2,7 @@
 #define __drwSimplifiedToobar_h_
 
 #include <QWidget>
+#include <QPixmap>
 
 class LinesApp;
 
@@ -46,6 +47,10 @@ private:
 
     Ui::drwSimplifiedToolbar *ui;
     LinesApp * m_app;
+
+    QPixmap m_notConnectedIcon;
+    QPixmap m_connectedIcon;
+    QPixmap m_sharingIcon;
 };
 
 #endif
