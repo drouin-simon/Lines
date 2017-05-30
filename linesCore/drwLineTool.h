@@ -99,6 +99,7 @@ protected:
 	PrimitiveType Type;
     double m_brushWidth;
     double m_eraseWidth;
+    double m_baseWidth;
 	bool m_pressureWidth;
 	bool m_pressureOpacity;
 	bool m_fill;
