@@ -59,20 +59,17 @@ void drwSimplifiedToolbar::UpdateUI()
     {
         ui->netStateLabel->setPixmap( m_sharingIcon );
         ui->netStateLabel->setToolTip( tr("Sharing") );
-        ui->netStateLabel->setStyleSheet("background-color: #b16b2c");
     }
     else if( m_app->IsConnected() )
     {
         ui->netStateLabel->setPixmap( m_connectedIcon );
         QString serverUserName = m_app->GetServerName();
         ui->netStateLabel->setToolTip( tr("Connected to ") + serverUserName );
-        ui->netStateLabel->setStyleSheet("background-color: #526b2c");
     }
     else
     {
         ui->netStateLabel->setPixmap( m_notConnectedIcon );
         ui->netStateLabel->setToolTip( tr("Not Connected") );
-        ui->netStateLabel->setStyleSheet("background-color: #6e6e6e");
     }
 
     BlockSigs( false );
