@@ -125,12 +125,16 @@ int drwToolbox::GetNumberOfFrames()
     return m_scene->GetNumberOfFrames();
 }
 
-void drwToolbox::Reset()
+void drwToolbox::EmitStateCommand()
 {
-    m_currentFrame = 0;
-    m_currentTool = 0;
 	for( unsigned i = 0; i < Tools.size(); ++i )
-        Tools[i]->Reset();
+        Tools[i]->EmitStateCommand();
+}
+
+void drwToolbox::PostAnimationLoad()
+{
+    for( unsigned i = 0; i < Tools.size(); ++i )
+        Tools[i]->PostAnimationLoad();
 }
 
 void drwToolbox::blockSignals( bool block )

@@ -44,7 +44,8 @@ public:
     void GotoPrevFrame();
     int GetNumberOfFrames();
 
-    void Reset();
+    void EmitStateCommand();
+    void PostAnimationLoad();
 	
 	void blockSignals( bool block );
 	

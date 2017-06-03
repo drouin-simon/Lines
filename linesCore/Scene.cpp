@@ -26,6 +26,12 @@ void Scene::Clear()
     m_renderer->NeedRedraw();
 }
 
+void Scene::EmitStateCommand()
+{
+    drwCommand::s_ptr command( new drwSceneParamsCommand( m_frames.size() ) );
+    emit CommandExecuted( command );
+}
+
 void Scene::DrawFrame( int frame, drwDrawingContext & context )
 {
     m_framesLock.lockForRead();
@@ -93,8 +99,7 @@ void Scene::SetNumberOfFrames( int nbFrames )
 	emit NumberOfFramesChanged( nbFrames );
 
     // Tell db and network peers
-    drwCommand::s_ptr command( new drwSceneParamsCommand( nbFrames ) );
-    emit CommandExecuted( command );
+    EmitStateCommand();
 }
 
 void Scene::InsertFrame( int beforeThisFrame )

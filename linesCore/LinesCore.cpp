@@ -68,6 +68,9 @@ void LinesCore::LoadAnimation( const char * filename )
     m_scene->blockSignals( true );
     m_localToolbox->blockSignals( true );
 
+    SetCurrentFrame(0);
+    ClearAnimation();
+
     // Read commands from the file
     m_commandDb->Read( filename );
 
@@ -85,7 +88,12 @@ void LinesCore::LoadAnimation( const char * filename )
     m_scene->blockSignals( false );
     m_renderer->EnableRendering( true );
 
+    m_localToolbox->PostAnimationLoad();
     m_scene->MarkModified();
+
+    // Tell ui everything is changed (make sure all ui is updated)
+    emit DisplaySettingsModified();
+    emit PlaybackSettingsChangedSignal();
 }
 
 void LinesCore::SaveAnimation( const char * filename )
@@ -98,20 +106,24 @@ bool LinesCore::IsAnimationModified()
     return m_commandDb->IsModified();
 }
 
-void LinesCore::Reset()
+void LinesCore::NewAnimation()
 {
-    // todo : This should probably be done in network manager
+    // Tell clients to clear their animation
     if( m_remoteIO->IsSharing() )
     {
         drwCommand::s_ptr newSceneCommand( new drwNewSceneCommand );
         m_remoteIO->SendCommand( newSceneCommand );
     }
-    m_scene->Clear();
-    m_commandDb->Clear();
-    ClearAllToolboxesButLocal();
-    m_localToolbox->Reset();
-    m_lastUsedUserId = 0;
-    m_cachedStateCommands.clear();
+
+    // Clear local animation
+    ClearAnimation();
+
+    // Remember initial state in the new animation
+    m_scene->EmitStateCommand();
+    m_localToolbox->EmitStateCommand();
+
+    // Restart at frame 0
+    SetCurrentFrame( 0 );
 }
 
 void LinesCore::SetDrawingSurface( drwDrawingSurface * surface )
@@ -337,7 +349,7 @@ void LinesCore::IncomingNetCommand( drwCommand::s_ptr com )
 {
     if( com->GetCommandId() == drwIdNewSceneCommand )
     {
-        Reset();
+        NewAnimation();
     }
     else if( com->GetCommandId() == drwIdSceneParamsCommand )
     {
@@ -436,6 +448,15 @@ drwToolbox * LinesCore::AddUser( int commandUserId )
     if( m_lastUsedUserId < commandUserId )
         m_lastUsedUserId = commandUserId;
     return newUser;
+}
+
+void LinesCore::ClearAnimation()
+{
+    m_scene->Clear();
+    m_commandDb->Clear();
+    ClearAllToolboxesButLocal();
+    m_lastUsedUserId = 0;
+    m_cachedStateCommands.clear();
 }
 
 void LinesCore::ClearAllToolboxesButLocal()

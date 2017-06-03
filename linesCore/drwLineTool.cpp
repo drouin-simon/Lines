@@ -44,9 +44,6 @@ drwLineTool::drwLineTool( Scene * scene, drwToolbox * toolbox )
         m_cursor->SetRadius( m_baseWidth );
         m_cursor->SetColor( lightGreen );
     }
-
-	// Make sure the Reset function is the only one driving initial param values
-	Reset();
 }
 
 void drwLineTool::ReadSettings( QSettings & s )
@@ -289,23 +286,15 @@ void drwLineTool::NotifyFrameChanged( int frame )
 	}
 }
 
-void drwLineTool::Reset()
+void drwLineTool::EmitStateCommand()
 {
-    m_lastXWorld = 0.0;
-    m_lastYWorld = 0.0;
-    m_lastPressure = 1.0;
-    m_isDrawing = false;
-	Color = Vec4(1.0,1.0,1.0,1.0);
-	Type = TypeWideLine;
-    SetBaseWidth( 10.0 );
-	m_pressureWidth = true;
-	m_pressureOpacity = true;
-	m_fill = false;
-    m_frameChangeMode = Manual;
-    m_persistenceEnabled = false;
-    m_persistence = 0;
-    CurrentNodes.clear();
     ParametersChanged();
+}
+
+void drwLineTool::PostAnimationLoad()
+{
+    UpdateCursor();
+    emit ParametersChangedSignal();
 }
 
 void drwLineTool::NotifyRendererChanged()

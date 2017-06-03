@@ -39,7 +39,8 @@ public:
 	
 	virtual void ExecuteCommand( drwCommand::s_ptr command );
     virtual void NotifyFrameChanged( int frame );
-	virtual void Reset();
+    virtual void EmitStateCommand();
+    virtual void PostAnimationLoad();
 
     virtual void NotifyRendererChanged();
     virtual void SetShowCursor( bool show );

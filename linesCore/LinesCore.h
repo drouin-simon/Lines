@@ -32,7 +32,7 @@ public:
     void LoadAnimation( const char * filename );
     void SaveAnimation( const char * filename );
     bool IsAnimationModified();
-    void Reset();
+    void NewAnimation();
 
     // Setting properties
     void SetDrawingSurface( drwDrawingSurface * surface );
@@ -105,6 +105,7 @@ signals:
 private:
 
     drwToolbox * AddUser( int commandUserId );
+    void ClearAnimation();
     void ClearAllToolboxesButLocal();
 
     // Attributes for playback

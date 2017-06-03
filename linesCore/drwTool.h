@@ -28,7 +28,8 @@ public:
     virtual void WriteSettings( QSettings & s ) {}
 	
     virtual void NotifyFrameChanged( int frame ) {}
-    virtual void Reset() {}
+    virtual void EmitStateCommand() {}
+    virtual void PostAnimationLoad() {}
 
     virtual void NotifyRendererChanged() {}
     virtual void SetShowCursor( bool show ) {}

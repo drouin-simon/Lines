@@ -22,6 +22,7 @@ public:
 	
     void SetRenderer( drwGLRenderer * r ) { m_renderer = r; }
 	void Clear();
+    void EmitStateCommand();
 	
     void DrawFrame( int frame, drwDrawingContext & context );
 	

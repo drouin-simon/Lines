@@ -596,7 +596,7 @@ void MainWindow::writeSettings()
 
 void MainWindow::Reset()
 {
-    m_lines->Reset();
+    m_lines->NewAnimation();
 	m_filename = "";
 }
 
