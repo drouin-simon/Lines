@@ -15,5 +15,6 @@
         <file>icons-60x60/net-connected.png</file>
         <file>icons-60x60/net-not-connected.png</file>
         <file>icons-60x60/net-share.png</file>
+        <file>icons-60x60/persistence.png</file>
     </qresource>
 </RCC>

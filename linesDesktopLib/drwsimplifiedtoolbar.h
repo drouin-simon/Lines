@@ -41,6 +41,8 @@ private slots:
     void on_onionAfterSpinBox_valueChanged(int arg1);
     void on_playModeButton_toggled(bool checked);
 
+    void on_persistenceSpinBox_valueChanged(int arg1);
+
 private:
 
     void BlockSigs( bool block );

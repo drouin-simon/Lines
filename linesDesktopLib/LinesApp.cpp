@@ -114,6 +114,16 @@ void LinesApp::SetFill( bool fill )
     GetLineTool()->SetFill( fill );
 }
 
+void LinesApp::SetPersistence( int p )
+{
+    GetLineTool()->SetPersistence( p );
+}
+
+int LinesApp::GetPersistence()
+{
+    return GetLineTool()->GetPersistence();
+}
+
 bool LinesApp::IsFrameChangeManual()
 {
     return GetFrameChangeMode() == Manual;

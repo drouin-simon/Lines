@@ -266,6 +266,9 @@
      <property name="buttonSymbols">
       <enum>QAbstractSpinBox::UpDownArrows</enum>
      </property>
+     <property name="maximum">
+      <number>10</number>
+     </property>
     </widget>
    </item>
    <item>
@@ -292,7 +295,11 @@
     </widget>
    </item>
    <item>
-    <widget class="QSpinBox" name="onionAfterSpinBox"/>
+    <widget class="QSpinBox" name="onionAfterSpinBox">
+     <property name="maximum">
+      <number>10</number>
+     </property>
+    </widget>
    </item>
    <item>
     <spacer name="verticalSpacer_4">
@@ -312,13 +319,35 @@
    </item>
    <item>
     <widget class="QLabel" name="label">
+     <property name="minimumSize">
+      <size>
+       <width>30</width>
+       <height>30</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>30</width>
+       <height>30</height>
+      </size>
+     </property>
      <property name="text">
-      <string>Persist</string>
+      <string/>
+     </property>
+     <property name="pixmap">
+      <pixmap resource="lineslibresources.qrc">:/icons-60x60/persistence.png</pixmap>
+     </property>
+     <property name="scaledContents">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QSpinBox" name="persistenceSpinBox"/>
+    <widget class="QSpinBox" name="persistenceSpinBox">
+     <property name="maximum">
+      <number>10</number>
+     </property>
+    </widget>
    </item>
    <item>
     <spacer name="verticalSpacer_5">
@@ -417,7 +446,7 @@
  </resources>
  <connections/>
  <buttongroups>
-  <buttongroup name="paintToolButtonGroup"/>
   <buttongroup name="frameChangeButtonGroup"/>
+  <buttongroup name="paintToolButtonGroup"/>
  </buttongroups>
 </ui>

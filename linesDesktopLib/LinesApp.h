@@ -38,6 +38,8 @@ public:
     void SetUsePressureOpacity( bool use );
     bool IsFilling();
     void SetFill( bool fill );
+    void SetPersistence( int p );
+    int GetPersistence();
 
     // Frame Change mode
     bool IsFrameChangeManual();

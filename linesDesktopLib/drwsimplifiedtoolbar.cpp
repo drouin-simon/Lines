@@ -54,6 +54,9 @@ void drwSimplifiedToolbar::UpdateUI()
     ui->oneOnionButton->setChecked( m_app->IsOnionSkinEnabled() );
     ui->onionAfterSpinBox->setValue( m_app->GetOnionSkinAfter() );
 
+    // Persistence
+    ui->persistenceSpinBox->setValue( m_app->GetPersistence() );
+
     // Network label
     if( m_app->IsSharing() )
     {
@@ -87,6 +90,7 @@ void drwSimplifiedToolbar::BlockSigs( bool block )
     ui->jumpModeButton->blockSignals( block );
     ui->playModeButton->blockSignals( block );
     ui->oneOnionButton->blockSignals( block );
+    ui->persistenceSpinBox->blockSignals( block );
 }
 
 void drwSimplifiedToolbar::on_smallBrushButton_toggled(bool checked)
@@ -153,4 +157,9 @@ void drwSimplifiedToolbar::on_playModeButton_toggled(bool checked)
 {
     if( checked )
         m_app->SetFrameChangePlay();
+}
+
+void drwSimplifiedToolbar::on_persistenceSpinBox_valueChanged(int arg1)
+{
+    m_app->SetPersistence( arg1 );
 }
