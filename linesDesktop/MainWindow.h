@@ -56,7 +56,6 @@ private slots:
 	
 	void viewFullscreen();
     void toggleShowGui();
-    void toggleRightPanel();
 
     void about();
     
@@ -105,12 +104,7 @@ private:
 	
     // Right panel
     QWidget * m_mainWidget;
-    QDockWidget * m_rightPanelDock;
-    QWidget * m_rightPanelWidget;
 	PlaybackControlerWidget * m_playbackControlerWidget;
-	PrimitiveToolOptionWidget * m_toolOptionWidget;
-	DisplaySettingsWidget * m_displaySettingsWidget;
-    QLabel * m_networkStateLabel;
 
 	TabletStateWidget * m_tabletStateWidget;
 	QDockWidget * m_dockTabletState;
@@ -126,7 +120,6 @@ private:
     static const QString m_appName;
     bool m_whiteOnBlack;
     bool m_eraseToggled;
-    bool m_simplifiedGui;
     bool m_guiHidden;
 };
 

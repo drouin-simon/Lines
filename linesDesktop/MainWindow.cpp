@@ -2,9 +2,7 @@
 #include "drwDrawingWidget.h"
 #include "drwAspectRatioWidget.h"
 #include "PlaybackControlerWidget.h"
-#include "PrimitiveToolOptionWidget.h"
 #include "TabletStateWidget.h"
-#include "DisplaySettingsWidget.h"
 #include "ExportDialog.h"
 #include "drwNetworkConnectDialog.h"
 #include "drwNetworkManager.h"
@@ -23,7 +21,6 @@ MainWindow::MainWindow()
     setWindowTitle( m_appName );
     m_whiteOnBlack = true;
     m_eraseToggled = false;
-    m_simplifiedGui = true;
     m_guiHidden = false;
 
 	CreateActions();
@@ -55,25 +52,6 @@ MainWindow::MainWindow()
 	drawingAreaLayout->setContentsMargins( 0, 0, 0, 0 );
     mainLayout->addLayout( drawingAreaLayout );
 
-    // Right panel widget
-    m_rightPanelDock = new QDockWidget( tr("Right Panel"), this );
-
-    QWidget * defaultTitleBar = m_rightPanelDock->titleBarWidget();
-    QWidget * emptyTitleBar = new QWidget();
-    m_rightPanelDock->setTitleBarWidget(emptyTitleBar);
-    delete defaultTitleBar;
-
-    m_rightPanelDock->setFeatures( QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable );
-    m_rightPanelDock->setAllowedAreas( Qt::RightDockWidgetArea );
-    addDockWidget( Qt::RightDockWidgetArea, m_rightPanelDock );
-
-    m_rightPanelWidget = new QWidget( m_rightPanelDock );
-    QVBoxLayout * rightPanelLayout = new QVBoxLayout( m_rightPanelWidget );
-    rightPanelLayout->setContentsMargins( 0, 10, 0, 10 );
-    rightPanelLayout->setSpacing( 15 );
-    m_rightPanelDock->setWidget( m_rightPanelWidget );
-    m_rightPanelDock->setHidden( m_simplifiedGui ); // by default, this is hidden
-
     // Set default OpenGL surface format that will be applied to all openGL windows
     QSurfaceFormat format;
     format.setDepthBufferSize(24);
@@ -83,7 +61,7 @@ MainWindow::MainWindow()
     format.setSwapBehavior( QSurfaceFormat::DoubleBuffer );
     QSurfaceFormat::setDefaultFormat(format);
 
-    // Left panel widget (simplified toolbar)
+    // Toolbar
     m_simplifiedToolbar = new drwSimplifiedToolbar( m_mainWidget );
     m_simplifiedToolbar->SetApp( m_linesApp );
     drawingAreaLayout->addWidget( m_simplifiedToolbar );
@@ -103,30 +81,6 @@ MainWindow::MainWindow()
 	// Create playback control widget
     m_playbackControlerWidget = new PlaybackControlerWidget( m_lines, m_mainWidget );
 	drawingAreaLayout->addWidget( m_playbackControlerWidget );
-    m_playbackControlerWidget->SetHideFrameRate( true );
-
-	// Alternative right panel
-    drwLineTool * lineTool = m_lines->GetLineTool();
-    m_toolOptionWidget = new PrimitiveToolOptionWidget( lineTool, m_rightPanelWidget );
-	rightPanelLayout->addWidget( m_toolOptionWidget );
-    m_displaySettingsWidget = new DisplaySettingsWidget( m_lines, m_rightPanelWidget );
-	rightPanelLayout->addWidget( m_displaySettingsWidget );
-
-    QHBoxLayout * networkStateLayout = new QHBoxLayout();
-    rightPanelLayout->addLayout( networkStateLayout );
-    networkStateLayout->setContentsMargins ( 5, 5, 5, 5 );
-
-    m_networkStateLabel = new QLabel( m_mainWidget );
-    m_networkStateLabel->setText( "Not Connected" );
-    m_networkStateLabel->setWordWrap( true );
-    m_networkStateLabel->setFrameShape( QLabel::Box );
-    m_networkStateLabel->setFrameShadow( QLabel::Plain );
-    m_networkStateLabel->setAlignment( Qt::AlignCenter  );
-    m_networkStateLabel->setMaximumWidth( 150 );
-    m_networkStateLabel->setStyleSheet("background-color: #6e6e6e");
-    networkStateLayout->addWidget( m_networkStateLabel );
-
-	rightPanelLayout->addStretch();
 	
 	// Create tablet state dock
 	m_dockTabletState = new QDockWidget(tr("Tablet State"));
@@ -380,8 +334,6 @@ void MainWindow::UpdateNetworkStatus()
 	{
 		m_netShareSessionMenuAction->setText( tr("Stop Sharing" ) );
 		m_netConnectMenuItem->setEnabled( false );
-        m_networkStateLabel->setText( tr("Sharing") );
-        m_networkStateLabel->setStyleSheet("background-color: #b16b2c");
 	}
 	else 
 	{
@@ -393,15 +345,11 @@ void MainWindow::UpdateNetworkStatus()
 			m_netShareSessionMenuAction->setEnabled( false );
 
             QString serverUserName = m_networkManager->GetServerUserName();
-            m_networkStateLabel->setText( tr("Connected to: \n") + serverUserName );
-            m_networkStateLabel->setStyleSheet("background-color: #526b2c");
 		}
 		else 
 		{
             m_netShareSessionMenuAction->setEnabled( true );
 			m_netConnectMenuItem->setText( tr("Connect...") );
-            m_networkStateLabel->setText( tr("Not Connected") );
-            m_networkStateLabel->setStyleSheet("background-color: #6e6e6e");
 		}
 	}
 }
@@ -439,14 +387,10 @@ void MainWindow::viewFullscreen()
 	{
 		showNormal();
         m_playbackControlerWidget->show();
-        m_rightPanelDock->show();
-        m_rightPanelDock->setFloating( false );
 	}
 	else
 	{
         m_playbackControlerWidget->hide();
-        m_rightPanelDock->hide();
-        m_rightPanelDock->setFloating( true );
 		showFullScreen();
 	}
 }
@@ -454,26 +398,9 @@ void MainWindow::viewFullscreen()
 void MainWindow::toggleShowGui()
 {
     m_guiHidden = !m_guiHidden;
-    m_simplifiedToolbar->setHidden( m_guiHidden || !m_simplifiedGui );
+    m_simplifiedToolbar->setHidden( m_guiHidden );
     m_playbackControlerWidget->setHidden( m_guiHidden );
-    m_rightPanelDock->setHidden( m_guiHidden || m_simplifiedGui );
     m_drawingWidgetContainer->setAspectRatioEnabled( !m_guiHidden );
-    //m_glWidget->SetShowCameraFrame( !m_guiHidden );
-}
-
-void MainWindow::toggleRightPanel()
-{
-    bool isHidden = m_rightPanelDock->isHidden();
-    if( isHidden )
-    {
-        m_rightPanelDock->show();
-        m_playbackControlerWidget->SetHideFrameRate( false );
-    }
-    else
-    {
-        m_rightPanelDock->hide();
-        m_playbackControlerWidget->SetHideFrameRate( true );
-    }
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -688,16 +615,6 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
             toggleShowGui();
             handled = true;
         }
-        else if( keyEvent->key() == Qt::Key_A )
-        {
-            toggleRightPanel();
-            handled = true;
-        }
-        /*else if( keyEvent->key() == Qt::Key_T )
-        {
-            DrawSinusoidLine();
-            handled = true;
-        }*/
 	}
     else if( event->type() == QEvent::KeyRelease )
     {

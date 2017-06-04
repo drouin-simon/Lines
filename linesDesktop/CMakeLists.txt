@@ -2,15 +2,11 @@ set( ExecName Lines )
 
 set( Drw_src  main.cpp 
 		MainWindow.cpp 
-		PrimitiveToolOptionWidget.cpp 
 		PlaybackControlerWidget.cpp 
-		DisplaySettingsWidget.cpp 
 		ExportDialog.cpp )
 
-set( Drw_hdr MainWindow.h 
-		PrimitiveToolOptionWidget.h 
+set( Drw_hdr MainWindow.h  
 		PlaybackControlerWidget.h 
-		DisplaySettingsWidget.h
 		ExportDialog.h )
 
 # Include dir for DrawLib
