@@ -18,6 +18,7 @@ LinesCore::LinesCore()
     m_time.start();
     m_lastUsedUserId = 0;
     m_onionSkinEnabled = true;
+    m_remoteIO = 0;
 
     // Scene
     m_scene = new Scene(this);
@@ -41,6 +42,9 @@ LinesCore::LinesCore()
     m_renderer->SetCurrentScene( m_scene );
     m_localToolbox->SetRenderer( m_renderer );
     m_scene->SetRenderer( m_renderer );
+
+    // Mechanism to exectute net commands (coming from different threads) into the main thread
+    connect( this, SIGNAL(NetCommandAvailable()), this, SLOT(ProcessPendingNetCommandsSlot()), Qt::QueuedConnection );
 }
 
 LinesCore::~LinesCore()
@@ -347,30 +351,11 @@ void LinesCore::LockDb( bool l )
 
 void LinesCore::IncomingNetCommand( drwCommand::s_ptr com )
 {
-    if( com->GetCommandId() == drwIdNewSceneCommand )
-    {
-        NewAnimation();
-    }
-    else if( com->GetCommandId() == drwIdSceneParamsCommand )
-    {
-        drwSceneParamsCommand * serverMsg = dynamic_cast<drwSceneParamsCommand*> (com.get());
-        m_scene->SetNumberOfFrames( serverMsg->GetNumberOfFrames() );
+    m_netCommandsMutex.lock();
+    m_netCommandsToProcess.push_back( com );
+    m_netCommandsMutex.unlock();
 
-        // Store it in the database
-        m_commandDb->PushCommand( com );
-    }
-    else
-    {
-        // Execute the command in the appropriate toolbox
-        int commandUserId = com->GetUserId();
-        drwToolbox * box = m_toolboxes[ commandUserId ];
-        if( !box )
-            box = AddUser( commandUserId );
-        box->ExecuteCommand( com );
-
-        // Store it in the database
-        m_commandDb->PushCommand( com );
-    }
+    emit NetCommandAvailable();
 }
 
 void LinesCore::IncomingLocalCommand( drwCommand::s_ptr command )
@@ -441,6 +426,12 @@ void LinesCore::FrameChangedSlot()
     emit PlaybackSettingsChangedSignal();
 }
 
+void LinesCore::ProcessPendingNetCommandsSlot()
+{
+    // Execute pending commands
+    ExecuteNetCommands();
+}
+
 drwToolbox * LinesCore::AddUser( int commandUserId )
 {
     drwToolbox * newUser = new drwToolbox( m_scene, NULL, false );
@@ -469,4 +460,43 @@ void LinesCore::ClearAllToolboxesButLocal()
     }
     m_toolboxes.clear();
     m_toolboxes[ m_localToolboxId ] = local;
+}
+
+void LinesCore::ExecuteNetCommands()
+{
+    m_netCommandsMutex.lock();
+    foreach( drwCommand::s_ptr com, m_netCommandsToProcess )
+    {
+        ExecuteOneNetCommand( com );
+    }
+    m_netCommandsToProcess.clear();
+    m_netCommandsMutex.unlock();
+}
+
+void LinesCore::ExecuteOneNetCommand( drwCommand::s_ptr com )
+{
+    if( com->GetCommandId() == drwIdNewSceneCommand )
+    {
+        NewAnimation();
+    }
+    else if( com->GetCommandId() == drwIdSceneParamsCommand )
+    {
+        drwSceneParamsCommand * serverMsg = dynamic_cast<drwSceneParamsCommand*> (com.get());
+        m_scene->SetNumberOfFrames( serverMsg->GetNumberOfFrames() );
+
+        // Store it in the database
+        m_commandDb->PushCommand( com );
+    }
+    else
+    {
+        // Execute the command in the appropriate toolbox
+        int commandUserId = com->GetUserId();
+        drwToolbox * box = m_toolboxes[ commandUserId ];
+        if( !box )
+            box = AddUser( commandUserId );
+        box->ExecuteCommand( com );
+
+        // Store it in the database
+        m_commandDb->PushCommand( com );
+    }
 }

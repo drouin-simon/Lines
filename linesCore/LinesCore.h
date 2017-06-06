@@ -83,11 +83,11 @@ public:
     int GetNumberOfDbCommands();
     drwCommand::s_ptr GetDbCommand( int index );
     void LockDb( bool l );
+    void IncomingNetCommand( drwCommand::s_ptr );
 
 public slots:
 
     // Command dispatch
-    void IncomingNetCommand( drwCommand::s_ptr );
     void IncomingLocalCommand( drwCommand::s_ptr );
     void IncomingDbCommand( drwCommand::s_ptr );
 
@@ -95,12 +95,14 @@ protected slots:
 
     void FrameChangedSlot();
     void NumberOfFramesChangedSlot();
+    void ProcessPendingNetCommandsSlot();
 
 signals:
 
     void DisplaySettingsModified();
     void PlaybackSettingsChangedSignal();
     void PlaybackStartStop( bool );
+    void NetCommandAvailable();
 
 private:
 
@@ -119,6 +121,13 @@ private:
     // Container to cache state commands until an effective command comes
     typedef QList< drwCommand::s_ptr > CommandContainer;
     CommandContainer m_cachedStateCommands;
+
+    // List of Network commands that need to be processed. This needs to be
+    // protected by a mutex because it may be accessed from different threads
+    void ExecuteNetCommands();
+    void ExecuteOneNetCommand( drwCommand::s_ptr com );
+    QMutex m_netCommandsMutex;
+    CommandContainer m_netCommandsToProcess;
 
      // Attribute to used to dispatch external (Network) commands
     static const int m_localToolboxId;

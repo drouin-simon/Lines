@@ -185,7 +185,7 @@ void drwGLRenderer::RenderToTexture( int currentFrame, int onionSkinBefore, int 
         }
         
         // draw background of next layer
-        glColor4d( m_clearColor[0], m_clearColor[1], m_clearColor[2], 0.3 );
+        glColor4d( m_clearColor[0], m_clearColor[1], m_clearColor[2], 0.5 );
         RenderRect();
     }
     
