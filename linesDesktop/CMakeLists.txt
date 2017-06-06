@@ -69,11 +69,7 @@ endif()
 #--------------------------------------------------------------------------------
 # INSTALL
 #--------------------------------------------------------------------------------
-
-# Install executables (Windows and Linux) in CMAKE_INSTALL_PREFIX/bin - macOS is not handled by standard install
-if( NOT APPLE )
-    install( TARGETS ${ExecName} BUNDLE DESTINATION . COMPONENT Runtime RUNTIME DESTINATION bin COMPONENT Runtime )
-endif()
+#PrintVariables()
 
 # Run Qt deployment tool for each platform
 get_target_property( QMakeLocation Qt5::qmake LOCATION)
@@ -86,9 +82,16 @@ if( APPLE )
     install( CODE "file( COPY ${BuiltExecFullPath} DESTINATION ${CMAKE_INSTALL_PREFIX} )
         execute_process( COMMAND ${MacDeployQtExec} ${CMAKE_INSTALL_PREFIX}/${ExecName}.app -dmg )
         execute_process( COMMAND mv ${CMAKE_INSTALL_PREFIX}/${ExecName}.dmg ${CMAKE_INSTALL_PREFIX}/${DmgFileName} )" )
-else()
+elseif( WIN32 )
     set( WinDeployQtExec ${QtBinLocation}/windeployqt.exe )
-    install( CODE "execute_process( COMMAND ${WinDeployQtExec} ${CMAKE_CURRENT_BINARY_DIR}/${ExecName}.exe )")
+	set( BuiltExecFullPath ${CMAKE_CURRENT_BINARY_DIR}/Release/${ExecName}.exe )
+	file( TIMESTAMP ${BuiltExecFullPath} ExecDate %Y-%m-%d )
+	set( InstallDir ${CMAKE_INSTALL_PREFIX}/${ExecName}-v${LINES_MAJOR_VERSION}.${LINES_MINOR_VERSION}.${LINES_PATCH_VERSION}-${LINES_VERSION_QUALIFIER} )
+	set( ZipFileName ${ExecName}-v${LINES_MAJOR_VERSION}.${LINES_MINOR_VERSION}.${LINES_PATCH_VERSION}-${LINES_VERSION_QUALIFIER}-${ExecDate}-Win-${GIT_COMMIT_HASH_SHORT}.zip )
+    set( SevenZExec "c:/Program Files/7-Zip/7z.exe" )
+	install( CODE "file( COPY ${BuiltExecFullPath} DESTINATION ${InstallDir} )
+		execute_process( COMMAND ${WinDeployQtExec} ${InstallDir}/${ExecName}.exe )
+		execute_process( COMMAND ${SevenZExec} a ${CMAKE_INSTALL_PREFIX}/${ZipFileName} ${InstallDir} )" )
 endif()
 
 #--------------------------------------------------------------------------------
