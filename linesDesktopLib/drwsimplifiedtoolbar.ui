@@ -267,7 +267,7 @@
       <enum>QAbstractSpinBox::UpDownArrows</enum>
      </property>
      <property name="maximum">
-      <number>10</number>
+      <number>30</number>
      </property>
     </widget>
    </item>
@@ -297,7 +297,7 @@
    <item>
     <widget class="QSpinBox" name="onionAfterSpinBox">
      <property name="maximum">
-      <number>10</number>
+      <number>30</number>
      </property>
     </widget>
    </item>

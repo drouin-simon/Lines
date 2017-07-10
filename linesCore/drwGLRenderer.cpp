@@ -170,7 +170,9 @@ void drwGLRenderer::RenderToTexture( int currentFrame, int onionSkinBefore, int 
             int f = currentFrame - dist;
             while( f < 0 )
                 f = m_scene->GetNumberOfFrames() - abs( f );
-            context.m_colorMultiplier = Vec4( 1.0, 0.0, 0.0, 1.0 );
+            double factor = dist / ( onionSkinBefore + 1.0 );
+            factor = exp( -1.5 * factor * factor );
+            context.m_colorMultiplier = Vec4( factor, 0.0, 0.0, 1.0 );
             RenderLayer( f, context );
         }
         
@@ -180,13 +182,14 @@ void drwGLRenderer::RenderToTexture( int currentFrame, int onionSkinBefore, int 
             int f = currentFrame + dist;
             while( f > m_scene->GetNumberOfFrames() - 1 )
                 f = f - m_scene->GetNumberOfFrames();
-            context.m_colorMultiplier = Vec4( 0.0, 0.0, 1.0, 1.0 );
+            double factor = dist / ( onionSkinAfter + 1.0 );
+            factor = exp( -1.5 * factor * factor );
+            context.m_colorMultiplier = Vec4( 0.0, 0.0, factor, 1.0 );
             RenderLayer( f, context );
         }
         
         // draw background of next layer
         glColor4d( m_clearColor[0], m_clearColor[1], m_clearColor[2], 0.5 );
-        RenderRect();
     }
     
     // draw current frame
@@ -266,36 +269,6 @@ void drwGLRenderer::RenderTextureToScreen( int x, int y, int width, int height )
 
     glDisable( GL_SCISSOR_TEST );
     glScissor( x, y, width, height );
-}
-
-void drwGLRenderer::RenderRect()
-{
-    glPushAttrib( GL_COLOR_BUFFER_BIT );
-
-    glEnable( GL_BLEND );
-    glBlendFuncSeparate( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ZERO, GL_ONE );
-
-    glMatrixMode( GL_PROJECTION );
-    glPushMatrix();
-    glLoadIdentity();
-    
-    double tw = m_renderTexture->GetWidth();
-    double th = m_renderTexture->GetHeight();
-    gluOrtho2D( 0, tw, 0, th );
-    
-    glBegin( GL_QUADS );
-    {
-        glVertex2d( 0.0, 0.0 );
-        glVertex2d( tw, 0.0 );
-        glVertex2d( tw, th );
-        glVertex2d( 0.0, th );
-    }
-    glEnd();
-    
-    glPopMatrix();
-    glMatrixMode( GL_MODELVIEW );
-
-    glPopAttrib();
 }
 
 void drwGLRenderer::SetRenderSize( int width, int height )

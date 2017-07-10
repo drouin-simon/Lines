@@ -39,7 +39,6 @@ public:
     drwDrawableTexture * GetRenderTexture() { return m_renderTexture; }
     void RenderTextureToScreen();
     void RenderTextureToScreen( int x, int y, int width, int height );
-    void RenderRect();
 
     void SetRenderSize( int width, int height );
     int * GetRenderSize();
