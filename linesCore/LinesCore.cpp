@@ -180,6 +180,22 @@ void LinesCore::SetOnionSkinAfter( int n )
     emit DisplaySettingsModified();
 }
 
+void LinesCore::ToggleInOnionFrame()
+{
+    if( m_renderer->GetInOnionFrame() == -1 )
+        m_renderer->SetInOnionFrame( GetCurrentFrame() );
+    else
+        m_renderer->SetInOnionFrame( -1 );
+}
+
+void LinesCore::ToggleOutOnionFrame()
+{
+    if( m_renderer->GetOutOnionFrame() == -1 )
+        m_renderer->SetOutOnionFrame( GetCurrentFrame() );
+    else
+        m_renderer->SetOutOnionFrame( -1 );
+}
+
 void LinesCore::ReadSettings( QSettings & s ) { m_localToolbox->ReadSettings( s ); }
 void LinesCore::WriteSettings( QSettings & s ) { m_localToolbox->WriteSettings( s ); }
 

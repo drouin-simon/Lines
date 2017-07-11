@@ -185,6 +185,16 @@ int LinesApp::GetOnionSkinBefore() { return m_lines->GetOnionSkinBefore(); }
 void LinesApp::SetOnionSkinAfter( int nbFrames ) { m_lines->SetOnionSkinAfter( nbFrames ); }
 int LinesApp::GetOnionSkinAfter() { return m_lines->GetOnionSkinAfter(); }
 
+void LinesApp::ToggleInOnionSkin()
+{
+    m_lines->ToggleInOnionFrame();
+}
+
+void LinesApp::ToggleOutOnionSkin()
+{
+    m_lines->ToggleOutOnionFrame();
+}
+
 bool LinesApp::IsSharing()
 {
     return m_netManager->IsSharing();

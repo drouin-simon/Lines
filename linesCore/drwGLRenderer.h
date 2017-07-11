@@ -32,6 +32,10 @@ public:
     void SetOnionSkinAfter( int );
     bool GetInhibitOnionSkin() { return m_inhibitOnionSkin; }
     void SetInhibitOnionSkin( bool isOn );
+    int GetInOnionFrame() { return m_inOnionFrame; }
+    void SetInOnionFrame( int f );
+    int GetOutOnionFrame() { return m_outOnionFrame; }
+    void SetOutOnionFrame( int f );
 
     void Render();
     void RenderToTexture( int currentFrame, int onionSkinBefore, int onionSkinAfter, Box2i & rect );
@@ -73,6 +77,8 @@ protected:
     void RenderLayer( int frame, drwDrawingContext & context );
 
     // Onion skin params
+    int m_inOnionFrame;
+    int m_outOnionFrame;
     int m_onionSkinFramesBefore;
     int m_onionSkinFramesAfter;
     bool m_inhibitOnionSkin;

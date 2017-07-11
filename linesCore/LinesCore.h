@@ -45,6 +45,8 @@ public:
     void SetOnionSkinBefore( int n );
     int GetOnionSkinAfter();
     void SetOnionSkinAfter( int n );
+    void ToggleInOnionFrame();
+    void ToggleOutOnionFrame();
 
     // Read/Write settings
     void ReadSettings( QSettings & s );

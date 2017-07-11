@@ -14,6 +14,8 @@
 drwGLRenderer::drwGLRenderer()
 {
     // Onion Skin
+    m_inOnionFrame = -1;
+    m_outOnionFrame = -1;
     m_onionSkinFramesBefore = 1;
     m_onionSkinFramesAfter = 0;
     m_inhibitOnionSkin = false;
@@ -63,6 +65,18 @@ void drwGLRenderer::SetOnionSkinAfter( int value )
 void drwGLRenderer::SetInhibitOnionSkin( bool isOn )
 {
     m_inhibitOnionSkin = isOn;
+    NeedRedraw();
+}
+
+void drwGLRenderer::SetInOnionFrame( int f )
+{
+    m_inOnionFrame = f;
+    NeedRedraw();
+}
+
+void drwGLRenderer::SetOutOnionFrame( int f )
+{
+    m_outOnionFrame = f;
     NeedRedraw();
 }
 
@@ -161,6 +175,19 @@ void drwGLRenderer::RenderToTexture( int currentFrame, int onionSkinBefore, int 
     GLWindowToWorld( rect, worldRect );
     drwDrawingContext context(this,worldRect);
     
+    // Draw in/out frame onions
+    if( m_inOnionFrame != -1 && !GetInhibitOnionSkin() )
+    {
+        context.m_colorMultiplier = Vec4( 0.85, 0.70, 0.0, 1.0 );
+        RenderLayer( m_inOnionFrame, context );
+    }
+    if( m_outOnionFrame != -1 && !GetInhibitOnionSkin() )
+    {
+        context.m_colorMultiplier = Vec4( 0.0, 0.80, 0.80, 1.0 );
+        RenderLayer( m_outOnionFrame, context );
+    }
+
+    // Draw onion skins
     int maxFrames = std::max( onionSkinBefore, onionSkinAfter );
     for( int dist = maxFrames; dist > 0; --dist )
     {
@@ -187,9 +214,6 @@ void drwGLRenderer::RenderToTexture( int currentFrame, int onionSkinBefore, int 
             context.m_colorMultiplier = Vec4( 0.0, 0.0, factor, 1.0 );
             RenderLayer( f, context );
         }
-        
-        // draw background of next layer
-        glColor4d( m_clearColor[0], m_clearColor[1], m_clearColor[2], 0.5 );
     }
     
     // draw current frame
@@ -228,6 +252,10 @@ bool drwGLRenderer::IsFrameDisplayed( int frame )
         if( frame <= lastFrameOver )
             return true;
         if( frame >= firstFrameUnder )
+            return true;
+        if( frame == m_inOnionFrame )
+            return true;
+        if( frame == m_outOnionFrame )
             return true;
         return false;
     }

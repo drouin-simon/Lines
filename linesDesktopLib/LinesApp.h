@@ -59,6 +59,8 @@ public:
     int GetOnionSkinBefore();
     void SetOnionSkinAfter( int nbFrames );
     int GetOnionSkinAfter();
+    void ToggleInOnionSkin();
+    void ToggleOutOnionSkin();
 
     // Network
     bool IsSharing();

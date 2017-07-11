@@ -591,7 +591,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
             m_linesApp->DecreaseBrushSize();
             handled = true;
         }
-        else if( keyEvent->key() == Qt::Key_O )
+        else if( keyEvent->key() == Qt::Key_S )
         {
             m_linesApp->ToggleOnionSkinEnabled();
             handled = true;
@@ -613,6 +613,16 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
         else if( keyEvent->key() == Qt::Key_F )
         {
             toggleShowGui();
+            handled = true;
+        }
+        else if( keyEvent->key() == Qt::Key_I )
+        {
+            m_linesApp->ToggleInOnionSkin();
+            handled = true;
+        }
+        else if( keyEvent->key() == Qt::Key_O )
+        {
+            m_linesApp->ToggleOutOnionSkin();
             handled = true;
         }
 	}
