@@ -20,6 +20,12 @@ LinesCore::LinesCore()
     m_onionSkinEnabled = true;
     m_remoteIO = 0;
 
+    // Flip frame mode
+    m_flipFramesMode = false;
+    m_flippingFrames = false;
+    m_flipStartY = 0.0;
+    m_flipStartFrame = 0;
+
     // Scene
     m_scene = new Scene(this);
     connect( m_scene, SIGNAL(NumberOfFramesChanged(int)), this, SLOT(NumberOfFramesChangedSlot()) );
@@ -196,6 +202,17 @@ void LinesCore::ToggleOutOnionFrame()
         m_renderer->SetOutOnionFrame( -1 );
 }
 
+bool LinesCore::IsFlippingFrameModeEnabled()
+{
+    return m_flipFramesMode;
+}
+
+void LinesCore::SetFlippingFrameModeEnabled( bool enable )
+{
+    m_flipFramesMode = enable;
+    SetOnionSkinEnabled( !m_flipFramesMode );
+}
+
 void LinesCore::ReadSettings( QSettings & s ) { m_localToolbox->ReadSettings( s ); }
 void LinesCore::WriteSettings( QSettings & s ) { m_localToolbox->WriteSettings( s ); }
 
@@ -207,11 +224,18 @@ void LinesCore::Render()
 void LinesCore::MouseEvent( drwMouseCommand::MouseCommandType commandType, double xWin, double yWin, double pressure,
                  int xTilt, int yTilt, double rotation, double tangentialPressure )
 {
-    double xWorld = 0.0;
-    double yWorld = 0.0;
-    m_renderer->WindowToWorld( xWin, yWin, xWorld, yWorld );
-    drwCommand::s_ptr command( new drwMouseCommand( commandType, xWorld, yWorld, 0.0, xWin, yWin, xTilt, yTilt, pressure, rotation, tangentialPressure ) );
-    m_localToolbox->ExecuteCommand( command );
+    if( m_flipFramesMode || m_flippingFrames /* haven't finished*/ )
+    {
+        HandleFlipFrameEvent( commandType, yWin );
+    }
+    else
+    {
+        double xWorld = 0.0;
+        double yWorld = 0.0;
+        m_renderer->WindowToWorld( xWin, yWin, xWorld, yWorld );
+        drwCommand::s_ptr command( new drwMouseCommand( commandType, xWorld, yWorld, 0.0, xWin, yWin, xTilt, yTilt, pressure, rotation, tangentialPressure ) );
+        m_localToolbox->ExecuteCommand( command );
+    }
 }
 
 void LinesCore::MouseEventWorld( drwMouseCommand::MouseCommandType type, double xWorld, double yWorld, double pressure )
@@ -476,6 +500,35 @@ void LinesCore::ClearAllToolboxesButLocal()
     }
     m_toolboxes.clear();
     m_toolboxes[ m_localToolboxId ] = local;
+}
+
+void LinesCore::HandleFlipFrameEvent( drwMouseCommand::MouseCommandType commandType, double yWin )
+{
+    // We hardcode 3% screen height = move one frame. Todo: do something smarter
+    double ratioScreenPerFrame = 0.03;
+    int screenHeight = m_renderer->GetRenderSize()[1];
+    int nbPixPerFrame = (int)( ratioScreenPerFrame * screenHeight );
+
+    if( commandType == drwMouseCommand::Press )
+    {
+        m_flippingFrames = true;
+        m_flipStartY = (int)yWin;
+        m_flipStartFrame = GetCurrentFrame();
+    }
+    else if( commandType == drwMouseCommand::Release )
+    {
+        m_flippingFrames = false;
+        SetCurrentFrame( m_flipStartFrame );
+    }
+    else if( commandType == drwMouseCommand::Move && m_flippingFrames )
+    {
+        int newFrame = m_flipStartFrame - ( (int)yWin - m_flipStartY ) / nbPixPerFrame;
+        if( newFrame >= GetNumberOfFrames() )
+            newFrame = newFrame % GetNumberOfFrames();
+        if( newFrame < 0 )
+            newFrame = GetNumberOfFrames() - ( std::abs( newFrame ) % GetNumberOfFrames() );
+        SetCurrentFrame( newFrame );
+    }
 }
 
 void LinesCore::ExecuteNetCommands()

@@ -62,6 +62,9 @@ public:
     void ToggleInOnionSkin();
     void ToggleOutOnionSkin();
 
+    // Frame flipping mode
+    void SetFlippingModeEnabled( bool enabled );
+
     // Network
     bool IsSharing();
     bool IsConnected();

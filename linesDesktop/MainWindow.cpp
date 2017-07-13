@@ -610,7 +610,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
             ToggleShowGlobalLineParams();
             handled = true;
         }
-        else if( keyEvent->key() == Qt::Key_F )
+        else if( keyEvent->key() == Qt::Key_A )
         {
             toggleShowGui();
             handled = true;
@@ -625,6 +625,11 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
             m_linesApp->ToggleOutOnionSkin();
             handled = true;
         }
+        else if( keyEvent->key() == Qt::Key_F )
+        {
+            m_linesApp->SetFlippingModeEnabled( true );
+            handled = true;
+        }
 	}
     else if( event->type() == QEvent::KeyRelease )
     {
@@ -636,6 +641,11 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
                 m_linesApp->UseBrush();
                 m_eraseToggled = false;
             }
+            handled = true;
+        }
+        if( keyEvent->key() == Qt::Key_F )
+        {
+            m_linesApp->SetFlippingModeEnabled( false );
             handled = true;
         }
     }

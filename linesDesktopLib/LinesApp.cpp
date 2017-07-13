@@ -195,6 +195,11 @@ void LinesApp::ToggleOutOnionSkin()
     m_lines->ToggleOutOnionFrame();
 }
 
+void LinesApp::SetFlippingModeEnabled( bool enabled )
+{
+    m_lines->SetFlippingFrameModeEnabled( enabled );
+}
+
 bool LinesApp::IsSharing()
 {
     return m_netManager->IsSharing();

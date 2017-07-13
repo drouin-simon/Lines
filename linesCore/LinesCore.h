@@ -48,6 +48,10 @@ public:
     void ToggleInOnionFrame();
     void ToggleOutOnionFrame();
 
+    // Flipping frames mode
+    bool IsFlippingFrameModeEnabled();
+    void SetFlippingFrameModeEnabled( bool enable );
+
     // Read/Write settings
     void ReadSettings( QSettings & s );
     void WriteSettings( QSettings & s );
@@ -117,6 +121,13 @@ private:
     int   m_frameInterval;  // number of miliseconds between frames
     bool  m_isPlaying;
     int	  m_lastFrameWantedTime;
+
+    // Flip frame mode
+    bool m_flipFramesMode;
+    bool m_flippingFrames;
+    int m_flipStartY;
+    int m_flipStartFrame;
+    void HandleFlipFrameEvent( drwMouseCommand::MouseCommandType commandType, double yWin );
 
     bool m_onionSkinEnabled;
 
