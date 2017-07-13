@@ -8,8 +8,8 @@
 #include <QSpacerItem>
 #include <QToolButton>
 
-const int PlaybackControlerWidget::NumberOfFrameRates = 8;
-const int PlaybackControlerWidget::AvailableFrameRates[8] =  \
+const int PlaybackControlerWidget::NumberOfFrameRates = 9;
+const int PlaybackControlerWidget::AvailableFrameRates[9] =  \
 {
 	4000, // 4 spf
 	2000, // 2 spf
@@ -17,14 +17,24 @@ const int PlaybackControlerWidget::AvailableFrameRates[8] =  \
 	500,  // 2 fps
 	250,  // 4 fps
 	167,  // 6 fps
+    125,  // 8 fps
 	83,   // 12 fps
 	42    // 24 fps
 };
 
+int PlaybackControlerWidget::IndexFromFrameRate( int ms )
+{
+    for( int i = 0; i < PlaybackControlerWidget::NumberOfFrameRates; ++i )
+    {
+        if( PlaybackControlerWidget::AvailableFrameRates[i] == ms )
+            return i;
+    }
+    return -1;
+}
+
 PlaybackControlerWidget::PlaybackControlerWidget( LinesCore * lc, QWidget * parent )
 : QWidget( parent )
 , m_lines( lc )
-, m_frameRateIndex(6)
 , playIcon("://icons-60x60/play.png")
 , pauseIcon("://icons-60x60/pause.png")
 {
@@ -53,8 +63,7 @@ void PlaybackControlerWidget::OnCurrentFrameSliderValueChanged( int value )
 
 void PlaybackControlerWidget::OnFrameRateSliderValueChanged( int value )
 {
-    m_frameRateIndex = value;
-    int ms = AvailableFrameRates[ m_frameRateIndex ];
+    int ms = AvailableFrameRates[ value ];
     m_lines->SetFrameInterval( ms );
 }
 
@@ -113,7 +122,7 @@ void PlaybackControlerWidget::SetupUi()
 		QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
 		sizePolicy.setHeightForWidth(frameRateSlider->sizePolicy().hasHeightForWidth());
 		frameRateSlider->setSizePolicy(sizePolicy);
-		frameRateSlider->setMaximum(7);
+        frameRateSlider->setMaximum( NumberOfFrameRates - 1 );
 		frameRateSlider->setSingleStep(1);
 		frameRateSlider->setOrientation(Qt::Horizontal);
 		frameRateSlider->setTickPosition(QSlider::TicksBelow);
@@ -151,14 +160,18 @@ void PlaybackControlerWidget::UpdateUi()
         playPauseButton->setIcon( pauseIcon );
 	else
         playPauseButton->setIcon( playIcon );
+
+    //
+    int mSecPerFrame = m_lines->GetFrameInterval();
+    int frameRateIndex = IndexFromFrameRate( mSecPerFrame );
+    Q_ASSERT( frameRateIndex != -1 );
 	
 	// Frame rate slider
     frameRateSlider->blockSignals( true );
-	frameRateSlider->setValue( m_frameRateIndex );
+    frameRateSlider->setValue( frameRateIndex );
     frameRateSlider->blockSignals( false );
 	
 	// Frame rate line edit
-	int mSecPerFrame = AvailableFrameRates[ m_frameRateIndex ];
 	double fps = double(1000) / double(mSecPerFrame);
 	frameRateLineEdit->setText( QString::number( fps, 'g', 2 ) );
 }

@@ -75,6 +75,7 @@ public:
     void PrevFrame();
     void GotoStart();
     void GotoEnd();
+    int GetFrameInterval() { return m_frameInterval; }
     void SetFrameInterval( int intervalms );
     bool IsPlaying();
     void StartPlaying();

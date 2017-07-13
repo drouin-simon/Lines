@@ -40,11 +40,11 @@ private slots:
 private:
 
 	void SetupUi();
+    int IndexFromFrameRate( int ms );
 	
     LinesCore * m_lines;
-	int m_frameRateIndex;
 	static const int NumberOfFrameRates;
-	static const int AvailableFrameRates[8];	
+    static const int AvailableFrameRates[9];
 	
 	QHBoxLayout * mainLayout;
     QLineEdit	* currentFrameLineEdit;

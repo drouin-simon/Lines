@@ -289,6 +289,7 @@ void LinesCore::GotoEnd()
 void LinesCore::SetFrameInterval( int intervalms )
 {
     m_frameInterval = intervalms;
+    emit PlaybackSettingsChangedSignal();
 }
 
 bool LinesCore::IsPlaying()
