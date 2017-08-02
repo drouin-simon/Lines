@@ -7,6 +7,7 @@
 
 int main( int argc, char** argv )
 {
+	QApplication::setAttribute(Qt::AA_EnableHighDpiScaling); // DPI support
     QApplication a( argc, argv );
 
     Q_INIT_RESOURCE(lineslibresources);
@@ -22,6 +23,7 @@ int main( int argc, char** argv )
 	styleSheet += "QGroupBox { margin: 10px 0 0 0; padding: 0px 0 0 0; border: 1px solid rgb(120,120,120); border-radius: 5px; }";
 	styleSheet += "QGroupBox::title { subcontrol-origin: margin; subcontrol-position: top center; margin: 0 }";
 
+	
     QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 
     MainWindow mw;
