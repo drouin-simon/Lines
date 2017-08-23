@@ -21,6 +21,7 @@ class DisplaySettingsWidget;
 class drwNetworkManager;
 class drwGlobalLineParams;
 class drwSimplifiedToolbar;
+class SideToolbar;
 class LinesApp;
 class LinesCore;
 
@@ -89,6 +90,7 @@ private:
     drwAspectRatioWidget * m_drawingWidgetContainer;
 	drwDrawingWidget    * m_glWidget;
     drwSimplifiedToolbar * m_simplifiedToolbar;
+    SideToolbar * m_sideToolbar;
     LinesApp * m_linesApp;
 
 	QMenu       * m_viewMenu;

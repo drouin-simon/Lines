@@ -6,6 +6,7 @@ drwSimplifiedToolbar::drwSimplifiedToolbar(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::drwSimplifiedToolbar),
     m_app(0),
+    m_vertical( false ),
     m_notConnectedIcon("://icons-60x60/net-not-connected.png"),
     m_connectedIcon("://icons-60x60/net-connected.png"),
     m_sharingIcon("://icons-60x60/net-share.png")
@@ -25,6 +26,24 @@ void drwSimplifiedToolbar::SetApp( LinesApp * app )
     connect( m_app, SIGNAL(DisplayParamsModified()), this, SLOT(UpdateUI()) );
     connect( m_app, SIGNAL(LineParamsModified()), this, SLOT(UpdateUI()) );
     connect( m_app, SIGNAL(NetworkManagerStateChangedSignal()), this, SLOT(UpdateUI()) );
+}
+
+void drwSimplifiedToolbar::SetOrientationToVertical()
+{
+    QBoxLayout * mainLayout = qobject_cast<QBoxLayout *>( layout() );
+    Q_ASSERT( mainLayout );
+
+    mainLayout->setDirection(QBoxLayout::TopToBottom);
+    setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Preferred );
+}
+
+void drwSimplifiedToolbar::SetOrientationToHorizontal()
+{
+    QBoxLayout * mainLayout = qobject_cast<QBoxLayout *>( layout() );
+    Q_ASSERT( mainLayout );
+
+    mainLayout->setDirection( QBoxLayout::LeftToRight );
+    setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Fixed );
 }
 
 void drwSimplifiedToolbar::UpdateUI()

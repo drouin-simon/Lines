@@ -20,6 +20,8 @@ public:
     ~drwSimplifiedToolbar();
 
     void SetApp( LinesApp * app );
+    void SetOrientationToVertical();
+    void SetOrientationToHorizontal();
 
 protected slots:
 
@@ -49,6 +51,7 @@ private:
 
     Ui::drwSimplifiedToolbar *ui;
     LinesApp * m_app;
+    bool m_vertical;
 
     QPixmap m_notConnectedIcon;
     QPixmap m_connectedIcon;

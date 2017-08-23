@@ -3,6 +3,8 @@
 
 #include <QWidget>
 
+class QPoint;
+
 class drwGradientWidget : public QWidget
 {
     Q_OBJECT
@@ -11,6 +13,9 @@ public:
 
     explicit drwGradientWidget( QWidget *parent = 0);
 	~drwGradientWidget();
+
+    void setVertical( bool v );
+    bool isVertical();
 
 	double sliderValue();
 	void setSliderValue( double );
@@ -30,10 +35,10 @@ protected:
 
 private:
 
-	void   setSliderValue( int );
-	double widgetPosToSliderValue( int );
+    void   setSliderValue( QPoint p );
 	int    sliderValueToWidgetPos( double );
 
+    bool    m_vertical;
 	int     m_cursorWidth;
 	int		m_cursorHeight;
 	double  m_sliderValue;

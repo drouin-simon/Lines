@@ -7,6 +7,7 @@
 
 drwGradientWidget::drwGradientWidget( QWidget *parent) :
 		QWidget(parent),
+        m_vertical( false ),
 		m_cursorWidth( 10 ),
 		m_cursorHeight( 5 ),
 		m_sliderValue( .5 ),
@@ -38,15 +39,7 @@ void drwGradientWidget::mouseMoveEvent( QMouseEvent * event )
         return;
     }
 
-	int cursorWindowPos = 0;
-	if( event->pos().x() >= rect().width() )
-		cursorWindowPos = rect().width() - 1;
-	else if( event->pos().x() < 0 )
-		cursorWindowPos = 0;
-	else
-		cursorWindowPos = event->pos().x();
-
-	setSliderValue( cursorWindowPos );
+    setSliderValue( event->pos() );
     event->accept();
 }
 
@@ -58,7 +51,7 @@ void drwGradientWidget::mousePressEvent( QMouseEvent * event )
         return;
     }
 
-	setSliderValue( event->pos().x() );
+    setSliderValue( event->pos() );
 	m_leftButtonPressed = true;
     event->accept();
 }
@@ -74,7 +67,7 @@ void drwGradientWidget::mouseReleaseEvent(QMouseEvent *event)
     // On teste que la souris est bien dans le widget
 	if( rect().contains( event->pos() ) )
     {
-		setSliderValue( event->pos().x() );
+        setSliderValue( event->pos() );
     }
 
 	m_leftButtonPressed = false;
@@ -89,8 +82,15 @@ void drwGradientWidget::paintEvent( QPaintEvent * event )
 	painter.setRenderHint( QPainter::HighQualityAntialiasing );
 
 	// Draw gradient
-	QRect gradientRect( 0, 0, width(), height() - m_cursorHeight - 2 );
-	QLinearGradient linearGrad( QPointF( 0, 0 ), QPointF( width(), 0) );
+    QPoint topLeft( 0, 0 );
+    QSize s( width(), height() - m_cursorHeight - 2 );
+    if( isVertical() )
+        s = QSize( width() - m_cursorHeight - 2, height() );
+    QRect gradientRect( topLeft, s );
+    QPointF gradEnd( width(), 0.0 );
+    if( isVertical() )
+        gradEnd = QPointF( 0.0, height() );
+    QLinearGradient linearGrad( QPointF( 0, 0 ), gradEnd );
 	linearGrad.setColorAt( 0, Qt::black );
 	linearGrad.setColorAt( 1, Qt::white );
 	painter.setBrush( QBrush(linearGrad) );
@@ -98,16 +98,40 @@ void drwGradientWidget::paintEvent( QPaintEvent * event )
 
 	// Draw slider
 	int cursorPosition = sliderValueToWidgetPos( m_sliderValue );
-	painter.setBrush( palette().windowText() );
-	float bottom = (float)(rect().height() - 1);
-	float top = (float)(rect().height() - m_cursorHeight - 1);
-	float left = (float)(cursorPosition - m_cursorWidth * .5 );
-	float right = (float)(cursorPosition + m_cursorWidth * .5);
+	painter.setBrush( palette().windowText() );    
 	QPolygonF triangle;
-	triangle.push_back( QPointF( left, bottom ) );
-	triangle.push_back( QPointF( right, bottom ) );
-	triangle.push_back( QPointF( float(cursorPosition), top ) );
+    if( isVertical() )
+    {
+        float bottom = (float)(rect().width() - 1);
+        float top = (float)(rect().width() - m_cursorHeight - 1);
+        float left = (float)(cursorPosition + m_cursorWidth * .5 );
+        float right = (float)(cursorPosition - m_cursorWidth * .5);
+        triangle.push_back( QPointF( left, bottom ) );
+        triangle.push_back( QPointF( right, bottom ) );
+        triangle.push_back( QPointF( float(cursorPosition), top ) );
+    }
+    else
+    {
+        float bottom = (float)(rect().height() - 1);
+        float top = (float)(rect().height() - m_cursorHeight - 1);
+        float left = (float)(cursorPosition - m_cursorWidth * .5 );
+        float right = (float)(cursorPosition + m_cursorWidth * .5);
+        triangle.push_back( QPointF( left, bottom ) );
+        triangle.push_back( QPointF( right, bottom ) );
+        triangle.push_back( QPointF( float(cursorPosition), top ) );
+    }
 	painter.drawPolygon( triangle );
+}
+
+void drwGradientWidget::setVertical( bool v )
+{
+    m_vertical = v;
+    update();
+}
+
+bool drwGradientWidget::isVertical()
+{
+    return m_vertical;
 }
 
 void drwGradientWidget::setSliderValue( double val )
@@ -117,18 +141,16 @@ void drwGradientWidget::setSliderValue( double val )
 	update();
 }
 
-void drwGradientWidget::setSliderValue( int val )
+void drwGradientWidget::setSliderValue( QPoint p )
 {
-	setSliderValue( widgetPosToSliderValue( val ) );
-}
-
-double drwGradientWidget::widgetPosToSliderValue( int widgetPos )
-{
-	double sliderValue = (double)widgetPos / width();
-	return sliderValue;
+    if( isVertical() )
+        setSliderValue( (double)std::min( p.y(), height() ) / height() );
+    setSliderValue( (double)std::min( p.x(), width() ) / width() );
 }
 
 int drwGradientWidget::sliderValueToWidgetPos( double sliderValue )
 {
+    if( isVertical() )
+        return (int)round( sliderValue * height() );
 	return (int)round( sliderValue * width() );
 }

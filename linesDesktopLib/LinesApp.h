@@ -41,6 +41,10 @@ public:
     void SetPersistence( int p );
     int GetPersistence();
 
+    // Control
+    void GotoNextFrame();
+    void GotoPreviousFrame();
+
     // Frame Change mode
     bool IsFrameChangeManual();
     void SetFrameChangeManual();
@@ -63,6 +67,7 @@ public:
     void ToggleOutOnionSkin();
 
     // Frame flipping mode
+    bool IsFlippingModeEnabled();
     void SetFlippingModeEnabled( bool enabled );
 
     // Network

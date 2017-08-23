@@ -124,6 +124,16 @@ int LinesApp::GetPersistence()
     return GetLineTool()->GetPersistence();
 }
 
+void LinesApp::GotoNextFrame()
+{
+    m_lines->NextFrame();
+}
+
+void LinesApp::GotoPreviousFrame()
+{
+    m_lines->PrevFrame();
+}
+
 bool LinesApp::IsFrameChangeManual()
 {
     return GetFrameChangeMode() == Manual;
@@ -193,6 +203,11 @@ void LinesApp::ToggleInOnionSkin()
 void LinesApp::ToggleOutOnionSkin()
 {
     m_lines->ToggleOutOnionFrame();
+}
+
+bool LinesApp::IsFlippingModeEnabled()
+{
+    return m_lines->IsFlippingFrameModeEnabled();
 }
 
 void LinesApp::SetFlippingModeEnabled( bool enabled )

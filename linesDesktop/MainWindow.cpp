@@ -1,4 +1,5 @@
 #include "MainWindow.h"
+#include "SideToolbar.h"
 #include "drwDrawingWidget.h"
 #include "drwAspectRatioWidget.h"
 #include "PlaybackControlerWidget.h"
@@ -46,6 +47,11 @@ MainWindow::MainWindow()
     QHBoxLayout * mainLayout = new QHBoxLayout( m_mainWidget );
     mainLayout->setContentsMargins( 0, 0, 0, 0 );
     mainLayout->setSpacing( 0 );
+
+    // Side toolbar (only left for now)
+    m_sideToolbar = new SideToolbar( m_mainWidget );
+    m_sideToolbar->SetApp( m_linesApp );
+    mainLayout->addWidget( m_sideToolbar );
 
     // Drawing area layout (drawing window + timeline)
     QVBoxLayout * drawingAreaLayout = new QVBoxLayout();
@@ -399,6 +405,7 @@ void MainWindow::toggleShowGui()
 {
     m_guiHidden = !m_guiHidden;
     m_simplifiedToolbar->setHidden( m_guiHidden );
+    m_sideToolbar->setHidden( m_guiHidden );
     m_playbackControlerWidget->setHidden( m_guiHidden );
     m_drawingWidgetContainer->setAspectRatioEnabled( !m_guiHidden );
 }
