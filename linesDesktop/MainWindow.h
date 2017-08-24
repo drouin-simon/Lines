@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QString>
+#include <QHostAddress>
 
 class QPopupMenu;
 class QWorkspace;
@@ -115,7 +116,10 @@ private:
     QDockWidget * m_globalLineParamsDock;
 	
     LinesCore * m_lines;
-	drwNetworkManager		* m_networkManager;
+
+    // Network
+    QHostAddress m_lastServerAddress;
+    drwNetworkManager * m_networkManager;
 
 	QProgressDialog * m_progressDialog;
 

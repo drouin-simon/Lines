@@ -275,6 +275,8 @@ void MainWindow::NetShareSession()
 	}
 }
 
+#include <QHostAddress>
+
 void MainWindow::NetConnect()
 {
     if( m_networkManager->IsConnected() )
@@ -285,25 +287,26 @@ void MainWindow::NetConnect()
     {
         // Get the user to select the server to connect to
         drwNetworkConnectDialog * dlg = new drwNetworkConnectDialog( this );
+        dlg->SetServerAddress( m_lastServerAddress );
         int result = dlg->exec();
-        QString name;
-        QHostAddress address;
-        if( result != QDialog::Accepted || !dlg->GetSelectedUserAndAddress( name, address ) )
+        if( result != QDialog::Accepted || dlg->GetServerAddress().isNull() )
         {
             delete dlg;
             return;
         }
+        m_lastServerAddress = dlg->GetServerAddress();
+        QString serverName = dlg->GetServerUserName();
         delete dlg;
 
         // Now we have a valid username and ip, try to connect
         Reset();
         m_lines->EnableRendering( false );
-        m_networkManager->Connect( name, address );
+        m_networkManager->Connect( serverName, m_lastServerAddress );
 
         // Create a timer to update a progress dialog
         QTimer timer;
         connect( &timer, SIGNAL(timeout()), this, SLOT(NetConnectProgress()) );
-        timer.start( 200 );
+        timer.start( 100 );
 
         // Create progress dialog and start it
         m_progressDialog = new QProgressDialog( "Connecting", "Cancel", 0, 100 );
@@ -498,6 +501,9 @@ void MainWindow::readSettings()
     // white on black or black on white
     bool wob = settings.value( "WhiteOnBlack", true ).toBool();
     SetWhiteOnBlack( wob );
+
+    // Last server address
+    m_lastServerAddress = QHostAddress( settings.value( "LastServerAddress", QHostAddress().toString() ).toString() );
     
     // Allow toolbox and all tools to read their settings
     m_lines->ReadSettings( settings );
@@ -523,6 +529,9 @@ void MainWindow::writeSettings()
     
     // white on black or black on white
     settings.setValue( "WhiteOnBlack", m_whiteOnBlack );
+
+    // Last server address
+    settings.setValue( "LastServerAddress", m_lastServerAddress.toString() );
     
     // Allow toolbox and all tools to save their settings
     m_lines->WriteSettings( settings );

@@ -1,13 +1,13 @@
 #include "drwNetworkConnectDialog.h"
 #include "ui_drwNetworkConnectDialog.h"
 #include "drwNetworkServerFinder.h"
-#include <QHostAddress>
 
 drwNetworkConnectDialog::drwNetworkConnectDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::drwNetworkConnectDialog),
     m_selectedRow( -1 )
 {
+    m_serverName = QString( "Manual IP" );
     ui->setupUi(this);
     m_finder = new drwNetworkServerFinder( );
     connect( m_finder, SIGNAL(ModifiedSignal()), this, SLOT(UpdateUi()) );
@@ -20,28 +20,10 @@ drwNetworkConnectDialog::~drwNetworkConnectDialog()
     delete ui;
 }
 
-bool drwNetworkConnectDialog::GetSelectedUserAndAddress( QString & user, QHostAddress & address )
+void drwNetworkConnectDialog::SetServerAddress( QHostAddress & address )
 {
-	if( m_selectedRow != -1 && m_finder->GetServerUsers().size() > m_selectedRow )
-	{
-		const QStringList & names = m_finder->GetServerUsers();
-		user = names.at( m_selectedRow );
-		const QList<QHostAddress> & addresses = m_finder->GetServerAddresses();
-		address = addresses.at( m_selectedRow );
-		return true;
-	}
-    else
-    {
-        QHostAddress stringAddr;
-        bool valid = stringAddr.setAddress( ui->serverIPEdit->text() );
-        if( valid )
-        {
-            user = "Manual IP";
-            address = stringAddr;
-            return true;
-        }
-    }
-	return false;
+    m_serverAddress = address;
+    UpdateUi();
 }
 
 void drwNetworkConnectDialog::UpdateUi()
@@ -64,10 +46,24 @@ void drwNetworkConnectDialog::UpdateUi()
         QTableWidgetSelectionRange range( m_selectedRow, 0, m_selectedRow, 1 );
         ui->tableWidget->setRangeSelected( range, true );
     }
+
+    ui->serverIPEdit->blockSignals( true );
+    ui->serverIPEdit->setText( m_serverAddress.toString() );
+    ui->serverIPEdit->blockSignals( false );
 }
 
 void drwNetworkConnectDialog::on_tableWidget_cellPressed(int row, int column)
 {
     m_selectedRow = row;
+
+    const QList<QHostAddress> & addresses = m_finder->GetServerAddresses();
+    Q_ASSERT( addresses.size() > row );
+    m_serverAddress = addresses[ row ];
+
     UpdateUi();
+}
+
+void drwNetworkConnectDialog::on_serverIPEdit_textChanged(const QString &arg1)
+{
+    m_serverAddress.setAddress( arg1 );
 }
