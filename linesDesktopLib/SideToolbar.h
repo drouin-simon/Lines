@@ -22,7 +22,7 @@ public:
 
 private slots:
 
-    void on_flipModeButton_toggled(bool checked);
+    void OnScrollWidgetClick(int);
     void on_nextFrameButton_clicked();
     void on_prevFrameButton_clicked();
     void on_increaseSizeButton_clicked();

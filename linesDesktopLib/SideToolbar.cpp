@@ -7,6 +7,7 @@ SideToolbar::SideToolbar(QWidget *parent) :
     ui(new Ui::SideToolbar)
 {
     ui->setupUi(this);
+    connect( ui->scrollWidget, SIGNAL(wheelClick(int)), this, SLOT(OnScrollWidgetClick(int) ) );
 }
 
 SideToolbar::~SideToolbar()
@@ -20,10 +21,12 @@ void SideToolbar::SetApp( LinesApp * app )
     UpdateUi();
 }
 
-void SideToolbar::on_flipModeButton_toggled(bool checked)
+void SideToolbar::OnScrollWidgetClick( int nbClicks )
 {
-    m_app->SetFlippingModeEnabled( checked );
-    UpdateUi();
+    if( nbClicks > 0 )
+        m_app->GotoPreviousFrame();
+    else
+        m_app->GotoNextFrame();
 }
 
 void SideToolbar::on_nextFrameButton_clicked()
@@ -48,7 +51,4 @@ void SideToolbar::on_decreaseSizeButton_clicked()
 
 void SideToolbar::UpdateUi()
 {
-    ui->flipModeButton->blockSignals( true );
-    ui->flipModeButton->setChecked( m_app->IsFlippingModeEnabled() );
-    ui->flipModeButton->blockSignals( false );
 }
