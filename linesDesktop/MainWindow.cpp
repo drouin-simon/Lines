@@ -140,7 +140,9 @@ void MainWindow::CreateActions()
 	
 	// Create the View menu
     m_viewMenu = menuBar()->addMenu( "&View" );
-    //m_viewMenu->addAction( "Fullscreen", this, SLOT( viewFullscreen() ), Qt::CTRL + Qt::Key_F );
+#ifdef Q_OS_WIN
+	m_viewMenu->addAction("Fullscreen", this, SLOT(viewFullscreen()), Qt::CTRL + Qt::Key_F);
+#endif // Q_OS_WIN
 	
     // Create a Help menu
     menuBar()->addSeparator();
@@ -395,11 +397,9 @@ void MainWindow::viewFullscreen()
 	if( isFullScreen() )
 	{
 		showNormal();
-        m_playbackControlerWidget->show();
 	}
 	else
 	{
-        m_playbackControlerWidget->hide();
 		showFullScreen();
 	}
 }
