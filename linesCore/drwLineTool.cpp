@@ -309,7 +309,7 @@ void drwLineTool::SetShowCursor( bool show )
     drwGLRenderer * ren = m_toolbox->GetRenderer();
     if( ren )
     {
-        m_toolbox->GetRenderer()->SetShowCursor( show );
+        ren->SetShowCursor( show );
         ren->MarkOverlayModified();
     }
 }

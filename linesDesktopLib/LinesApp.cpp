@@ -47,6 +47,7 @@ void LinesApp::DecreaseBrushSize()
 void LinesApp::SetLineWidth( double w )
 {
     GetLineTool()->SetBaseWidth( w );
+    m_lines->SetShowCursor( true );
 }
 
 double LinesApp::GetLineWidth()
