@@ -20,4 +20,3 @@ else( EXISTS ${GIT_SOURCE_DIR}/.git )
   set( GIT_COMMIT_HASH 0 )
   set( GIT_COMMIT_HASH_SHORT 0 )
 endif( EXISTS ${GIT_SOURCE_DIR}/.git )
-
