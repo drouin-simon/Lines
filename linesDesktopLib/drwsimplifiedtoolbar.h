@@ -23,6 +23,9 @@ public:
     void SetOrientationToVertical();
     void SetOrientationToHorizontal();
 
+    void SetButtonHeight( int h );
+    int GetButtonHeight();
+
 protected slots:
 
     void UpdateUI();

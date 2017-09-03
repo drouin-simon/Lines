@@ -19,6 +19,8 @@ public:
     ~SideToolbar();
 
     void SetApp( LinesApp * app );
+    int GetButtonWidth();
+    void SetButtonWidth( int w );
 
 private slots:
 

@@ -3,11 +3,13 @@ set( ExecName Lines )
 set( Drw_src  main.cpp 
 		MainWindow.cpp 
 		PlaybackControlerWidget.cpp 
-		ExportDialog.cpp )
+                ExportDialog.cpp
+                LinesPreferencesWidget.cpp )
 
 set( Drw_hdr MainWindow.h  
 		PlaybackControlerWidget.h 
-		ExportDialog.h )
+                ExportDialog.h
+                LinesPreferencesWidget.h )
 
 # Include dir for DrawLib
 include_directories(${linesCoreIncludeDirs})
@@ -18,7 +20,7 @@ include_directories(${linesDesktopLibIncludeDirs})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 # Create classes from Qt ui files
-set( Drw_ui ExportDialog.ui )
+set( Drw_ui ExportDialog.ui LinesPreferencesWidget.ui )
 qt5_wrap_ui( Drw_hdr_ui ${Drw_ui} )
 
 # moc Qt source file without a ui file

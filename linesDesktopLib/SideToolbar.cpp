@@ -21,6 +21,19 @@ void SideToolbar::SetApp( LinesApp * app )
     UpdateUi();
 }
 
+int SideToolbar::GetButtonWidth()
+{
+    return ui->nextFrameButton->minimumWidth();
+}
+
+void SideToolbar::SetButtonWidth( int w )
+{
+    ui->nextFrameButton->setMinimumSize( w, w );
+    ui->prevFrameButton->setMinimumSize( w, w );
+    ui->increaseSizeButton->setMinimumSize( w, w );
+    ui->decreaseSizeButton->setMinimumSize( w, w );
+}
+
 void SideToolbar::OnScrollWidgetClick( int nbClicks )
 {
     if( nbClicks > 0 )

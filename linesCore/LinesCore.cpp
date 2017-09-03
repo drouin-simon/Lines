@@ -129,11 +129,16 @@ void LinesCore::NewAnimation()
     ClearAnimation();
 
     // Remember initial state in the new animation
-    m_scene->EmitStateCommand();
-    m_localToolbox->EmitStateCommand();
+    EmitStateCommands();
 
     // Restart at frame 0
     SetCurrentFrame( 0 );
+}
+
+void LinesCore::EmitStateCommands()
+{
+    m_scene->EmitStateCommand();
+    m_localToolbox->EmitStateCommand();
 }
 
 void LinesCore::SetDrawingSurface( drwDrawingSurface * surface )

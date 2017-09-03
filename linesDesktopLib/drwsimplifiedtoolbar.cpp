@@ -46,6 +46,21 @@ void drwSimplifiedToolbar::SetOrientationToHorizontal()
     setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Fixed );
 }
 
+void drwSimplifiedToolbar::SetButtonHeight( int h )
+{
+    foreach( QObject *child , children() )
+    {
+        QToolButton * b = qobject_cast< QToolButton* >( child );
+        if( b )
+            b->setIconSize( QSize( h, h ) );
+    }
+}
+
+int drwSimplifiedToolbar::GetButtonHeight()
+{
+    return ui->smallBrushButton->iconSize().width();
+}
+
 void drwSimplifiedToolbar::UpdateUI()
 {
     if( !m_app )

@@ -17,6 +17,7 @@ int main( int argc, char** argv )
 	styleSheet += "QWidget { background-color: rgb(61, 61, 61); color: white; }";
 	styleSheet += "QPushButton { border: 1px solid rgb(120,120,120); border-radius: 5px; padding: 2px }";
     styleSheet += "QToolButton { border: 1px solid rgb(120,120,120); border-radius: 5px; padding: 2px }";
+    styleSheet += "QToolButton:pressed { background-color: rgb(170,100,60); padding: 0 }";
     styleSheet += "QToolButton:checked { background-color: rgb(100, 100, 100); border: 2px solid rgb(120,120,120); border-radius: 5px; padding: 2px }";
 	styleSheet += "QLineEdit { background-color: rgb(100,100,100); border: 1px solid rgb(120,120,120); border-radius: 5px; }";
 	styleSheet += "QSpinBox { background-color: rgb(100,100,100); }";

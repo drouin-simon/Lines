@@ -12,6 +12,8 @@ class QDockWidget;
 class QAction;
 class QProgressDialog;
 class QLabel;
+class QHBoxLayout;
+class QVBoxLayout;
 
 class drwAspectRatioWidget;
 class drwDrawingWidget;
@@ -25,6 +27,7 @@ class drwSimplifiedToolbar;
 class SideToolbar;
 class LinesApp;
 class LinesCore;
+class LinesPreferencesWidget;
 
 class MainWindow : public QMainWindow
 {
@@ -36,6 +39,15 @@ public:
     ~MainWindow();
 	
 	void closeEvent( QCloseEvent * e );
+
+    void SetShowSideToolbar( bool show );
+    bool IsSideToolbarShown();
+    void SetSideToolbarLeft( bool left );
+    bool IsSideToolbarLeft();
+    void SetSideToolbarWidth( int w );
+    int GetSideToolbarWidth();
+    void SetMainToolbarHeight( int w );
+    int GetMainToolbarHeight();
 
 private slots:
 	
@@ -49,6 +61,8 @@ private slots:
     void editMenuAboutToShow();
 	void editSetNumberOfFrames();
     void editWhiteOnBlackToggled( bool wob );
+    void editPreferences();
+    void OnLinesPreferencesClosed();
 	
 	void NetShareSession();
 	void NetConnect();
@@ -91,7 +105,10 @@ private:
     drwAspectRatioWidget * m_drawingWidgetContainer;
 	drwDrawingWidget    * m_glWidget;
     drwSimplifiedToolbar * m_simplifiedToolbar;
+
+    bool m_sideToolbarLeft;
     SideToolbar * m_sideToolbar;
+
     LinesApp * m_linesApp;
 
 	QMenu       * m_viewMenu;
@@ -105,8 +122,9 @@ private:
 	QAction * m_netShareSessionMenuAction;
 	QAction * m_netConnectMenuItem;
 	
-    // Right panel
     QWidget * m_mainWidget;
+    QHBoxLayout * m_mainLayout;
+    QVBoxLayout * m_drawingAreaLayout;
 	PlaybackControlerWidget * m_playbackControlerWidget;
 
 	TabletStateWidget * m_tabletStateWidget;
@@ -114,6 +132,8 @@ private:
     
     drwGlobalLineParams * m_globalLineParams;
     QDockWidget * m_globalLineParamsDock;
+
+    LinesPreferencesWidget * m_linesPreferences;
 	
     LinesCore * m_lines;
 

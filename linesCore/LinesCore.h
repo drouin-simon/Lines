@@ -33,6 +33,7 @@ public:
     void SaveAnimation( const char * filename );
     bool IsAnimationModified();
     void NewAnimation();
+    void EmitStateCommands();
 
     // Setting properties
     void SetDrawingSurface( drwDrawingSurface * surface );

@@ -13,6 +13,7 @@
 #include "drwsimplifiedtoolbar.h"
 #include "LinesApp.h"
 #include "LinesCore.h"
+#include "LinesPreferencesWidget.h"
 
 const QString MainWindow::m_appName( "Lines" );
 
@@ -38,25 +39,28 @@ MainWindow::MainWindow()
     m_globalLineParams = new drwGlobalLineParams( this );
     m_globalLineParamsDock = 0;
 
+    m_linesPreferences = 0;
+
     m_linesApp = new LinesApp( m_lines, m_networkManager );
 
 	// Create main widget  (just a frame to put the viewing widget and the playback control widget)
     m_mainWidget = new QWidget(this);
     setCentralWidget( m_mainWidget );
 
-    QHBoxLayout * mainLayout = new QHBoxLayout( m_mainWidget );
-    mainLayout->setContentsMargins( 0, 0, 0, 0 );
-    mainLayout->setSpacing( 0 );
+    m_mainLayout = new QHBoxLayout( m_mainWidget );
+    m_mainLayout->setContentsMargins( 0, 0, 0, 0 );
+    m_mainLayout->setSpacing( 0 );
 
     // Side toolbar (only left for now)
+    m_sideToolbarLeft = true;
     m_sideToolbar = new SideToolbar( m_mainWidget );
     m_sideToolbar->SetApp( m_linesApp );
-    mainLayout->addWidget( m_sideToolbar );
+    m_mainLayout->addWidget( m_sideToolbar );
 
     // Drawing area layout (drawing window + timeline)
-    QVBoxLayout * drawingAreaLayout = new QVBoxLayout();
-	drawingAreaLayout->setContentsMargins( 0, 0, 0, 0 );
-    mainLayout->addLayout( drawingAreaLayout );
+    m_drawingAreaLayout = new QVBoxLayout();
+    m_drawingAreaLayout->setContentsMargins( 0, 0, 0, 0 );
+    m_mainLayout->addLayout( m_drawingAreaLayout );
 
     // Set default OpenGL surface format that will be applied to all openGL windows
     QSurfaceFormat format;
@@ -70,11 +74,11 @@ MainWindow::MainWindow()
     // Toolbar
     m_simplifiedToolbar = new drwSimplifiedToolbar( m_mainWidget );
     m_simplifiedToolbar->SetApp( m_linesApp );
-    drawingAreaLayout->addWidget( m_simplifiedToolbar );
+    m_drawingAreaLayout->addWidget( m_simplifiedToolbar );
 
     // Create Drawing window container that maintains a 16:9 aspect ratio
     m_drawingWidgetContainer = new drwAspectRatioWidget( m_mainWidget );
-    drawingAreaLayout->addWidget( m_drawingWidgetContainer );
+    m_drawingAreaLayout->addWidget( m_drawingWidgetContainer );
 	
 	// Create Drawing window
     m_glWidget = new drwDrawingWidget( m_drawingWidgetContainer );
@@ -86,7 +90,7 @@ MainWindow::MainWindow()
 	
 	// Create playback control widget
     m_playbackControlerWidget = new PlaybackControlerWidget( m_lines, m_mainWidget );
-	drawingAreaLayout->addWidget( m_playbackControlerWidget );
+    m_drawingAreaLayout->addWidget( m_playbackControlerWidget );
 	
 	// Create tablet state dock
 	m_dockTabletState = new QDockWidget(tr("Tablet State"));
@@ -111,6 +115,58 @@ MainWindow::~MainWindow()
     delete m_lines;
 }
 
+void MainWindow::SetShowSideToolbar( bool show )
+{
+    m_sideToolbar->setHidden( !show );
+}
+
+bool MainWindow::IsSideToolbarShown()
+{
+    return !m_sideToolbar->isHidden();
+}
+
+void MainWindow::SetSideToolbarLeft( bool left )
+{
+    m_sideToolbarLeft = left;
+    m_mainLayout->removeWidget( m_sideToolbar );
+    m_mainLayout->removeItem( m_drawingAreaLayout );
+    if( left )
+    {
+        m_mainLayout->addWidget( m_sideToolbar );
+        m_mainLayout->addItem( m_drawingAreaLayout );
+    }
+    else
+    {
+        m_mainLayout->addItem( m_drawingAreaLayout );
+        m_mainLayout->addWidget( m_sideToolbar );
+    }
+}
+
+bool MainWindow::IsSideToolbarLeft()
+{
+    return m_sideToolbarLeft;
+}
+
+void MainWindow::SetSideToolbarWidth( int w )
+{
+    m_sideToolbar->SetButtonWidth( w );
+}
+
+int MainWindow::GetSideToolbarWidth()
+{
+    return m_sideToolbar->GetButtonWidth();
+}
+
+void MainWindow::SetMainToolbarHeight( int h )
+{
+    m_simplifiedToolbar->SetButtonHeight( h );
+}
+
+int MainWindow::GetMainToolbarHeight()
+{
+    return m_simplifiedToolbar->GetButtonHeight();
+}
+
 void MainWindow::CreateActions()
 {
 	// Creates a file menu
@@ -132,6 +188,7 @@ void MainWindow::CreateActions()
     //connect( m_whiteOnBlackAction, SIGNAL(toggled(bool)), this, SLOT(editWhiteOnBlackToggled(bool)) );
     //m_editMenu->addAction( m_whiteOnBlackAction );
     connect( m_editMenu, SIGNAL(aboutToShow()), this, SLOT(editMenuAboutToShow()) );
+    QAction * preferencesAction = m_editMenu->addAction( "preferences...", this, SLOT( editPreferences() ) );
 	
 	// Create the Network menu
 	m_networkMenu = menuBar()->addMenu( "&Network" );
@@ -263,6 +320,25 @@ void MainWindow::editWhiteOnBlackToggled( bool wob )
     m_glWidget->NeedRedraw();
 }
 
+void MainWindow::editPreferences()
+{
+    if( !m_linesPreferences )
+    {
+        m_linesPreferences = new LinesPreferencesWidget;
+        m_linesPreferences->setAttribute( Qt::WA_DeleteOnClose );
+        Qt::WindowFlags flags = Qt::Tool;
+        m_linesPreferences->setWindowFlags( flags );
+        connect( m_linesPreferences, SIGNAL(destroyed(QObject*)), this, SLOT(OnLinesPreferencesClosed()) );
+        m_linesPreferences->SetMainWindow( this );
+    }
+    m_linesPreferences->show();
+}
+
+void MainWindow::OnLinesPreferencesClosed()
+{
+    m_linesPreferences = 0;
+}
+
 void MainWindow::NetShareSession()
 {
     if( !m_networkManager->IsSharing() && !m_networkManager->IsConnected() )
@@ -321,6 +397,9 @@ void MainWindow::NetConnect()
         {
             m_networkManager->Disconnect();
         }
+
+        // make sure other nodes in the network know the state of local session
+        m_lines->EmitStateCommands();
 
         delete m_progressDialog;
         m_progressDialog = 0;
