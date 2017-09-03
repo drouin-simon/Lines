@@ -32,6 +32,7 @@ void LinesPreferencesWidget::UpdateUI()
     ui->sideToolbarLeftRadioButton->blockSignals( true );
     ui->sideToolbarRightRadioButton->blockSignals( true );
     ui->sideToolbarLeftRadioButton->setChecked( m_mainWindow->IsSideToolbarLeft() );
+	ui->sideToolbarRightRadioButton->setChecked(!m_mainWindow->IsSideToolbarLeft());
     ui->sideToolbarLeftRadioButton->blockSignals( false );
     ui->sideToolbarRightRadioButton->blockSignals( false );
 

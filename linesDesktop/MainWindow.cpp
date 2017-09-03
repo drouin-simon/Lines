@@ -55,6 +55,7 @@ MainWindow::MainWindow()
     m_sideToolbarLeft = true;
     m_sideToolbar = new SideToolbar( m_mainWidget );
     m_sideToolbar->SetApp( m_linesApp );
+	m_sideToolbar->SetButtonWidth(50);
     m_mainLayout->addWidget( m_sideToolbar );
 
     // Drawing area layout (drawing window + timeline)
@@ -74,6 +75,7 @@ MainWindow::MainWindow()
     // Toolbar
     m_simplifiedToolbar = new drwSimplifiedToolbar( m_mainWidget );
     m_simplifiedToolbar->SetApp( m_linesApp );
+	m_simplifiedToolbar->SetButtonHeight(30);
     m_drawingAreaLayout->addWidget( m_simplifiedToolbar );
 
     // Create Drawing window container that maintains a 16:9 aspect ratio
@@ -569,6 +571,14 @@ void MainWindow::readSettings()
 	QSize size = settings.value( "MainWindow_size", mainWindowRect.size() ).toSize();
 	resize( size );
 	move( pos );
+	int mainToolbarHeight = settings.value("MainToolbarHeight", 30).toInt();
+	SetMainToolbarHeight(mainToolbarHeight);
+	int sideToolbarWidth = settings.value("SideToolbarWidth", 50).toInt();
+	SetSideToolbarWidth(sideToolbarWidth);
+	bool sideToolbarLeft = settings.value("SideToolbarLeft", true).toBool();
+	SetSideToolbarLeft(sideToolbarLeft);
+	bool showSideToolbar = settings.value("ShowSideToolbar", true).toBool();
+	SetShowSideToolbar(showSideToolbar);
 	
 	// Save path
 	m_fileDialogStartPath = settings.value( "filedialogstartpath", QDir::homePath() ).toString();
@@ -583,7 +593,7 @@ void MainWindow::readSettings()
 
     // Last server address
     m_lastServerAddress = QHostAddress( settings.value( "LastServerAddress", QHostAddress().toString() ).toString() );
-    
+
     // Allow toolbox and all tools to read their settings
     m_lines->ReadSettings( settings );
 }
@@ -600,6 +610,11 @@ void MainWindow::writeSettings()
 	// Main window settings
 	settings.setValue( "MainWindow_pos", pos() );
 	settings.setValue( "MainWindow_size", size() );
+
+	settings.setValue("MainToolbarHeight", GetMainToolbarHeight());
+	settings.setValue("SideToolbarWidth", GetSideToolbarWidth());
+	settings.setValue("SideToolbarLeft", IsSideToolbarLeft());
+	settings.setValue("ShowSideToolbar", IsSideToolbarShown());
 	
 	// File dialog settings
 	settings.setValue( "filedialogstartpath", m_fileDialogStartPath );
