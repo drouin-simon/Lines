@@ -9,6 +9,7 @@ public:
 
     virtual void SendCommand( drwCommand::s_ptr ) = 0;
     virtual bool IsSharing() = 0;
+    virtual bool IsConnected() = 0;
 };
 
 #endif

@@ -115,6 +115,7 @@ signals:
 private:
 
     drwToolbox * AddUser( int commandUserId );
+    void LocalNewAnimation();
     void ClearAnimation();
     void ClearAllToolboxesButLocal();
 

@@ -74,6 +74,7 @@ public:
     bool IsSharing();
     bool IsConnected();
     QString GetServerName();
+    bool IsMaster();
 
 signals:
 

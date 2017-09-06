@@ -216,7 +216,7 @@ void MainWindow::CreateActions()
 void MainWindow::fileMenuAboutToShow()
 {
     bool networkOn = m_networkManager->IsConnected() || m_networkManager->IsSharing();
-    m_fileNewAction->setEnabled( !m_networkManager->IsConnected() );
+    m_fileNewAction->setEnabled( !m_networkManager->IsConnected() || m_linesApp->IsMaster() );
     m_fileOpenAction->setEnabled( !networkOn );
 }
 
@@ -307,7 +307,7 @@ bool MainWindow::fileExport()
 void MainWindow::editMenuAboutToShow()
 {
     bool networkOn = m_networkManager->IsConnected();
-    m_editSetNumberOfFramesAction->setEnabled( !networkOn );
+    m_editSetNumberOfFramesAction->setEnabled( !networkOn || m_linesApp->IsMaster() );
 }
 
 void MainWindow::editSetNumberOfFrames()

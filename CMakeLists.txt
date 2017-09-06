@@ -49,6 +49,12 @@ set( LINES_VERSION_QUALIFIER Beta3 )
 set( LINES_BUILD_QUALIFIER "" )
 set( LINES_PROTOCOL_VERSION 0 )
 set( LINES_COPYRIGHT "2010 Simon Drouin" )
+option( LINES_MASTER_BUILD "Does this build enable Master functionality?" OFF )
+if( LINES_MASTER_BUILD )
+    set( LINES_DEFINE_MASTER_BUILD "#define LINES_MASTER_BUILD" )
+else()
+    set( LINES_DEFINE_MASTER_BUILD "" )
+endif()
 configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/linesversion.h.in ${CMAKE_CURRENT_BINARY_DIR}/linesversion.h )
 
 # Find git hash

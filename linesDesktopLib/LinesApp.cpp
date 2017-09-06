@@ -1,6 +1,7 @@
 #include "LinesApp.h"
 #include "LinesCore.h"
 #include "drwNetworkManager.h"
+#include "linesversion.h"
 
 static double percentBrushIncrease = 0.2;
 static int nbOnionOneBefore = 1;
@@ -229,6 +230,15 @@ bool LinesApp::IsConnected()
 QString LinesApp::GetServerName()
 {
     return m_netManager->GetServerUserName();
+}
+
+bool LinesApp::IsMaster()
+{
+#ifdef LINES_MASTER_BUILD
+    return true;
+#else
+    return false;
+#endif
 }
 
 void LinesApp::LineParamsModifiedSlot()
