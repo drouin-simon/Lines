@@ -118,41 +118,19 @@ bool LinesCore::IsAnimationModified()
 
 void LinesCore::NewAnimation()
 {
-    // Tell clients to clear their animation
-    if( m_remoteIO->IsSharing() )   // we are the server: we reset before sending the command to others
-    {
-        LocalNewAnimation();
-        drwCommand::s_ptr newSceneCommand( new drwNewSceneCommand );
-        m_remoteIO->SendCommand( newSceneCommand );
-    }
-    else if( m_remoteIO->IsConnected() )  // we are a client: we just send the command that will be distributed by the server and we'll get it like others so we don't reset yet
-    {
-        drwCommand::s_ptr newSceneCommand( new drwNewSceneCommand );
-        m_remoteIO->SendCommand( newSceneCommand );
-    }
-    else // no connection : just reset
-    {
-        LocalNewAnimation();
-    }
-}
+    // Tell others that they need to reset
+    drwCommand::s_ptr newSceneCommand( new drwNewSceneCommand );
+    m_remoteIO->SendCommand( newSceneCommand );
 
-// This is the function that really does the work locally
-// to clear the animation
-void LinesCore::LocalNewAnimation()
-{
     // Clear local animation
     ClearAnimation();
 
-    // Remember initial state in the new animation
-    EmitStateCommands();
-
-    // Restart at frame 0
-    SetCurrentFrame( 0 );
+    // Remember and tell others what state the tools and scene are in
+    m_scene->EmitStateCommand();
 }
 
 void LinesCore::EmitStateCommands()
 {
-    m_scene->EmitStateCommand();
     m_localToolbox->EmitStateCommand();
 }
 
@@ -507,8 +485,9 @@ void LinesCore::ClearAnimation()
     m_scene->Clear();
     m_commandDb->Clear();
     ClearAllToolboxesButLocal();
-    m_lastUsedUserId = 0;
     m_cachedStateCommands.clear();
+    m_localToolbox->EmitStateCommand();
+    SetCurrentFrame( 0 );
 }
 
 void LinesCore::ClearAllToolboxesButLocal()
@@ -567,7 +546,7 @@ void LinesCore::ExecuteOneNetCommand( drwCommand::s_ptr com )
 {
     if( com->GetCommandId() == drwIdNewSceneCommand )
     {
-        LocalNewAnimation();
+        ClearAnimation();
     }
     else if( com->GetCommandId() == drwIdSceneParamsCommand )
     {
