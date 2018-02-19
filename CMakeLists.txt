@@ -5,6 +5,9 @@ cmake_minimum_required(VERSION 3.1)
 # Include some CMake utilities
 include( ${CMAKE_CURRENT_SOURCE_DIR}/cmake/printvariables.cmake )
 
+# Use locally defined modules
+list( APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
 #----------------------------------------
 # Include BOOST dir if needed (eg. osx < 10.9 )
 OPTION( LINES_USE_BOOST "Use boost to build lines. This is needed with older compiler without shared_ptr" OFF )
@@ -39,6 +42,14 @@ endif()
 # Use Opengl
 find_package(OpenGL)
 #----------------------------------------
+
+#----------------------------------------
+# Find FFMPEG (optional)
+#----------------------------------------
+find_package(FFMPEG)
+if( FFMPEG_FOUND )
+    add_subdirectory( linesVideoIO )
+endif()
 
 #----------------------------------------
 # configure version and git hash
