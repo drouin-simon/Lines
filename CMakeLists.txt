@@ -3,6 +3,7 @@ PROJECT( Lines )
 cmake_minimum_required(VERSION 3.1)
 
 # Include some CMake utilities
+set( CMAKE_EXT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cmake )
 include( ${CMAKE_CURRENT_SOURCE_DIR}/cmake/printvariables.cmake )
 
 #----------------------------------------
