@@ -2,6 +2,8 @@ PROJECT( Lines )
 
 cmake_minimum_required(VERSION 3.1)
 
+SET(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 # Include some CMake utilities
 set( CMAKE_EXT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cmake )
 include( ${CMAKE_CURRENT_SOURCE_DIR}/cmake/printvariables.cmake )
@@ -23,10 +25,11 @@ include_directories( ${svlIncludeDir} )
 
 #----------------------------------------
 # Use Qt 5
-find_package( Qt5 COMPONENTS Widgets OpenGL Network REQUIRED )
+find_package( Qt5 COMPONENTS Core Widgets Network REQUIRED )
 include_directories( ${Qt5Widgets_INCLUDE_DIRS} )
 include_directories( ${Qt5OpenGL_INCLUDE_DIRS} )
 include_directories( ${Qt5Network_INCLUDE_DIRS} )
+
 #----------------------------------------
 
 #----------------------------------------
@@ -38,7 +41,7 @@ endif()
 
 #----------------------------------------
 # Use Opengl
-find_package(OpenGL)
+find_package(OpenGL REQUIRED)
 #----------------------------------------
 
 #----------------------------------------
@@ -71,12 +74,6 @@ add_custom_command(OUTPUT version_git_hash COMMAND ${CMAKE_COMMAND}
 set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/githash.h PROPERTIES GENERATED TRUE HEADER_FILE_ONLY TRUE)
 include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 #----------------------------------------
-
-# Need Glee for OpenGL if not on MacOS
-if( NOT APPLE )
-  add_subdirectory( GLee )
-  include_directories( ${GLeeIncludeDir} )
-endif()
 
 add_subdirectory( linesCore )
 add_subdirectory( linesNetwork )

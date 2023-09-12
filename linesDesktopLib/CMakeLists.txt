@@ -3,6 +3,7 @@ set( LibName linesDesktopLib )
 include_directories( ${linesCoreIncludeDirs} )
 include_directories( ${linesNetworkIncludeDirs} )
 
+
 set( DrawLib_src LinesApp.cpp drwDrawingWidget.cpp DrawingWidgetMT.cpp drwsimplifiedtoolbar.cpp SideToolbar.cpp
         TabletStateWidget.cpp drwNetworkConnectDialog.cpp
         drwBitmapExporter.cpp drwGradientWidget.cpp ClickScrollWidget.cpp
@@ -18,6 +19,10 @@ set( DrawLib_hdr drwLineToolViewportWidget.h drwFpsCounter.h )
 # Include bin directory for ui_ files
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+
+#----------------------------------------
+# Use Qt
+#----------------------------------------
 
 # Create classes from Qt ui files
 set( Drw_ui TabletStateWidget.ui drwNetworkConnectDialog.ui drwsimplifiedtoolbar.ui SideToolbar.ui )

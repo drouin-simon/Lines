@@ -1,11 +1,12 @@
 #include "drwDrawingWidget.h"
 #include <iostream>
-#include <QtGui>
-#include <QtOpenGL>
+#include <QtWidgets>
+#include <QOpenGLWidget>
 #include "LinesCore.h"
 
 drwDrawingWidget::drwDrawingWidget( QWidget * parent )
 : QOpenGLWidget( parent )
+
 , m_isPlaying( false )
 , m_muteMouse(false)
 , m_tabletHasControl(false)
