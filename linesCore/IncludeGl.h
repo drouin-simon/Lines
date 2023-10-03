@@ -2,7 +2,7 @@
 #define __IncludeGl_h_
 
 // This file is use for cross-platform inclusion of OpenGl header files
-#ifdef _WIN32
+#if (defined(_WIN32) && !defined(NOMINMAX))
 #define NOMINMAX
 #include <Windows.h>
 #endif

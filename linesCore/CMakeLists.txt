@@ -20,7 +20,7 @@ qt5_wrap_cpp( ${LibName}_moc ${${LibName}_hdr_moc} )
 
 # Create and link executable
 set( ${LibName}_all_src ${${LibName}_src} ${${LibName}_moc} ${${LibName}_hdr} ${${LibName}_hdr_moc} )
-add_library( ${LibName} ${${LibName}_all_src} )
+add_library( ${LibName} ${${LibName}_all_src}  "IGraphicsEngine.h")
 
 #================================
 # Explicit dependencies
