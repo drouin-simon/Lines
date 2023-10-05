@@ -1,5 +1,5 @@
-#ifndef __IncludeGLee_h_
-#define __IncludeGLee_h_
+#ifndef __IncludeGLEW_h_
+#define __IncludeGLEW_h_
 
 #if (defined(_WIN32) && !defined(NOMINMAX))
 #define NOMINMAX
@@ -8,7 +8,7 @@
 
 #if !(defined(__APPLE__) && defined(__MACH__))
 #define NOMINMAX
-#include <GLee.h>
+#include <GL/glew.h>
 #endif
 
 #endif
