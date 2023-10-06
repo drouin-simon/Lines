@@ -65,7 +65,7 @@ qt5_use_modules( ${ExecName} OpenGL Widgets Network )
 if (APPLE)
     set_target_properties( ${ExecName} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_BINARY_DIR}/LinesInfo.plist )
 else()
-    target_link_libraries( ${ExecName} OpenGL::GL GLEW)
+    target_link_libraries( ${ExecName} OpenGL::GL ${GLEW_LIBRARIES})
 endif()
 
 
