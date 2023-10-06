@@ -9,10 +9,13 @@
 #include "Primitive.h"
 #include "drwDrawingSurface.h"
 #include "Box2i.h"
+#include "IGraphicsEngine.h"
 #include <algorithm>
 
 drwGLRenderer::drwGLRenderer()
 {
+    m_engine = new OpenGLGraphicsEngine();
+
     // Onion Skin
     m_inOnionFrame = -1;
     m_outOnionFrame = -1;
@@ -123,11 +126,14 @@ void drwGLRenderer::Render()
     // Render cursor
     if( m_cursor && m_showCursor )
     {
-        glEnable( GL_SCISSOR_TEST );
-        glScissor( x, y, w, h );
+        m_engine->enableScissorTest();
+
+        m_engine->scissor(x, y, w, h);
+
         drwDrawingContext context( this, m_overlayModifiedRect );
+
         m_cursor->Draw( context );
-        glDisable( GL_SCISSOR_TEST );
+        m_engine->disableScissorTest();
     }
 }
 
@@ -136,15 +142,10 @@ void drwGLRenderer::RenderToTexture( int currentFrame, int onionSkinBefore, int 
     Q_ASSERT( m_scene );
 
     // State setup
-    glDisable( GL_DEPTH_TEST );
-    glEnableClientState( GL_VERTEX_ARRAY );
-    glEnable( GL_TEXTURE_RECTANGLE_ARB );
-    glEnable( GL_BLEND );
-    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+    m_engine->initializeState();
     
     // initialize modelview matrix
-    glMatrixMode( GL_MODELVIEW );
-    glLoadIdentity();
+    m_engine->initializeModelViewMatrix();
     
     // Resize textures if needed
     int frameSize[2];
@@ -161,14 +162,14 @@ void drwGLRenderer::RenderToTexture( int currentFrame, int onionSkinBefore, int 
 
     // Only update specified region. rect is specified in window coordinate system,
     // we need to change it to frame (texture) coordinate system.
-    glEnable( GL_SCISSOR_TEST );
+    m_engine->enableScissorTest();
     Box2i frameRect;
     GLWindowToGLFrame( rect, frameRect );
-    glScissor( frameRect.XMin(), frameRect.YMin(), frameRect.GetWidth(), frameRect.GetHeight() );
+    m_engine->scissor( frameRect.XMin(), frameRect.YMin(), frameRect.GetWidth(), frameRect.GetHeight() );
     
     // Clear texture
-    glClearColor( m_clearColor[0], m_clearColor[1], m_clearColor[2], 0.0 );
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+    m_engine->clearColor( m_clearColor[0], m_clearColor[1], m_clearColor[2], 0.0 );
+    m_engine->clear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     
     // Create a drawing context
     Box2d worldRect;
@@ -223,7 +224,7 @@ void drwGLRenderer::RenderToTexture( int currentFrame, int onionSkinBefore, int 
     // stop drawing to texture
     m_renderTexture->DrawToTexture( false );
 
-    glDisable( GL_SCISSOR_TEST );
+    m_engine->disableScissorTest();
 }
 
 void drwGLRenderer::RenderToTexture( int currentFrame )
@@ -264,14 +265,14 @@ bool drwGLRenderer::IsFrameDisplayed( int frame )
 void drwGLRenderer::RenderLayer( int frame, drwDrawingContext & context )
 {
     m_layerTexture->DrawToTexture( true );
-    glClearColor( m_clearColor[0], m_clearColor[1], m_clearColor[2], 0.0 );
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+    m_engine->clearColor( m_clearColor[0], m_clearColor[1], m_clearColor[2], 0.0 );
+    m_engine->clear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     m_scene->DrawFrame( frame, context );
     m_layerTexture->DrawToTexture( false );
     
-    glEnable( GL_BLEND );
-    glBlendFunc( GL_ONE, GL_ONE_MINUS_SRC_ALPHA );
-    glColor4d( 1.0, 1.0, 1.0, 1.0 );
+    m_engine->enable(GL_BLEND);
+    m_engine->blendFunc( GL_ONE, GL_ONE_MINUS_SRC_ALPHA );
+    m_engine->color4d( 1.0, 1.0, 1.0, 1.0 );
     m_layerTexture->PasteToScreen();
 }
 
@@ -282,21 +283,21 @@ void drwGLRenderer::RenderTextureToScreen()
 
 void drwGLRenderer::RenderTextureToScreen( int x, int y, int width, int height )
 {
-    glEnable( GL_SCISSOR_TEST );
-    glScissor( x, y, width, height );
-
-    glEnable( GL_BLEND );
-    glBlendFunc( GL_ONE, GL_ONE_MINUS_SRC_ALPHA );
+    m_engine->enableScissorTest();
+    m_engine->scissor(x, y, width, height);
     
-    glClearColor( m_clearColor[0], m_clearColor[1], m_clearColor[2], m_clearColor[3] );
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+    m_engine->enable(GL_BLEND);
+    m_engine->blendFunc( GL_ONE, GL_ONE_MINUS_SRC_ALPHA );
+    
+    m_engine->clearColor( m_clearColor[0], m_clearColor[1], m_clearColor[2], m_clearColor[3] );
+    m_engine->clear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     
     m_camera->SetupToRenderTextureToScreen();
-    glColor4d( 1.0, 1.0, 1.0, 1.0 );
+    m_engine->color4d( 1.0, 1.0, 1.0, 1.0 );
     m_renderTexture->PasteToScreen();
 
-    glDisable( GL_SCISSOR_TEST );
-    glScissor( x, y, width, height );
+    m_engine->disableScissorTest();
+    m_engine->scissor( x, y, width, height );
 }
 
 void drwGLRenderer::SetRenderSize( int width, int height )
