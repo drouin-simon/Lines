@@ -38,6 +38,11 @@ public:
     virtual void clearColor(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha) = 0;
     virtual void blendFunc(GLenum sfactor, GLenum dfactor) = 0;
     virtual void color4d(GLdouble red, GLdouble green, GLdouble blue, GLdouble alpha) = 0;
+    virtual GLuint createProgram() = 0;
+    virtual void attachShader(GLuint glslProgram, GLuint glslVertexShader) = 0;
+    virtual void getProgramIv(GLuint program, GLenum pname, GLint *params) = 0;
+    virtual void linkProgram(GLuint program) = 0;
+    virtual void getProgramInfoLog(GLuint program, GLsizei maxLength, GLsizei *length, GLchar *infoLog ) = 0; 
 };
 
 class OpenGLGraphicsEngine : public IGraphicsEngine {
@@ -87,6 +92,25 @@ class OpenGLGraphicsEngine : public IGraphicsEngine {
             glColor4d(red, green, blue, alpha);
         }
 
+        GLuint createProgram() override {
+            return glCreateProgram();
+        }
+
+        void linkProgram(GLuint glslProgram) {
+            glLinkProgram(glslProgram);
+        }
+
+        void attachShader(GLuint glslProgram, GLuint glslVertexShader) override {
+            glAttachShader(glslProgram, glslVertexShader);
+        }
+        
+        void getProgramIv(GLuint program, GLenum pname, GLint *params) override {
+            glGetProgramiv(program, pname, params);
+        }
+
+        void getProgramInfoLog(GLuint program, GLsizei maxLength, GLsizei *length, GLchar *infoLog) override {
+            glGetProgramInfoLog(program, maxLength, length, infoLog);
+        }
 
         void Download(unsigned char* buffer) {
             //glBindTexture(GL_TEXTURE_RECTANGLE_ARB, m_texId);
