@@ -4,10 +4,6 @@ class IDrawable {
 
 };
 
-class Line : IDrawable {
-
-};
-
 class Polygon : IDrawable {
 
 };
