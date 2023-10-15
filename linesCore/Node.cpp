@@ -1,3 +1,4 @@
+#include "IGraphicsEngine.h"
 #include "Node.h"
 #include "Primitive.h"
 #include "drwDrawingContext.h"
@@ -9,11 +10,13 @@ Node::Node() : Position(0,0)
 	Id = NextId++;
 	ThePrimitive = 0;
 	IsHidden = false;
+	m_engine = new OpenGLGraphicsEngine();
 }
 
 
 Node::~Node()
 {
+	delete m_engine;
 }
 
 
@@ -22,18 +25,18 @@ void Node::Draw( drwDrawingContext & context )
 	if( ThePrimitive && !IsHidden )
 	{
 		if( context.m_isPicking )
-			glPushName(Id);
+			m_engine->pushName(Id);
 
-		glPushMatrix();
+		m_engine->pushMatrix();
 		
 		//glTranslate( Position );
 
 		ThePrimitive->Draw( context );
 		
-		glPopMatrix();
+		m_engine->popMatrix();
 		
 		if( context.m_isPicking )
-			glPopName();
+			m_engine->popName();
 	}
 }
 

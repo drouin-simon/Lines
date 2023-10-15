@@ -4,8 +4,12 @@
 #include <string>
 #include <vector>
 
+class IGraphicsEngine;
+
 class drwGlslShader
 {
+private:
+	IGraphicsEngine* m_engine;
 
 public:
 
