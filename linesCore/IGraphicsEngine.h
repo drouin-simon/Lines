@@ -30,6 +30,7 @@ public:
     virtual void scissor(GLint x, GLint y, GLsizei width, GLsizei height) = 0;
     virtual void initializeState() = 0;
     virtual void initializeModelViewMatrix() = 0;
+    virtual void clear() = 0;
     virtual void clear(GLbitfield mask) = 0;
     virtual void clearColor(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha) = 0;
     virtual void blendFunc(GLenum sfactor, GLenum dfactor) = 0;
@@ -74,6 +75,10 @@ class OpenGLGraphicsEngine : public IGraphicsEngine {
         void initializeModelViewMatrix() override { 
             glMatrixMode( GL_MODELVIEW );
             glLoadIdentity();
+        }
+        
+        void clear() override {
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         }
 
         void clear(GLbitfield mask) override {

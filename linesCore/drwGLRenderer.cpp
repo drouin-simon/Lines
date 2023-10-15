@@ -51,6 +51,7 @@ drwGLRenderer::~drwGLRenderer()
     delete m_workTexture;
     if( m_widelineShader )
         delete m_widelineShader;
+    delete m_engine;
 }
 
 void drwGLRenderer::SetOnionSkinBefore( int value )
@@ -169,7 +170,7 @@ void drwGLRenderer::RenderToTexture( int currentFrame, int onionSkinBefore, int 
     
     // Clear texture
     m_engine->clearColor( m_clearColor[0], m_clearColor[1], m_clearColor[2], 0.0 );
-    m_engine->clear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+    m_engine->clear();
     
     // Create a drawing context
     Box2d worldRect;
@@ -266,7 +267,7 @@ void drwGLRenderer::RenderLayer( int frame, drwDrawingContext & context )
 {
     m_layerTexture->DrawToTexture( true );
     m_engine->clearColor( m_clearColor[0], m_clearColor[1], m_clearColor[2], 0.0 );
-    m_engine->clear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+    m_engine->clear();
     m_scene->DrawFrame( frame, context );
     m_layerTexture->DrawToTexture( false );
     
@@ -290,7 +291,7 @@ void drwGLRenderer::RenderTextureToScreen( int x, int y, int width, int height )
     m_engine->blendFunc( GL_ONE, GL_ONE_MINUS_SRC_ALPHA );
     
     m_engine->clearColor( m_clearColor[0], m_clearColor[1], m_clearColor[2], m_clearColor[3] );
-    m_engine->clear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+    m_engine->clear();
     
     m_camera->SetupToRenderTextureToScreen();
     m_engine->color4d( 1.0, 1.0, 1.0, 1.0 );
