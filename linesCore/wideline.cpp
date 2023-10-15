@@ -57,7 +57,6 @@ void WideLine::InternDraw( drwDrawingContext & context )
 	}
 
 	// 2 - draw wideline
-	glEnable( GL_BLEND );
 
     drwGlslShader * shader = context.GetWidelineShader();
     if( !shader )
@@ -78,33 +77,13 @@ void WideLine::InternDraw( drwDrawingContext & context )
 		
 	glBlendEquation( GL_MAX );
 
-    glVertexPointer( 2, GL_DOUBLE, 0, m_vertices.GetBuffer() );
-	glEnableClientState( GL_TEXTURE_COORD_ARRAY );
-	glTexCoordPointer( 3, GL_DOUBLE, 0, m_texCoord.GetBuffer() );
-    glEnableClientState( GL_NORMAL_ARRAY );
-    glNormalPointer( GL_DOUBLE, 0, m_normals.GetBuffer() );
-    glDrawElements( GL_QUADS, m_indices.size(), GL_UNSIGNED_INT, m_indices.GetBuffer() );
+    m_engine->DrawWideLine(m_vertices.GetBuffer(), m_indices.GetBuffer(), m_indices.size(), m_normals.GetBuffer(), m_texCoord.GetBuffer());
 
-    glDisableClientState( GL_TEXTURE_COORD_ARRAY );
-    glDisableClientState( GL_NORMAL_ARRAY );
     shader->UseProgram( false );
-
     tex->DrawToTexture( false );
 
 	// Paste the texture to screen with the right color
-    if( !m_erase )
-    {
-        glBlendEquation( GL_FUNC_ADD );
-        glBlendFuncSeparate( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE );
-        Vec4 col = m_color * context.m_colorMultiplier;
-        glColor4d( col[0], col[1], col[2], col[3] );
-    }
-    else
-    {
-        glBlendEquationSeparate( GL_FUNC_ADD, GL_FUNC_REVERSE_SUBTRACT );
-        glBlendFuncSeparate( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE );
-        glColor4d( 0.0, 0.0, 0.0, 1.0 );
-    }
+    m_erase ? m_engine->SetupEraseTextureToScreen() : m_engine->SetupPasteTextureToScreen(m_color * context.m_colorMultiplier);
 
     int xWinMin = 0;
     int yWinMin = 0;
@@ -117,8 +96,7 @@ void WideLine::InternDraw( drwDrawingContext & context )
     tex->PasteToScreen( xWinMin, yWinMin, width, height );
 
 	// Erase trace on work texture
-    glBlendEquation( GL_FUNC_ADD );
-    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+    m_engine->ResetTextureState();
     tex->DrawToTexture( true );
     tex->Clear( xWinMin, yWinMin, width, height );
     tex->DrawToTexture( false );

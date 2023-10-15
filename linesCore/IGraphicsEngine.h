@@ -39,6 +39,11 @@ public:
     virtual void DrawLine(double* pointsBuffer, unsigned int* pointsIndexBuffer, size_t pointsIndexSize, double lineWidth, Vec4 color) = 0;
 
     // wideline.cpp
+    virtual void FillLine(double* poinstBuffer, unsigned int* indicesBuffer, size_t indicesSize, Vec4 color) = 0;
+    virtual void DrawWideLine(double* verticlesBuffer, unsigned int* indicesBuffer, size_t indicesSize, double* normalsBuffer, double* uvsBuffer) = 0;
+    virtual void SetupPasteTextureToScreen(Vec4 color) = 0;
+    virtual void SetupEraseTextureToScreen(Vec4 color = Vec4{ 0.0, 0.0, 0.0, 1.0 }) = 0;
+    virtual void ResetTextureState() = 0;
 };
 
 class OpenGLGraphicsEngine : public IGraphicsEngine {
@@ -211,6 +216,50 @@ class OpenGLGraphicsEngine : public IGraphicsEngine {
         glLineWidth(lineWidth);
         glVertexPointer(2, GL_DOUBLE, 0, pointsBuffer);
         glDrawElements(GL_LINE_STRIP, pointsIndexSize, GL_UNSIGNED_INT, pointsIndexBuffer);
+    }
+
+    void FillLine(double* poinstBuffer, unsigned int* indicesBuffer, size_t indicesSize, Vec4 color) {
+        glColor4d(color[0], color[1], color[2], color[3]);
+        glDisable(GL_BLEND);
+        glEnable(GL_COLOR_LOGIC_OP);
+        glLogicOp(GL_INVERT);
+        glVertexPointer(2, GL_DOUBLE, 0, poinstBuffer);
+        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+        glDrawElements(GL_TRIANGLE_FAN, indicesSize, GL_UNSIGNED_INT, indicesBuffer);
+
+        glDisable(GL_COLOR_LOGIC_OP);
+    }
+
+    void DrawWideLine(double* verticlesBuffer, unsigned int* indicesBuffer, size_t indicesSize, double* normalsBuffer, double* uvsBuffer) {
+        glEnable(GL_BLEND);
+        glBlendEquation(GL_MAX);
+
+        glVertexPointer(2, GL_DOUBLE, 0, verticlesBuffer);
+        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+        glTexCoordPointer(3, GL_DOUBLE, 0, uvsBuffer);
+        glEnableClientState(GL_NORMAL_ARRAY);
+        glNormalPointer(GL_DOUBLE, 0, normalsBuffer);
+        glDrawElements(GL_QUADS, indicesSize, GL_UNSIGNED_INT, indicesBuffer);
+
+        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+        glDisableClientState(GL_NORMAL_ARRAY);
+    }
+
+    void SetupPasteTextureToScreen(Vec4 color) {
+        glBlendEquation(GL_FUNC_ADD);
+        glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE);
+        glColor4d(color[0], color[1], color[2], color[3]);
+    }
+
+    void SetupEraseTextureToScreen(Vec4 color) {
+        glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_REVERSE_SUBTRACT);
+        glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE);
+        glColor4d(color[0], color[1], color[2], color[3]);
+    }
+
+    void ResetTextureState() {
+        glBlendEquation(GL_FUNC_ADD);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 };
 
