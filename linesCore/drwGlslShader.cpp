@@ -4,6 +4,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <stdarg.h>
+#include "IGraphicsEngine.h"
 
 using namespace std;
 
@@ -13,11 +14,13 @@ drwGlslShader::drwGlslShader()
 	, m_glslProg(0)
 	, m_init( false )
 {
+    m_engine = new OpenGLGraphicsEngine();
 }
 
 drwGlslShader::~drwGlslShader() 
 {
 	Clear();
+	delete m_engine;
 }
 
 void drwGlslShader::AddShaderFilename( const char * filename )
@@ -60,22 +63,24 @@ bool drwGlslShader::Init()
 		return false;
 
 	// Create program object and attach shader
-	m_glslProg = glCreateProgram();
+	m_glslProg = m_engine->createProgram();
 	if( m_glslVertexShader )
-		glAttachShader( m_glslProg, m_glslVertexShader );
+		m_engine->attachShader( m_glslProg, m_glslVertexShader );
 	if( m_glslShader )
-		glAttachShader( m_glslProg, m_glslShader );
+		m_engine->attachShader( m_glslProg, m_glslShader );
 
 	// Create program and link shaders
-    glLinkProgram( m_glslProg );
+	m_engine->linkProgram(m_glslProg);
+
 	GLint success = 0;
-    glGetProgramiv( m_glslProg, GL_LINK_STATUS, &success );
+
+    m_engine->getProgramIv( m_glslProg, GL_LINK_STATUS, &success );
     if (!success)
     {
 		GLint logLength = 0;
-		glGetProgramiv(	m_glslProg, GL_INFO_LOG_LENGTH, &logLength );
+		m_engine->getProgramIv(	m_glslProg, GL_INFO_LOG_LENGTH, &logLength );
 		GLchar * infoLog = new GLchar[ logLength + 1 ];
-        glGetProgramInfoLog( m_glslProg, logLength, NULL, infoLog );
+        m_engine->getProgramInfoLog( m_glslProg, logLength, NULL, infoLog );
 		ReportError( "Error in glsl program linking: \n %s\n", infoLog );
 		delete [] infoLog;
 		return false;

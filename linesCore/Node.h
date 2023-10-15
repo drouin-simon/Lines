@@ -12,6 +12,8 @@ class drwDrawingContext;
 
 class Node
 {
+private:
+	IGraphicsEngine* m_engine;
 	
 public:
 	
