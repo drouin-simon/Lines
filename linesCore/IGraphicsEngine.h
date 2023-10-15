@@ -39,6 +39,10 @@ public:
     virtual void getProgramIv(GLuint program, GLenum pname, GLint *params) = 0;
     virtual void linkProgram(GLuint program) = 0;
     virtual void getProgramInfoLog(GLuint program, GLsizei maxLength, GLsizei *length, GLchar *infoLog ) = 0; 
+    virtual void pushName(GLuint name) = 0;
+    virtual void popMatrix() = 0;
+    virtual void pushMatrix() = 0;
+    virtual void popName() = 0;
 };
 
 class OpenGLGraphicsEngine : public IGraphicsEngine {
@@ -112,6 +116,22 @@ class OpenGLGraphicsEngine : public IGraphicsEngine {
             //glBindTexture(GL_TEXTURE_RECTANGLE_ARB, m_texId);
             //glGetTexImage(GL_TEXTURE_RECTANGLE_ARB, 0, m_downloadPixelType, GL_UNSIGNED_BYTE, buffer);
             //glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
+        }
+        
+        void pushName(GLuint name) override {
+            glPushName(name);
+        }
+        
+        void pushMatrix() override {
+            glPushMatrix();
+        }
+
+        void popMatrix() override {
+            glPopMatrix();
+        }
+
+        void popName() override {
+            glPopName();
         }
 };
 
