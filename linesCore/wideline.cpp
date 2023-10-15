@@ -41,23 +41,16 @@ void WideLine::InternDraw( drwDrawingContext & context )
 	// Draw mask to texture
     drwDrawableTexture * tex = context.GetWorkingTexture();
     tex->DrawToTexture( true );
-    glColor4d( 1.0, 1.0, 1.0, 1.0 );
+
+    Vec4 lineColor = Vec4{ 1.0, 1.0, 1.0, 1.0 };
 
 	// 1 - fill if needed
 	if( m_fill && m_doneAddingPoints && m_fillIndices.size() > 3 )
 	{
-		glDisable( GL_BLEND );
-		glEnable( GL_COLOR_LOGIC_OP );
-		glLogicOp( GL_INVERT );
-		glVertexPointer( 2, GL_DOUBLE, 0, m_fillVertices.GetBuffer() );
-		glDisableClientState( GL_TEXTURE_COORD_ARRAY );
-		glDrawElements( GL_TRIANGLE_FAN, m_fillIndices.size(), GL_UNSIGNED_INT, m_fillIndices.GetBuffer() );
-
-		glDisable( GL_COLOR_LOGIC_OP );
+        m_engine->FillLine(m_fillVertices.GetBuffer(), m_fillIndices.GetBuffer(), m_fillIndices.size(), lineColor);
 	}
 
 	// 2 - draw wideline
-
     drwGlslShader * shader = context.GetWidelineShader();
     if( !shader )
     {
@@ -77,7 +70,7 @@ void WideLine::InternDraw( drwDrawingContext & context )
 		
 	glBlendEquation( GL_MAX );
 
-    m_engine->DrawWideLine(m_vertices.GetBuffer(), m_indices.GetBuffer(), m_indices.size(), m_normals.GetBuffer(), m_texCoord.GetBuffer());
+    m_engine->DrawWideLine(m_vertices.GetBuffer(), m_indices.GetBuffer(), m_indices.size(), m_normals.GetBuffer(), m_texCoord.GetBuffer(), lineColor);
 
     shader->UseProgram( false );
     tex->DrawToTexture( false );

@@ -40,7 +40,7 @@ public:
 
     // wideline.cpp
     virtual void FillLine(double* poinstBuffer, unsigned int* indicesBuffer, size_t indicesSize, Vec4 color) = 0;
-    virtual void DrawWideLine(double* verticlesBuffer, unsigned int* indicesBuffer, size_t indicesSize, double* normalsBuffer, double* uvsBuffer) = 0;
+    virtual void DrawWideLine(double* verticlesBuffer, unsigned int* indicesBuffer, size_t indicesSize, double* normalsBuffer, double* uvsBuffer, Vec4 color) = 0;
     virtual void SetupPasteTextureToScreen(Vec4 color) = 0;
     virtual void SetupEraseTextureToScreen(Vec4 color = Vec4{ 0.0, 0.0, 0.0, 1.0 }) = 0;
     virtual void ResetTextureState() = 0;
@@ -230,7 +230,8 @@ class OpenGLGraphicsEngine : public IGraphicsEngine {
         glDisable(GL_COLOR_LOGIC_OP);
     }
 
-    void DrawWideLine(double* verticlesBuffer, unsigned int* indicesBuffer, size_t indicesSize, double* normalsBuffer, double* uvsBuffer) {
+    void DrawWideLine(double* verticlesBuffer, unsigned int* indicesBuffer, size_t indicesSize, double* normalsBuffer, double* uvsBuffer, Vec4 color) {
+        glColor4d(color[0], color[1], color[2], color[3]);
         glEnable(GL_BLEND);
         glBlendEquation(GL_MAX);
 
