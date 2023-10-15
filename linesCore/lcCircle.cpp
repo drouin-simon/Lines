@@ -1,5 +1,4 @@
 #include "lcCircle.h"
-//#include "IncludeGl.h"
 
 Circle::Circle() : Center( Vec2( 0, 0 ) )
 {

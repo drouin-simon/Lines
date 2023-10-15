@@ -1,5 +1,4 @@
 #include "line.h"
-//#include "IncludeGl.h"
 #include "drwDrawingContext.h"
 
 Line::Line() : m_lineWidth( 1.0 )
