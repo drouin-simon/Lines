@@ -20,7 +20,7 @@ drwDrawableTexture::drwDrawableTexture()
 
 drwDrawableTexture::~drwDrawableTexture()
 {
-	Release();
+    Release();
     delete m_engine;
 }
 
