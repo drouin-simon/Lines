@@ -1,6 +1,8 @@
 #ifndef __drwDrawableTexture_h_
 #define __drwDrawableTexture_h_
 
+#include "IGraphicsEngine.h"
+
 class drwDrawableTexture
 {
 
@@ -46,6 +48,8 @@ protected:
     int m_backupFbId;
 	int m_width;
 	int m_height;
+
+    IGraphicsEngine* m_engine;
 };
 
 #endif
