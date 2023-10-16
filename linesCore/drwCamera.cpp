@@ -21,7 +21,14 @@ drwCamera::drwCamera()
     m_winSizeWorld[0] = 0.0;
     m_winSizeWorld[1] = 0.0;
     
+    m_engine = new OpenGLGraphicsEngine();
+
     UpdateSizes();
+}
+
+drwCamera::~drwCamera()
+{
+    delete m_engine;
 }
 
 void drwCamera::SetWindowSize( int w, int h )
@@ -87,27 +94,19 @@ double drwCamera::UnitsPerPixel()
 
 void drwCamera::SetupForWindow()
 {
-    glViewport( 0, 0, m_winSizePix[0], m_winSizePix[1] );
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluOrtho2D( m_winPosWorld[0], m_winPosWorld[0] + m_winSizeWorld[0], m_winPosWorld[1], m_winPosWorld[1] + m_winSizeWorld[1] );
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
+    m_engine->SetProjectionViewPort(0, 0, m_winSizePix[0], m_winSizePix[1]);
+    m_engine->SetModelViewOrtho2D(m_winPosWorld[0], m_winPosWorld[0] + m_winSizeWorld[0], m_winPosWorld[1], m_winPosWorld[1] + m_winSizeWorld[1]);
 }
 
 void drwCamera::SetupForFrame()
 {
-    glViewport( 0, 0, m_frameSizePix[0], m_frameSizePix[1] );
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluOrtho2D( 0.0, m_frameSizeWorld[0], 0.0, m_frameSizeWorld[1] );
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
+    m_engine->SetProjectionViewPort(0, 0, m_frameSizePix[0], m_frameSizePix[1]);
+    m_engine->SetModelViewOrtho2D(0.0, m_frameSizeWorld[0], 0.0, m_frameSizeWorld[1]);
 }
 
 void drwCamera::SetupToRenderTextureToScreen()
 {
-    glViewport( m_framePosPix[0], m_framePosPix[1], m_frameSizePix[0], m_frameSizePix[1] );
+    m_engine->SetViewPort(m_framePosPix[0], m_framePosPix[1], m_frameSizePix[0], m_frameSizePix[1]);
 }
 
 #include <iostream>

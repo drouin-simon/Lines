@@ -1,8 +1,7 @@
 #ifndef __Node_h_
 #define __Node_h_
 
-#include <SVL.h>
-#include "IncludeGl.h"
+#include "IGraphicsEngine.h"
 #include "macros.h"
 #include "SharedPtrMacro.h"
 
