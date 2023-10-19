@@ -1,7 +1,7 @@
 #ifndef __Circle_h_
 #define __Circle_h_
 
-#include "IGraphicsEngine.h"
+#include "../GraphicsEngine/GraphicsEngine.h"
 #include "macros.h"
 #include "Primitive.h"
 #include "PolygonData.h"

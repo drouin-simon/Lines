@@ -1,6 +1,4 @@
 #include "drwGLRenderer.h"
-#include "IncludeGLEW.h"
-#include "IncludeGl.h"
 #include "Scene.h"
 #include "drwCamera.h"
 #include "drwDrawableTexture.h"
@@ -9,7 +7,7 @@
 #include "Primitive.h"
 #include "drwDrawingSurface.h"
 #include "Box2i.h"
-#include "IGraphicsEngine.h"
+#include "../GraphicsEngine/GraphicsEngine.h"
 #include <algorithm>
 
 drwGLRenderer::drwGLRenderer()
