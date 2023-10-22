@@ -44,17 +44,6 @@ public:
     virtual void SetupPasteTextureToScreen(Vec4 color) = 0;
     virtual void SetupEraseTextureToScreen(Vec4 color = Vec4{ 0.0, 0.0, 0.0, 1.0 }) = 0;
     virtual void ResetTextureState() = 0;
-
-        // General
-    // virtual void clear(int x, int y, int width, int height) = 0;
-    // virtual void setupFrame() = 0;
-
-    // // Line
-    // virtual int draw(Line line) = 0;
-    // virtual void erase(int id) = 0;
-
-    // // Texture
-    // virtual void drawTexture() = 0;
     
     // drwGLRenderer.h
     virtual void enableScissorTest() = 0;
