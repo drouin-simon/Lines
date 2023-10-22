@@ -1,10 +1,8 @@
 #include "drwGlslShader.h"
-#include "IncludeGLEW.h"
-#include "IncludeGl.h"
 #include <iostream>
 #include <stdio.h>
 #include <stdarg.h>
-#include "IGraphicsEngine.h"
+#include "../GraphicsEngine/GraphicsEngine.h"
 
 using namespace std;
 

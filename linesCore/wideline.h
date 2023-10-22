@@ -1,7 +1,7 @@
 #ifndef __WideLine_h_
 #define __WideLine_h_
 
-#include "IGraphicsEngine.h"
+#include "../GraphicsEngine/GraphicsEngine.h"
 #include "drwDataArray.h"
 #include "LinePrimitive.h"
 #include "Box2d.h"

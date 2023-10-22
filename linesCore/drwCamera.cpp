@@ -1,5 +1,4 @@
 #include "drwCamera.h"
-#include "IncludeGl.h"
 #include "math.h"
 
 drwCamera::drwCamera()

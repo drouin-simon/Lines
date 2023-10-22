@@ -1,4 +1,4 @@
-#include "IGraphicsEngine.h"
+#include "../GraphicsEngine/GraphicsEngine.h"
 #include "Node.h"
 #include "Primitive.h"
 #include "drwDrawingContext.h"
