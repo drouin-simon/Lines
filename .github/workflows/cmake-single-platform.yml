@@ -25,7 +25,7 @@ jobs:
     - name: Install Qt5
       run: |
         sudo apt-get update
-        sudo apt-get install qt5-default qtbase5-dev qtdeclarative5-dev # Add other Qt modules if needed
+        sudo apt-get install qtcreator qtbase5-dev qt5-qmake # Add other Qt modules if needed
 
 
     - name: Configure CMake
