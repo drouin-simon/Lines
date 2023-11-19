@@ -76,10 +76,17 @@ void OpenGLGraphicsEngine::PasteTextureToScreen(unsigned int texId, int texWidth
     glBindTexture(GL_TEXTURE_RECTANGLE_ARB, texId);
     glBegin(GL_QUADS);
     {
-        glTexCoord2i(x, y);					glVertex2d(x, y);
-        glTexCoord2i(x + screenWidth, y);			glVertex2d(x + screenWidth, y);
-        glTexCoord2i(x + screenWidth, y + screenHeight);	glVertex2d(x + screenWidth, y + screenHeight);
-        glTexCoord2i(x, y + screenHeight);			glVertex2d(x, y + screenHeight);
+        glTexCoord2i(x, y);					
+        glVertex2d(x, y);
+
+        glTexCoord2i(x + screenWidth, y);			
+        glVertex2d(x + screenWidth, y);
+
+        glTexCoord2i(x + screenWidth, y + screenHeight);	
+        glVertex2d(x + screenWidth, y + screenHeight);
+
+        glTexCoord2i(x, y + screenHeight);			
+        glVertex2d(x, y + screenHeight);
     }
     glEnd();
     glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
@@ -224,11 +231,11 @@ void OpenGLGraphicsEngine::disableScissorTest() {
     glDisable(GL_SCISSOR_TEST);
 }
 
-void OpenGLGraphicsEngine::enable(GLenum cap) {
+void OpenGLGraphicsEngine::enable(unsigned int cap) {
     glEnable(cap);
 }
 
-void OpenGLGraphicsEngine::scissor(GLint x, GLint y, GLsizei width, GLsizei height) {
+void OpenGLGraphicsEngine::scissor(int x, int y, int width, int height) {
     glScissor(x, y, width, height);
 }
 
@@ -249,15 +256,15 @@ void OpenGLGraphicsEngine::clear() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void OpenGLGraphicsEngine::clear(GLbitfield mask) {
+void OpenGLGraphicsEngine::clear(unsigned int mask) {
     glClear(mask);
 }
 
-void OpenGLGraphicsEngine::clearColor(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha) {
+void OpenGLGraphicsEngine::clearColor(float red, float green, float blue, float alpha) {
     glClearColor(red, green, blue, alpha);
 }
 
-void OpenGLGraphicsEngine::blendFunc(GLenum sfactor, GLenum dfactor) {
+void OpenGLGraphicsEngine::blendFunc(unsigned int sfactor, unsigned int dfactor) {
     glBlendFunc(sfactor, dfactor);
 }
 
@@ -265,23 +272,23 @@ void OpenGLGraphicsEngine::color4d(float red, float green, float blue, float alp
     glColor4d(red, green, blue, alpha);
 }
 
-GLuint OpenGLGraphicsEngine::createProgram() {
+unsigned int OpenGLGraphicsEngine::createProgram() {
     return glCreateProgram();
 }
 
-void OpenGLGraphicsEngine::linkProgram(GLuint glslProgram) {
+void OpenGLGraphicsEngine::linkProgram(unsigned int glslProgram) {
     glLinkProgram(glslProgram);
 }
 
-void OpenGLGraphicsEngine::attachShader(GLuint glslProgram, GLuint glslVertexShader) {
+void OpenGLGraphicsEngine::attachShader(unsigned int glslProgram, unsigned int glslVertexShader) {
     glAttachShader(glslProgram, glslVertexShader);
 }
 
-void OpenGLGraphicsEngine::getProgramIv(GLuint program, GLenum pname, GLint* params) {
+void OpenGLGraphicsEngine::getProgramIv(unsigned int program, unsigned int pname, int* params) {
     glGetProgramiv(program, pname, params);
 }
 
-void OpenGLGraphicsEngine::getProgramInfoLog(GLuint program, GLsizei maxLength, GLsizei* length, GLchar* infoLog) {
+void OpenGLGraphicsEngine::getProgramInfoLog(unsigned int program, int maxLength, int* length, char* infoLog) {
     glGetProgramInfoLog(program, maxLength, length, infoLog);
 }
 
@@ -291,7 +298,7 @@ void OpenGLGraphicsEngine::getProgramInfoLog(GLuint program, GLsizei maxLength, 
 //    //glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
 //}
 
-void OpenGLGraphicsEngine::pushName(GLuint name) {
+void OpenGLGraphicsEngine::pushName(unsigned int name) {
     glPushName(name);
 }
 
@@ -311,8 +318,8 @@ void OpenGLGraphicsEngine::BindFrameBuffer(unsigned int fbId) {
     glBindFramebuffer(GL_FRAMEBUFFER, fbId);
 }
 
-bool OpenGLGraphicsEngine::SetVariable(unsigned int prog, const char* name, int value) {
-    int location = glGetUniformLocation(prog, name);
+bool OpenGLGraphicsEngine::SetVariable(unsigned int programId, const char* name, int value) {
+    int location = glGetUniformLocation(programId, name);
     if (location != -1)
     {
         glUniform1i(location, value);
@@ -321,8 +328,8 @@ bool OpenGLGraphicsEngine::SetVariable(unsigned int prog, const char* name, int 
     return false;
 }
 
-bool OpenGLGraphicsEngine::SetVariable(unsigned int prog, const char* name, float value) {
-    int location = glGetUniformLocation(prog, name);
+bool OpenGLGraphicsEngine::SetVariable(unsigned int programId, const char* name, float value) {
+    int location = glGetUniformLocation(programId, name);
     if (location != -1)
     {
         glUniform1f(location, value);

@@ -1,7 +1,8 @@
 #ifndef __OpenGLGraphicsEngine_h_
 #define __OpenGLGraphicsEngine_h_
 
-
+#include "IncludeGLEW.h"
+#include "IncludeGl.h"
 
 #include "IGraphicsEngine.h"
 
@@ -29,22 +30,22 @@ class OpenGLGraphicsEngine : public IGraphicsEngine {
     void ResetTextureState() override;
     void enableScissorTest() override;
     void disableScissorTest() override;
-    void enable(GLenum cap) override;
-    void scissor(GLint x, GLint y, GLsizei width, GLsizei height) override;
+    void enable(unsigned int cap) override;
+    void scissor(int x, int y, int width, int height) override;
     void initializeState() override;
     void initializeModelViewMatrix() override;
     void clear() override;
-    void clear(GLbitfield mask) override;
-    void clearColor(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha) override;
-    void blendFunc(GLenum sfactor, GLenum dfactor) override;
+    void clear(unsigned int mask) override;
+    void clearColor(float red, float green, float blue, float alpha) override;
+    void blendFunc(unsigned int sfactor, unsigned int dfactor) override;
     void color4d(float red, float green, float blue, float alpha) override;
     //void color4d(GLdouble red, GLdouble green, GLdouble blue, GLdouble alpha) override;
-    GLuint createProgram() override;
-    void linkProgram(GLuint glslProgram) override;
-    void attachShader(GLuint glslProgram, GLuint glslVertexShader) override;
-    void getProgramIv(GLuint program, GLenum pname, GLint* params) override;
-    void getProgramInfoLog(GLuint program, GLsizei maxLength, GLsizei* length, GLchar* infoLog) override;
-    void pushName(GLuint name) override;
+    unsigned int createProgram() override;
+    void linkProgram(unsigned int glslProgram) override;
+    void attachShader(unsigned int glslProgram, unsigned int glslVertexShader) override;
+    void getProgramIv(unsigned int program, unsigned int pname, int* params) override;
+    void getProgramInfoLog(unsigned int program, int maxLength, int* length, char* infoLog) override;
+    void pushName(unsigned int name) override;
     void pushMatrix() override;
     void popMatrix() override;
     void popName() override;

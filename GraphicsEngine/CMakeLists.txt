@@ -11,4 +11,4 @@ if( NOT APPLE )
 endif()
 
 include_directories( include )
-add_library(${PROJECT_NAME} "GraphicsEngine.h" "src/OpenGLGraphicsEngine.cpp")
+add_library(${PROJECT_NAME} "GraphicsEngine.h" "src/OpenGLGraphicsEngine.cpp" "include/IncludeGLES.h")

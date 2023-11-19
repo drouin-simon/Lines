@@ -1,9 +1,6 @@
 #ifndef __IGraphicsEngine_h_
 #define __IGraphicsEngine_h_
 
-#include "IncludeGLEW.h"
-#include "IncludeGl.h"
-
 #include "../linesCore/PolygonData.h"
 
 #include <SVL.h>
@@ -48,22 +45,22 @@ public:
     // drwGLRenderer.h
     virtual void enableScissorTest() = 0;
     virtual void disableScissorTest() = 0;
-    virtual void enable(GLenum cap) = 0;
-    virtual void scissor(GLint x, GLint y, GLsizei width, GLsizei height) = 0;
+    virtual void enable(unsigned int cap) = 0;
+    virtual void scissor(int x, int y, int width, int height) = 0;
     virtual void initializeState() = 0;
     virtual void initializeModelViewMatrix() = 0;
     virtual void clear() = 0;
-    virtual void clear(GLbitfield mask) = 0;
-    virtual void clearColor(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha) = 0;
-    virtual void blendFunc(GLenum sfactor, GLenum dfactor) = 0;
+    virtual void clear(unsigned int mask) = 0;
+    virtual void clearColor(float red, float green, float blue, float alpha) = 0;
+    virtual void blendFunc(unsigned int sfactor, unsigned int dfactor) = 0;
     virtual void color4d(float red, float green, float blue, float alpha) = 0;
     //virtual void color4d(GLdouble red, GLdouble green, GLdouble blue, GLdouble alpha) = 0;
-    virtual GLuint createProgram() = 0;
-    virtual void attachShader(GLuint glslProgram, GLuint glslVertexShader) = 0;
-    virtual void getProgramIv(GLuint program, GLenum pname, GLint *params) = 0;
-    virtual void linkProgram(GLuint program) = 0;
-    virtual void getProgramInfoLog(GLuint program, GLsizei maxLength, GLsizei *length, GLchar *infoLog ) = 0; 
-    virtual void pushName(GLuint name) = 0;
+    virtual unsigned int createProgram() = 0;
+    virtual void attachShader(unsigned int glslProgram, unsigned int glslVertexShader) = 0;
+    virtual void getProgramIv(unsigned int program, unsigned int pname, int* params) = 0;
+    virtual void linkProgram(unsigned int program) = 0;
+    virtual void getProgramInfoLog(unsigned int program, int maxLength, int *length, char* infoLog ) = 0;
+    virtual void pushName(unsigned int name) = 0;
     virtual void popMatrix() = 0;
     virtual void pushMatrix() = 0;
     virtual void popName() = 0;
