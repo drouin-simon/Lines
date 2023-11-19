@@ -10,7 +10,7 @@ Node::Node() : Position(0,0)
 	Id = NextId++;
 	ThePrimitive = 0;
 	IsHidden = false;
-	m_engine = new OpenGLGraphicsEngine();
+	m_engine = new GraphicsEngine();
 }
 
 

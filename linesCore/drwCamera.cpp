@@ -20,7 +20,7 @@ drwCamera::drwCamera()
     m_winSizeWorld[0] = 0.0;
     m_winSizeWorld[1] = 0.0;
     
-    m_engine = new OpenGLGraphicsEngine();
+    m_engine = new GraphicsEngine();
 
     UpdateSizes();
 }

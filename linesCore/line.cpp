@@ -3,7 +3,7 @@
 
 Line::Line() : m_lineWidth( 1.0 )
 {
-    m_engine = new OpenGLGraphicsEngine();
+    m_engine = new GraphicsEngine();
 }
 
 

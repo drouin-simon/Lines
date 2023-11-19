@@ -1,6 +1,4 @@
 #include "wideline.h"
-//#include "IncludeGLEW.h"
-//#include "IncludeGl.h"
 #include "math.h"
 #include "drwGlslShader.h"
 #include "drwDrawingContext.h"
@@ -22,7 +20,7 @@ WideLine::WideLine( double width )
 , m_prevPressure( 1.0 )
 , m_doneAddingPoints( false )
 {
-    m_engine = new OpenGLGraphicsEngine();
+    m_engine = new GraphicsEngine();
 }
 
 

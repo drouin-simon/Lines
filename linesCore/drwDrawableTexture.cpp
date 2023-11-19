@@ -13,7 +13,7 @@ drwDrawableTexture::drwDrawableTexture()
 	, m_width(1)
 	, m_height(1)
 {
-    m_engine = new OpenGLGraphicsEngine();
+    m_engine = new GraphicsEngine();
 }
 
 drwDrawableTexture::~drwDrawableTexture()
@@ -25,7 +25,7 @@ drwDrawableTexture::~drwDrawableTexture()
 void drwDrawableTexture::SetPixelFormatToRGBU8() { m_internalFormat = GL_RGB; m_pixelType = GL_RGB; m_componentType = GL_UNSIGNED_BYTE; m_downloadPixelType = GL_RGB; }
 //void drwDrawableTexture::SetPixelFormatToGreyF16() { m_internalFormat = GL_R16F; m_pixelType = GL_LUMINANCE; m_componentType = GL_FLOAT; m_downloadPixelType = GL_RED; }
 void drwDrawableTexture::SetPixelFormatToGreyF32() { m_internalFormat = GL_R32F; m_pixelType = GL_RED; m_componentType = GL_FLOAT; m_downloadPixelType = GL_RED; }
-void drwDrawableTexture::SetPixelFormatToRGBAF32() { m_internalFormat = GL_RGBA32F_ARB; m_pixelType = GL_RGBA; m_componentType = GL_FLOAT; m_downloadPixelType = GL_RGBA; }
+void drwDrawableTexture::SetPixelFormatToRGBAF32() { m_internalFormat = GL_RGBA /*GL_RGBA32F_ARB*/; m_pixelType = GL_RGBA; m_componentType = GL_FLOAT; m_downloadPixelType = GL_RGBA; }
 
 void drwDrawableTexture::Resize( int width, int height )
 {
@@ -59,14 +59,14 @@ void drwDrawableTexture::DrawToTexture( bool drawTo )
     if( drawTo )
     {
         assert( !m_isDrawingInTexture );
-        glGetIntegerv( GL_FRAMEBUFFER_BINDING, &m_backupFbId );
-		glBindFramebufferEXT( GL_FRAMEBUFFER_EXT, m_fbId );
+        m_engine->GetVariable(GL_FRAMEBUFFER_BINDING, &m_backupFbId);
+        m_engine->BindFrameBuffer(m_fbId);
         m_isDrawingInTexture = true;
     }
 	else
     {
         assert( m_isDrawingInTexture );
-        glBindFramebufferEXT( GL_FRAMEBUFFER_EXT, m_backupFbId );
+        m_engine->BindFrameBuffer(m_backupFbId);
         m_isDrawingInTexture = false;
     }
 }

@@ -12,7 +12,7 @@ drwGlslShader::drwGlslShader()
 	, m_glslProg(0)
 	, m_init( false )
 {
-    m_engine = new OpenGLGraphicsEngine();
+    m_engine = new GraphicsEngine();
 }
 
 drwGlslShader::~drwGlslShader() 
@@ -146,26 +146,16 @@ bool drwGlslShader::UseProgram( bool use )
 
 bool drwGlslShader::SetVariable( const char * name, int value )
 {
-	int location = glGetUniformLocation( m_glslProg, name );
-	if( location != -1 )
-	{
-		glUniform1iARB( location, value );
-		return true;
-	}
-	ReportError( "Couldn't set shader variable %s.\n", name );
-	return false;
+	bool result = m_engine->SetVariable(m_glslProg, name, value);
+	if (!result) ReportError( "Couldn't set shader variable %s.\n", name );
+	return result;
 }
 
 bool drwGlslShader::SetVariable( const char * name, float value )
 {
-	int location = glGetUniformLocation( m_glslProg, name );
-	if( location != -1 )
-	{
-		glUniform1fARB( location, value );
-		return true;
-	}
-	ReportError( "Couldn't set shader variable %s.\n", name );
-	return false;
+	bool result = m_engine->SetVariable(m_glslProg, name, value);
+	if (!result) ReportError( "Couldn't set shader variable %s.\n", name );
+	return result;
 }
 
 bool drwGlslShader::LoadOneShaderSource( const char * filename, std::string & shaderSource )
@@ -200,17 +190,17 @@ void drwGlslShader::Clear()
 {
 	if( m_glslVertexShader != 0 )
 	{
-		glDeleteShader( m_glslVertexShader );
+		m_engine->DeleteShader(m_glslVertexShader);
 		m_glslVertexShader = 0;
 	}
 	if( m_glslShader != 0 )
 	{
-		glDeleteShader( m_glslShader );
+		m_engine->DeleteShader(m_glslShader);
 		m_glslShader = 0;
 	}
 	if( m_glslProg != 0 )
 	{
-		glDeleteProgram( m_glslProg );
+		m_engine->DeleteProgram(m_glslProg);
 		m_glslProg = 0;
 	}
 	m_init = false;
