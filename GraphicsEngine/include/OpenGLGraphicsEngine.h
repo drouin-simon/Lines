@@ -39,7 +39,6 @@ class OpenGLGraphicsEngine : public IGraphicsEngine {
     void clearColor(float red, float green, float blue, float alpha) override;
     void blendFunc(unsigned int sfactor, unsigned int dfactor) override;
     void color4d(float red, float green, float blue, float alpha) override;
-    //void color4d(GLdouble red, GLdouble green, GLdouble blue, GLdouble alpha) override;
     unsigned int createProgram() override;
     void linkProgram(unsigned int glslProgram) override;
     void attachShader(unsigned int glslProgram, unsigned int glslVertexShader) override;
@@ -53,6 +52,7 @@ class OpenGLGraphicsEngine : public IGraphicsEngine {
     void BindFrameBuffer(unsigned int fbId) override;
     bool SetVariable(unsigned int programId, const char* name, int value) override;
     bool SetVariable(unsigned int programId, const char* name, float value) override;
+    void GetVariable(unsigned int name, int* value) override;
 
     void DeleteShader(unsigned int shaderId) override;
     void DeleteProgram(unsigned int programId) override;

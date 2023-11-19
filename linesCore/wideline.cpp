@@ -1,6 +1,4 @@
 #include "wideline.h"
-//#include "IncludeGLEW.h"
-//#include "IncludeGl.h"
 #include "math.h"
 #include "drwGlslShader.h"
 #include "drwDrawingContext.h"

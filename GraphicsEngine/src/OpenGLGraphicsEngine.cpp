@@ -338,6 +338,10 @@ bool OpenGLGraphicsEngine::SetVariable(unsigned int programId, const char* name,
     return false;
 }
 
+void OpenGLGraphicsEngine::GetVariable(unsigned int name, int* value) {
+    glGetIntegerv(name, value);
+}
+
 void OpenGLGraphicsEngine::DeleteShader(unsigned int shaderId) {
     glDeleteShader(shaderId);
 }

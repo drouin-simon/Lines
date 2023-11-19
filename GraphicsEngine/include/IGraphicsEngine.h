@@ -54,7 +54,6 @@ public:
     virtual void clearColor(float red, float green, float blue, float alpha) = 0;
     virtual void blendFunc(unsigned int sfactor, unsigned int dfactor) = 0;
     virtual void color4d(float red, float green, float blue, float alpha) = 0;
-    //virtual void color4d(GLdouble red, GLdouble green, GLdouble blue, GLdouble alpha) = 0;
     virtual unsigned int createProgram() = 0;
     virtual void attachShader(unsigned int glslProgram, unsigned int glslVertexShader) = 0;
     virtual void getProgramIv(unsigned int program, unsigned int pname, int* params) = 0;
@@ -69,6 +68,7 @@ public:
     virtual void BindFrameBuffer(unsigned int fbId) = 0;
     virtual bool SetVariable(unsigned int programId, const char* name, int value) = 0;
     virtual bool SetVariable(unsigned int programId, const char* name, float value) = 0;
+    virtual void GetVariable(unsigned int name, int* value) = 0;
 
     virtual void DeleteShader(unsigned int shaderId) = 0;
     virtual void DeleteProgram(unsigned int programId) = 0;

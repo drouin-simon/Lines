@@ -59,7 +59,7 @@ void drwDrawableTexture::DrawToTexture( bool drawTo )
     if( drawTo )
     {
         assert( !m_isDrawingInTexture );
-        glGetIntegerv( GL_FRAMEBUFFER_BINDING, &m_backupFbId );
+        m_engine->GetVariable(GL_FRAMEBUFFER_BINDING, &m_backupFbId);
         m_engine->BindFrameBuffer(m_fbId);
         m_isDrawingInTexture = true;
     }
