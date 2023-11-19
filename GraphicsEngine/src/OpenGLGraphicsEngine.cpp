@@ -2,6 +2,7 @@
 
 void OpenGLGraphicsEngine::SetViewPort(int x, int y, int width, int height) {
     glViewport(x, y, width, height);
+    
 }
 
 void OpenGLGraphicsEngine::SetProjectionViewPort(int x, int y, int width, int height) {
@@ -260,7 +261,7 @@ void OpenGLGraphicsEngine::blendFunc(GLenum sfactor, GLenum dfactor) {
     glBlendFunc(sfactor, dfactor);
 }
 
-void OpenGLGraphicsEngine::color4d(GLdouble red, GLdouble green, GLdouble blue, GLdouble alpha) {
+void OpenGLGraphicsEngine::color4d(float red, float green, float blue, float alpha) {
     glColor4d(red, green, blue, alpha);
 }
 
@@ -304,4 +305,36 @@ void OpenGLGraphicsEngine::popMatrix() {
 
 void OpenGLGraphicsEngine::popName() {
     glPopName();
+}
+
+void OpenGLGraphicsEngine::BindFrameBuffer(unsigned int fbId) {
+    glBindFramebuffer(GL_FRAMEBUFFER, fbId);
+}
+
+bool OpenGLGraphicsEngine::SetVariable(unsigned int prog, const char* name, int value) {
+    int location = glGetUniformLocation(prog, name);
+    if (location != -1)
+    {
+        glUniform1i(location, value);
+        return true;
+    }
+    return false;
+}
+
+bool OpenGLGraphicsEngine::SetVariable(unsigned int prog, const char* name, float value) {
+    int location = glGetUniformLocation(prog, name);
+    if (location != -1)
+    {
+        glUniform1f(location, value);
+        return true;
+    }
+    return false;
+}
+
+void OpenGLGraphicsEngine::DeleteShader(unsigned int shaderId) {
+    glDeleteShader(shaderId);
+}
+
+void OpenGLGraphicsEngine::DeleteProgram(unsigned int programId) {
+    glDeleteProgram(programId);
 }

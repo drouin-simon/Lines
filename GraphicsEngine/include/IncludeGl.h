@@ -12,8 +12,9 @@
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
 #else
-//#include <GL/gl.h>
-#include <GLES3/gl3.h>
+#include <GL/gl.h>
+//#define GL_GLEXT_PROTOTYPES
+//#include <GLES3/gl3.h>
 #include <GL/glu.h>
 #endif
 

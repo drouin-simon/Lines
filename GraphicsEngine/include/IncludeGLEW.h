@@ -9,6 +9,7 @@
 #if !(defined(__APPLE__) && defined(__MACH__))
 #define NOMINMAX
 #include <GL/glew.h>
+//#include <EGL/egl.h>
 #endif
 
 #endif

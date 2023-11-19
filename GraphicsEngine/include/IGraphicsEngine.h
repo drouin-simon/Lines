@@ -56,7 +56,8 @@ public:
     virtual void clear(GLbitfield mask) = 0;
     virtual void clearColor(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha) = 0;
     virtual void blendFunc(GLenum sfactor, GLenum dfactor) = 0;
-    virtual void color4d(GLdouble red, GLdouble green, GLdouble blue, GLdouble alpha) = 0;
+    virtual void color4d(float red, float green, float blue, float alpha) = 0;
+    //virtual void color4d(GLdouble red, GLdouble green, GLdouble blue, GLdouble alpha) = 0;
     virtual GLuint createProgram() = 0;
     virtual void attachShader(GLuint glslProgram, GLuint glslVertexShader) = 0;
     virtual void getProgramIv(GLuint program, GLenum pname, GLint *params) = 0;
@@ -66,6 +67,14 @@ public:
     virtual void popMatrix() = 0;
     virtual void pushMatrix() = 0;
     virtual void popName() = 0;
+
+    // Other
+    virtual void BindFrameBuffer(unsigned int fbId) = 0;
+    virtual bool SetVariable(unsigned int programId, const char* name, int value) = 0;
+    virtual bool SetVariable(unsigned int programId, const char* name, float value) = 0;
+
+    virtual void DeleteShader(unsigned int shaderId) = 0;
+    virtual void DeleteProgram(unsigned int programId) = 0;
 };
 
 #endif

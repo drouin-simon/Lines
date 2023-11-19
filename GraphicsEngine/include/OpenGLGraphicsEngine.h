@@ -1,6 +1,8 @@
 #ifndef __OpenGLGraphicsEngine_h_
 #define __OpenGLGraphicsEngine_h_
 
+
+
 #include "IGraphicsEngine.h"
 
 class OpenGLGraphicsEngine : public IGraphicsEngine {
@@ -35,7 +37,8 @@ class OpenGLGraphicsEngine : public IGraphicsEngine {
     void clear(GLbitfield mask) override;
     void clearColor(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha) override;
     void blendFunc(GLenum sfactor, GLenum dfactor) override;
-    void color4d(GLdouble red, GLdouble green, GLdouble blue, GLdouble alpha) override;
+    void color4d(float red, float green, float blue, float alpha) override;
+    //void color4d(GLdouble red, GLdouble green, GLdouble blue, GLdouble alpha) override;
     GLuint createProgram() override;
     void linkProgram(GLuint glslProgram) override;
     void attachShader(GLuint glslProgram, GLuint glslVertexShader) override;
@@ -45,6 +48,13 @@ class OpenGLGraphicsEngine : public IGraphicsEngine {
     void pushMatrix() override;
     void popMatrix() override;
     void popName() override;
+
+    void BindFrameBuffer(unsigned int fbId) override;
+    bool SetVariable(unsigned int programId, const char* name, int value) override;
+    bool SetVariable(unsigned int programId, const char* name, float value) override;
+
+    void DeleteShader(unsigned int shaderId) override;
+    void DeleteProgram(unsigned int programId) override;
 };
 
 #endif // __OpenGLGraphicsEngine_h_
