@@ -14,23 +14,21 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
 
     steps:
     - uses: actions/checkout@v3
 
     - name: Install dependencies
+      if: matrix.os == 'ubuntu-latest'
       run: |
-        if [ ${{ matrix.os }} = "ubuntu-latest" ]; then
-          sudo apt-get update
-          sudo apt-get install -y libglu1-mesa-dev
-        fi
+        sudo apt-get update && sudo apt-get install -y libglu1-mesa-dev
 
     - name: Install Qt
       uses: jurplel/install-qt-action@v3
       with:
         version: '5.15.2'
-        host: ${{ matrix.os == 'ubuntu-latest' && 'linux' || 'mac' }}
+        host: ${{ (matrix.os == 'ubuntu-latest' && 'linux') || (matrix.os == 'macos-latest' && 'mac') || (matrix.os == 'windows-latest' && 'windows') }}
         target: desktop
 
     - name: Configure CMake
