@@ -28,18 +28,13 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y libglu1-mesa-dev
 
-    - name: Install deps on Windows
-      if: matrix.os == 'windows-latest'
-      run: |
-        choco install -y glew
-        choco install -y freeglut
-
     - name: Install Qt
       uses: jurplel/install-qt-action@v3
       with:
         version: '5.15.2' # or any other version you need
         host: ${{ matrix.os == 'ubuntu-latest' && 'linux' || 'windows' }}
         target: desktop
+        modules: 'qtdatavis3d'
 
     - name: Configure CMake
       run: |
