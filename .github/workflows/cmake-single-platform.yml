@@ -1,10 +1,7 @@
 name: CMake on Multiple Platforms
 
 on:
-  push:
-    branches: [ "build" ]
-  pull_request:
-    branches: [ "build" ]
+  push
 
 env:
   BUILD_TYPE: Release
