@@ -1,6 +1,4 @@
-# This starter workflow is for a CMake project running on a single platform. There is a different starter workflow if you need cross-platform coverage.
-# See: https://github.com/actions/starter-workflows/blob/main/ci/cmake-multi-platform.yml
-name: CMake on a single platform
+name: CMake on Multiple Platforms
 
 on:
   push:
@@ -13,21 +11,26 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
 
     steps:
     - uses: actions/checkout@v3
 
-    - name: Install dependencies on Ubuntu
+    - name: Install dependencies
       run: |
-        sudo apt-get update
-        sudo apt-get install -y libglu1-mesa-dev
+        if [ ${{ matrix.os }} = "ubuntu-latest" ]; then
+          sudo apt-get update
+          sudo apt-get install -y libglu1-mesa-dev
+        fi
 
     - name: Install Qt
       uses: jurplel/install-qt-action@v3
       with:
-        version: '5.15.2' # or any other version you need
-        host: linux
+        version: '5.15.2'
+        host: ${{ matrix.os == 'ubuntu-latest' && 'linux' || 'mac' }}
         target: desktop
 
     - name: Configure CMake
