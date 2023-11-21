@@ -34,7 +34,6 @@ jobs:
         version: '5.15.2' # or any other version you need
         host: ${{ matrix.os == 'ubuntu-latest' && 'linux' || 'windows' }}
         target: desktop
-        modules: 'qtdatavis3d'
 
     - name: Configure CMake
       run: |
