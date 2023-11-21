@@ -18,6 +18,11 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
+    - name: Install dependencies on Ubuntu
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libglu1-mesa-dev
+
     - name: Install Qt
       uses: jurplel/install-qt-action@v3
       with:
