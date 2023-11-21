@@ -19,6 +19,8 @@ include_directories(${linesDesktopLibIncludeDirs})
 # Include bin directory for moc files
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
+include_directories(${glew_SOURCE_DIR} ${glew_BINARY_DIR})
+
 # Create classes from Qt ui files
 set( Drw_ui ExportDialog.ui LinesPreferencesWidget.ui )
 qt5_wrap_ui( Drw_hdr_ui ${Drw_ui} )
@@ -65,7 +67,7 @@ qt5_use_modules( ${ExecName} OpenGL Widgets Network )
 if (APPLE)
     set_target_properties( ${ExecName} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_BINARY_DIR}/LinesInfo.plist )
 else()
-    target_link_libraries( ${ExecName} OpenGL::GL ${GLEW_LIBRARIES})
+    target_link_libraries( ${ExecName} OpenGL::GL libglew_static)
 endif()
 
 

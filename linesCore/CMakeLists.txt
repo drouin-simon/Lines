@@ -29,3 +29,4 @@ add_dependencies( ${LibName} svl )
 
 # Define include directory for this lib
 set( linesCoreIncludeDirs ${CMAKE_CURRENT_SOURCE_DIR} PARENT_SCOPE )
+target_link_libraries( ${LibName} PRIVATE libglew_static )
