@@ -34,6 +34,8 @@ qt5_add_resources( LinesLib_rcs_src ${LinesLib_rcs})
 set( DrawLib_all_src ${DrawLib_src} ${DrawLib_moc} ${DrawLib_hdr} ${DrawLib_hdr_moc} ${DrawLib_hdr_ui} ${LinesLib_rcs_src} )
 add_library( ${LibName} ${DrawLib_all_src} )
 
+target_link_libraries( ${LibName} libglew_static )
+
 #================================
 # Define include dir for dependent projects
 #================================
@@ -42,4 +44,4 @@ set( linesDesktopLibIncludeDirs ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOUR
 #================================
 # Explicit dependencies
 #================================
-ADD_DEPENDENCIES( ${LibName} svl linesCore linesNetwork )
+ADD_DEPENDENCIES( ${LibName} svl linesCore linesNetwork GraphicsEngine )

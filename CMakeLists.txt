@@ -74,19 +74,27 @@ set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/githash.h PROPERTIES GEN
 include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 #----------------------------------------
 
-# Need GLEW for OpenGL if not on MacOS
-if( NOT APPLE )
-  find_package(GLEW REQUIRED)
-  include_directories(${GLEW_INCLUDE_DIRS})
-endif()
+message(STATUS "Fetching glew")
+include(FetchContent)
+FetchContent_Declare(
+	glew
+	GIT_REPOSITORY https://github.com/Perlmint/glew-cmake.git
+	GIT_TAG glew-cmake-2.2.0
+)
 
+FetchContent_GetProperties(glew)
+if(NOT glew_POPULATED)
+	FetchContent_Populate(glew)
+
+	set(glew-cmake_BUILD_SHARED OFF CACHE INTERNAL "Build the shared glew library")
+	set(ONLY_LIBS ON CACHE INTERNAL "Only build the glew library")
+	add_subdirectory(${glew_SOURCE_DIR} ${glew_BINARY_DIR})
+endif()
 
 add_subdirectory( linesCore )
 add_subdirectory( linesNetwork )
 add_subdirectory( linesDesktopLib )
 add_subdirectory( linesDesktop )
 
-
 include_directories( GraphicsEngine )
 add_subdirectory( GraphicsEngine )
-target_link_libraries( GraphicsEngine )
