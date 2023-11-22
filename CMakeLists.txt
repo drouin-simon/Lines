@@ -24,8 +24,8 @@ include_directories( ${svlIncludeDir} )
 #----------------------------------------
 
 #----------------------------------------
-# Use Qt 5
-find_package( Qt5 COMPONENTS Widgets OpenGL Network REQUIRED )
+# Use Qt 6
+find_package( Qt6 COMPONENTS Widgets OpenGL Network REQUIRED )
 include_directories( ${Qt5Widgets_INCLUDE_DIRS} )
 include_directories( ${Qt5OpenGL_INCLUDE_DIRS} )
 include_directories( ${Qt5Network_INCLUDE_DIRS} )
