@@ -1,4 +1,3 @@
-/*
 #ifndef __OpenGLESGraphicsEngine_h_
 #define __OpenGLESGraphicsEngine_h_
 
@@ -59,5 +58,3 @@ class OpenGLESGraphicsEngine : public IGraphicsEngine {
 };
 
 #endif // __OpenGLESGraphicsEngine_h_
-
-*/
