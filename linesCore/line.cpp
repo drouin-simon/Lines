@@ -1,25 +1,22 @@
 #include "line.h"
-#include "IncludeGl.h"
 #include "drwDrawingContext.h"
 
 Line::Line() : m_lineWidth( 1.0 )
 {
+    m_engine = new GraphicsEngine();
 }
 
 
 Line::~Line() 
 {
+    delete m_engine;
 }
 
 
 void Line::InternDraw( drwDrawingContext & context )
 {
     Vec4 color = m_color * context.m_colorMultiplier;
-    glColor4d( color[0], color[1], color[2], color[3] );
-
-	glLineWidth( m_lineWidth );
-    glVertexPointer( 2, GL_DOUBLE, 0, m_pointTable.GetBuffer() );
-    glDrawElements(GL_LINE_STRIP, m_pointIndex.size(), GL_UNSIGNED_INT, m_pointIndex.GetBuffer() );
+    m_engine->DrawLine(m_pointTable.GetBuffer(), m_pointIndex.GetBuffer(), m_pointIndex.size(), m_lineWidth, color);
 }
 
 

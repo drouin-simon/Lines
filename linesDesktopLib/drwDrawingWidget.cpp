@@ -1,3 +1,4 @@
+#include <GL/glew.h>
 #include "drwDrawingWidget.h"
 #include <iostream>
 #include <QtGui>
@@ -57,6 +58,10 @@ void drwDrawingWidget::NotifyPlaybackStartStop( bool isStarting )
 
 void drwDrawingWidget::initializeGL()
 {
+    GLenum err = glewInit();
+    if (err != GLEW_OK) {
+        qFatal("Failed to initialize GLEW: %s", glewGetErrorString(err));
+    }
 }
 
 void drwDrawingWidget::resizeGL( int w, int h )

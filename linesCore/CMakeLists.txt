@@ -13,14 +13,14 @@ set( ${LibName}_hdr_moc drwToolbox.h drwTool.h drwLineTool.h drwCommandDatabase.
 set( ${LibName}_hdr drwGLRenderer.h drwDrawingSurface.h drwRemoteCommandIO.h drwGlslShader.h
         drwCamera.h Frame.h line.h Node.h Primitive.h LinePrimitive.h
 	wideline.h drwDrawableTexture.h drwDrawingContext.h drwCommand.h drwDataArray.h
-        PolygonData.h IncludeGl.h IncludeGlee.h lcCircle.h )
+        PolygonData.h lcCircle.h )
 
 # moc Qt source file without a ui file
 qt5_wrap_cpp( ${LibName}_moc ${${LibName}_hdr_moc} )
 
 # Create and link executable
 set( ${LibName}_all_src ${${LibName}_src} ${${LibName}_moc} ${${LibName}_hdr} ${${LibName}_hdr_moc} )
-add_library( ${LibName} ${${LibName}_all_src} )
+add_library( ${LibName} ${${LibName}_all_src})
 
 #================================
 # Explicit dependencies

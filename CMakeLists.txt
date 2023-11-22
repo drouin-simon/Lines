@@ -2,6 +2,8 @@ PROJECT( Lines )
 
 cmake_minimum_required(VERSION 3.1)
 
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 # Include some CMake utilities
 set( CMAKE_EXT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cmake )
 include( ${CMAKE_CURRENT_SOURCE_DIR}/cmake/printvariables.cmake )
@@ -72,13 +74,19 @@ set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/githash.h PROPERTIES GEN
 include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 #----------------------------------------
 
-# Need Glee for OpenGL if not on MacOS
+# Need GLEW for OpenGL if not on MacOS
 if( NOT APPLE )
-  add_subdirectory( GLee )
-  include_directories( ${GLeeIncludeDir} )
+  find_package(GLEW REQUIRED)
+  include_directories(${GLEW_INCLUDE_DIRS})
 endif()
+
 
 add_subdirectory( linesCore )
 add_subdirectory( linesNetwork )
 add_subdirectory( linesDesktopLib )
 add_subdirectory( linesDesktop )
+
+
+include_directories( GraphicsEngine )
+add_subdirectory( GraphicsEngine )
+target_link_libraries( GraphicsEngine )

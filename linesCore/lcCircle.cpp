@@ -1,5 +1,4 @@
 #include "lcCircle.h"
-#include "IncludeGl.h"
 
 Circle::Circle() : Center( Vec2( 0, 0 ) )
 {
@@ -10,10 +9,13 @@ Circle::Circle() : Center( Vec2( 0, 0 ) )
     IntermediatePointOnly = 0;
     Contour = false;
     Fill = true;
+
+    m_engine = new OpenGLGraphicsEngine();
 }
 
 Circle::~Circle()
 {
+    delete m_engine;
 }
 
 void Circle::SetCenter( Vec2 center )
@@ -52,27 +54,7 @@ void Circle::InternDraw( drwDrawingContext & context )
     }
 
     // Draw the polygons
-    drwVec2Array & points = m_poly.GetPoints();
-    if( points.size() > 0 )
-    {
-        glColor4d( m_color[0], m_color[1], m_color[2], m_color[3] );
-        double * pbuffer = points.GetBuffer();
-        glVertexPointer( 2, GL_DOUBLE, 0, pbuffer );
-
-        drwIndexArray & triangles = m_poly.GetTriangles();
-        if( triangles.size() > 0 )
-        {
-            int numberOfIndexes = triangles.size();
-            glDrawElements( GL_TRIANGLES, numberOfIndexes, GL_UNSIGNED_INT, triangles.GetBuffer() );
-        }
-
-        drwIndexArray & lines = m_poly.GetLines();
-        if( lines.size() > 0 )
-        {
-            int numberOfIndexes = lines.size();
-            glDrawElements( GL_LINE_STRIP, numberOfIndexes, GL_UNSIGNED_INT, lines.GetBuffer() );
-        }
-    }
+    m_engine->DrawPolygon(m_poly, m_color);
 }
 
 void Circle::GeneratePolygonData()

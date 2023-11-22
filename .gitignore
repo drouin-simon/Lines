@@ -1,2 +1,6 @@
-
 *.user
+out
+build
+.vscode
+.vs
+.cache

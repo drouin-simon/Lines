@@ -1,8 +1,7 @@
 #ifndef __Node_h_
 #define __Node_h_
 
-#include <SVL.h>
-#include "IncludeGl.h"
+#include "../GraphicsEngine/GraphicsEngine.h"
 #include "macros.h"
 #include "SharedPtrMacro.h"
 
@@ -12,6 +11,8 @@ class drwDrawingContext;
 
 class Node
 {
+private:
+	IGraphicsEngine* m_engine;
 	
 public:
 	

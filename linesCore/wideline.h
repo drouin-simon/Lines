@@ -1,6 +1,7 @@
 #ifndef __WideLine_h_
 #define __WideLine_h_
 
+#include "../GraphicsEngine/GraphicsEngine.h"
 #include "drwDataArray.h"
 #include "LinePrimitive.h"
 #include "Box2d.h"
@@ -69,6 +70,9 @@ protected:
     Vec2       m_prevPoint;
 	double	   m_prevPressure;
 	bool m_doneAddingPoints;
+
+private:
+    IGraphicsEngine* m_engine;
 };
 
 

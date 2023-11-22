@@ -1,6 +1,4 @@
 #include "drwDrawableTexture.h"
-#include "IncludeGLee.h"
-#include "IncludeGl.h"
 #include <assert.h>
 
 drwDrawableTexture::drwDrawableTexture()
@@ -15,39 +13,27 @@ drwDrawableTexture::drwDrawableTexture()
 	, m_width(1)
 	, m_height(1)
 {
+    m_engine = new GraphicsEngine();
 }
 
 drwDrawableTexture::~drwDrawableTexture()
 {
-	Release();
+    Release();
+    delete m_engine;
 }
 
 void drwDrawableTexture::SetPixelFormatToRGBU8() { m_internalFormat = GL_RGB; m_pixelType = GL_RGB; m_componentType = GL_UNSIGNED_BYTE; m_downloadPixelType = GL_RGB; }
 //void drwDrawableTexture::SetPixelFormatToGreyF16() { m_internalFormat = GL_R16F; m_pixelType = GL_LUMINANCE; m_componentType = GL_FLOAT; m_downloadPixelType = GL_RED; }
 void drwDrawableTexture::SetPixelFormatToGreyF32() { m_internalFormat = GL_R32F; m_pixelType = GL_RED; m_componentType = GL_FLOAT; m_downloadPixelType = GL_RED; }
-void drwDrawableTexture::SetPixelFormatToRGBAF32() { m_internalFormat = GL_RGBA32F_ARB; m_pixelType = GL_RGBA; m_componentType = GL_FLOAT; m_downloadPixelType = GL_RGBA; }
+void drwDrawableTexture::SetPixelFormatToRGBAF32() { m_internalFormat = GL_RGBA /*GL_RGBA32F_ARB*/; m_pixelType = GL_RGBA; m_componentType = GL_FLOAT; m_downloadPixelType = GL_RGBA; }
 
 void drwDrawableTexture::Resize( int width, int height )
 {
     // Init texture and fbo if needed
     if( !m_texId )
     {
-        glGenTextures( 1, &m_texId );
-        glBindTexture(GL_TEXTURE_RECTANGLE_ARB, m_texId );
-        glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
-        glTexImage2D( GL_TEXTURE_RECTANGLE_ARB, 0, m_internalFormat, width, height, 0, m_pixelType, m_componentType, 0 );
-        glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0 );
-
-        int backupFbId = 0;
-        glGetIntegerv( GL_FRAMEBUFFER_BINDING, &backupFbId );
-        glGenFramebuffersEXT( 1, &m_fbId );
-        glBindFramebufferEXT( GL_FRAMEBUFFER_EXT, m_fbId );
-        glFramebufferTexture2DEXT( GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_RECTANGLE_ARB, m_texId, 0 );
-        GLenum ret = glCheckFramebufferStatusEXT( GL_FRAMEBUFFER_EXT );
-        assert( ret == GL_FRAMEBUFFER_COMPLETE_EXT );
-        glBindFramebufferEXT( GL_FRAMEBUFFER_EXT, backupFbId );
+        m_texId = m_engine->InitTexture(0, m_internalFormat, width, height, 0, m_pixelType, m_componentType, 0);
+        m_fbId = m_engine->InitFrameBuffer(m_texId);
     }
 
     if( m_width != width || m_height != height )
@@ -55,26 +41,16 @@ void drwDrawableTexture::Resize( int width, int height )
         // Change texture size
         m_width = width;
 		m_height = height;
-		glBindTexture( GL_TEXTURE_RECTANGLE_ARB, m_texId );
-        glTexImage2D( GL_TEXTURE_RECTANGLE_ARB, 0, m_internalFormat, width, height, 0, m_pixelType, m_componentType, 0 );
-		glBindTexture( GL_TEXTURE_RECTANGLE_ARB, 0 );
+        m_engine->DisplayTexture(m_texId, 0, m_internalFormat, width, height, 0, m_pixelType, m_componentType, 0);
 
         // Clear texture
-        int backupFbId = 0;
-        glGetIntegerv( GL_FRAMEBUFFER_BINDING, &backupFbId );
-		glBindFramebufferEXT( GL_FRAMEBUFFER_EXT, m_fbId );
-		glClearColor( 0.0, 0.0, 0.0, 0.0 );
-		glClear( GL_COLOR_BUFFER_BIT );
-        glBindFramebufferEXT( GL_FRAMEBUFFER_EXT, backupFbId );
+        m_engine->ClearTexture(m_fbId);
 	}
 }
 
 void drwDrawableTexture::Release()
 {
-	if( m_fbId )
-		glDeleteFramebuffersEXT( 1, &m_fbId );
-	if( m_texId )
-		glDeleteTextures( 1, &m_texId );
+    m_engine->ReleaseTexture(m_texId, m_fbId);
 }
 
 void drwDrawableTexture::DrawToTexture( bool drawTo )
@@ -83,14 +59,14 @@ void drwDrawableTexture::DrawToTexture( bool drawTo )
     if( drawTo )
     {
         assert( !m_isDrawingInTexture );
-        glGetIntegerv( GL_FRAMEBUFFER_BINDING, &m_backupFbId );
-		glBindFramebufferEXT( GL_FRAMEBUFFER_EXT, m_fbId );
+        m_engine->GetVariable(GL_FRAMEBUFFER_BINDING, &m_backupFbId);
+        m_engine->BindFrameBuffer(m_fbId);
         m_isDrawingInTexture = true;
     }
 	else
     {
         assert( m_isDrawingInTexture );
-        glBindFramebufferEXT( GL_FRAMEBUFFER_EXT, m_backupFbId );
+        m_engine->BindFrameBuffer(m_backupFbId);
         m_isDrawingInTexture = false;
     }
 }
@@ -101,47 +77,12 @@ void drwDrawableTexture::DrawToTexture( bool drawTo )
 // will happen.
 void drwDrawableTexture::PasteToScreen( int x, int y, int width, int height )
 {
-	glMatrixMode( GL_PROJECTION );
-	glPushMatrix();
-	glLoadIdentity();
-	gluOrtho2D( 0, m_width, 0, m_height );
-
-	glBindTexture( GL_TEXTURE_RECTANGLE_ARB, m_texId );
-	glBegin( GL_QUADS );
-	{
-		glTexCoord2i( x, y );					glVertex2d( x, y );
-		glTexCoord2i( x + width, y );			glVertex2d( x + width, y );
-		glTexCoord2i( x + width, y + height );	glVertex2d( x + width, y + height );
-		glTexCoord2i( x, y + height );			glVertex2d( x, y + height );
-	}
-    glEnd();
-	glBindTexture( GL_TEXTURE_RECTANGLE_ARB, 0 );
-
-	glPopMatrix();
-	glMatrixMode( GL_MODELVIEW );
+    m_engine->PasteTextureToScreen(m_texId, m_width, m_height, x, y, width, height);
 }
 
 void drwDrawableTexture::Clear( int x, int y, int width, int height )
 {
-    glDisable( GL_BLEND );
-    glMatrixMode( GL_PROJECTION );
-    glPushMatrix();
-    glLoadIdentity();
-    gluOrtho2D( 0, m_width, 0, m_height );
-
-    glColor4d( 0.0, 0.0, 0.0, 0.0 );
-    glBegin( GL_QUADS );
-    {
-        glVertex2d( x, y );
-        glVertex2d( x + width, y );
-        glVertex2d( x + width, y + height );
-        glVertex2d( x, y + height );
-    }
-    glEnd();
-
-    glPopMatrix();
-    glMatrixMode( GL_MODELVIEW );
-    glEnable( GL_BLEND );
+    m_engine->ClearScreen(m_width, m_height, x, y, width, height);
 }
 
 void drwDrawableTexture::PasteToScreen( int x, int y )
@@ -156,28 +97,20 @@ void drwDrawableTexture::PasteToScreen()
 
 void drwDrawableTexture::Upload( unsigned char * buffer )
 {
-    glBindTexture( GL_TEXTURE_RECTANGLE_ARB, m_texId );
-    glTexImage2D( GL_TEXTURE_RECTANGLE_ARB, 0, m_internalFormat, m_width, m_height, 0, m_pixelType, GL_UNSIGNED_BYTE, buffer );
-    glBindTexture( GL_TEXTURE_RECTANGLE_ARB, 0 );
+    m_engine->Upload(m_texId, 0, m_internalFormat, m_width, m_height, 0, m_pixelType, GL_UNSIGNED_BYTE, buffer);
 }
 
 void drwDrawableTexture::Download( unsigned char * buffer )
 {
-    glBindTexture( GL_TEXTURE_RECTANGLE_ARB, m_texId );
-    glGetTexImage( GL_TEXTURE_RECTANGLE_ARB, 0, m_downloadPixelType, GL_UNSIGNED_BYTE, buffer );
-    glBindTexture( GL_TEXTURE_RECTANGLE_ARB, 0 );
+    m_engine->Download(m_texId, 0, m_downloadPixelType, GL_UNSIGNED_BYTE, buffer);
 }
 
 void drwDrawableTexture::Download( unsigned short * buffer )
 {
-    glBindTexture( GL_TEXTURE_RECTANGLE_ARB, m_texId );
-    glGetTexImage( GL_TEXTURE_RECTANGLE_ARB, 0, m_downloadPixelType, GL_UNSIGNED_SHORT, buffer );
-    glBindTexture( GL_TEXTURE_RECTANGLE_ARB, 0 );
+    m_engine->Download(m_texId, 0, m_downloadPixelType, GL_UNSIGNED_SHORT, buffer);
 }
 
 void drwDrawableTexture::Download( float * buffer )
 {
-    glBindTexture( GL_TEXTURE_RECTANGLE_ARB, m_texId );
-    glGetTexImage( GL_TEXTURE_RECTANGLE_ARB, 0, GL_RED, GL_FLOAT, buffer );
-    glBindTexture( GL_TEXTURE_RECTANGLE_ARB, 0 );
+    m_engine->Download(m_texId, 0, GL_RED, GL_FLOAT, buffer);
 }

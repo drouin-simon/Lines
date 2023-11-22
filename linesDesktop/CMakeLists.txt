@@ -60,12 +60,12 @@ endif()
 #--------------------------------------------------------------------------------
 set( Drw_all_src ${Drw_src} ${Drw_hdr} ${Drw_moc} ${Drw_hdr_ui} )
 add_executable( ${ExecName} ${executable_flags} ${Drw_all_src} )
-target_link_libraries( ${ExecName} linesDesktopLib linesNetwork linesCore svl ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY} ${QT_LIBRARIES} )
+target_link_libraries( ${ExecName} linesDesktopLib linesNetwork linesCore GraphicsEngine svl ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY} ${QT_LIBRARIES} )
 qt5_use_modules( ${ExecName} OpenGL Widgets Network )
 if (APPLE)
     set_target_properties( ${ExecName} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_BINARY_DIR}/LinesInfo.plist )
 else()
-    target_link_libraries( ${ExecName} GLee )
+    target_link_libraries( ${ExecName} OpenGL::GL ${GLEW_LIBRARIES})
 endif()
 
 

@@ -1,6 +1,7 @@
 #ifndef LINE_H
 #define LINE_H
 
+#include "../GraphicsEngine/GraphicsEngine.h"
 #include "drwDataArray.h"
 #include "LinePrimitive.h"
 
@@ -30,6 +31,8 @@ protected:
     drwVec2Array   m_pointTable;
     drwIndexArray  m_pointIndex;
 
+private: 
+    IGraphicsEngine* m_engine;
 };
 
 #endif
