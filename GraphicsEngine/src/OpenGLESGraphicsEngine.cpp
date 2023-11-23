@@ -275,7 +275,7 @@ void OpenGLESGraphicsEngine::color4d(float red, float green, float blue, float a
     //glColor4d(red, green, blue, alpha);
 }
 
-GLuint OpenGLESGraphicsEngine::createProgram() {
+unsigned int OpenGLESGraphicsEngine::createProgram() {
     //return glCreateProgram();
 
     return 0;
