@@ -1,7 +1,7 @@
 #include "OpenGLESGraphicsEngine.h"
 
 void OpenGLESGraphicsEngine::SetViewPort(int x, int y, int width, int height) {
-    //glViewport(x, y, width, height);
+    glViewport(x, y, width, height);
 }
 
 void OpenGLESGraphicsEngine::SetProjectionViewPort(int x, int y, int width, int height) {
