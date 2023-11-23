@@ -6,6 +6,7 @@
 #include "IGraphicsEngine.h"
 
 class OpenGLESGraphicsEngine : public IGraphicsEngine {
+    // Abdellah
     void SetViewPort(int x, int y, int width, int height) override;
     void SetProjectionViewPort(int x, int y, int width, int height);
     void SetModelViewOrtho2D(double left, double right, double bottom, double top) override;
@@ -20,6 +21,8 @@ class OpenGLESGraphicsEngine : public IGraphicsEngine {
     void Download(unsigned int texId, int level, int format, int type, unsigned char* buffer) override;
     void Download(unsigned int texId, int level, int format, int type, unsigned short* buffer) override;
     void Download(unsigned int texId, int level, int format, int type, float* buffer) override;
+
+    // Nicolas
     void DrawPolygon(PolygonData& data, Vec4 color) override;
     void DrawLine(double* pointsBuffer, unsigned int* pointsIndexBuffer, size_t pointsIndexSize, double lineWidth, Vec4 color) override;
     void FillLine(double* poinstBuffer, unsigned int* indicesBuffer, size_t indicesSize, Vec4 color) override;
