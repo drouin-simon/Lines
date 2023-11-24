@@ -10,7 +10,7 @@ void drwFpsCounter::Start()
 {
     m_timeStamps.clear();
     m_timeStamps.reserve( 100000 );
-    m_time.start();
+    m_time = QTime(0, 0, 0, 0);
     m_isRunning = true;
 }
 
@@ -21,7 +21,7 @@ void drwFpsCounter::Stop()
 
 void drwFpsCounter::Tick()
 {
-    int current = m_time.elapsed();
+    int current = m_time.msecsSinceStartOfDay(); // TODO: Check if it works
     m_timeStamps.push_back( current );
 }
 

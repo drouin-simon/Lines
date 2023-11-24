@@ -79,7 +79,7 @@ void drwGradientWidget::paintEvent( QPaintEvent * event )
     Q_UNUSED(event)
 
     QPainter painter(this);
-	painter.setRenderHint( QPainter::HighQualityAntialiasing );
+	painter.setRenderHint( QPainter::Antialiasing );
 
 	// Draw gradient
     QPoint topLeft( 0, 0 );

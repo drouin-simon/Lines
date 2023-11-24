@@ -1,10 +1,13 @@
 #include "drwBitmapExporter.h"
 #include "drwGLRenderer.h"
 #include "Scene.h"
-#include <QGLFramebufferObject>
-#include <QGLPixelBuffer>
 #include <QFileInfo>
 #include <QDir>
+#include <QSurfaceFormat>
+#include <QWindow>
+#include <QOpenGLContext>
+#include <QOpenGLFramebufferObjectFormat>
+#include <QOpenGLFramebufferObject>
 
 drwBitmapExporter::drwBitmapExporter()
 : m_scene(0)
@@ -38,12 +41,6 @@ bool drwBitmapExporter::StartWriting()
 	
 	return true;
 }
-
-#include <QSurfaceFormat>
-#include <QWindow>
-#include <QOpenGLContext>
-#include <QOpenGLFramebufferObjectFormat>
-#include <QOpenGLFramebufferObject>
 
 void drwBitmapExporter::run()
 {

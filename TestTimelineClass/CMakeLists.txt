@@ -14,14 +14,14 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 #----------------------------------------
 # Use Qt
 #----------------------------------------
-find_package(Qt4 REQUIRED)
+find_package(Qt6 REQUIRED)
 set(QT_USE_QTOPENGL TRUE)
 include(${QT_USE_FILE})
 include_directories(${QT_INCLUDE_DIR})
 #----------------------------------------
 
 # moc Qt source file without a ui file
-qt4_wrap_cpp( Proj_moc ${Proj_hdr})
+qt_wrap_cpp( Proj_moc ${Proj_hdr})
 
 # Create and link executable
 set( Proj_all_src ${Proj_src} ${Proj_hdr} ${Proj_moc} )
