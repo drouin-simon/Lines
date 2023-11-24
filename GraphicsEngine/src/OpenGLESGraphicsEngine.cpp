@@ -222,24 +222,24 @@ void OpenGLESGraphicsEngine::SetupEraseTextureToScreen(Vec4 color) {
 }
 
 void OpenGLESGraphicsEngine::ResetTextureState() {
-    //glBlendEquation(GL_FUNC_ADD);
-    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendEquation(GL_FUNC_ADD);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void OpenGLESGraphicsEngine::enableScissorTest() {
-    //glEnable(GL_SCISSOR_TEST);
+    glEnable(GL_SCISSOR_TEST);
 }
 
 void OpenGLESGraphicsEngine::disableScissorTest() {
-    //glDisable(GL_SCISSOR_TEST);
+    glDisable(GL_SCISSOR_TEST);
 }
 
 void OpenGLESGraphicsEngine::enable(unsigned int cap) {
-    //glEnable(cap);
+    glEnable(cap);
 }
 
 void OpenGLESGraphicsEngine::scissor(int x, int y, int width, int height) {
-    //glScissor(x, y, width, height);
+    glScissor(x, y, width, height);
 }
 
 void OpenGLESGraphicsEngine::initializeState() {
@@ -256,15 +256,15 @@ void OpenGLESGraphicsEngine::initializeModelViewMatrix() {
 }
 
 void OpenGLESGraphicsEngine::clear() {
-    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void OpenGLESGraphicsEngine::clear(unsigned int mask) {
-    //glClear(mask);
+    glClear(mask);
 }
 
 void OpenGLESGraphicsEngine::clearColor(float red, float green, float blue, float alpha) {
-    //glClearColor(red, green, blue, alpha);
+    glClearColor(red, green, blue, alpha);
 }
 
 void OpenGLESGraphicsEngine::blendFunc(unsigned int sfactor, unsigned int dfactor) {
@@ -276,25 +276,23 @@ void OpenGLESGraphicsEngine::color4d(float red, float green, float blue, float a
 }
 
 unsigned int OpenGLESGraphicsEngine::createProgram() {
-    //return glCreateProgram();
-
-    return 0;
+    return glCreateProgram();
 }
 
 void OpenGLESGraphicsEngine::linkProgram(unsigned int glslProgram) {
-    //glLinkProgram(glslProgram);
+    glLinkProgram(glslProgram);
 }
 
 void OpenGLESGraphicsEngine::attachShader(unsigned int glslProgram, unsigned int glslVertexShader) {
-    //glAttachShader(glslProgram, glslVertexShader);
+    glAttachShader(glslProgram, glslVertexShader);
 }
 
 void OpenGLESGraphicsEngine::getProgramIv(unsigned int program, unsigned int pname, int* params) {
-    //glGetProgramiv(program, pname, params);
+    glGetProgramiv(program, pname, params);
 }
 
 void OpenGLESGraphicsEngine::getProgramInfoLog(unsigned int program, int maxLength, int* length, char* infoLog) {
-   // glGetProgramInfoLog(program, maxLength, length, infoLog);
+   glGetProgramInfoLog(program, maxLength, length, infoLog);
 }
 
 void OpenGLESGraphicsEngine::pushName(unsigned int name) {
@@ -314,41 +312,37 @@ void OpenGLESGraphicsEngine::popName() {
 }
 
 void OpenGLESGraphicsEngine::BindFrameBuffer(unsigned int fbId) {
-    //glBindFramebuffer(GL_FRAMEBUFFER, fbId);
+    glBindFramebuffer(GL_FRAMEBUFFER, fbId);
 }
 
 bool OpenGLESGraphicsEngine::SetVariable(unsigned int programId, const char* name, int value) {
-    //int location = glGetUniformLocation(programId, name);
-    //if (location != -1)
-    //{
-    //    glUniform1i(location, value);
-    //    return true;
-    //}
-    //return false;
-
-    return true;
+    int location = glGetUniformLocation(programId, name);
+    if (location != -1)
+    {
+        glUniform1i(location, value);
+        return true;
+    }
+    return false;
 }
 
 bool OpenGLESGraphicsEngine::SetVariable(unsigned int programId, const char* name, float value) {
-    //int location = glGetUniformLocation(programId, name);
-    //if (location != -1)
-    //{
-    //    glUniform1f(location, value);
-    //    return true;
-    //}
-    //return false;
-
-    return true;
+    int location = glGetUniformLocation(programId, name);
+    if (location != -1)
+    {
+        glUniform1f(location, value);
+        return true;
+    }
+    return false;
 }
 
 void OpenGLESGraphicsEngine::GetVariable(unsigned int name, int* value) {
-    //glGetIntegerv(name, value);
+    glGetIntegerv(name, value);
 }
 
 void OpenGLESGraphicsEngine::DeleteShader(unsigned int shaderId) {
-    //glDeleteShader(shaderId);
+    glDeleteShader(shaderId);
 }
 
 void OpenGLESGraphicsEngine::DeleteProgram(unsigned int programId) {
-    //glDeleteProgram(programId);
+    glDeleteProgram(programId);
 }
