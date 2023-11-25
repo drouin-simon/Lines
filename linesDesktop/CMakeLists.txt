@@ -1,5 +1,12 @@
 set( ExecName Lines )
 
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 set( Drw_src  main.cpp 
 		MainWindow.cpp 
 		PlaybackControlerWidget.cpp 
@@ -63,7 +70,6 @@ endif()
 set( Drw_all_src ${Drw_src} ${Drw_hdr} ${Drw_moc} ${Drw_hdr_ui} )
 add_executable( ${ExecName} ${executable_flags} ${Drw_all_src} )
 target_link_libraries( ${ExecName} linesDesktopLib linesNetwork linesCore GraphicsEngine svl ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY} ${QT_LIBRARIES} )
-#qt_use_modules( ${ExecName} OpenGL Widgets Network )
 target_link_libraries(${ExecName} OpenGL Widgets Network)
 if (APPLE)
     set_target_properties( ${ExecName} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_BINARY_DIR}/LinesInfo.plist )

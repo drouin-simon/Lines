@@ -2,6 +2,13 @@ PROJECT( Lines )
 
 cmake_minimum_required(VERSION 3.1)
 
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 add_compile_definitions(QT_DISABLE_DEPRECATED_UP_TO=0x050F00)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
@@ -31,14 +38,6 @@ find_package( Qt6 COMPONENTS Widgets OpenGL Network REQUIRED OpenGLWidgets)
 include_directories( ${Qt6Widgets_INCLUDE_DIRS} )
 include_directories( ${Qt6OpenGL_INCLUDE_DIRS} )
 include_directories( ${Qt6Network_INCLUDE_DIRS} )
-#----------------------------------------
-
-#----------------------------------------
-# Tell the compiler to use c++11 which is required with Qt >= 5.7
-#if( Qt5_VERSION VERSION_GREATER 5.7 OR Qt5_VERSION VERSION_EQUAL 5.7 )
-#    set( CMAKE_CXX_STANDARD 11 )
-#endif()
-set( CMAKE_CXX_STANDARD 17 )
 #----------------------------------------
 
 #----------------------------------------

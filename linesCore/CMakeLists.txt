@@ -1,5 +1,12 @@
 set( LibName linesCore )
 
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 project( ${LibName} )
 
 set( ${LibName}_src drwToolbox.cpp drwLineTool.cpp drwGlslShader.cpp drwCamera.cpp
@@ -30,3 +37,4 @@ add_dependencies( ${LibName} svl )
 # Define include directory for this lib
 set( linesCoreIncludeDirs ${CMAKE_CURRENT_SOURCE_DIR} PARENT_SCOPE )
 target_link_libraries( ${LibName} PRIVATE libglew_static )
+target_link_libraries(${LibName} PRIVATE Qt6::OpenGLWidgets)
