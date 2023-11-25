@@ -38,6 +38,7 @@ find_package( Qt6 COMPONENTS Widgets OpenGL Network REQUIRED OpenGLWidgets)
 include_directories( ${Qt6Widgets_INCLUDE_DIRS} )
 include_directories( ${Qt6OpenGL_INCLUDE_DIRS} )
 include_directories( ${Qt6Network_INCLUDE_DIRS} )
+include_directories( ${Qt6OpenGLWidgets_INCLUDE_DIRS} )
 #----------------------------------------
 
 #----------------------------------------

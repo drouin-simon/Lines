@@ -174,9 +174,9 @@ void MainWindow::CreateActions()
 	// Creates a file menu
     QMenu * file = menuBar()->addMenu( "&File" );
     m_fileNewAction = file->addAction( "New", this, SLOT( fileNew() ), Qt::CTRL + Qt::Key_N );
-    m_fileOpenAction = file->addAction( "Open...", this, SLOT( fileOpen() ), Qt::CTRL + Qt::Key_O );
+    m_fileOpenAction = file->addAction( "Open...", this, SLOT( fileOpen() ), Qt::CTRL | Qt::Key_O );
 	file->addAction( "Save", this, SLOT( fileSave() ), Qt::CTRL + Qt::Key_S );
-	file->addAction( "Save As...", this, SLOT( fileSaveAs() ), Qt::SHIFT + Qt::CTRL + Qt::Key_S );
+	file->addAction( "Save As...", this, SLOT( fileSaveAs() ), Qt::SHIFT | Qt::CTRL | Qt::Key_S );
 	file->addAction( "Export...", this, SLOT( fileExport() ) );
     file->addAction( "&Exit", this, SLOT( close() ) );
     connect( file, SIGNAL(aboutToShow()), this, SLOT(fileMenuAboutToShow()) );

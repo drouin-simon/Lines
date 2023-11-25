@@ -42,6 +42,7 @@ set( DrawLib_all_src ${DrawLib_src} ${DrawLib_moc} ${DrawLib_hdr} ${DrawLib_hdr_
 add_library( ${LibName} ${DrawLib_all_src} )
 
 target_link_libraries( ${LibName} libglew_static )
+target_link_libraries(${LibName} OpenGLWidgets)
 
 #================================
 # Define include dir for dependent projects
