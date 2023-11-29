@@ -1,12 +1,5 @@
 set( ExecName Lines )
 
-set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
-
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
 set( Drw_src  main.cpp 
 		MainWindow.cpp 
 		PlaybackControlerWidget.cpp 
@@ -70,8 +63,7 @@ endif()
 set( Drw_all_src ${Drw_src} ${Drw_hdr} ${Drw_moc} ${Drw_hdr_ui} )
 add_executable( ${ExecName} ${executable_flags} ${Drw_all_src} )
 target_link_libraries( ${ExecName} linesDesktopLib linesNetwork linesCore GraphicsEngine svl ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY} ${QT_LIBRARIES} )
-target_link_libraries( ${ExecName} Qt6::OpenGL Qt6::Widgets Qt6::Network Qt6::OpenGLWidgets )
-
+target_link_libraries( ${ExecName} Qt6::OpenGL Qt6::Widgets Qt6::Network )
 if (APPLE)
     set_target_properties( ${ExecName} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_BINARY_DIR}/LinesInfo.plist )
 else()
@@ -85,7 +77,7 @@ endif()
 #PrintVariables()
 
 # Run Qt deployment tool for each platform
-get_target_property( QMakeLocation Qt${QT_VERSION_MAJOR}::qmake LOCATION)
+get_target_property( QMakeLocation Qt6::qmake LOCATION)
 get_filename_component( QtBinLocation ${QMakeLocation} DIRECTORY )
 if( APPLE )
     set( MacDeployQtExec ${QtBinLocation}/macdeployqt )
