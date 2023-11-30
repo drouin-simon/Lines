@@ -52,7 +52,7 @@ IF(APPLE)
 ENDIF(APPLE)
 #--------------------------------------------------------------------------------
 
-if( WIN32 )
+if( WIN32 )-
 	set( executable_flags WIN32 )
         set( Drw_src ${Drw_src} Lines.rc )
 endif()
@@ -63,7 +63,7 @@ endif()
 set( Drw_all_src ${Drw_src} ${Drw_hdr} ${Drw_moc} ${Drw_hdr_ui} )
 add_executable( ${ExecName} ${executable_flags} ${Drw_all_src} )
 target_link_libraries( ${ExecName} linesDesktopLib linesNetwork linesCore GraphicsEngine svl ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY} ${QT_LIBRARIES} )
-target_link_libraries( ${ExecName} Qt6::OpenGL Qt6::Widgets Qt6::Network )
+target_link_libraries( ${ExecName} Qt6::OpenGL Qt6::Widgets Qt6::Network Qt6::OpenGLWidgets )
 if (APPLE)
     set_target_properties( ${ExecName} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_BINARY_DIR}/LinesInfo.plist )
 else()
