@@ -52,7 +52,7 @@ IF(APPLE)
 ENDIF(APPLE)
 #--------------------------------------------------------------------------------
 
-if( WIN32 )-
+if( WIN32 )
 	set( executable_flags WIN32 )
         set( Drw_src ${Drw_src} Lines.rc )
 endif()
