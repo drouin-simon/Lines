@@ -11,7 +11,7 @@ void OpenGLGraphicsEngine::SetProjectionViewPort(int x, int y, int width, int he
     glLoadIdentity();
 }
 void OpenGLGraphicsEngine::SetModelViewOrtho2D(double left, double right, double bottom, double top) {
-    gluOrtho2D(left, right, bottom, top);
+    glOrtho(left, right, bottom, top, -1, 1);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 }
@@ -71,7 +71,7 @@ void OpenGLGraphicsEngine::PasteTextureToScreen(unsigned int texId, int texWidth
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
-    gluOrtho2D(0, texWidth, 0, texHeight);
+    glOrtho(0, texWidth, 0, texHeight, -1, 1);
 
     glBindTexture(GL_TEXTURE_RECTANGLE_ARB, texId);
     glBegin(GL_QUADS);
@@ -100,7 +100,7 @@ void OpenGLGraphicsEngine::ClearScreen(int texWidth, int texHeight, int x, int y
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
-    gluOrtho2D(0, texWidth, 0, texHeight);
+    glOrtho(0, texWidth, 0, texHeight, -1, 1);
 
     glColor4d(0.0, 0.0, 0.0, 0.0);
     glBegin(GL_QUADS);

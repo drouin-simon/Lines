@@ -44,7 +44,7 @@ function(windeployqt target directory)
             env PATH="${_qt_bin_dir}" "${WINDEPLOYQT_EXECUTABLE}"
                 --verbose 0
                 --no-compiler-runtime
-                --no-angle
+                #--no-angle
                 --no-opengl-sw
                 \"$<TARGET_FILE:${target}>\"
     )
@@ -66,7 +66,6 @@ function(windeployqt target directory)
                 env PATH=\"${_qt_bin_dir}\" \"${WINDEPLOYQT_EXECUTABLE}\"
                     --dry-run
                     --no-compiler-runtime
-                    --no-angle
                     --no-opengl-sw
                     --list mapping
                     \${_file}
