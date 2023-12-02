@@ -1,40 +1,52 @@
 name: CMake on Multiple Platforms
 
-on:
-  push
+on: push
 
 env:
   BUILD_TYPE: Release
+  QT_VERSION: "6.6.0"
 
 jobs:
   build:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            host: linux
+          - os: windows-latest
+            host: windows
+          - os: macos-latest
+            host: mac
 
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    - name: Install dependencies
-      if: matrix.os == 'ubuntu-latest'
-      run: |
-        sudo apt-get update && sudo apt-get install -y libglu1-mesa-dev
+      - name: Install dependencies on Ubuntu
+        if: matrix.os == 'ubuntu-latest'
+        run: sudo apt-get update && sudo apt-get install -y libglu1-mesa-dev
 
-    - name: Install Qt
-      uses: jurplel/install-qt-action@v3
-      with:
-        version: '5.15.2'
-        host: ${{ (matrix.os == 'ubuntu-latest' && 'linux') || (matrix.os == 'macos-latest' && 'mac') || (matrix.os == 'windows-latest' && 'windows') }}
-        target: desktop
+      - name: Install Qt
+        uses: jurplel/install-qt-action@727bfe75193759a6fe1ca38c6d3f0bcfa68dada8
+        with:
+          version: ${{ env.QT_VERSION }}
+          host: ${{ matrix.host }}
+          target: desktop
+          cache: true
+          cache-key-prefix: "install-qt-action"
 
-    - name: Configure CMake
-      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+      - name: Configure CMake on Ubuntu and MacOS
+        if: matrix.os != 'windows-latest'
+        run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
-    - name: Build
-      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+      - name: Configure CMake on Windows
+        if: matrix.os == 'windows-latest'
+        run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_CXX_FLAGS="/Zc:__cplusplus /permissive-"
 
-    - name: Test
-      working-directory: ${{github.workspace}}/build
-      run: ctest -C ${{env.BUILD_TYPE}}
+      - name: Build
+        run: cmake --build ${{github.workspace}}/build -j8 --config ${{env.BUILD_TYPE}}
 
+      - name: Test
+        working-directory: ${{github.workspace}}/build
+        run: ctest -C ${{env.BUILD_TYPE}}
