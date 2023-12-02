@@ -10,7 +10,7 @@
 
 #if defined(__APPLE__) && defined(__MACH__)
 #include <OpenGL/gl.h>
-#include <OpenGL/glew.h>
+//#include <OpenGL/glew.h>
 #else
 #include <GL/gl.h>
 #include <GL/glew.h>
