@@ -1,5 +1,12 @@
 set( ExecName Lines )
 
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 set( Drw_src  main.cpp 
 		MainWindow.cpp 
 		PlaybackControlerWidget.cpp 
@@ -56,25 +63,29 @@ if( WIN32 )
 	set( executable_flags WIN32 )
         set( Drw_src ${Drw_src} Lines.rc )
 endif()
+#--------------------------------------------------------------------------------
+
+if ( __ANDROID__ )
+    set( executable_flags MANUAL_FINALIZATION )
+endif()
 
 #--------------------------------------------------------------------------------
 # Create and link executable
 #--------------------------------------------------------------------------------
 set( Drw_all_src ${Drw_src} ${Drw_hdr} ${Drw_moc} ${Drw_hdr_ui} )
-add_executable( ${ExecName} ${executable_flags} ${Drw_all_src} )
-target_link_libraries( ${ExecName} linesDesktopLib linesNetwork linesCore GraphicsEngine svl ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY} ${QT_LIBRARIES} )
-target_link_libraries( ${ExecName} Qt6::OpenGL Qt6::Widgets Qt6::Network Qt6::OpenGLWidgets )
+qt_add_executable( ${ExecName} ${executable_flags} ${Drw_all_src} )
+target_link_libraries( ${ExecName} PRIVATE linesDesktopLib linesNetwork linesCore GraphicsEngine svl ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY} ${QT_LIBRARIES} )
+target_link_libraries( ${ExecName} PRIVATE Qt6::OpenGL Qt6::Widgets Qt6::Network Qt6::OpenGLWidgets )
 if (APPLE)
     set_target_properties( ${ExecName} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_BINARY_DIR}/LinesInfo.plist )
 else()
-    target_link_libraries( ${ExecName} OpenGL::GL libglew_static)
+    target_link_libraries( ${ExecName} PRIVATE OpenGL::GL libglew_static)
 endif()
 
 
 #--------------------------------------------------------------------------------
 # INSTALL
 #--------------------------------------------------------------------------------
-#PrintVariables()
 
 # Run Qt deployment tool for each platform
 get_target_property( QMakeLocation Qt6::qmake LOCATION)
@@ -93,6 +104,8 @@ elseif( WIN32 )
    # on Windows, we use WinDeployQt. CPack below is creating an installer using NSIS
    include(${CMAKE_EXT_DIR}/windeployqt.cmake)
    windeployqt( ${ExecName} . )
+else()
+    qt_finalize_executable(${ExecName})
 endif()
 
 #--------------------------------------------------------------------------------
