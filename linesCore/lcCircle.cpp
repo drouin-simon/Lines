@@ -10,7 +10,7 @@ Circle::Circle() : Center( Vec2( 0, 0 ) )
     Contour = false;
     Fill = true;
 
-    m_engine = new GraphicsEngine();
+    m_engine = GraphicsEngineManager::getGraphicsEngine();
 }
 
 Circle::~Circle()

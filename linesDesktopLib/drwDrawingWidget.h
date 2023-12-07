@@ -1,7 +1,7 @@
 #ifndef __drwDrawingWidget_h_
 #define __drwDrawingWidget_h_
 
-#include "../GraphicsEngine/GraphicsEngine.h"
+#include "../GraphicsEngine/include/GraphicsEngineManager.h"
 
 #include <QOpenGLWidget>
 #include "drwCommand.h"
@@ -20,6 +20,8 @@ public:
 		
     drwDrawingWidget( QWidget * parent );
 	~drwDrawingWidget();
+
+	//void initializeGL();
 
     void SetLinesCore( LinesCore * lc ) { m_lines = lc; }
 

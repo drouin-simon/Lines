@@ -1,7 +1,7 @@
 #ifndef __drwCamera_h_
 #define __drwCamera_h_
 
-#include "../GraphicsEngine/GraphicsEngine.h"
+#include "../GraphicsEngine/include/GraphicsEngineManager.h"
 
 class drwCamera
 {

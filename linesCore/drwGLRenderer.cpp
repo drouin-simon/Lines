@@ -7,12 +7,12 @@
 #include "Primitive.h"
 #include "drwDrawingSurface.h"
 #include "Box2i.h"
-#include "../GraphicsEngine/GraphicsEngine.h"
+#include "../GraphicsEngine/include/GraphicsEngineManager.h"
 #include <algorithm>
 
 drwGLRenderer::drwGLRenderer()
 {
-    m_engine = new GraphicsEngine();
+    m_engine = GraphicsEngineManager::getGraphicsEngine();
 
     // Onion Skin
     m_inOnionFrame = -1;

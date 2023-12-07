@@ -13,7 +13,7 @@ drwDrawableTexture::drwDrawableTexture()
 	, m_width(1)
 	, m_height(1)
 {
-    m_engine = new GraphicsEngine();
+    m_engine = GraphicsEngineManager::getGraphicsEngine();
 }
 
 drwDrawableTexture::~drwDrawableTexture()

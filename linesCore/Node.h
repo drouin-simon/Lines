@@ -1,7 +1,7 @@
 #ifndef __Node_h_
 #define __Node_h_
 
-#include "../GraphicsEngine/GraphicsEngine.h"
+#include "../GraphicsEngine/include/GraphicsEngineManager.h"
 #include "macros.h"
 #include "SharedPtrMacro.h"
 

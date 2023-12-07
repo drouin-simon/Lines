@@ -2,7 +2,6 @@
 #include <iostream>
 #include <stdio.h>
 #include <stdarg.h>
-#include "../GraphicsEngine/GraphicsEngine.h"
 
 using namespace std;
 
@@ -12,7 +11,7 @@ drwGlslShader::drwGlslShader()
 	, m_glslProg(0)
 	, m_init( false )
 {
-    m_engine = new GraphicsEngine();
+    m_engine = GraphicsEngineManager::getGraphicsEngine();
 }
 
 drwGlslShader::~drwGlslShader() 

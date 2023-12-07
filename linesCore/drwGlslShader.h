@@ -1,6 +1,8 @@
 #ifndef __drwGlslShader_h_
 #define __drwGlslShader_h_
 
+#include "../GraphicsEngine/include/GraphicsEngineManager.h"
+
 #include <string>
 #include <vector>
 

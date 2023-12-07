@@ -6,11 +6,21 @@
 #include <SVL.h>
 #include <assert.h>
 
+#include <QOpenGLContext>
+
 // TODO: Use SVL to make Vec3/4
 class IGraphicsEngine
 {
+protected:
+    QOpenGLContext* context;
+
 public:
+
     virtual void initialize() = 0;
+
+    void setContext(QOpenGLContext* newContext) {
+        this->context = newContext;
+    }
 
     // drwCamera.cpp
     virtual void SetViewPort(int x, int y, int width, int height) = 0;

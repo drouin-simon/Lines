@@ -1,7 +1,7 @@
 #ifndef __drwDrawableTexture_h_
 #define __drwDrawableTexture_h_
 
-#include "../GraphicsEngine/GraphicsEngine.h"
+#include "../GraphicsEngine/include/GraphicsEngineManager.h"
 
 class drwDrawableTexture
 {

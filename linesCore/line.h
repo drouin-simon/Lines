@@ -1,7 +1,7 @@
 #ifndef LINE_H
 #define LINE_H
 
-#include "../GraphicsEngine/GraphicsEngine.h"
+#include "../GraphicsEngine/include/GraphicsEngineManager.h"
 #include "drwDataArray.h"
 #include "LinePrimitive.h"
 

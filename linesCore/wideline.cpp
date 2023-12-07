@@ -20,7 +20,7 @@ WideLine::WideLine( double width )
 , m_prevPressure( 1.0 )
 , m_doneAddingPoints( false )
 {
-    m_engine = new GraphicsEngine();
+    m_engine = GraphicsEngineManager::getGraphicsEngine();
 }
 
 

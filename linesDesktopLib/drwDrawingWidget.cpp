@@ -21,7 +21,7 @@ drwDrawingWidget::drwDrawingWidget( QWidget * parent )
     setUpdateBehavior( QOpenGLWidget::PartialUpdate );  // allows to redraw only part of the window
     EnableVSync( false );
 
-    m_engine = new GraphicsEngine();
+    m_engine = GraphicsEngineManager::getGraphicsEngine();
 }
 
 drwDrawingWidget::~drwDrawingWidget()
@@ -60,6 +60,7 @@ void drwDrawingWidget::NotifyPlaybackStartStop( bool isStarting )
 
 void drwDrawingWidget::initializeGL()
 {
+    m_engine->setContext(QOpenGLContext::currentContext());
     m_engine->initialize();
 }
 

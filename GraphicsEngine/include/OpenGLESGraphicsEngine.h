@@ -3,9 +3,21 @@
 
 #include "IncludeGLES.h"
 
+#include <QImage>
+#include <QOpenGLTexture>
+#include <QOpenGLShaderProgram>
+#include <QOpenGLBuffer>
+#include <QOpenGLContext>
+#include <QOpenGLVertexArrayObject>
+#include <QOpenGLExtraFunctions>
+#include <QPropertyAnimation>
+#include <QSequentialAnimationGroup>
+#include <QTimer>
+
 #include "IGraphicsEngine.h"
-//#include <glm/glm.hpp>
-//#include <glm/gtc/matrix_transform.hpp>
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 class OpenGLESGraphicsEngine : public IGraphicsEngine {
 
@@ -22,7 +34,7 @@ public:
         BLEND = 0x0BE2
     };
 
-    //OpenGLESGraphicsEngine();
+    OpenGLESGraphicsEngine();
     //virtual ~OpenGLESGraphicsEngine();
 
     void initialize() ;
@@ -95,13 +107,16 @@ public:
 
     void Flush();
 
+    QOpenGLFunctions* openglFunctions;
 
-    //GLuint vertexShader;
-    //GLuint fragmentShader;
-    //unsigned int programId;
+    //QOpenGLExtraFunctions* openglFunctions;
 
-    //glm::mat4 projectionMatrix;
-    //glm::mat4 modelViewMatrix;
+    GLuint vertexShader;
+    GLuint fragmentShader;
+    unsigned int programId;
+
+    glm::mat4 projectionMatrix;
+    glm::mat4 modelViewMatrix;
 
 };
 

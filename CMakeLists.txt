@@ -96,6 +96,15 @@ if (NOT ANDROID)
     endif()
 endif()
 
+message(STATUS "Fetching GLM")
+include(FetchContent)
+FetchContent_Declare(
+    glm
+    GIT_REPOSITORY https://github.com/g-truc/glm
+    GIT_TAG 0.9.9.8
+)
+FetchContent_MakeAvailable(glm)
+include_directories("${glm_SOURCE_DIR}")
 
 add_subdirectory( linesCore )
 add_subdirectory( linesNetwork )

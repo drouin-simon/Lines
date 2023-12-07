@@ -78,11 +78,10 @@ public:
     bool CreateAndCompileFragmentShader(unsigned& shaderId, std::vector< std::string >& files, std::vector< std::string >& memSources) ;
     bool LoadOneShaderSource(const char* filename, std::string& shaderSource);
 
-    void BlendMaxEquation() ;
-    void UseProgram(unsigned int programId) ;
-    void DrawToTexture(unsigned int& fbId, int& backupFbId) ;
+    void BlendMaxEquation();
+    void UseProgram(unsigned int programId);
+    void DrawToTexture(unsigned int& fbId, int& backupFbId);
     void Flush() ;
-
 };
 
 #endif // __OpenGLGraphicsEngine_h_
