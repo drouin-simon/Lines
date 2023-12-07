@@ -34,7 +34,13 @@ qt_add_resources( LinesLib_rcs_src ${LinesLib_rcs})
 set( DrawLib_all_src ${DrawLib_src} ${DrawLib_moc} ${DrawLib_hdr} ${DrawLib_hdr_moc} ${DrawLib_hdr_ui} ${LinesLib_rcs_src} )
 add_library( ${LibName} ${DrawLib_all_src} )
 
-target_link_libraries( ${LibName} libglew_static Qt6::OpenGLWidgets )
+if (ANDROID)
+    target_link_libraries( ${LibName} Qt6::OpenGLWidgets)
+else()
+    target_link_libraries( ${LibName} libglew_static Qt6::OpenGLWidgets )
+endif()
+
+
 
 #================================
 # Define include dir for dependent projects

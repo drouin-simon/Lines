@@ -26,7 +26,10 @@ include_directories(${linesDesktopLibIncludeDirs})
 # Include bin directory for moc files
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-include_directories(${glew_SOURCE_DIR} ${glew_BINARY_DIR})
+if (NOT ANDROID)
+    include_directories(${glew_SOURCE_DIR} ${glew_BINARY_DIR})
+endif()
+
 
 # Create classes from Qt ui files
 set( Drw_ui ExportDialog.ui LinesPreferencesWidget.ui )
@@ -61,11 +64,12 @@ ENDIF(APPLE)
 
 if( WIN32 )
 	set( executable_flags WIN32 )
-        set( Drw_src ${Drw_src} Lines.rc )
+    set( Drw_src ${Drw_src} Lines.rc )
 endif()
 #--------------------------------------------------------------------------------
 
-if ( __ANDROID__ )
+
+if ( ANDROID )
     set( executable_flags MANUAL_FINALIZATION )
 endif()
 
@@ -74,11 +78,21 @@ endif()
 #--------------------------------------------------------------------------------
 set( Drw_all_src ${Drw_src} ${Drw_hdr} ${Drw_moc} ${Drw_hdr_ui} )
 qt_add_executable( ${ExecName} ${executable_flags} ${Drw_all_src} )
-target_link_libraries( ${ExecName} PRIVATE linesDesktopLib linesNetwork linesCore GraphicsEngine svl ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY} ${QT_LIBRARIES} )
-target_link_libraries( ${ExecName} PRIVATE Qt6::OpenGL Qt6::Widgets Qt6::Network Qt6::OpenGLWidgets )
-if (APPLE)
-    set_target_properties( ${ExecName} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_BINARY_DIR}/LinesInfo.plist )
+
+if (ANDROID)
+    target_link_libraries( ${ExecName} PRIVATE Qt6::Widgets Qt6::Network Qt6::OpenGLWidgets )
 else()
+    target_link_libraries( ${ExecName} PRIVATE Qt6::OpenGL Qt6::Widgets Qt6::Network Qt6::OpenGLWidgets )
+endif()
+
+if (APPLE)
+    set_target_properties( ${ExecName} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_BINARY_DIR}/LinesInfo.plist )  
+elseif(ANDROID)
+    target_link_libraries( ${ExecName} PRIVATE linesDesktopLib linesNetwork linesCore GraphicsEngine svl ${QT_LIBRARIES} )
+    target_link_libraries( ${ExecName})
+else()
+    target_link_libraries( ${ExecName} PRIVATE linesDesktopLib linesNetwork linesCore GraphicsEngine svl ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY} ${QT_LIBRARIES} )
+    find_package(OpenGL)
     target_link_libraries( ${ExecName} PRIVATE OpenGL::GL libglew_static)
 endif()
 

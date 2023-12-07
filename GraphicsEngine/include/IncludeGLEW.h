@@ -8,7 +8,11 @@
 
 #if !(defined(__APPLE__) && defined(__MACH__))
 #define NOMINMAX
-#include <GL/glew.h>
-#endif
+
+    #if !(defined(__ANDROID__))
+        #include <GL/glew.h>
+    #endif
 
 #endif
+
+#endif // __IncludeGLEW_h_
