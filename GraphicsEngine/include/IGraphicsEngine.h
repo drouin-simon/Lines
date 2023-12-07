@@ -83,7 +83,7 @@ public:
     virtual void BlendMaxEquation() = 0;
     virtual void UseProgram(unsigned int programId) = 0;
 
-    virtual void DrawToTexture(int& backupFbId) = 0;
+    virtual void DrawToTexture(unsigned int& fbId, int& backupFbId) = 0;
 
     virtual void Flush() = 0;
 };

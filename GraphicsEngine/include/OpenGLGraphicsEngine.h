@@ -81,7 +81,7 @@ public:
     void BlendMaxEquation() override;
     void UseProgram(unsigned int programId) override;
 
-    void DrawToTexture(int& backupFbId) override;
+    void DrawToTexture(unsigned int& fbId, int& backupFbId) override;
 
     void Flush() override;
 

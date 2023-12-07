@@ -512,7 +512,7 @@ void OpenGLESGraphicsEngine::UseProgram(unsigned int programId) {
     //glUseProgram(programId);
 }
 
-void OpenGLESGraphicsEngine::DrawToTexture(int& backupFbId) {
+void OpenGLESGraphicsEngine::DrawToTexture(int& fbId, int& backupFbId) {
     //this->GetVariable(GL_FRAMEBUFFER_BINDING, &backupFbId);
     //this->BindFrameBuffer(backupFbId);
 }

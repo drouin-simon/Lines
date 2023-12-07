@@ -59,7 +59,7 @@ void drwDrawableTexture::DrawToTexture( bool drawTo )
     if( drawTo )
     {
         assert( !m_isDrawingInTexture );
-        m_engine->DrawToTexture(m_backupFbId);
+        m_engine->DrawToTexture(m_fbId, m_backupFbId);
         m_isDrawingInTexture = true;
     }
 	else

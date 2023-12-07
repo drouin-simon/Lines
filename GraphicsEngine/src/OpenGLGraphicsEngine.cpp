@@ -433,9 +433,9 @@ void OpenGLGraphicsEngine::UseProgram(unsigned int programId) {
     glUseProgram(programId);
 }
 
-void OpenGLGraphicsEngine::DrawToTexture(int &backupFbId) {
+void OpenGLGraphicsEngine::DrawToTexture(unsigned int& fbId, int &backupFbId) {
     this->GetVariable(GL_FRAMEBUFFER_BINDING, &backupFbId);
-    this->BindFrameBuffer(backupFbId);
+    this->BindFrameBuffer(fbId);
 }
 
 void OpenGLGraphicsEngine::Flush() {
