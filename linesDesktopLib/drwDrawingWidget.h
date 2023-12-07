@@ -69,7 +69,7 @@ private:
     bool m_muteMouse;
     bool m_tabletHasControl;  // make sur not to generate both mouse and tablet events
 
-	GraphicsEngine* m_engine;
+	IGraphicsEngine* m_engine;
 }; 
 
 #endif // __drwDrawingWidget_h_

@@ -31,7 +31,7 @@ bool OpenGLGraphicsEngine::LoadOneShaderSource(const char* filename, std::string
 void OpenGLGraphicsEngine::initialize() {
     GLenum err = glewInit();
     if (err != GLEW_OK) {
-        throw("Failed to initialize GLEW: %s", glewGetErrorString(err));
+        //throw("Failed to initialize GLEW: %s", glewGetErrorString(err));
     }
 }
 

@@ -16,29 +16,29 @@ std::string readShaderFile(const std::string& filePath) {
     //return buffer.str();
 }
 
-OpenGLESGraphicsEngine::OpenGLESGraphicsEngine() {
+//OpenGLESGraphicsEngine::OpenGLESGraphicsEngine() {
+//
+//    //this->programId = 0;
+//
+//    //const GLchar* vertexShaderCode = readShaderFile("shader/vertexShader.glsl").c_str();
+//    //const GLchar* fragmentShaderCode = readShaderFile("shader/fragmentShader.glsl").c_str();
+//
+//    //// Configuration initiale des matrices
+//
+//    //projectionMatrix = glm::mat4(1.0f);
+//    //modelViewMatrix = glm::mat4(1.0f);
+//
+//    //this->vertexShader = glCreateShader(GL_VERTEX_SHADER);
+//    //glShaderSource(this->vertexShader, 1, &vertexShaderCode, nullptr);
+//    //glCompileShader(this->vertexShader);
+//
+//
+//    //this->fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+//    //glShaderSource(this->fragmentShader, 1, &fragmentShaderCode, nullptr);
+//    //glCompileShader(this->fragmentShader);
+//}
 
-    //this->programId = 0;
-
-    //const GLchar* vertexShaderCode = readShaderFile("shader/vertexShader.glsl").c_str();
-    //const GLchar* fragmentShaderCode = readShaderFile("shader/fragmentShader.glsl").c_str();
-
-    //// Configuration initiale des matrices
-
-    //projectionMatrix = glm::mat4(1.0f);
-    //modelViewMatrix = glm::mat4(1.0f);
-
-    //this->vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    //glShaderSource(this->vertexShader, 1, &vertexShaderCode, nullptr);
-    //glCompileShader(this->vertexShader);
-
-
-    //this->fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    //glShaderSource(this->fragmentShader, 1, &fragmentShaderCode, nullptr);
-    //glCompileShader(this->fragmentShader);
-}
-
-OpenGLESGraphicsEngine::~OpenGLESGraphicsEngine() {
+void OpenGLESGraphicsEngine::initialize() {
 
 }
 

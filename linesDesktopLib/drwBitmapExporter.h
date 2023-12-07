@@ -43,7 +43,7 @@ protected:
 
 private:
 
-	GraphicsEngine* m_engine;
+	IGraphicsEngine* m_engine;
 };
 
 #endif
