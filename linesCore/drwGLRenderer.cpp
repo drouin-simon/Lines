@@ -12,7 +12,7 @@
 
 drwGLRenderer::drwGLRenderer()
 {
-    m_engine = new OpenGLGraphicsEngine();
+    m_engine = new GraphicsEngine();
 
     // Onion Skin
     m_inOnionFrame = -1;
@@ -269,8 +269,8 @@ void drwGLRenderer::RenderLayer( int frame, drwDrawingContext & context )
     m_scene->DrawFrame( frame, context );
     m_layerTexture->DrawToTexture( false );
     
-    m_engine->enable(GL_BLEND);
-    m_engine->blendFunc( GL_ONE, GL_ONE_MINUS_SRC_ALPHA );
+    m_engine->enable(GraphicsEngine::TYPES_MAPPING::BLEND);
+    m_engine->blendFunc(GraphicsEngine::TYPES_MAPPING::ONE, GraphicsEngine::TYPES_MAPPING::ONE_MINUS_SRC_ALPHA );
     m_engine->color4d( 1.0, 1.0, 1.0, 1.0 );
     m_layerTexture->PasteToScreen();
 }
@@ -285,8 +285,8 @@ void drwGLRenderer::RenderTextureToScreen( int x, int y, int width, int height )
     m_engine->enableScissorTest();
     m_engine->scissor(x, y, width, height);
     
-    m_engine->enable(GL_BLEND);
-    m_engine->blendFunc( GL_ONE, GL_ONE_MINUS_SRC_ALPHA );
+    m_engine->enable(GraphicsEngine::TYPES_MAPPING::BLEND);
+    m_engine->blendFunc(GraphicsEngine::TYPES_MAPPING::ONE, GraphicsEngine::TYPES_MAPPING::ONE_MINUS_SRC_ALPHA);
     
     m_engine->clearColor( m_clearColor[0], m_clearColor[1], m_clearColor[2], m_clearColor[3] );
     m_engine->clear();

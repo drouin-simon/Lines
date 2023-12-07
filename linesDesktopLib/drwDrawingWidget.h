@@ -1,6 +1,8 @@
 #ifndef __drwDrawingWidget_h_
 #define __drwDrawingWidget_h_
 
+#include "../GraphicsEngine/GraphicsEngine.h"
+
 #include <QOpenGLWidget>
 #include "drwCommand.h"
 #include "drwDrawingSurface.h"
@@ -66,6 +68,8 @@ private:
 
     bool m_muteMouse;
     bool m_tabletHasControl;  // make sur not to generate both mouse and tablet events
+
+	GraphicsEngine* m_engine;
 }; 
 
-#endif
+#endif // __drwDrawingWidget_h_

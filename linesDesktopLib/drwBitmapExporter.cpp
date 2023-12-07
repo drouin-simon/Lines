@@ -13,10 +13,12 @@ drwBitmapExporter::drwBitmapExporter()
 : m_scene(0)
 {
     m_exportAlpha = false;
+    m_engine = new GraphicsEngine();
 }
 
 drwBitmapExporter::~drwBitmapExporter()
 {
+    delete m_engine;
 }
 
 void drwBitmapExporter::SetSize( const QSize & size ) 
@@ -82,7 +84,7 @@ void drwBitmapExporter::run()
         ren.RenderToTexture( i );
         ren.RenderTextureToScreen();
 
-        glFlush();
+        m_engine->Flush();
 
         fbo.release();
         QImage im = fbo.toImage();

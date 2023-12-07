@@ -48,12 +48,12 @@ bool drwGlslShader::Init()
 	
 	// Load and try compiling vertex shader
 	if( m_vertexMemSources.size() != 0 || m_vertexShaderFilenames.size() != 0 )
-		if( !CreateAndCompileShader( GL_VERTEX_SHADER, m_glslVertexShader, m_vertexShaderFilenames, m_vertexMemSources ) )
+		if( !m_engine->CreateAndCompileVertexShader( m_glslVertexShader, m_vertexShaderFilenames, m_vertexMemSources ) )
 			return false;
 	
 	// Load and try compiling pixel shader
 	if( m_memSources.size() != 0 || m_shaderFilenames.size() != 0 )
-		if( !CreateAndCompileShader( GL_FRAGMENT_SHADER, m_glslShader, m_shaderFilenames, m_memSources ) )
+		if( !m_engine->CreateAndCompileFragmentShader( m_glslShader, m_shaderFilenames, m_memSources ) )
 			return false;
 	
 	// Check that at least one of the shaders have been compiled
@@ -70,76 +70,77 @@ bool drwGlslShader::Init()
 	// Create program and link shaders
 	m_engine->linkProgram(m_glslProg);
 
-	GLint success = 0;
+	// Error message if program was not link correctly
+	//GLint success = 0;
 
-    m_engine->getProgramIv( m_glslProg, GL_LINK_STATUS, &success );
-    if (!success)
-    {
-		GLint logLength = 0;
-		m_engine->getProgramIv(	m_glslProg, GL_INFO_LOG_LENGTH, &logLength );
-		GLchar * infoLog = new GLchar[ logLength + 1 ];
-        m_engine->getProgramInfoLog( m_glslProg, logLength, NULL, infoLog );
-		ReportError( "Error in glsl program linking: \n %s\n", infoLog );
-		delete [] infoLog;
-		return false;
-    }
+ //   m_engine->getProgramIv( m_glslProg, GL_LINK_STATUS, &success );
+ //   if (!success)
+ //   {
+	//	GLint logLength = 0;
+	//	m_engine->getProgramIv(	m_glslProg, GL_INFO_LOG_LENGTH, &logLength );
+	//	GLchar * infoLog = new GLchar[ logLength + 1 ];
+ //       m_engine->getProgramInfoLog( m_glslProg, logLength, NULL, infoLog );
+	//	ReportError( "Error in glsl program linking: \n %s\n", infoLog );
+	//	delete [] infoLog;
+	//	return false;
+ //   }
 
 	m_init = true;
 	return true;
 }
 
-bool drwGlslShader::CreateAndCompileShader( unsigned shaderType, unsigned & shaderId, std::vector< std::string > & files, std::vector< std::string > & memSources )
-{
-	// Add sources from files to m_memSources vector
-	for( unsigned i = 0; i < files.size(); ++i )
-	{
-		std::string newSource;
-		if( !LoadOneShaderSource( files[i].c_str(), newSource ) )
-			return false;
-		memSources.push_back( newSource );
-	}
-	
-	// put all the sources in an array of const GLchar*
-	const GLchar ** shaderStringPtr = new const GLchar*[ memSources.size() ];
-	for( unsigned i = 0; i < memSources.size(); ++i )
-	{
-		shaderStringPtr[i] = memSources[i].c_str();
-	}
-	
-	// Create the shader and set its source
-	shaderId = glCreateShader( shaderType );
-    glShaderSource( shaderId, memSources.size(), shaderStringPtr, NULL);
-	
-	delete [] shaderStringPtr;
-	
-	// Compile the shader
-	GLint success = 0;
-	glCompileShader( shaderId );
-    glGetShaderiv( shaderId, GL_COMPILE_STATUS, &success );
-    if (!success)
-    {
-		GLint logLength = 0;
-		glGetShaderiv( shaderId, GL_INFO_LOG_LENGTH, &logLength );
-        GLchar * infoLog = new GLchar[logLength+1];
-        glGetShaderInfoLog( shaderId, logLength, NULL, infoLog);
-		ReportError( "Error in shader complilation: \n %s\n", infoLog );
-		delete [] infoLog;
-        return false;
-    }
-	return true;
-}
+//bool drwGlslShader::CreateAndCompileShader( unsigned shaderType, unsigned & shaderId, std::vector< std::string > & files, std::vector< std::string > & memSources )
+//{
+//	// Add sources from files to m_memSources vector
+//	for( unsigned i = 0; i < files.size(); ++i )
+//	{
+//		std::string newSource;
+//		if( !LoadOneShaderSource( files[i].c_str(), newSource ) )
+//			return false;
+//		memSources.push_back( newSource );
+//	}
+//	
+//	// put all the sources in an array of const GLchar*
+//	const GLchar ** shaderStringPtr = new const GLchar*[ memSources.size() ];
+//	for( unsigned i = 0; i < memSources.size(); ++i )
+//	{
+//		shaderStringPtr[i] = memSources[i].c_str();
+//	}
+//	
+//	// Create the shader and set its source
+//	shaderId = glCreateShader( shaderType );
+//    glShaderSource( shaderId, memSources.size(), shaderStringPtr, NULL);
+//	
+//	delete [] shaderStringPtr;
+//	
+//	// Compile the shader
+//	GLint success = 0;
+//	glCompileShader( shaderId );
+//    glGetShaderiv( shaderId, GL_COMPILE_STATUS, &success );
+//    if (!success)
+//    {
+//		GLint logLength = 0;
+//		glGetShaderiv( shaderId, GL_INFO_LOG_LENGTH, &logLength );
+//        GLchar * infoLog = new GLchar[logLength+1];
+//        glGetShaderInfoLog( shaderId, logLength, NULL, infoLog);
+//		ReportError( "Error in shader complilation: \n %s\n", infoLog );
+//		delete [] infoLog;
+//        return false;
+//    }
+//	return true;
+//}
 
 bool drwGlslShader::UseProgram( bool use )
 {
 	bool res = true;
 	if( use && m_init )
 	{
-		glUseProgram( m_glslProg );
+		m_engine->UseProgram(m_glslProg);
 	}
 	else
 	{
 		res = true;
-		glUseProgram( 0 );
+		m_engine->UseProgram(0);
 	}
 	return res;
 }
@@ -158,33 +159,33 @@ bool drwGlslShader::SetVariable( const char * name, float value )
 	return result;
 }
 
-bool drwGlslShader::LoadOneShaderSource( const char * filename, std::string & shaderSource )
-{
-	// Open shader file for reading
-	FILE * f = fopen( filename, "rb" );
-	if( !f )
-	{
-		ReportError( "Couldn't open shader file %s\n", filename );
-		return false;
-	}
-
-	// Get file size
-	fseek( f, 0, SEEK_END );
-    long length = ftell( f );
-	fseek( f, 0, SEEK_SET );
-
-	// Read file into shaderSource string
-	char * charShaderSource = new char[ length + 1 ];
-	fread( charShaderSource, 1, length, f );
-	charShaderSource[length] = '\0';
-	shaderSource = charShaderSource;
-	delete [] charShaderSource;
-
-	// close the file
-    fclose( f );
-
-	return true;
-}
+//bool drwGlslShader::LoadOneShaderSource( const char * filename, std::string & shaderSource )
+//{
+//	// Open shader file for reading
+//	FILE * f = fopen( filename, "rb" );
+//	if( !f )
+//	{
+//		ReportError( "Couldn't open shader file %s\n", filename );
+//		return false;
+//	}
+//
+//	// Get file size
+//	fseek( f, 0, SEEK_END );
+//    long length = ftell( f );
+//	fseek( f, 0, SEEK_SET );
+//
+//	// Read file into shaderSource string
+//	char * charShaderSource = new char[ length + 1 ];
+//	fread( charShaderSource, 1, length, f );
+//	charShaderSource[length] = '\0';
+//	shaderSource = charShaderSource;
+//	delete [] charShaderSource;
+//
+//	// close the file
+//    fclose( f );
+//
+//	return true;
+//}
 
 void drwGlslShader::Clear()
 {

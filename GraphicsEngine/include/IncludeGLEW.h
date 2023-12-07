@@ -7,12 +7,10 @@
 #endif
 
 #if !(defined(__APPLE__) && defined(__MACH__))
-#define NOMINMAX
-
-    #if !(defined(__ANDROID__))
+    #define NOMINMAX
+    #if (!defined(__ANDROID__))
         #include <GL/glew.h>
     #endif
-
 #endif
 
 #endif // __IncludeGLEW_h_

@@ -7,6 +7,22 @@
 #include "IGraphicsEngine.h"
 
 class OpenGLGraphicsEngine : public IGraphicsEngine {
+
+public:
+    enum TYPES_MAPPING {
+        RED = GL_RED,
+        RGB = GL_RGB,
+        RGBA = GL_RGBA,
+        F32 = GL_FLOAT,
+        UBYTE = GL_UNSIGNED_BYTE,
+        R32F = GL_R32F,
+        ONE = GL_ONE,
+        ONE_MINUS_SRC_ALPHA = GL_ONE_MINUS_SRC_ALPHA,
+        BLEND = GL_BLEND
+    };
+
+    void initialize() override;
+
     void SetViewPort(int x, int y, int width, int height) override;
     void SetProjectionViewPort(int x, int y, int width, int height);
     void SetModelViewOrtho2D(double left, double right, double bottom, double top) override;
@@ -17,10 +33,10 @@ class OpenGLGraphicsEngine : public IGraphicsEngine {
     void ReleaseTexture(unsigned int texId, unsigned int fbId) override;
     void PasteTextureToScreen(unsigned int texId, int texWidth, int texHeight, int x, int y, int screenWidth, int screenHeight) override;
     void ClearScreen(int texWidth, int texHeight, int x, int y, int screenWidth, int screenHeight) override;
-    void Upload(unsigned int texId, int level, int internalFormat, int width, int height, int border, int format, int type, unsigned char* buffer) override;
-    void Download(unsigned int texId, int level, int format, int type, unsigned char* buffer) override;
-    void Download(unsigned int texId, int level, int format, int type, unsigned short* buffer) override;
-    void Download(unsigned int texId, int level, int format, int type, float* buffer) override;
+    void UploadUnsignedByte(unsigned int texId, int level, int internalFormat, int width, int height, int border, int format, unsigned char* buffer) override;
+    void DownloadUnsignedByte(unsigned int texId, int level, int format, unsigned char* buffer) override;
+    void DownloadUnsignedShort(unsigned int texId, int level, int format, unsigned short* buffer) override;
+    void DownloadFloat(unsigned int texId, int level, int format, float* buffer) override;
     void DrawPolygon(PolygonData& data, Vec4 color) override;
     void DrawLine(double* pointsBuffer, unsigned int* pointsIndexBuffer, size_t pointsIndexSize, double lineWidth, Vec4 color) override;
     void FillLine(double* poinstBuffer, unsigned int* indicesBuffer, size_t indicesSize, Vec4 color) override;
@@ -56,6 +72,19 @@ class OpenGLGraphicsEngine : public IGraphicsEngine {
 
     void DeleteShader(unsigned int shaderId) override;
     void DeleteProgram(unsigned int programId) override;
+
+    bool CreateAndCompileShader(unsigned shaderType, unsigned& shaderId, std::vector< std::string >& files, std::vector< std::string >& memSources) override;
+    bool CreateAndCompileVertexShader(unsigned& shaderId, std::vector< std::string >& files, std::vector< std::string >& memSources) override;
+    bool CreateAndCompileFragmentShader(unsigned& shaderId, std::vector< std::string >& files, std::vector< std::string >& memSources) override;
+    bool LoadOneShaderSource(const char* filename, std::string& shaderSource);
+
+    void BlendMaxEquation() override;
+    void UseProgram(unsigned int programId) override;
+
+    void DrawToTexture(int& backupFbId) override;
+
+    void Flush() override;
+
 };
 
 #endif // __OpenGLGraphicsEngine_h_

@@ -2,9 +2,14 @@
 #define GraphicsEngine_H
 
 #include "include/IGraphicsEngine.h"
-#include "include/OpenGLGraphicsEngine.h"
-#include "include/OpenGLESGraphicsEngine.h"
 
-using GraphicsEngine = OpenGLGraphicsEngine;
+#if (defined(__ANDROID__))
+	#include "include/OpenGLESGraphicsEngine.h"
+	using GraphicsEngine = OpenGLESGraphicsEngine;
+#else
+	#include "include/OpenGLGraphicsEngine.h"
+	using GraphicsEngine = OpenGLGraphicsEngine;
+#endif
+
 
 #endif // GraphicsEngine_H

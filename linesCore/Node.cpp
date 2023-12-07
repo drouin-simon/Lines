@@ -3,7 +3,7 @@
 #include "Primitive.h"
 #include "drwDrawingContext.h"
 
-GLuint Node::NextId = 1;
+unsigned int Node::NextId = 1;
 
 Node::Node() : Position(0,0)
 {

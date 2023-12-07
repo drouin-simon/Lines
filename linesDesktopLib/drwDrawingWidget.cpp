@@ -1,4 +1,3 @@
-#include <GL/glew.h>
 #include "drwDrawingWidget.h"
 #include <iostream>
 #include <QtGui>
@@ -21,10 +20,13 @@ drwDrawingWidget::drwDrawingWidget( QWidget * parent )
     setCursor( QCursor( Qt::BlankCursor ) );
     setUpdateBehavior( QOpenGLWidget::PartialUpdate );  // allows to redraw only part of the window
     EnableVSync( false );
+
+    m_engine = new GraphicsEngine();
 }
 
 drwDrawingWidget::~drwDrawingWidget()
 {
+    delete m_engine;
 }
 
 void drwDrawingWidget::NeedRedraw()
@@ -58,10 +60,7 @@ void drwDrawingWidget::NotifyPlaybackStartStop( bool isStarting )
 
 void drwDrawingWidget::initializeGL()
 {
-    GLenum err = glewInit();
-    if (err != GLEW_OK) {
-        qFatal("Failed to initialize GLEW: %s", glewGetErrorString(err));
-    }
+    m_engine->initialize();
 }
 
 void drwDrawingWidget::resizeGL( int w, int h )
@@ -74,7 +73,7 @@ void drwDrawingWidget::paintEvent( QPaintEvent * event )
 {
 	makeCurrent();
     m_lines->Render();
-    glFlush();
+    m_engine->Flush();
     emit FinishedPainting();
 }
 

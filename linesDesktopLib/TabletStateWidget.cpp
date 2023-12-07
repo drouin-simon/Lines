@@ -1,6 +1,7 @@
+#include "drwDrawingWidget.h"
 #include "TabletStateWidget.h"
 #include "TabletStateTestingArea.h"
-#include "drwDrawingWidget.h"
+
 
 TabletStateWidget::TabletStateWidget( QWidget * parent ) : QWidget( parent )
 {

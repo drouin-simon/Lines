@@ -66,7 +66,7 @@ void WideLine::InternDraw( drwDrawingContext & context )
     shader->SetVariable( "sigma_large", m_sigma_large );
     shader->SetVariable( "sigma_small", m_sigma_small );
 		
-	glBlendEquation( GL_MAX );
+    m_engine->BlendMaxEquation();
 
     m_engine->DrawWideLine(m_vertices.GetBuffer(), m_indices.GetBuffer(), m_indices.size(), m_normals.GetBuffer(), m_texCoord.GetBuffer(), lineColor);
 

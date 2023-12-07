@@ -1,6 +1,8 @@
 #ifndef __drwBitmapExporter_h_
 #define __drwBitmapExporter_h_
 
+#include "../GraphicsEngine/GraphicsEngine.h"
+
 #include <QThread>
 #include <QSize>
 
@@ -38,6 +40,10 @@ protected:
 	QString m_fileExtension;
 	QSize m_size;
     bool m_exportAlpha;
+
+private:
+
+	GraphicsEngine* m_engine;
 };
 
 #endif
