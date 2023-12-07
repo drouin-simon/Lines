@@ -23,13 +23,14 @@ public:
     };
 
     OpenGLESGraphicsEngine();
+    ~OpenGLESGraphicsEngine();
 
     void initialize() override;
 
     // Abdellah
     void RenderObject();
     void SetViewPort(int x, int y, int width, int height) override;
-    void SetProjectionViewPort(int x, int y, int width, int height);
+    void SetProjectionViewPort(int x, int y, int width, int height) override;
     void SetModelViewOrtho2D(double left, double right, double bottom, double top) override;
     unsigned int InitTexture(int level, int internalFormat, int width, int height, int border, int format, int type, void* pixels) override;
     unsigned int InitFrameBuffer(unsigned int texId) override;
@@ -90,7 +91,7 @@ public:
     void BlendMaxEquation() override;
     void UseProgram(unsigned int programId) override;
 
-    void DrawToTexture(int& fbId, int& backupFbId) override;
+    void DrawToTexture(unsigned int& fbId, int& backupFbId) override;
 
     void Flush() override;
 

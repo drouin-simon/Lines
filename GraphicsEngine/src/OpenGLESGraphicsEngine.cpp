@@ -18,7 +18,7 @@ std::string readShaderFile(const std::string& filePath) {
 
 OpenGLESGraphicsEngine::OpenGLESGraphicsEngine() {
 
-    this->programId = 0;
+    //this->programId = 0;
 
     //const GLchar* vertexShaderCode = readShaderFile("shader/vertexShader.glsl").c_str();
     //const GLchar* fragmentShaderCode = readShaderFile("shader/fragmentShader.glsl").c_str();
@@ -36,6 +36,10 @@ OpenGLESGraphicsEngine::OpenGLESGraphicsEngine() {
     //this->fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
     //glShaderSource(this->fragmentShader, 1, &fragmentShaderCode, nullptr);
     //glCompileShader(this->fragmentShader);
+}
+
+OpenGLESGraphicsEngine::~OpenGLESGraphicsEngine() {
+
 }
 
 void OpenGLESGraphicsEngine::SetViewPort(int x, int y, int width, int height) {
@@ -512,7 +516,7 @@ void OpenGLESGraphicsEngine::UseProgram(unsigned int programId) {
     //glUseProgram(programId);
 }
 
-void OpenGLESGraphicsEngine::DrawToTexture(int& fbId, int& backupFbId) {
+void OpenGLESGraphicsEngine::DrawToTexture(unsigned int& fbId, int& backupFbId) {
     //this->GetVariable(GL_FRAMEBUFFER_BINDING, &backupFbId);
     //this->BindFrameBuffer(backupFbId);
 }
