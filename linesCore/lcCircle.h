@@ -12,7 +12,6 @@ class Circle : public Primitive
 public:
 
     Circle();
-    ~Circle();
 
     void SetCenter( Vec2 center );
     void SetCenter( double x, double y );

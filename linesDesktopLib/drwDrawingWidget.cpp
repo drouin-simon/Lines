@@ -24,11 +24,6 @@ drwDrawingWidget::drwDrawingWidget( QWidget * parent )
     m_engine = GraphicsEngineManager::getGraphicsEngine();
 }
 
-drwDrawingWidget::~drwDrawingWidget()
-{
-    delete m_engine;
-}
-
 void drwDrawingWidget::NeedRedraw()
 {
     update();

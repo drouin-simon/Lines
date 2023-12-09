@@ -15,7 +15,6 @@ class WideLine : public LinePrimitive
 public:
 
 	WideLine( double width );
-    ~WideLine();
     
     virtual void StartPoint( double x, double y, double pressure );
     virtual void EndPoint( double x, double y, double pressure );

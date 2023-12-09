@@ -9,7 +9,6 @@ class drwCamera
 public:
 
     drwCamera();
-    ~drwCamera();
     
     void SetWindowSize( int w, int h );
     int * GetWindowSize() { return m_winSizePix; }

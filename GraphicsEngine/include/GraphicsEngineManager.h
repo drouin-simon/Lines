@@ -4,10 +4,9 @@
 #include "../GraphicsEngine.h"
 
 class GraphicsEngineManager {
-
 public:
-	
 	static IGraphicsEngine* getGraphicsEngine();
+	static void deleteGraphicsEngine();
 };
 
 #endif // __GraphicsEngineManager_h_

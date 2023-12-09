@@ -10,3 +10,11 @@ IGraphicsEngine* GraphicsEngineManager::getGraphicsEngine()
 
 	return instance;
 }
+
+void GraphicsEngineManager::deleteGraphicsEngine()
+{
+	if (instance != nullptr) {
+		delete instance;
+		instance = nullptr;
+	}
+}

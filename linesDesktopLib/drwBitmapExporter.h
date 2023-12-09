@@ -18,7 +18,6 @@ class drwBitmapExporter : public QThread
 public:
 	
 	drwBitmapExporter();
-	~drwBitmapExporter();
 	void SetScene( Scene * scene ) { m_scene = scene; }
 	void SetFilename( QString filename ) { m_filename = filename; }
 	void SetSize( const QSize & size );

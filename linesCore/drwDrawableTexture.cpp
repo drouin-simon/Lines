@@ -19,7 +19,6 @@ drwDrawableTexture::drwDrawableTexture()
 drwDrawableTexture::~drwDrawableTexture()
 {
     Release();
-    delete m_engine;
 }
 
 void drwDrawableTexture::SetPixelFormatToRGBU8() { m_internalFormat = GraphicsEngine::TYPES_MAPPING::RGB; m_pixelType = GraphicsEngine::TYPES_MAPPING::RGB; m_componentType = GraphicsEngine::TYPES_MAPPING::UBYTE; m_downloadPixelType = GraphicsEngine::TYPES_MAPPING::RGB; }

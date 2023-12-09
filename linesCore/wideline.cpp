@@ -23,12 +23,6 @@ WideLine::WideLine( double width )
     m_engine = GraphicsEngineManager::getGraphicsEngine();
 }
 
-
-WideLine::~WideLine() 
-{
-    delete m_engine;
-}
-
 void WideLine::InternDraw( drwDrawingContext & context )
 {
     // Don't draw if the area of the screen to repaint doesn't intersect

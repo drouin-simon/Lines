@@ -19,7 +19,6 @@ public:
 	SharedPtrMacro(Node);
 	
 	Node();
-	~Node();
 	
     void Draw( drwDrawingContext & context );
 	

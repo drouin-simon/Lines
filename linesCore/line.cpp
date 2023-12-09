@@ -6,13 +6,6 @@ Line::Line() : m_lineWidth( 1.0 )
     m_engine = GraphicsEngineManager::getGraphicsEngine();
 }
 
-
-Line::~Line() 
-{
-    delete m_engine;
-}
-
-
 void Line::InternDraw( drwDrawingContext & context )
 {
     Vec4 color = m_color * context.m_colorMultiplier;

@@ -25,11 +25,6 @@ drwCamera::drwCamera()
     UpdateSizes();
 }
 
-drwCamera::~drwCamera()
-{
-    delete m_engine;
-}
-
 void drwCamera::SetWindowSize( int w, int h )
 {
     m_winSizePix[0] = w;

@@ -13,11 +13,6 @@ Circle::Circle() : Center( Vec2( 0, 0 ) )
     m_engine = GraphicsEngineManager::getGraphicsEngine();
 }
 
-Circle::~Circle()
-{
-    delete m_engine;
-}
-
 void Circle::SetCenter( Vec2 center )
 {
     SetCenter( center[0], center[1] );

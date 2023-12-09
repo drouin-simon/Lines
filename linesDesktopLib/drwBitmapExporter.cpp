@@ -16,11 +16,6 @@ drwBitmapExporter::drwBitmapExporter()
     m_engine = GraphicsEngineManager::getGraphicsEngine();
 }
 
-drwBitmapExporter::~drwBitmapExporter()
-{
-    delete m_engine;
-}
-
 void drwBitmapExporter::SetSize( const QSize & size ) 
 { 
 	m_size = size; 

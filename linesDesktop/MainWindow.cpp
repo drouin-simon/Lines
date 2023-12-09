@@ -14,6 +14,7 @@
 #include "LinesApp.h"
 #include "LinesCore.h"
 #include "LinesPreferencesWidget.h"
+#include "../GraphicsEngine/include/GraphicsEngineManager.h"
 
 const QString MainWindow::m_appName( "Lines" );
 
@@ -108,11 +109,11 @@ MainWindow::MainWindow()
 	// Tell the qApp unique instance to send event to MainWindow::eventFilter before anyone else
 	// so that we can grab global keyboard shortcuts.
 	qApp->installEventFilter(this);
-	
 }
 
 MainWindow::~MainWindow()
 {
+    GraphicsEngineManager::deleteGraphicsEngine();
     delete m_linesApp;
     delete m_lines;
 }

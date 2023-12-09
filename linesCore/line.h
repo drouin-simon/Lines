@@ -14,7 +14,6 @@ class Line : public LinePrimitive
 public:
 
     Line();
-    ~Line();
 
     virtual void StartPoint( double x, double y, double pressure );
     virtual void EndPoint( double x, double y, double pressure );

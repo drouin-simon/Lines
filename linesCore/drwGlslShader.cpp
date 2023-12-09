@@ -17,7 +17,6 @@ drwGlslShader::drwGlslShader()
 drwGlslShader::~drwGlslShader() 
 {
 	Clear();
-	delete m_engine;
 }
 
 void drwGlslShader::AddShaderFilename( const char * filename )

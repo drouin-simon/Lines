@@ -49,7 +49,6 @@ drwGLRenderer::~drwGLRenderer()
     delete m_workTexture;
     if( m_widelineShader )
         delete m_widelineShader;
-    delete m_engine;
 }
 
 void drwGLRenderer::SetOnionSkinBefore( int value )

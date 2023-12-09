@@ -12,13 +12,6 @@ Node::Node() : Position(0,0)
 	m_engine = GraphicsEngineManager::getGraphicsEngine();
 }
 
-
-Node::~Node()
-{
-	delete m_engine;
-}
-
-
 void Node::Draw( drwDrawingContext & context )
 {
 	if( ThePrimitive && !IsHidden )

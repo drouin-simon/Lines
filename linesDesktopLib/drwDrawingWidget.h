@@ -19,7 +19,6 @@ class drwDrawingWidget : public QOpenGLWidget, public drwDrawingSurface
 public:
 		
     drwDrawingWidget( QWidget * parent );
-	~drwDrawingWidget();
 
 	//void initializeGL();
 
