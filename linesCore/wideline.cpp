@@ -320,6 +320,7 @@ uniform float pix_margin; \
 uniform float pix_damp_width; \
 uniform float sigma_large; \
 uniform float sigma_small; \
+uniform vec4 u_color; \
 varying float margin; \
 varying float sigma; \
 void main() \

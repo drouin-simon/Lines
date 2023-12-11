@@ -157,6 +157,13 @@ bool drwGlslShader::SetVariable( const char * name, float value )
 	return result;
 }
 
+bool drwGlslShader::SetVariable( const char * name, Vec4 value )
+{
+	bool result = m_engine->SetVariable(m_glslProg, name, value);
+	if (!result) ReportError( "Couldn't set shader variable %s.\n", name );
+	return result;
+}
+
 //bool drwGlslShader::LoadOneShaderSource( const char * filename, std::string & shaderSource )
 //{
 //	// Open shader file for reading

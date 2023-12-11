@@ -80,6 +80,7 @@ public:
     virtual void BindFrameBuffer(unsigned int fbId) = 0;
     virtual bool SetVariable(unsigned int programId, const char* name, int value) = 0;
     virtual bool SetVariable(unsigned int programId, const char* name, float value) = 0;
+    virtual bool SetVariable(unsigned int programId, const char* name, Vec4 value) = 0;
     virtual void GetVariable(unsigned int name, int* value) = 0;
 
     virtual void DeleteShader(unsigned int shaderId) = 0;

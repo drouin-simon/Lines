@@ -399,6 +399,16 @@ bool OpenGLESGraphicsEngine::SetVariable(unsigned int programId, const char* nam
     return false;
 }
 
+bool OpenGLESGraphicsEngine::SetVariable(unsigned int programId, const char* name, Vec4 value) {
+    int location = glGetUniformLocation(programId, name);
+    if (location != -1)
+    {
+        glUniform4f(location, value[0], value[1], value[2], value[3]);
+        return true;
+    }
+    return false;
+}
+
 void OpenGLESGraphicsEngine::GetVariable(unsigned int name, int* value) {
     glGetIntegerv(name, value);
 }
