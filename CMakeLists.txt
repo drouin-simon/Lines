@@ -86,16 +86,15 @@ if (NOT ANDROID)
 	    GIT_REPOSITORY https://github.com/Perlmint/glew-cmake.git
 	    GIT_TAG glew-cmake-2.2.0
     )
-    FetchContent_MakeAvailable(glew)
 
-    # FetchContent_GetProperties(glew)
-    # if(NOT glew_POPULATED)
-	#     FetchContent_Populate(glew)
+    FetchContent_GetProperties(glew)
+    if(NOT glew_POPULATED)
+	        FetchContent_Populate(glew)
 
-	#     set(glew-cmake_BUILD_SHARED OFF CACHE INTERNAL "Build the shared glew library")
-	#     set(ONLY_LIBS ON CACHE INTERNAL "Only build the glew library")
-	#     add_subdirectory(${glew_SOURCE_DIR} ${glew_BINARY_DIR})
-    # endif()
+	        set(glew-cmake_BUILD_SHARED OFF CACHE INTERNAL "Build the shared glew library")
+	        set(ONLY_LIBS ON CACHE INTERNAL "Only build the glew library")
+	        add_subdirectory(${glew_SOURCE_DIR} ${glew_BINARY_DIR})
+    endif()
 endif()
 
 message(STATUS "Fetching GLM")
@@ -105,7 +104,7 @@ FetchContent_Declare(
     GIT_TAG 0.9.9.8
 )
 FetchContent_MakeAvailable(glm)
-#include_directories("${glm_SOURCE_DIR}")
+include_directories("${glm_SOURCE_DIR}")
 
 add_subdirectory( linesCore )
 add_subdirectory( linesNetwork )
