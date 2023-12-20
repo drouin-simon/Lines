@@ -198,7 +198,7 @@ void DrawingWidgetMT::mouseMoveEvent( QMouseEvent * e )
     }
 }
 
-void DrawingWidgetMT::enterEvent( QEvent * e )
+void DrawingWidgetMT::enterEvent( QEnterEvent * e )
 {
     m_lines->SetShowCursor( true );
     TryRender();

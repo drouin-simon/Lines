@@ -4,3 +4,6 @@ build
 .vscode
 .vs
 .cache
+_deps
+_deps/*
+*.bat

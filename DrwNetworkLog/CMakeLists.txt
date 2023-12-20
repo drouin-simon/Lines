@@ -12,7 +12,7 @@ set( receiver_src drwNetworkLog.cpp receiver.cpp )
 set( receiver_hdr receiver.h )
 
 # moc Qt source file without a ui file
-qt4_wrap_cpp( receiver_moc ${receiver_hdr})
+qt_wrap_cpp( receiver_moc ${receiver_hdr})
 
 # Create and link executable
 set( receiver_all_src ${receiver_src} ${receiver_hdr} ${receiver_moc} )

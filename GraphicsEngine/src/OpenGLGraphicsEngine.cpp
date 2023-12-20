@@ -1,8 +1,42 @@
 #include "OpenGLGraphicsEngine.h"
 
+bool OpenGLGraphicsEngine::LoadOneShaderSource(const char* filename, std::string& shaderSource)
+{
+    // Open shader file for reading
+    FILE* f = fopen(filename, "rb");
+    if (!f)
+    {
+        //ReportError("Couldn't open shader file %s\n", filename);
+        return false;
+    }
+
+    // Get file size
+    fseek(f, 0, SEEK_END);
+    long length = ftell(f);
+    fseek(f, 0, SEEK_SET);
+
+    // Read file into shaderSource string
+    char* charShaderSource = new char[length + 1];
+    fread(charShaderSource, 1, length, f);
+    charShaderSource[length] = '\0';
+    shaderSource = charShaderSource;
+    delete[] charShaderSource;
+
+    // close the file
+    fclose(f);
+
+    return true;
+}
+
+void OpenGLGraphicsEngine::initialize() {
+    GLenum err = glewInit();
+    if (err != GLEW_OK) {
+        //throw("Failed to initialize GLEW: %s", glewGetErrorString(err));
+    }
+}
+
 void OpenGLGraphicsEngine::SetViewPort(int x, int y, int width, int height) {
     glViewport(x, y, width, height);
-    
 }
 
 void OpenGLGraphicsEngine::SetProjectionViewPort(int x, int y, int width, int height) {
@@ -11,7 +45,7 @@ void OpenGLGraphicsEngine::SetProjectionViewPort(int x, int y, int width, int he
     glLoadIdentity();
 }
 void OpenGLGraphicsEngine::SetModelViewOrtho2D(double left, double right, double bottom, double top) {
-    gluOrtho2D(left, right, bottom, top);
+    glOrtho(left, right, bottom, top, -1, 1);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 }
@@ -71,7 +105,7 @@ void OpenGLGraphicsEngine::PasteTextureToScreen(unsigned int texId, int texWidth
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
-    gluOrtho2D(0, texWidth, 0, texHeight);
+    glOrtho(0, texWidth, 0, texHeight, -1, 1);
 
     glBindTexture(GL_TEXTURE_RECTANGLE_ARB, texId);
     glBegin(GL_QUADS);
@@ -100,7 +134,7 @@ void OpenGLGraphicsEngine::ClearScreen(int texWidth, int texHeight, int x, int y
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
-    gluOrtho2D(0, texWidth, 0, texHeight);
+    glOrtho(0, texWidth, 0, texHeight, -1, 1);
 
     glColor4d(0.0, 0.0, 0.0, 0.0);
     glBegin(GL_QUADS);
@@ -117,32 +151,32 @@ void OpenGLGraphicsEngine::ClearScreen(int texWidth, int texHeight, int x, int y
     glEnable(GL_BLEND);
 }
 
-void OpenGLGraphicsEngine::Upload(unsigned int texId, int level, int internalFormat, int width, int height, int border, int format, int type, unsigned char* buffer)
+void OpenGLGraphicsEngine::UploadUnsignedByte(unsigned int texId, int level, int internalFormat, int width, int height, int border, int format, unsigned char* buffer)
 {
     glBindTexture(GL_TEXTURE_RECTANGLE_ARB, texId);
-    glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, level, internalFormat, width, height, border, format, type, buffer);
+    glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, level, internalFormat, width, height, border, format, GL_UNSIGNED_BYTE, buffer);
     glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
 }
 
-void OpenGLGraphicsEngine::Download(unsigned int texId, int level, int format, int type, unsigned char* buffer)
+void OpenGLGraphicsEngine::DownloadUnsignedByte(unsigned int texId, int level, int format, unsigned char* buffer)
 {
     glBindTexture(GL_TEXTURE_RECTANGLE_ARB, texId);
-    glGetTexImage(GL_TEXTURE_RECTANGLE_ARB, level, format, type, buffer);
+    glGetTexImage(GL_TEXTURE_RECTANGLE_ARB, level, format, GL_UNSIGNED_BYTE, buffer);
     glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
 }
 
-void OpenGLGraphicsEngine::Download(unsigned int texId, int level, int format, int type, unsigned short* buffer)
+void OpenGLGraphicsEngine::DownloadUnsignedShort(unsigned int texId, int level, int format, unsigned short* buffer)
 {
     glBindTexture(GL_TEXTURE_RECTANGLE_ARB, texId);
-    glGetTexImage(GL_TEXTURE_RECTANGLE_ARB, level, format, type, buffer);
+    glGetTexImage(GL_TEXTURE_RECTANGLE_ARB, level, format, GL_UNSIGNED_SHORT, buffer);
     glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
 }
 
-void OpenGLGraphicsEngine::Download(unsigned int texId, int level, int format, int type, float* buffer)
+void OpenGLGraphicsEngine::DownloadFloat(unsigned int texId, int level, int format, float* buffer)
 {
     glBindTexture(GL_TEXTURE_RECTANGLE_ARB, texId);
     glGetTexImage(GL_TEXTURE_RECTANGLE_ARB, 0, GL_RED, GL_FLOAT, buffer);
-    glGetTexImage(GL_TEXTURE_RECTANGLE_ARB, level, format, type, buffer);
+    glGetTexImage(GL_TEXTURE_RECTANGLE_ARB, level, format, GL_FLOAT, buffer);
     glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
 }
 
@@ -292,18 +326,12 @@ void OpenGLGraphicsEngine::getProgramInfoLog(unsigned int program, int maxLength
     glGetProgramInfoLog(program, maxLength, length, infoLog);
 }
 
-//void OpenGLGraphicsEngine::Download(unsigned char* buffer) {
-//    //glBindTexture(GL_TEXTURE_RECTANGLE_ARB, m_texId);
-//    //glGetTexImage(GL_TEXTURE_RECTANGLE_ARB, 0, m_downloadPixelType, GL_UNSIGNED_BYTE, buffer);
-//    //glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
-//}
-
 void OpenGLGraphicsEngine::pushName(unsigned int name) {
     glPushName(name);
 }
 
 void OpenGLGraphicsEngine::pushMatrix() {
-    glPushMatrix();
+     glPushMatrix();
 }
 
 void OpenGLGraphicsEngine::popMatrix() {
@@ -338,6 +366,16 @@ bool OpenGLGraphicsEngine::SetVariable(unsigned int programId, const char* name,
     return false;
 }
 
+bool OpenGLGraphicsEngine::SetVariable(unsigned int programId, const char* name, Vec4 value) {
+    int location = glGetUniformLocation(programId, name);
+    if (location != -1)
+    {
+        glUniform4f(location, value[0], value[1], value[2], value[3]);
+        return true;
+    }
+    return false;
+}
+
 void OpenGLGraphicsEngine::GetVariable(unsigned int name, int* value) {
     glGetIntegerv(name, value);
 }
@@ -348,4 +386,68 @@ void OpenGLGraphicsEngine::DeleteShader(unsigned int shaderId) {
 
 void OpenGLGraphicsEngine::DeleteProgram(unsigned int programId) {
     glDeleteProgram(programId);
+}
+
+bool OpenGLGraphicsEngine::CreateAndCompileVertexShader(unsigned& shaderId, std::vector< std::string >& files, std::vector< std::string >& memSources) {
+    return CreateAndCompileShader(GL_VERTEX_SHADER, shaderId, files, memSources);
+}
+bool OpenGLGraphicsEngine::CreateAndCompileFragmentShader(unsigned& shaderId, std::vector< std::string >& files, std::vector< std::string >& memSources) {
+    return CreateAndCompileShader(GL_FRAGMENT_SHADER, shaderId, files, memSources);
+}
+
+bool OpenGLGraphicsEngine::CreateAndCompileShader(unsigned shaderType, unsigned& shaderId, std::vector< std::string >& files, std::vector< std::string >& memSources) {
+    // Add sources from files to m_memSources vector
+    for (unsigned i = 0; i < files.size(); ++i)
+    {
+        std::string newSource;
+        if (!LoadOneShaderSource(files[i].c_str(), newSource))
+            return false;
+        memSources.push_back(newSource);
+    }
+
+    // put all the sources in an array of const GLchar*
+    const GLchar** shaderStringPtr = new const GLchar * [memSources.size()];
+    for (unsigned i = 0; i < memSources.size(); ++i)
+    {
+        shaderStringPtr[i] = memSources[i].c_str();
+    }
+
+    // Create the shader and set its source
+    shaderId = glCreateShader(shaderType);
+    glShaderSource(shaderId, memSources.size(), shaderStringPtr, NULL);
+
+    delete[] shaderStringPtr;
+
+    // Compile the shader
+    GLint success = 0;
+    glCompileShader(shaderId);
+    glGetShaderiv(shaderId, GL_COMPILE_STATUS, &success);
+    //if (!success)
+    //{
+    //    GLint logLength = 0;
+    //    glGetShaderiv(shaderId, GL_INFO_LOG_LENGTH, &logLength);
+    //    GLchar* infoLog = new GLchar[logLength + 1];
+    //    glGetShaderInfoLog(shaderId, logLength, NULL, infoLog);
+    //    ReportError("Error in shader complilation: \n %s\n", infoLog);
+    //    delete[] infoLog;
+    //    return false;
+    //}
+    return true;
+}
+
+void OpenGLGraphicsEngine::BlendMaxEquation() {
+    glBlendEquation(GL_MAX);
+}
+
+void OpenGLGraphicsEngine::UseProgram(unsigned int programId) {
+    glUseProgram(programId);
+}
+
+void OpenGLGraphicsEngine::DrawToTexture(unsigned int& fbId, int &backupFbId) {
+    this->GetVariable(GL_FRAMEBUFFER_BINDING, &backupFbId);
+    this->BindFrameBuffer(fbId);
+}
+
+void OpenGLGraphicsEngine::Flush() {
+    glFlush();
 }

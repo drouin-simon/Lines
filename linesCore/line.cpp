@@ -3,15 +3,8 @@
 
 Line::Line() : m_lineWidth( 1.0 )
 {
-    m_engine = new GraphicsEngine();
+    m_engine = GraphicsEngineManager::getGraphicsEngine();
 }
-
-
-Line::~Line() 
-{
-    delete m_engine;
-}
-
 
 void Line::InternDraw( drwDrawingContext & context )
 {

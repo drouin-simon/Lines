@@ -2,10 +2,10 @@
 #include <assert.h>
 
 drwDrawableTexture::drwDrawableTexture()
-    : m_internalFormat( GL_RGBA )
-    , m_pixelType( GL_RGBA )
-    , m_componentType( GL_UNSIGNED_BYTE )
-    , m_downloadPixelType( GL_RGBA )
+    : m_internalFormat( GraphicsEngine::TYPES_MAPPING::RGBA )
+    , m_pixelType(GraphicsEngine::TYPES_MAPPING::RGBA)
+    , m_componentType(GraphicsEngine::TYPES_MAPPING::UBYTE)
+    , m_downloadPixelType(GraphicsEngine::TYPES_MAPPING::RGBA)
     , m_isDrawingInTexture( false )
     , m_texId(0)
 	, m_fbId(0)
@@ -13,19 +13,18 @@ drwDrawableTexture::drwDrawableTexture()
 	, m_width(1)
 	, m_height(1)
 {
-    m_engine = new GraphicsEngine();
+    m_engine = GraphicsEngineManager::getGraphicsEngine();
 }
 
 drwDrawableTexture::~drwDrawableTexture()
 {
     Release();
-    delete m_engine;
 }
 
-void drwDrawableTexture::SetPixelFormatToRGBU8() { m_internalFormat = GL_RGB; m_pixelType = GL_RGB; m_componentType = GL_UNSIGNED_BYTE; m_downloadPixelType = GL_RGB; }
+void drwDrawableTexture::SetPixelFormatToRGBU8() { m_internalFormat = GraphicsEngine::TYPES_MAPPING::RGB; m_pixelType = GraphicsEngine::TYPES_MAPPING::RGB; m_componentType = GraphicsEngine::TYPES_MAPPING::UBYTE; m_downloadPixelType = GraphicsEngine::TYPES_MAPPING::RGB; }
 //void drwDrawableTexture::SetPixelFormatToGreyF16() { m_internalFormat = GL_R16F; m_pixelType = GL_LUMINANCE; m_componentType = GL_FLOAT; m_downloadPixelType = GL_RED; }
-void drwDrawableTexture::SetPixelFormatToGreyF32() { m_internalFormat = GL_R32F; m_pixelType = GL_RED; m_componentType = GL_FLOAT; m_downloadPixelType = GL_RED; }
-void drwDrawableTexture::SetPixelFormatToRGBAF32() { m_internalFormat = GL_RGBA /*GL_RGBA32F_ARB*/; m_pixelType = GL_RGBA; m_componentType = GL_FLOAT; m_downloadPixelType = GL_RGBA; }
+void drwDrawableTexture::SetPixelFormatToGreyF32() { m_internalFormat = GraphicsEngine::TYPES_MAPPING::R32F; m_pixelType = GraphicsEngine::TYPES_MAPPING::RED; m_componentType = GraphicsEngine::TYPES_MAPPING::F32; m_downloadPixelType = GraphicsEngine::TYPES_MAPPING::RED; }
+void drwDrawableTexture::SetPixelFormatToRGBAF32() { m_internalFormat = GraphicsEngine::TYPES_MAPPING::RGBA /*GL_RGBA32F_ARB*/; m_pixelType = GraphicsEngine::TYPES_MAPPING::RGBA; m_componentType = GraphicsEngine::TYPES_MAPPING::F32; m_downloadPixelType = GraphicsEngine::TYPES_MAPPING::RGBA; }
 
 void drwDrawableTexture::Resize( int width, int height )
 {
@@ -59,8 +58,7 @@ void drwDrawableTexture::DrawToTexture( bool drawTo )
     if( drawTo )
     {
         assert( !m_isDrawingInTexture );
-        m_engine->GetVariable(GL_FRAMEBUFFER_BINDING, &m_backupFbId);
-        m_engine->BindFrameBuffer(m_fbId);
+        m_engine->DrawToTexture(m_fbId, m_backupFbId);
         m_isDrawingInTexture = true;
     }
 	else
@@ -97,20 +95,20 @@ void drwDrawableTexture::PasteToScreen()
 
 void drwDrawableTexture::Upload( unsigned char * buffer )
 {
-    m_engine->Upload(m_texId, 0, m_internalFormat, m_width, m_height, 0, m_pixelType, GL_UNSIGNED_BYTE, buffer);
+    m_engine->UploadUnsignedByte(m_texId, 0, m_internalFormat, m_width, m_height, 0, m_pixelType, buffer);
 }
 
 void drwDrawableTexture::Download( unsigned char * buffer )
 {
-    m_engine->Download(m_texId, 0, m_downloadPixelType, GL_UNSIGNED_BYTE, buffer);
+    m_engine->DownloadUnsignedByte(m_texId, 0, m_downloadPixelType, buffer);
 }
 
 void drwDrawableTexture::Download( unsigned short * buffer )
 {
-    m_engine->Download(m_texId, 0, m_downloadPixelType, GL_UNSIGNED_SHORT, buffer);
+    m_engine->DownloadUnsignedShort(m_texId, 0, m_downloadPixelType, buffer);
 }
 
 void drwDrawableTexture::Download( float * buffer )
 {
-    m_engine->Download(m_texId, 0, GL_RED, GL_FLOAT, buffer);
+    m_engine->DownloadFloat(m_texId, 0, GraphicsEngine::TYPES_MAPPING::RED, buffer);
 }

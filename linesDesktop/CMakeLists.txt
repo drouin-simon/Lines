@@ -1,5 +1,12 @@
 set( ExecName Lines )
 
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 set( Drw_src  main.cpp 
 		MainWindow.cpp 
 		PlaybackControlerWidget.cpp 
@@ -19,14 +26,17 @@ include_directories(${linesDesktopLibIncludeDirs})
 # Include bin directory for moc files
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-include_directories(${glew_SOURCE_DIR} ${glew_BINARY_DIR})
+if (NOT ANDROID)
+    include_directories(${glew_SOURCE_DIR} ${glew_BINARY_DIR})
+endif()
+
 
 # Create classes from Qt ui files
 set( Drw_ui ExportDialog.ui LinesPreferencesWidget.ui )
-qt5_wrap_ui( Drw_hdr_ui ${Drw_ui} )
+qt_wrap_ui( Drw_hdr_ui ${Drw_ui} )
 
 # moc Qt source file without a ui file
-qt5_wrap_cpp( Drw_moc ${Drw_hdr})
+qt_wrap_cpp( Drw_moc ${Drw_hdr})
 
 #--------------------------------------------------------------------------------
 # For Apple set the icns file containing icons
@@ -54,30 +64,43 @@ ENDIF(APPLE)
 
 if( WIN32 )
 	set( executable_flags WIN32 )
-        set( Drw_src ${Drw_src} Lines.rc )
+    set( Drw_src ${Drw_src} Lines.rc )
+endif()
+#--------------------------------------------------------------------------------
+
+
+if ( ANDROID )
+    set( executable_flags MANUAL_FINALIZATION )
 endif()
 
 #--------------------------------------------------------------------------------
 # Create and link executable
 #--------------------------------------------------------------------------------
 set( Drw_all_src ${Drw_src} ${Drw_hdr} ${Drw_moc} ${Drw_hdr_ui} )
-add_executable( ${ExecName} ${executable_flags} ${Drw_all_src} )
-target_link_libraries( ${ExecName} linesDesktopLib linesNetwork linesCore GraphicsEngine svl ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY} ${QT_LIBRARIES} )
-qt5_use_modules( ${ExecName} OpenGL Widgets Network )
-if (APPLE)
-    set_target_properties( ${ExecName} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_BINARY_DIR}/LinesInfo.plist )
+qt_add_executable( ${ExecName} ${executable_flags} ${Drw_all_src} )
+
+if (ANDROID)
+    target_link_libraries( ${ExecName} PRIVATE linesDesktopLib linesNetwork linesCore GraphicsEngine svl ${QT_LIBRARIES} )
+    target_link_libraries( ${ExecName} PRIVATE Qt6::Widgets Qt6::Network Qt6::OpenGLWidgets )
 else()
-    target_link_libraries( ${ExecName} OpenGL::GL libglew_static)
+    #find_package(OpenGL)
+    target_link_libraries( ${ExecName} PRIVATE linesDesktopLib linesNetwork linesCore GraphicsEngine svl ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY} ${QT_LIBRARIES} )
+    target_link_libraries( ${ExecName} PRIVATE Qt6::OpenGL Qt6::Widgets Qt6::Network Qt6::OpenGLWidgets )
+endif()
+
+if (APPLE)   
+    set_target_properties( ${ExecName} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_BINARY_DIR}/LinesInfo.plist )  
+elseif(NOT ANDROID)
+    #target_link_libraries( ${ExecName} PRIVATE OpenGL::GL libglew_static)
 endif()
 
 
 #--------------------------------------------------------------------------------
 # INSTALL
 #--------------------------------------------------------------------------------
-#PrintVariables()
 
 # Run Qt deployment tool for each platform
-get_target_property( QMakeLocation Qt5::qmake LOCATION)
+get_target_property( QMakeLocation Qt6::qmake LOCATION)
 get_filename_component( QtBinLocation ${QMakeLocation} DIRECTORY )
 if( APPLE )
     set( MacDeployQtExec ${QtBinLocation}/macdeployqt )
@@ -93,6 +116,8 @@ elseif( WIN32 )
    # on Windows, we use WinDeployQt. CPack below is creating an installer using NSIS
    include(${CMAKE_EXT_DIR}/windeployqt.cmake)
    windeployqt( ${ExecName} . )
+else()
+    qt_finalize_executable(${ExecName})
 endif()
 
 #--------------------------------------------------------------------------------

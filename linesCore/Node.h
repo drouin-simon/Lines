@@ -1,7 +1,7 @@
 #ifndef __Node_h_
 #define __Node_h_
 
-#include "../GraphicsEngine/GraphicsEngine.h"
+#include "../GraphicsEngine/include/GraphicsEngineManager.h"
 #include "macros.h"
 #include "SharedPtrMacro.h"
 
@@ -19,7 +19,6 @@ public:
 	SharedPtrMacro(Node);
 	
 	Node();
-	~Node();
 	
     void Draw( drwDrawingContext & context );
 	
@@ -29,7 +28,7 @@ public:
 	void SetPrimitive( Primitive * prim ) { ThePrimitive = prim; }
 	Primitive * GetPrimitive() { return ThePrimitive; }
 	
-	GetMacro( Id, GLuint );
+	GetMacro( Id, unsigned int );
 	
 	SetMacro( IsHidden, bool );
 	
@@ -39,10 +38,10 @@ protected:
 	Vec2 Position;
 	Primitive * ThePrimitive;
 
-	GLuint Id;
+	unsigned int Id;
 	
 	// Next id to be attributed
-	static GLuint NextId;
+	static unsigned int NextId;
 	
 };
 

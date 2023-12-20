@@ -29,7 +29,7 @@ protected:
     void    mouseMoveEvent(QMouseEvent *event);
     void    mousePressEvent(QMouseEvent *event);
     void    mouseReleaseEvent(QMouseEvent *event);
-    void    enterEvent(QEvent *event);
+    void    enterEvent(QEnterEvent *event);
     void    leaveEvent(QEvent *event);
     void    paintEvent(QPaintEvent *event);
 

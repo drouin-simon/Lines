@@ -40,7 +40,7 @@ void TabletStateTestingArea::tabletEvent ( QTabletEvent * e )
     e->ignore();
 }
 
-void TabletStateTestingArea::enterEvent( QEvent * )
+void TabletStateTestingArea::enterEvent( QEnterEvent * )
 {
     m_parent->LogEnterEvent();
 }

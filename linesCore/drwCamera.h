@@ -1,7 +1,7 @@
 #ifndef __drwCamera_h_
 #define __drwCamera_h_
 
-#include "../GraphicsEngine/GraphicsEngine.h"
+#include "../GraphicsEngine/include/GraphicsEngineManager.h"
 
 class drwCamera
 {
@@ -9,7 +9,6 @@ class drwCamera
 public:
 
     drwCamera();
-    ~drwCamera();
     
     void SetWindowSize( int w, int h );
     int * GetWindowSize() { return m_winSizePix; }

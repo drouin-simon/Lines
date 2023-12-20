@@ -1,32 +1,100 @@
-/*
 #include "OpenGLESGraphicsEngine.h"
 
+#include <fstream>
+#include <sstream>
+
+#include <glm/gtc/type_ptr.hpp>
+
+std::string readShaderFile(const std::string& filePath) {
+    std::ifstream file(filePath);
+    if (!file.is_open()) {
+        return "";
+    }
+
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+    return buffer.str();
+}
+
+OpenGLESGraphicsEngine::OpenGLESGraphicsEngine() {
+
+    projectionMatrix = glm::mat4(1.0f);
+    modelViewMatrix = glm::mat4(1.0f);
+
+    this->programId = 0;
+
+}
+
+void OpenGLESGraphicsEngine::initialize() {
+    this->openglFunctions = this->context->functions();
+
+    const GLchar* vertexShaderCode = readShaderFile("shader/vertexShader.glsl").c_str();
+    const GLchar* fragmentShaderCode = readShaderFile("shader/fragmentShader.glsl").c_str();
+
+    this->vertexShader = this->openglFunctions->glCreateShader(GL_VERTEX_SHADER);
+    this->openglFunctions->glShaderSource(this->vertexShader, 1, &vertexShaderCode, nullptr);
+    this->openglFunctions->glCompileShader(this->vertexShader);
+
+
+    this->fragmentShader = this->openglFunctions->glCreateShader(GL_FRAGMENT_SHADER);
+    this->openglFunctions->glShaderSource(this->fragmentShader, 1, &fragmentShaderCode, nullptr);
+    this->openglFunctions->glCompileShader(this->fragmentShader);
+
+    this->openglFunctions->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    //// Définir les points pour dessiner la ligne
+    //GLfloat vertices[] = {
+    //    -0.5f, -0.5f, 0.0f,  // Premier point
+    //     0.5f,  0.5f, 0.0f   // Deuxième point
+    //};
+
+    //// Activer le pointeur de vertex
+    //this->openglFunctions->glEnableClientState(GL_VERTEX_ARRAY);
+    //this->openglFunctions->glVertexPointer(3, GL_FLOAT, 0, vertices);
+
+    //// Dessiner la ligne
+    //this->openglFunctions->glDrawArrays(GL_LINES, 0, 2);
+
+    //// Désactiver le pointeur de vertex
+    //this->openglFunctions->glDisableClientState(GL_VERTEX_ARRAY);
+}
+
 void OpenGLESGraphicsEngine::SetViewPort(int x, int y, int width, int height) {
-    glViewport(x, y, width, height);
-    
+    this->openglFunctions->glViewport(x, y, width, height);
 }
 
 void OpenGLESGraphicsEngine::SetProjectionViewPort(int x, int y, int width, int height) {
     this->SetViewPort(x, y, width, height);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
+    projectionMatrix = glm::ortho(0.0f, static_cast<float>(width), 0.0f, static_cast<float>(height));
+
 }
+
 void OpenGLESGraphicsEngine::SetModelViewOrtho2D(double left, double right, double bottom, double top) {
-    gluOrtho2D(left, right, bottom, top);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
+
+    modelViewMatrix = glm::ortho(static_cast<float>(left), static_cast<float>(right), static_cast<float>(bottom), static_cast<float>(top));
 }
+void OpenGLESGraphicsEngine::RenderObject() {
+
+    glUseProgram(programId);
+
+    GLint projMatrixLoc = glGetUniformLocation(programId, "u_projectionMatrix");
+    glUniformMatrix4fv(projMatrixLoc, 1, GL_FALSE, &projectionMatrix[0][0]);
+
+    GLint mvMatrixLoc = glGetUniformLocation(programId, "u_modelViewMatrix");
+    glUniformMatrix4fv(mvMatrixLoc, 1, GL_FALSE, &modelViewMatrix[0][0]);
+
+}
+
 
 unsigned int OpenGLESGraphicsEngine::InitTexture(int level, int internalFormat, int width, int height, int border, int format, int type, void* pixels) {
     unsigned int texId;
 
     glGenTextures(1, &texId);
-    glBindTexture(GL_TEXTURE_RECTANGLE_ARB, texId);
-    glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-    glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, level, internalFormat, width, height, border, format, type, pixels);
-    glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
+    glBindTexture(GL_TEXTURE_2D, texId);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D, level, internalFormat, width, height, border, format, type, pixels);
+    glBindTexture(GL_TEXTURE_2D, 0);
 
     return texId;
 }
@@ -34,117 +102,121 @@ unsigned int OpenGLESGraphicsEngine::InitTexture(int level, int internalFormat, 
 unsigned int OpenGLESGraphicsEngine::InitFrameBuffer(unsigned int texId) {
     unsigned int fbId;
 
-    int backupFbId = 0;
-    glGetIntegerv(GL_FRAMEBUFFER_BINDING, &backupFbId);
-    glGenFramebuffersEXT(1, &fbId);
-    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbId);
-    glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_RECTANGLE_ARB, texId, 0);
-    GLenum ret = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
-    assert(ret == GL_FRAMEBUFFER_COMPLETE_EXT);
-    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, backupFbId);
+    glGenFramebuffers(1, &fbId);
+    glBindFramebuffer(GL_FRAMEBUFFER, fbId);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texId, 0);
+    GLenum ret = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    assert(ret == GL_FRAMEBUFFER_COMPLETE);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     return fbId;
 }
 
 void OpenGLESGraphicsEngine::DisplayTexture(unsigned int texId, int level, int internalFormat, int width, int height, int border, int format, int type, void* pixels) {
-    glBindTexture(GL_TEXTURE_RECTANGLE_ARB, texId);
-    glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, level, internalFormat, width, height, border, format, type, pixels);
-    glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
+    glBindTexture(GL_TEXTURE_2D, texId);
+    glTexImage2D(GL_TEXTURE_2D, level, internalFormat, width, height, border, format, type, pixels);
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void OpenGLESGraphicsEngine::ClearTexture(unsigned int fbId) {
     int backupFbId = 0;
     glGetIntegerv(GL_FRAMEBUFFER_BINDING, &backupFbId);
-    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbId);
+    glBindFramebuffer(GL_FRAMEBUFFER, fbId);
     glClearColor(0.0, 0.0, 0.0, 0.0);
     glClear(GL_COLOR_BUFFER_BIT);
-    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, backupFbId);
+    glBindFramebuffer(GL_FRAMEBUFFER, backupFbId);
 }
 
 void OpenGLESGraphicsEngine::ReleaseTexture(unsigned int texId, unsigned int fbId) {
     if (fbId)
-        glDeleteFramebuffersEXT(1, &fbId);
+        glDeleteFramebuffers(1, &fbId);
     if (texId)
         glDeleteTextures(1, &texId);
 }
 
 void OpenGLESGraphicsEngine::PasteTextureToScreen(unsigned int texId, int texWidth, int texHeight, int x, int y, int screenWidth, int screenHeight) {
-    glMatrixMode(GL_PROJECTION);
-    glPushMatrix();
-    glLoadIdentity();
-    gluOrtho2D(0, texWidth, 0, texHeight);
 
-    glBindTexture(GL_TEXTURE_RECTANGLE_ARB, texId);
-    glBegin(GL_QUADS);
-    {
-        glTexCoord2i(x, y);					
-        glVertex2d(x, y);
+    glUseProgram(programId);
 
-        glTexCoord2i(x + screenWidth, y);			
-        glVertex2d(x + screenWidth, y);
+    glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(texWidth), 0.0f, static_cast<float>(texHeight));
+    GLint projMatrixLoc = glGetUniformLocation(programId, "u_projectionMatrix");
+    glUniformMatrix4fv(projMatrixLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
-        glTexCoord2i(x + screenWidth, y + screenHeight);	
-        glVertex2d(x + screenWidth, y + screenHeight);
 
-        glTexCoord2i(x, y + screenHeight);			
-        glVertex2d(x, y + screenHeight);
-    }
-    glEnd();
-    glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
+    glm::mat4 modelView = glm::mat4(1.0f);
+    GLint mvMatrixLoc = glGetUniformLocation(programId, "u_modelViewMatrix");
+    glUniformMatrix4fv(mvMatrixLoc, 1, GL_FALSE, glm::value_ptr(modelView));
 
-    glPopMatrix();
-    glMatrixMode(GL_MODELVIEW);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texId);
+
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glUseProgram(0);
 }
 
 void OpenGLESGraphicsEngine::ClearScreen(int texWidth, int texHeight, int x, int y, int screenWidth, int screenHeight) {
-    glDisable(GL_BLEND);
-    glMatrixMode(GL_PROJECTION);
-    glPushMatrix();
-    glLoadIdentity();
-    gluOrtho2D(0, texWidth, 0, texHeight);
+    glEnable(GL_SCISSOR_TEST);
+    glScissor(x, y, screenWidth, screenHeight);
+    glClearColor(0.0, 0.0, 0.0, 0.0);
+    glClear(GL_COLOR_BUFFER_BIT);
+    glDisable(GL_SCISSOR_TEST);
+}
 
-    glColor4d(0.0, 0.0, 0.0, 0.0);
-    glBegin(GL_QUADS);
-    {
-        glVertex2d(x, y);
-        glVertex2d(x + screenWidth, y);
-        glVertex2d(x + screenWidth, y + screenHeight);
-        glVertex2d(x, y + screenHeight);
+void OpenGLESGraphicsEngine::UploadUnsignedByte(unsigned int texId, int level, int internalFormat, int width, int height, int border, int format, unsigned char* buffer)
+{
+    glBindTexture(GL_TEXTURE_2D, texId);
+    glTexImage2D(GL_TEXTURE_2D, level, internalFormat, width, height, border, format, GL_UNSIGNED_BYTE, buffer);
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void OpenGLESGraphicsEngine::DownloadUnsignedByte(unsigned int texId, int level, int format, unsigned char* buffer)
+{
+
+    GLuint fbId;
+    glGenFramebuffers(1, &fbId);
+    glBindFramebuffer(GL_FRAMEBUFFER, fbId);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texId, level);
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE) {
+        int width, height;  // TODO: Initialization
+        glReadPixels(0, 0, width, height, format, GL_UNSIGNED_BYTE, buffer);
     }
-    glEnd();
 
-    glPopMatrix();
-    glMatrixMode(GL_MODELVIEW);
-    glEnable(GL_BLEND);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glDeleteFramebuffers(1, &fbId);
 }
 
-void OpenGLESGraphicsEngine::Upload(unsigned int texId, int level, int internalFormat, int width, int height, int border, int format, int type, unsigned char* buffer)
+void OpenGLESGraphicsEngine::DownloadUnsignedShort(unsigned int texId, int level, int format, unsigned short* buffer)
 {
-    glBindTexture(GL_TEXTURE_RECTANGLE_ARB, texId);
-    glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, level, internalFormat, width, height, border, format, type, buffer);
-    glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
+
+    GLuint fbId;
+    glGenFramebuffers(1, &fbId);
+    glBindFramebuffer(GL_FRAMEBUFFER, fbId);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texId, level);
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE) {
+        int width, height; // TODO: Initialization
+        glReadPixels(0, 0, width, height, format, GL_SHORT, buffer);
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glDeleteFramebuffers(1, &fbId);
 }
 
-void OpenGLESGraphicsEngine::Download(unsigned int texId, int level, int format, int type, unsigned char* buffer)
+void OpenGLESGraphicsEngine::DownloadFloat(unsigned int texId, int level, int format, float* buffer)
 {
-    glBindTexture(GL_TEXTURE_RECTANGLE_ARB, texId);
-    glGetTexImage(GL_TEXTURE_RECTANGLE_ARB, level, format, type, buffer);
-    glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
-}
 
-void OpenGLESGraphicsEngine::Download(unsigned int texId, int level, int format, int type, unsigned short* buffer)
-{
-    glBindTexture(GL_TEXTURE_RECTANGLE_ARB, texId);
-    glGetTexImage(GL_TEXTURE_RECTANGLE_ARB, level, format, type, buffer);
-    glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
-}
+    GLuint fbId;
+    glGenFramebuffers(1, &fbId);
+    glBindFramebuffer(GL_FRAMEBUFFER, fbId);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texId, level);
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE) {
+        int width, height;  // TODO: Initialization
+        glReadPixels(0, 0, width, height, format, GL_FLOAT, buffer);
+    }
 
-void OpenGLESGraphicsEngine::Download(unsigned int texId, int level, int format, int type, float* buffer)
-{
-    glBindTexture(GL_TEXTURE_RECTANGLE_ARB, texId);
-    glGetTexImage(GL_TEXTURE_RECTANGLE_ARB, 0, GL_RED, GL_FLOAT, buffer);
-    glGetTexImage(GL_TEXTURE_RECTANGLE_ARB, level, format, type, buffer);
-    glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glDeleteFramebuffers(1, &fbId);
 }
 
 void OpenGLESGraphicsEngine::DrawPolygon(PolygonData& data, Vec4 color) {
@@ -152,9 +224,10 @@ void OpenGLESGraphicsEngine::DrawPolygon(PolygonData& data, Vec4 color) {
     if (points.size() > 0)
     {
 
-        glColor4d(color[0], color[1], color[2], color[3]);
+        this->color4d(color[0], color[1], color[2], color[3]);
         double* pbuffer = points.GetBuffer();
-        glVertexPointer(2, GL_DOUBLE, 0, pbuffer);
+
+        this->VertexPointer(pbuffer);
 
         drwIndexArray& triangles = data.GetTriangles();
         if (triangles.size() > 0)
@@ -173,50 +246,54 @@ void OpenGLESGraphicsEngine::DrawPolygon(PolygonData& data, Vec4 color) {
 }
 
 void OpenGLESGraphicsEngine::DrawLine(double* pointsBuffer, unsigned int* pointsIndexBuffer, size_t pointsIndexSize, double lineWidth, Vec4 color) {
-    glColor4d(color[0], color[1], color[2], color[3]);
+
+    this->color4d(color[0], color[1], color[2], color[3]);
     glLineWidth(lineWidth);
-    glVertexPointer(2, GL_DOUBLE, 0, pointsBuffer);
+
+    this->VertexPointer(pointsBuffer);
     glDrawElements(GL_LINE_STRIP, pointsIndexSize, GL_UNSIGNED_INT, pointsIndexBuffer);
 }
 
 void OpenGLESGraphicsEngine::FillLine(double* poinstBuffer, unsigned int* indicesBuffer, size_t indicesSize, Vec4 color) {
-    glColor4d(color[0], color[1], color[2], color[3]);
-    glDisable(GL_BLEND);
-    glEnable(GL_COLOR_LOGIC_OP);
-    glLogicOp(GL_INVERT);
-    glVertexPointer(2, GL_DOUBLE, 0, poinstBuffer);
-    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-    glDrawElements(GL_TRIANGLE_FAN, indicesSize, GL_UNSIGNED_INT, indicesBuffer);
+    //glColor4d(color[0], color[1], color[2], color[3]);
+    //glDisable(GL_BLEND);
+    //glEnable(GL_COLOR_LOGIC_OP);
+    //glLogicOp(GL_INVERT);
+    //glVertexPointer(2, GL_DOUBLE, 0, poinstBuffer);
+    //glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    //glDrawElements(GL_TRIANGLE_FAN, indicesSize, GL_UNSIGNED_INT, indicesBuffer);
 
-    glDisable(GL_COLOR_LOGIC_OP);
+    //glDisable(GL_COLOR_LOGIC_OP);
 }
 
 void OpenGLESGraphicsEngine::DrawWideLine(double* verticlesBuffer, unsigned int* indicesBuffer, size_t indicesSize, double* normalsBuffer, double* uvsBuffer, Vec4 color) {
-    glColor4d(color[0], color[1], color[2], color[3]);
-    glEnable(GL_BLEND);
-    glBlendEquation(GL_MAX);
+    //glColor4d(color[0], color[1], color[2], color[3]);
+    //glEnable(GL_BLEND);
+    //glBlendEquation(GL_MAX);
 
-    glVertexPointer(2, GL_DOUBLE, 0, verticlesBuffer);
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    glTexCoordPointer(3, GL_DOUBLE, 0, uvsBuffer);
-    glEnableClientState(GL_NORMAL_ARRAY);
-    glNormalPointer(GL_DOUBLE, 0, normalsBuffer);
-    glDrawElements(GL_QUADS, indicesSize, GL_UNSIGNED_INT, indicesBuffer);
+    //glVertexPointer(2, GL_DOUBLE, 0, verticlesBuffer);
+    //glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    //glTexCoordPointer(3, GL_DOUBLE, 0, uvsBuffer);
+    //glEnableClientState(GL_NORMAL_ARRAY);
+    //glNormalPointer(GL_DOUBLE, 0, normalsBuffer);
+    //glDrawElements(GL_QUADS, indicesSize, GL_UNSIGNED_INT, indicesBuffer);
 
-    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-    glDisableClientState(GL_NORMAL_ARRAY);
+    //glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    //glDisableClientState(GL_NORMAL_ARRAY);
 }
 
 void OpenGLESGraphicsEngine::SetupPasteTextureToScreen(Vec4 color) {
     glBlendEquation(GL_FUNC_ADD);
     glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE);
-    glColor4d(color[0], color[1], color[2], color[3]);
+
+    this->color4d(color[0], color[1], color[2], color[3]);
 }
 
 void OpenGLESGraphicsEngine::SetupEraseTextureToScreen(Vec4 color) {
     glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_REVERSE_SUBTRACT);
     glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE);
-    glColor4d(color[0], color[1], color[2], color[3]);
+
+    this->color4d(color[0], color[1], color[2], color[3]);
 }
 
 void OpenGLESGraphicsEngine::ResetTextureState() {
@@ -241,23 +318,27 @@ void OpenGLESGraphicsEngine::scissor(int x, int y, int width, int height) {
 }
 
 void OpenGLESGraphicsEngine::initializeState() {
-    glDisable(GL_DEPTH_TEST);
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glEnable(GL_TEXTURE_RECTANGLE_ARB);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    //glDisable(GL_DEPTH_TEST);
+    //glEnableClientState(GL_VERTEX_ARRAY);
+    //glEnable(GL_TEXTURE_2D);
+    //glEnable(GL_BLEND);
+    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void OpenGLESGraphicsEngine::initializeModelViewMatrix() {
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
+    //glMatrixMode(GL_MODELVIEW);
+    //glLoadIdentity();
+
+    /*GLuint modelViewMatrixLocation = glGetUniformLocation(this->programId, "u_modelViewMatrix");
+    glm::mat4 modelViewMatrix = glm::mat4(1.0f);
+    glUniformMatrix4fv(modelViewMatrixLocation, 1, GL_FALSE, glm::value_ptr(modelViewMatrix));*/
 }
 
 void OpenGLESGraphicsEngine::clear() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void OpenGLESGraphicsEngine::clear(GLbitfield mask) {
+void OpenGLESGraphicsEngine::clear(unsigned int mask) {
     glClear(mask);
 }
 
@@ -270,15 +351,18 @@ void OpenGLESGraphicsEngine::blendFunc(unsigned int sfactor, unsigned int dfacto
 }
 
 void OpenGLESGraphicsEngine::color4d(float red, float green, float blue, float alpha) {
-    glColor4d(red, green, blue, alpha);
+
+    GLint colorLoc = glGetUniformLocation(this->programId, "u_color");
+    glUniform4f(colorLoc, red, green, blue, alpha);
 }
 
-GLuint OpenGLESGraphicsEngine::createProgram() {
+unsigned int OpenGLESGraphicsEngine::createProgram() {
     return glCreateProgram();
 }
 
 void OpenGLESGraphicsEngine::linkProgram(unsigned int glslProgram) {
     glLinkProgram(glslProgram);
+    this->programId = glslProgram;
 }
 
 void OpenGLESGraphicsEngine::attachShader(unsigned int glslProgram, unsigned int glslVertexShader) {
@@ -293,26 +377,20 @@ void OpenGLESGraphicsEngine::getProgramInfoLog(unsigned int program, int maxLeng
     glGetProgramInfoLog(program, maxLength, length, infoLog);
 }
 
-//void OpenGLGraphicsEngine::Download(unsigned char* buffer) {
-//    //glBindTexture(GL_TEXTURE_RECTANGLE_ARB, m_texId);
-//    //glGetTexImage(GL_TEXTURE_RECTANGLE_ARB, 0, m_downloadPixelType, GL_UNSIGNED_BYTE, buffer);
-//    //glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
-//}
-
 void OpenGLESGraphicsEngine::pushName(unsigned int name) {
-    glPushName(name);
+    //glPushName(name);
 }
 
 void OpenGLESGraphicsEngine::pushMatrix() {
-    glPushMatrix();
+    //glPushMatrix();
 }
 
 void OpenGLESGraphicsEngine::popMatrix() {
-    glPopMatrix();
+    //glPopMatrix();
 }
 
 void OpenGLESGraphicsEngine::popName() {
-    glPopName();
+    //glPopName();
 }
 
 void OpenGLESGraphicsEngine::BindFrameBuffer(unsigned int fbId) {
@@ -339,6 +417,16 @@ bool OpenGLESGraphicsEngine::SetVariable(unsigned int programId, const char* nam
     return false;
 }
 
+bool OpenGLESGraphicsEngine::SetVariable(unsigned int programId, const char* name, Vec4 value) {
+    int location = glGetUniformLocation(programId, name);
+    if (location != -1)
+    {
+        glUniform4f(location, value[0], value[1], value[2], value[3]);
+        return true;
+    }
+    return false;
+}
+
 void OpenGLESGraphicsEngine::GetVariable(unsigned int name, int* value) {
     glGetIntegerv(name, value);
 }
@@ -351,4 +439,101 @@ void OpenGLESGraphicsEngine::DeleteProgram(unsigned int programId) {
     glDeleteProgram(programId);
 }
 
-*/
+void OpenGLESGraphicsEngine::VertexPointer(double* verticlesBuffer) {
+    //GLint positionLoc = glGetAttribLocation(this->programId, "a_position");
+    //glVertexAttribPointer(positionLoc, 2, GL_FLOAT, GL_FALSE, 0, verticlesBuffer);
+    //glEnableVertexAttribArray(positionLoc);
+}
+
+bool OpenGLESGraphicsEngine::CreateAndCompileVertexShader(unsigned& shaderId, std::vector< std::string >& files, std::vector< std::string >& memSources) {
+    return CreateAndCompileShader(GL_VERTEX_SHADER, shaderId, files, memSources);
+}
+bool OpenGLESGraphicsEngine::CreateAndCompileFragmentShader(unsigned& shaderId, std::vector< std::string >& files, std::vector< std::string >& memSources) {
+    return CreateAndCompileShader(GL_FRAGMENT_SHADER, shaderId, files, memSources);
+}
+
+bool OpenGLESGraphicsEngine::CreateAndCompileShader(unsigned shaderType, unsigned& shaderId, std::vector< std::string >& files, std::vector< std::string >& memSources) {
+    // Add sources from files to m_memSources vector
+    for (unsigned i = 0; i < files.size(); ++i)
+    {
+        std::string newSource;
+        if (!LoadOneShaderSource(files[i].c_str(), newSource))
+            return false;
+        memSources.push_back(newSource);
+    }
+
+    // put all the sources in an array of const GLchar*
+    const GLchar** shaderStringPtr = new const GLchar * [memSources.size()];
+    for (unsigned i = 0; i < memSources.size(); ++i)
+    {
+        shaderStringPtr[i] = memSources[i].c_str();
+    }
+
+    // Create the shader and set its source
+    shaderId = glCreateShader(shaderType);
+    glShaderSource(shaderId, memSources.size(), shaderStringPtr, NULL);
+
+    delete[] shaderStringPtr;
+
+    // Compile the shader
+    GLint success = 0;
+    glCompileShader(shaderId);
+    glGetShaderiv(shaderId, GL_COMPILE_STATUS, &success);
+    //if (!success)
+    //{
+    //    GLint logLength = 0;
+    //    glGetShaderiv(shaderId, GL_INFO_LOG_LENGTH, &logLength);
+    //    GLchar* infoLog = new GLchar[logLength + 1];
+    //    glGetShaderInfoLog(shaderId, logLength, NULL, infoLog);
+    //    ReportError("Error in shader complilation: \n %s\n", infoLog);
+    //    delete[] infoLog;
+    //    return false;
+    //}
+    return true;
+
+}
+
+void OpenGLESGraphicsEngine::BlendMaxEquation() {
+   glBlendEquation(GL_MAX);
+}
+
+void OpenGLESGraphicsEngine::UseProgram(unsigned int programId) {
+    glUseProgram(programId);
+}
+
+void OpenGLESGraphicsEngine::DrawToTexture(unsigned int& fbId, int& backupFbId) {
+    this->GetVariable(GL_FRAMEBUFFER_BINDING, &backupFbId);
+    this->BindFrameBuffer(backupFbId);
+}
+
+void OpenGLESGraphicsEngine::Flush() {
+    glFlush();
+}
+
+bool OpenGLESGraphicsEngine::LoadOneShaderSource(const char* filename, std::string& shaderSource)
+{
+    // Open shader file for reading
+    FILE* f = fopen(filename, "rb");
+    if (!f)
+    {
+        //ReportError("Couldn't open shader file %s\n", filename);
+        return false;
+    }
+
+    // Get file size
+    fseek(f, 0, SEEK_END);
+    long length = ftell(f);
+    fseek(f, 0, SEEK_SET);
+
+    // Read file into shaderSource string
+    char* charShaderSource = new char[length + 1];
+    fread(charShaderSource, 1, length, f);
+    charShaderSource[length] = '\0';
+    shaderSource = charShaderSource;
+    delete[] charShaderSource;
+
+    // close the file
+    fclose(f);
+
+    return true;
+}

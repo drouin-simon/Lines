@@ -22,7 +22,7 @@ ClickScrollWidget::~ClickScrollWidget()
 {
 }
 
-void ClickScrollWidget::enterEvent(QEvent *event)
+void ClickScrollWidget::enterEvent(QEnterEvent *event)
 {
     Q_UNUSED(event)
     setCursor(Qt::CrossCursor);
@@ -89,7 +89,7 @@ void ClickScrollWidget::paintEvent( QPaintEvent * event )
     Q_UNUSED(event)
 
     QPainter painter(this);
-	painter.setRenderHint( QPainter::HighQualityAntialiasing );
+	painter.setRenderHint( QPainter::Antialiasing );
 
     // Draw bounding box
     painter.setPen( Qt::white );

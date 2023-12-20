@@ -1,7 +1,7 @@
 #ifndef __WideLine_h_
 #define __WideLine_h_
 
-#include "../GraphicsEngine/GraphicsEngine.h"
+#include "../GraphicsEngine/include/GraphicsEngineManager.h"
 #include "drwDataArray.h"
 #include "LinePrimitive.h"
 #include "Box2d.h"
@@ -15,7 +15,6 @@ class WideLine : public LinePrimitive
 public:
 
 	WideLine( double width );
-    ~WideLine();
     
     virtual void StartPoint( double x, double y, double pressure );
     virtual void EndPoint( double x, double y, double pressure );

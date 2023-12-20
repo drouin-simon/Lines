@@ -10,12 +10,7 @@ Circle::Circle() : Center( Vec2( 0, 0 ) )
     Contour = false;
     Fill = true;
 
-    m_engine = new OpenGLGraphicsEngine();
-}
-
-Circle::~Circle()
-{
-    delete m_engine;
+    m_engine = GraphicsEngineManager::getGraphicsEngine();
 }
 
 void Circle::SetCenter( Vec2 center )

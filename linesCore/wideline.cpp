@@ -20,13 +20,7 @@ WideLine::WideLine( double width )
 , m_prevPressure( 1.0 )
 , m_doneAddingPoints( false )
 {
-    m_engine = new GraphicsEngine();
-}
-
-
-WideLine::~WideLine() 
-{
-    delete m_engine;
+    m_engine = GraphicsEngineManager::getGraphicsEngine();
 }
 
 void WideLine::InternDraw( drwDrawingContext & context )
@@ -66,7 +60,7 @@ void WideLine::InternDraw( drwDrawingContext & context )
     shader->SetVariable( "sigma_large", m_sigma_large );
     shader->SetVariable( "sigma_small", m_sigma_small );
 		
-	glBlendEquation( GL_MAX );
+    m_engine->BlendMaxEquation();
 
     m_engine->DrawWideLine(m_vertices.GetBuffer(), m_indices.GetBuffer(), m_indices.size(), m_normals.GetBuffer(), m_texCoord.GetBuffer(), lineColor);
 
@@ -326,6 +320,7 @@ uniform float pix_margin; \
 uniform float pix_damp_width; \
 uniform float sigma_large; \
 uniform float sigma_small; \
+uniform vec4 u_color; \
 varying float margin; \
 varying float sigma; \
 void main() \

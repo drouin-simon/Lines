@@ -6,10 +6,22 @@
 #include <SVL.h>
 #include <assert.h>
 
+#include <QOpenGLContext>
+
 // TODO: Use SVL to make Vec3/4
 class IGraphicsEngine
 {
+protected:
+    QOpenGLContext* context;
+
 public:
+
+    virtual void initialize() = 0;
+
+    void setContext(QOpenGLContext* newContext) {
+        this->context = newContext;
+    }
+
     // drwCamera.cpp
     virtual void SetViewPort(int x, int y, int width, int height) = 0;
     virtual void SetProjectionViewPort(int x, int y, int width, int height) = 0;
@@ -24,10 +36,10 @@ public:
     virtual void PasteTextureToScreen(unsigned int texId, int texWidth, int texHeight, int x, int y, int screenWidth, int screenHeight) = 0;
     virtual void ClearScreen(int texWidth, int texHeight, int x, int y, int screenWidth, int screenHeight) = 0;
     
-    virtual void Upload(unsigned int texId, int level, int internalFormat, int width, int height, int border, int format, int type, unsigned char* buffer) = 0;
-    virtual void Download(unsigned int texId, int level, int format, int type, unsigned char* buffer) = 0;
-    virtual void Download(unsigned int texId, int level, int format, int type, unsigned short* buffer) = 0;
-    virtual void Download(unsigned int texId, int level, int format, int type, float* buffer) = 0;
+    virtual void UploadUnsignedByte(unsigned int texId, int level, int internalFormat, int width, int height, int border, int format, unsigned char* buffer) = 0;
+    virtual void DownloadUnsignedByte(unsigned int texId, int level, int format, unsigned char* buffer) = 0;
+    virtual void DownloadUnsignedShort(unsigned int texId, int level, int format, unsigned short* buffer) = 0;
+    virtual void DownloadFloat(unsigned int texId, int level, int format, float* buffer) = 0;
 
     // lcCircle.cpp
     virtual void DrawPolygon(PolygonData& data, Vec4 color) = 0;
@@ -68,10 +80,23 @@ public:
     virtual void BindFrameBuffer(unsigned int fbId) = 0;
     virtual bool SetVariable(unsigned int programId, const char* name, int value) = 0;
     virtual bool SetVariable(unsigned int programId, const char* name, float value) = 0;
+    virtual bool SetVariable(unsigned int programId, const char* name, Vec4 value) = 0;
     virtual void GetVariable(unsigned int name, int* value) = 0;
 
     virtual void DeleteShader(unsigned int shaderId) = 0;
     virtual void DeleteProgram(unsigned int programId) = 0;
+
+    virtual bool CreateAndCompileShader(unsigned shaderType, unsigned& shaderId, std::vector< std::string >& files, std::vector< std::string >& memSources) = 0;
+
+    virtual bool CreateAndCompileVertexShader(unsigned& shaderId, std::vector< std::string >& files, std::vector< std::string >& memSources) = 0;
+    virtual bool CreateAndCompileFragmentShader(unsigned& shaderId, std::vector< std::string >& files, std::vector< std::string >& memSources) = 0;
+
+    virtual void BlendMaxEquation() = 0;
+    virtual void UseProgram(unsigned int programId) = 0;
+
+    virtual void DrawToTexture(unsigned int& fbId, int& backupFbId) = 0;
+
+    virtual void Flush() = 0;
 };
 
 #endif

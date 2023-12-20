@@ -1,7 +1,7 @@
 #ifndef __Circle_h_
 #define __Circle_h_
 
-#include "../GraphicsEngine/GraphicsEngine.h"
+#include "../GraphicsEngine/include/GraphicsEngineManager.h"
 #include "macros.h"
 #include "Primitive.h"
 #include "PolygonData.h"
@@ -12,7 +12,6 @@ class Circle : public Primitive
 public:
 
     Circle();
-    ~Circle();
 
     void SetCenter( Vec2 center );
     void SetCenter( double x, double y );

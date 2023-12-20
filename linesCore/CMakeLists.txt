@@ -16,7 +16,7 @@ set( ${LibName}_hdr drwGLRenderer.h drwDrawingSurface.h drwRemoteCommandIO.h drw
         PolygonData.h lcCircle.h )
 
 # moc Qt source file without a ui file
-qt5_wrap_cpp( ${LibName}_moc ${${LibName}_hdr_moc} )
+qt_wrap_cpp( ${LibName}_moc ${${LibName}_hdr_moc} )
 
 # Create and link executable
 set( ${LibName}_all_src ${${LibName}_src} ${${LibName}_moc} ${${LibName}_hdr} ${${LibName}_hdr_moc} )
@@ -29,4 +29,10 @@ add_dependencies( ${LibName} svl )
 
 # Define include directory for this lib
 set( linesCoreIncludeDirs ${CMAKE_CURRENT_SOURCE_DIR} PARENT_SCOPE )
-target_link_libraries( ${LibName} PRIVATE libglew_static )
+
+if (ANDROID)
+    target_link_libraries( ${LibName} )
+else()
+    target_link_libraries( ${LibName} PRIVATE libglew_static )
+endif()
+

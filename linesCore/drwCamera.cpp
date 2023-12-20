@@ -20,14 +20,9 @@ drwCamera::drwCamera()
     m_winSizeWorld[0] = 0.0;
     m_winSizeWorld[1] = 0.0;
     
-    m_engine = new GraphicsEngine();
+    m_engine = GraphicsEngineManager::getGraphicsEngine();
 
     UpdateSizes();
-}
-
-drwCamera::~drwCamera()
-{
-    delete m_engine;
 }
 
 void drwCamera::SetWindowSize( int w, int h )

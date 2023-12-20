@@ -15,7 +15,7 @@ LinesCore::LinesCore()
     // initialize params
     m_frameInterval = 83;
     m_isPlaying = false;
-    m_time.start();
+    m_timer.start();
     m_lastUsedUserId = 0;
     m_onionSkinEnabled = true;
     m_remoteIO = 0;
@@ -300,7 +300,7 @@ void LinesCore::StartPlaying()
     if( GetCurrentFrame() == GetNumberOfFrames() - 1 )
         SetCurrentFrame( 0 );
     m_isPlaying = true;
-    m_time.restart();
+    m_timer.restart();
     m_lastFrameWantedTime = 0;
     m_renderer->SetInhibitOnionSkin( true );
     m_localToolbox->OnStartPlaying();
@@ -333,7 +333,7 @@ void LinesCore::Tick()
 {
     if( m_isPlaying )
     {
-        int current = m_time.elapsed();
+        int current = m_timer.elapsed(); // TODO: make sure the new method of calculating ms is correct
         int jump = ( current - m_lastFrameWantedTime ) / m_frameInterval;
         if( jump > 0 )
         {

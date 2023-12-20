@@ -2,13 +2,12 @@
 #define __IncludeGLEW_h_
 
 #if (defined(_WIN32) && !defined(NOMINMAX))
-#define NOMINMAX
-#include <Windows.h>
+	#define NOMINMAX
+	#include <Windows.h>
 #endif
 
-#if !(defined(__APPLE__) && defined(__MACH__))
-#define NOMINMAX
-#include <GL/glew.h>
+#if (!defined(__ANDROID__))
+	#include <GL/glew.h>
 #endif
 
-#endif
+#endif // __IncludeGLEW_h_
