@@ -89,22 +89,22 @@ if (NOT ANDROID)
 
     FetchContent_GetProperties(glew)
     if(NOT glew_POPULATED)
-	        FetchContent_Populate(glew)
+	    FetchContent_Populate(glew)
 
-	        set(glew-cmake_BUILD_SHARED OFF CACHE INTERNAL "Build the shared glew library")
-	        set(ONLY_LIBS ON CACHE INTERNAL "Only build the glew library")
-	        add_subdirectory(${glew_SOURCE_DIR} ${glew_BINARY_DIR})
+	    set(glew-cmake_BUILD_SHARED OFF CACHE INTERNAL "Build the shared glew library")
+	    set(ONLY_LIBS ON CACHE INTERNAL "Only build the glew library")
+	    add_subdirectory(${glew_SOURCE_DIR} ${glew_BINARY_DIR})
     endif()
+else()
+    message(STATUS "Fetching GLM")
+    FetchContent_Declare(
+        glm
+        GIT_REPOSITORY https://github.com/g-truc/glm
+        GIT_TAG 0.9.9.8
+    )
+    FetchContent_MakeAvailable(glm)
+    include_directories("${glm_SOURCE_DIR}")
 endif()
-
-message(STATUS "Fetching GLM")
-FetchContent_Declare(
-    glm
-    GIT_REPOSITORY https://github.com/g-truc/glm
-    GIT_TAG 0.9.9.8
-)
-FetchContent_MakeAvailable(glm)
-include_directories("${glm_SOURCE_DIR}")
 
 add_subdirectory( linesCore )
 add_subdirectory( linesNetwork )
