@@ -86,6 +86,7 @@ else()
 endif()
 
 if (APPLE)
+    find_package(OpenGL)
     target_link_libraries( ${ExecName} PRIVATE linesDesktopLib linesNetwork linesCore GraphicsEngine svl ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY} ${QT_LIBRARIES} )
     set_target_properties( ${ExecName} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_BINARY_DIR}/LinesInfo.plist )  
 elseif(ANDROID)
