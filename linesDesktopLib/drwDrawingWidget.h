@@ -51,7 +51,7 @@ protected:
 	// Manage timer that generates updateGL in playback mode
 	int m_timerId;
 	
-	void enterEvent( QEvent * );
+	void enterEvent( QEnterEvent * );
 	void leaveEvent( QEvent * );
 	
 	// stuff to do for all events

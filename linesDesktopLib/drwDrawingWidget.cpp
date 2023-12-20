@@ -124,7 +124,7 @@ void drwDrawingWidget::tabletEvent ( QTabletEvent * e )
     }
 }
 
-void drwDrawingWidget::enterEvent( QEvent * e )
+void drwDrawingWidget::enterEvent( QEnterEvent * e )
 {
     m_lines->SetShowCursor( true );
 }

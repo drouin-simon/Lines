@@ -19,7 +19,7 @@ drwGradientWidget::~drwGradientWidget()
 {
 }
 
-void drwGradientWidget::enterEvent(QEvent *event)
+void drwGradientWidget::enterEvent(QEnterEvent *event)
 {
     Q_UNUSED(event)
     setCursor(Qt::CrossCursor);
