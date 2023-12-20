@@ -27,6 +27,7 @@ public:
 	bool UseProgram( bool use );
 	bool SetVariable( const char * name, int value );
 	bool SetVariable( const char * name, float value );
+	bool SetVariable( const char * name, Vec4 value );
 
 protected:
 

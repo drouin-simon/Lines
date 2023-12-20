@@ -88,6 +88,7 @@ public:
     void BindFrameBuffer(unsigned int fbId);
     bool SetVariable(unsigned int programId, const char* name, int value);
     bool SetVariable(unsigned int programId, const char* name, float value);
+    bool SetVariable(unsigned int programId, const char* name, Vec4 value);
     void GetVariable(unsigned int name, int* value);
 
     void DeleteShader(unsigned int shaderId);

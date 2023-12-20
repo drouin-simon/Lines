@@ -22,7 +22,7 @@ ClickScrollWidget::~ClickScrollWidget()
 {
 }
 
-void ClickScrollWidget::enterEvent(QEvent *event)
+void ClickScrollWidget::enterEvent(QEnterEvent *event)
 {
     Q_UNUSED(event)
     setCursor(Qt::CrossCursor);
