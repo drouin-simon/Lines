@@ -42,21 +42,21 @@ void OpenGLESGraphicsEngine::initialize() {
 
     this->openglFunctions->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // Définir les points pour dessiner la ligne
-    GLfloat vertices[] = {
-        -0.5f, -0.5f, 0.0f,  // Premier point
-         0.5f,  0.5f, 0.0f   // Deuxième point
-    };
+    //// Définir les points pour dessiner la ligne
+    //GLfloat vertices[] = {
+    //    -0.5f, -0.5f, 0.0f,  // Premier point
+    //     0.5f,  0.5f, 0.0f   // Deuxième point
+    //};
 
-    // Activer le pointeur de vertex
-    this->openglFunctions->glEnableClientState(GL_VERTEX_ARRAY);
-    this->openglFunctions->glVertexPointer(3, GL_FLOAT, 0, vertices);
+    //// Activer le pointeur de vertex
+    //this->openglFunctions->glEnableClientState(GL_VERTEX_ARRAY);
+    //this->openglFunctions->glVertexPointer(3, GL_FLOAT, 0, vertices);
 
-    // Dessiner la ligne
-    this->openglFunctions->glDrawArrays(GL_LINES, 0, 2);
+    //// Dessiner la ligne
+    //this->openglFunctions->glDrawArrays(GL_LINES, 0, 2);
 
-    // Désactiver le pointeur de vertex
-    this->openglFunctions->glDisableClientState(GL_VERTEX_ARRAY);
+    //// Désactiver le pointeur de vertex
+    //this->openglFunctions->glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 void OpenGLESGraphicsEngine::SetViewPort(int x, int y, int width, int height) {
