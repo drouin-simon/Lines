@@ -333,7 +333,7 @@ void LinesCore::Tick()
 {
     if( m_isPlaying )
     {
-        int current = m_timer.elapsed(); // TODO: make sure the new method of calculating ms is correct
+        int current = m_timer.elapsed();
         int jump = ( current - m_lastFrameWantedTime ) / m_frameInterval;
         if( jump > 0 )
         {

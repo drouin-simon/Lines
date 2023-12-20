@@ -8,7 +8,6 @@
 
 #include <QOpenGLContext>
 
-// TODO: Use SVL to make Vec3/4
 class IGraphicsEngine
 {
 protected:

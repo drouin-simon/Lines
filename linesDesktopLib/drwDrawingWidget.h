@@ -20,8 +20,6 @@ public:
 		
     drwDrawingWidget( QWidget * parent );
 
-	//void initializeGL();
-
     void SetLinesCore( LinesCore * lc ) { m_lines = lc; }
 
     // Implement drwDrawingSurface interface
