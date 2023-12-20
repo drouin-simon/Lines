@@ -110,6 +110,7 @@ add_subdirectory( linesCore )
 add_subdirectory( linesNetwork )
 add_subdirectory( linesDesktopLib )
 add_subdirectory( linesDesktop )
+add_subdirectory( linesTest )
 
 include_directories( GraphicsEngine )
 add_subdirectory( GraphicsEngine )
