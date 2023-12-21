@@ -20,10 +20,8 @@ drwDrawingWidget::drwDrawingWidget( QWidget * parent )
     setCursor( QCursor( Qt::BlankCursor ) );
     setUpdateBehavior( QOpenGLWidget::PartialUpdate );  // allows to redraw only part of the window
     EnableVSync( false );
-}
 
-drwDrawingWidget::~drwDrawingWidget()
-{
+    m_engine = GraphicsEngineManager::getGraphicsEngine();
 }
 
 void drwDrawingWidget::NeedRedraw()
@@ -57,6 +55,8 @@ void drwDrawingWidget::NotifyPlaybackStartStop( bool isStarting )
 
 void drwDrawingWidget::initializeGL()
 {
+    m_engine->setContext(QOpenGLContext::currentContext());
+    m_engine->initialize();
 }
 
 void drwDrawingWidget::resizeGL( int w, int h )
@@ -69,7 +69,7 @@ void drwDrawingWidget::paintEvent( QPaintEvent * event )
 {
 	makeCurrent();
     m_lines->Render();
-    glFlush();
+    m_engine->Flush();
     emit FinishedPainting();
 }
 
@@ -124,7 +124,7 @@ void drwDrawingWidget::tabletEvent ( QTabletEvent * e )
     }
 }
 
-void drwDrawingWidget::enterEvent( QEvent * e )
+void drwDrawingWidget::enterEvent( QEnterEvent * e )
 {
     m_lines->SetShowCursor( true );
 }

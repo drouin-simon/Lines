@@ -1,7 +1,7 @@
 #ifndef __drwFpsCounter_h_
 #define __drwFpsCounter_h_
 
-#include <QTime>
+#include <QElapsedTimer>
 #include <vector>
 
 class drwFpsCounter
@@ -22,7 +22,7 @@ protected:
 
     int m_numberOfSamples;
     std::vector<int> m_timeStamps;
-    QTime m_time;
+    QElapsedTimer m_timer;
     bool m_isRunning;
 
 };

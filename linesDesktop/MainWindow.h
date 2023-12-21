@@ -47,7 +47,7 @@ public:
     void SetSideToolbarWidth( int w );
     int GetSideToolbarWidth();
     void SetMainToolbarHeight( int w );
-    int GetMainToolbarHeight();
+	int GetMainToolbarHeight();
 
 private slots:
 	

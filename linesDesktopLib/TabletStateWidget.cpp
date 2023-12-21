@@ -1,13 +1,16 @@
+#include "drwDrawingWidget.h"
 #include "TabletStateWidget.h"
 #include "TabletStateTestingArea.h"
-#include "drwDrawingWidget.h"
+
 
 TabletStateWidget::TabletStateWidget( QWidget * parent ) : QWidget( parent )
 {
     m_drawingWidget = 0;
 	ui.setupUi(this);
     ui.openGLWidget->SetTabletStateWidget( this );
-    QTabletEvent event( QEvent::TabletEnterProximity, QPoint(0,0), QPointF( 0, 0 ), QTabletEvent::NoDevice, QTabletEvent::UnknownPointer, 0, 0, 0, 0, 0, 0, 0, 0 );
+    QPointingDevice* device = new QPointingDevice();
+    QTabletEvent event( QEvent::TabletEnterProximity, device, QPointF(0, 0), QPointF(0, 0), 0, 0, 0, 0, 0, 0, 
+        Qt::KeyboardModifier::NoModifier, Qt::NoButton, Qt::NoButton);
 	UpdateUi(&event);
 }
 
@@ -18,7 +21,9 @@ TabletStateWidget::~TabletStateWidget()
 void TabletStateWidget::SetDrawingWiget( drwDrawingWidget * w )
 {
     m_drawingWidget = w;
-    QTabletEvent event( QEvent::TabletEnterProximity, QPoint(0,0), QPointF( 0, 0 ), QTabletEvent::NoDevice, QTabletEvent::UnknownPointer, 0, 0, 0, 0, 0, 0, 0, 0 );
+    QPointingDevice* device = new QPointingDevice();
+    QTabletEvent event(QEvent::TabletEnterProximity, device, QPointF(0, 0), QPointF(0, 0), 0, 0, 0, 0, 0, 0,
+        Qt::KeyboardModifier::NoModifier, Qt::NoButton, Qt::NoButton);
     UpdateUi(&event);
 }
 
@@ -101,16 +106,16 @@ void TabletStateWidget::UpdateUi( QTabletEvent * e )
     QString pType;
     switch ( e->pointerType() )
     {
-        case QTabletEvent::UnknownPointer:
+        case QPointingDevice::PointerType::Unknown:
             pType = "QTabletEvent::UnknownPointer";
             break;
-        case QTabletEvent::Pen:
+        case QPointingDevice::PointerType::Pen:
             pType = "QTabletEvent::Pen";
             break;
-        case QTabletEvent::Cursor:
+        case QPointingDevice::PointerType::Cursor:
             pType = "QTabletEvent::Cursor";
             break;
-        case QTabletEvent::Eraser:
+        case QPointingDevice::PointerType::Eraser:
             pType = "QTabletEvent::Eraser";
             break;
         default:
@@ -119,25 +124,22 @@ void TabletStateWidget::UpdateUi( QTabletEvent * e )
     }
     text += QString("Pointer type:         ") + pType + "\n";
     QString tabletDevice;
-    switch ( e->device() )
+    switch ( e->device()->type() )
     {
-        case QTabletEvent::NoDevice:
+        case QInputDevice::DeviceType::Unknown:
             tabletDevice = "QTabletEvent::NoDevice";
             break;
-        case QTabletEvent::Puck:
+        case QInputDevice::DeviceType::Puck:
             tabletDevice = "QTabletEvent::Puck";
             break;
-        case QTabletEvent::Stylus:
+        case QInputDevice::DeviceType::Stylus:
             tabletDevice = "QTabletEvent::Stylus";
             break;
-        case QTabletEvent::Airbrush:
+        case QInputDevice::DeviceType::Airbrush:
             tabletDevice = "QTabletEvent::Airbrush";
             break;
-        case QTabletEvent::FourDMouse:
+        case QInputDevice::DeviceType::Mouse:
             tabletDevice = "QTabletEvent::FourDMouse";
-            break;
-        case QTabletEvent::RotationStylus:
-            tabletDevice = "QTabletEvent::RotationStylus";
             break;
         default:
             tabletDevice = "NONE";
@@ -225,13 +227,13 @@ QString TabletStateWidget::TabletEventButtonsToString( QTabletEvent * e )
 QString TabletStateWidget::TabletEventToPointerType( QTabletEvent * e )
 {
     QString s = "";
-    if( e->pointerType() == QTabletEvent::UnknownPointer )
+    if( e->pointerType() == QPointingDevice::PointerType::Unknown)
         s = "Unknown";
-    else if( e->pointerType() == QTabletEvent::Pen )
+    else if( e->pointerType() == QPointingDevice::PointerType::Pen )
         s = "Pen";
-    else if( e->pointerType() == QTabletEvent::Cursor )
+    else if( e->pointerType() == QPointingDevice::PointerType::Cursor )
         s = "Cursor";
-    else if( e->pointerType() == QTabletEvent::Eraser )
+    else if( e->pointerType() == QPointingDevice::PointerType::Eraser )
         s = "Eraser";
     return s;
 }
@@ -239,18 +241,16 @@ QString TabletStateWidget::TabletEventToPointerType( QTabletEvent * e )
 QString TabletStateWidget::TabletEventToDeviceType( QTabletEvent * e )
 {
     QString s = "";
-    if( e->device() == QTabletEvent::NoDevice )
+    if( e->device()->type() == QInputDevice::DeviceType::Unknown)
         s = "NoDevice";
-    else if( e->device() == QTabletEvent::Puck )
+    else if( e->device()->type() == QInputDevice::DeviceType::Puck )
         s = "Puck";
-    else if( e->device() == QTabletEvent::Stylus )
+    else if( e->device()->type() == QInputDevice::DeviceType::Stylus )
         s = "Stylus";
-    else if( e->device() == QTabletEvent::Airbrush )
+    else if( e->device()->type() == QInputDevice::DeviceType::Airbrush )
         s = "Airbrush";
-    else if( e->device() == QTabletEvent::FourDMouse )
+    else if( e->device()->type() == QInputDevice::DeviceType::Mouse )
         s = "FourDMouse";
-    else if( e->device() == QTabletEvent::RotationStylus )
-        s = "RotationStylus";
     return s;
 }
 

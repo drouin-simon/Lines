@@ -21,18 +21,26 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 # Create classes from Qt ui files
 set( Drw_ui TabletStateWidget.ui drwNetworkConnectDialog.ui drwsimplifiedtoolbar.ui SideToolbar.ui )
-qt5_wrap_ui( DrawLib_hdr_ui ${Drw_ui} )
+qt_wrap_ui( DrawLib_hdr_ui ${Drw_ui} )
 
 # moc Qt source file without a ui file
-qt5_wrap_cpp( DrawLib_moc ${DrawLib_hdr_moc} )
+qt_wrap_cpp( DrawLib_moc ${DrawLib_hdr_moc} )
 
 # make rules to create c++ source from Qt resource files
 set( LinesLib_rcs lineslibresources.qrc )
-qt5_add_resources( LinesLib_rcs_src ${LinesLib_rcs})
+qt_add_resources( LinesLib_rcs_src ${LinesLib_rcs})
 
 # Create and link executable
 set( DrawLib_all_src ${DrawLib_src} ${DrawLib_moc} ${DrawLib_hdr} ${DrawLib_hdr_moc} ${DrawLib_hdr_ui} ${LinesLib_rcs_src} )
 add_library( ${LibName} ${DrawLib_all_src} )
+
+if (ANDROID)
+    target_link_libraries( ${LibName} Qt6::OpenGLWidgets)
+else()
+    target_link_libraries( ${LibName} libglew_static Qt6::OpenGLWidgets )
+endif()
+
+
 
 #================================
 # Define include dir for dependent projects
@@ -42,4 +50,4 @@ set( linesDesktopLibIncludeDirs ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOUR
 #================================
 # Explicit dependencies
 #================================
-ADD_DEPENDENCIES( ${LibName} svl linesCore linesNetwork )
+ADD_DEPENDENCIES( ${LibName} svl linesCore linesNetwork GraphicsEngine )
