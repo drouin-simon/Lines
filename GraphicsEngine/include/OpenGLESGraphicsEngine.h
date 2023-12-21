@@ -1,8 +1,6 @@
 #ifndef __OpenGLESGraphicsEngine_h_
 #define __OpenGLESGraphicsEngine_h_
 
-#include "IncludeGLES.h"
-
 #include <QImage>
 #include <QOpenGLTexture>
 #include <QOpenGLShaderProgram>

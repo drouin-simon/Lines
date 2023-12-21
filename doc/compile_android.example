@@ -1,0 +1,5 @@
+cmake . -B build_android -DCMAKE_PREFIX_PATH=C:\Qt\6.6.0\android_arm64_v8a -DCMAKE_FIND_ROOT_PATH=C:/Qt/6.6.0/android_arm64_v8a -DQt6_DIR=C:/Qt/6.6.0/android_arm64_v8a/lib/cmake/Qt6 -DANDROID_SDK_ROOT=C:/Users/user1/AppData/Local/Android/Sdk -DANDROID_NDK=C:/Users/user1/AppData/Local/Android/Sdk/ndk/26.1.10909125 -DCMAKE_C_COMPILER=C:/Users/user1/AppData/Local/Android/Sdk/ndk/26.1.10909125/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe -DCMAKE_TOOLCHAIN_FILE=C:/Users/user1/AppData/Local/Android/Sdk/ndk/26.1.10909125/build/cmake/android.toolchain.cmake -DANDROID_PLATFORM=android-23 -DANDROID_ABI=arm64-v8a -DQT_ANDROID_ABIS=arm64-v8a -DANDROID_STL=c++_shared -DANDROID_USE_LEGACY_TOOLCHAIN_FILE=OFF -DQT_HOST_PATH=C:/Qt/6.6.0/mingw_64 -DQT_HOST_PATH_CMAKE_DIR=C:/Qt/6.6.0/mingw_64/lib/cmake -DQT_NO_GLOBAL_APK_TARGET_PART_OF_ALL=ON
+
+cmake --build build_android
+
+androiddeployqt --output build_android/linesDesktop/android-build --input build_android/linesDesktop/android-Lines-deployment-settings.json --gradle --install --device A1AA11AAAAA
