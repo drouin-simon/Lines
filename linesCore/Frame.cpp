@@ -44,7 +44,7 @@ int Frame::AddNode( Node * node )
     return nodeId;
 }
 
-Node * Frame::GetNodeById( GLuint Id )
+Node * Frame::GetNodeById(unsigned int Id )
 {
 	for( unsigned i = 0; i < Nodes.size(); ++i )
 	{

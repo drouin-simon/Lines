@@ -1,0 +1,70 @@
+name: CMake on Multiple Platforms
+
+on: push
+
+env:
+  BUILD_TYPE: Release
+  QT_VERSION: "6.6.0"
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            host: linux
+          - os: windows-latest
+            host: windows
+          - os: macos-latest
+            host: mac
+
+    steps:
+      - uses: actions/checkout@v3
+
+      # Only libglu1-mesa-dev is necessary for Lines. The rest are dependencies of Qt's Xcb plugin
+      # which is used for headless tests.
+      - name: Install dependencies on Ubuntu
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libglu1-mesa-dev xvfb libx11-xcb1 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 \
+          libxcb-render-util0 libxcb-render0 libxcb-shape0 libxcb-shm0 libxcb-sync1 \
+          libxcb-xfixes0 libxcb-xinerama0 libxrender1 libxcb-glx0 libxi6 libxcb-cursor0
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@727bfe75193759a6fe1ca38c6d3f0bcfa68dada8
+        with:
+          version: ${{ env.QT_VERSION }}
+          host: ${{ matrix.host }}
+          target: desktop
+          cache: true
+          cache-key-prefix: "install-qt-action"
+
+      - name: Configure CMake on Ubuntu and MacOS
+        if: matrix.os != 'windows-latest'
+        run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+
+        # MSVC requires extra CMake flags with Qt6.
+      - name: Configure CMake on Windows
+        if: matrix.os == 'windows-latest'
+        run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_CXX_FLAGS="/Zc:__cplusplus /permissive-"
+
+      - name: Build
+        run: cmake --build ${{github.workspace}}/build -j8 --config ${{env.BUILD_TYPE}}
+
+      - name: Test on Ubuntu
+        if: matrix.os == 'ubuntu-latest'
+        working-directory: ${{github.workspace}}
+        run: |
+          xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" \
+          ./build/linesTest/linesTest ./testData/ref_good.png ./testData/test.png 2
+
+      - name: Upload testData directory
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-data
+          path: |
+            testData/
