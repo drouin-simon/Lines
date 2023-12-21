@@ -3,8 +3,8 @@ Lines is a minimalistic animation program designed for frame-by-frame 2D animati
 
 See the [Lines animation web page](https://linesanimation.org/) for more details.
 
-##Other documentation pages:
+## Other documentation pages:
 
-###[Compile for Android](./doc/runAndroid.md)
+### [Compile for Android](./doc/runAndroid.md)
 
-###[Diagrams](./doc/diagrams.md)
+### [Diagrams](./doc/diagrams.md)

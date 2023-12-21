@@ -9,4 +9,4 @@ Shows the relationship between classes in the new GraphicsEngine project
 Shows visually how the CI/CD build pipeline runs on Github
 ![Pipeline Sequence Diagram](./pipelineSequenceDiagram.png)
 
-####[Back to the main page](./../README.md)
+#### [Back to the main page](./../README.md)

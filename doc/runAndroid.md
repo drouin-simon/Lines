@@ -10,7 +10,7 @@ To compile Lines for Android, you need ALL of these pre-requisites:
 1. A java jdk installation
 1. The androiddeployqt tool (which should be automatically installed somewhere in your Qt6 for current OS folder)
 
-##Environment variables
+## Environment variables
 Once you make sure you have all of the prerequisites, you are ready to compile with CMake, from the command line.
 You will also need to specify a list of environment variables (either in your system, or directly in the first CMake command, as arguments preceded by "-D"):
 
@@ -30,7 +30,7 @@ You will also need to specify a list of environment variables (either in your sy
 - QT_HOST_PATH_CMAKE_DIR=\<your qt6 for current OS installation\>/lib/cmake
 - QT_NO_GLOBAL_APK_TARGET_PART_OF_ALL=ON
 
-##Compiling from the command line
+## Compiling from the command line
 Now, open a terminal in the root of your Lines folder. If it doesn't exist yet, create a folder for the Android build. Here we choose to name it build_android:
 
     mkdir build_android
@@ -47,7 +47,7 @@ To create and install to the traget device the Android package, run:
 
     androiddeployqt --output build_android/linesDesktop/android-build --input build_android/linesDesktop/android-Lines-deployment-settings.json --gradle --install --device <your android device identification number>
 
-##Practical example
+## Practical example
 If you're reading this for the first time, it might seem like a lot. Honestly, it kind of is.
 My recommandation is that you define your commands in a single script file (.sh or .bat depending on your OS). This is what I do to avoid having to cluter my environment variables with all 15 required variables.
 Once you have all the dependencies and you've defined you environment variables correctly, fully compiling Lines and installing it to a physical Android device is just as easy as a single command.
@@ -56,11 +56,11 @@ As a bonus, I will provide you with a (slightly modified for privacy) version of
 
 [Here you go!](./compile_android.example)
 
-##Future Considerations
+## Future Considerations
 You may have noticed that a lot of the paths given as values for the environment variables are found multiple times in the list. In the future, it would be good to implement a way to define only once every variable part of the environment variables, and to isolate in an external file (for instance) the variables that are subject to change between compilations to make it as easy as possible to change the setup used (the target android version for example). Also, some environment variables are just fixed and could probably be placed in a CMakeLists.txt file.
 
-##Further reading
+## Further reading
 [androiddeployqt documentation](https://doc.qt.io/qt-6/android-deploy-qt-tool.html)
 
 
-####[Back to the main page](./../README.md)
+#### [Back to the main page](./../README.md)
