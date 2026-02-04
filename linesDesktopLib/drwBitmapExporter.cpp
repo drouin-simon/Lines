@@ -38,10 +38,11 @@ bool drwBitmapExporter::StartWriting()
 }
 
 #include <QSurfaceFormat>
-#include <QWindow>
+#include <QOffscreenSurface>
 #include <QOpenGLContext>
 #include <QOpenGLFramebufferObjectFormat>
 #include <QOpenGLFramebufferObject>
+#include <QImage>
 
 void drwBitmapExporter::run()
 {
@@ -49,16 +50,15 @@ void drwBitmapExporter::run()
     format.setMajorVersion(3);
     format.setMinorVersion(2);
 
-    QWindow window;
-    window.setSurfaceType(QWindow::OpenGLSurface);
-    window.setFormat(format);
-    window.create();
+    QOffscreenSurface surface;
+    surface.setFormat(format);
+    surface.create();
 
     QOpenGLContext context;
     context.setFormat(format);
     if (!context.create())
         qFatal("Cannot create the requested OpenGL context!");
-    context.makeCurrent(&window);
+    context.makeCurrent(&surface);
 
     QOpenGLFramebufferObjectFormat fboFormat;
     fboFormat.setSamples(16);
