@@ -173,17 +173,17 @@ void MainWindow::CreateActions()
 {
 	// Creates a file menu
     QMenu * file = menuBar()->addMenu( "&File" );
-    m_fileNewAction = file->addAction( "New", this, SLOT( fileNew() ), Qt::CTRL + Qt::Key_N );
-    m_fileOpenAction = file->addAction( "Open...", this, SLOT( fileOpen() ), Qt::CTRL + Qt::Key_O );
-	file->addAction( "Save", this, SLOT( fileSave() ), Qt::CTRL + Qt::Key_S );
-	file->addAction( "Save As...", this, SLOT( fileSaveAs() ), Qt::SHIFT + Qt::CTRL + Qt::Key_S );
+    m_fileNewAction = file->addAction( "New", this, SLOT( fileNew() ), QKeySequence(Qt::CTRL | Qt::Key_N) );
+    m_fileOpenAction = file->addAction( "Open...", this, SLOT( fileOpen() ), QKeySequence(Qt::CTRL | Qt::Key_O) );
+	file->addAction( "Save", this, SLOT( fileSave() ), QKeySequence(Qt::CTRL | Qt::Key_S) );
+	file->addAction( "Save As...", this, SLOT( fileSaveAs() ), QKeySequence(Qt::SHIFT | Qt::CTRL | Qt::Key_S) );
 	file->addAction( "Export...", this, SLOT( fileExport() ) );
     file->addAction( "&Exit", this, SLOT( close() ) );
     connect( file, SIGNAL(aboutToShow()), this, SLOT(fileMenuAboutToShow()) );
 	
 	// Create the Edit menu
 	m_editMenu = menuBar()->addMenu( "&Edit" );
-    m_editSetNumberOfFramesAction = m_editMenu->addAction( "Set Number of Frames", this, SLOT( editSetNumberOfFrames() ), Qt::CTRL + Qt::Key_G );
+    m_editSetNumberOfFramesAction = m_editMenu->addAction( "Set Number of Frames", this, SLOT( editSetNumberOfFrames() ), QKeySequence(Qt::CTRL | Qt::Key_G) );
     //m_whiteOnBlackAction = new QAction( "White on black", m_editMenu );
     //m_whiteOnBlackAction->setCheckable( true );
     //m_whiteOnBlackAction->setChecked( true );
@@ -194,13 +194,13 @@ void MainWindow::CreateActions()
 	
 	// Create the Network menu
 	m_networkMenu = menuBar()->addMenu( "&Network" );
-	m_netShareSessionMenuAction = m_networkMenu->addAction( "Share session", this, SLOT( NetShareSession() ), Qt::CTRL + Qt::Key_T );
+	m_netShareSessionMenuAction = m_networkMenu->addAction( "Share session", this, SLOT( NetShareSession() ), QKeySequence(Qt::CTRL | Qt::Key_T) );
 	m_netConnectMenuItem = m_networkMenu->addAction( "Connect...", this, SLOT( NetConnect() ) );
 	
 	// Create the View menu
     m_viewMenu = menuBar()->addMenu( "&View" );
 #ifdef Q_OS_WIN
-	m_viewMenu->addAction("Fullscreen", this, SLOT(viewFullscreen()), Qt::CTRL + Qt::Key_F);
+	m_viewMenu->addAction("Fullscreen", this, SLOT(viewFullscreen()), QKeySequence(Qt::CTRL | Qt::Key_F));
 #endif // Q_OS_WIN
 	
     // Create a Help menu

@@ -1,8 +1,6 @@
 #include "drwBitmapExporter.h"
 #include "drwGLRenderer.h"
 #include "Scene.h"
-#include <QGLFramebufferObject>
-#include <QGLPixelBuffer>
 #include <QFileInfo>
 #include <QDir>
 

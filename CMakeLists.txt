@@ -1,19 +1,10 @@
-PROJECT( Lines )
+cmake_minimum_required(VERSION 3.16)
 
-cmake_minimum_required(VERSION 3.1)
+PROJECT( Lines )
 
 # Include some CMake utilities
 set( CMAKE_EXT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cmake )
 include( ${CMAKE_CURRENT_SOURCE_DIR}/cmake/printvariables.cmake )
-
-#----------------------------------------
-# Include BOOST dir if needed (eg. osx < 10.9 )
-OPTION( LINES_USE_BOOST "Use boost to build lines. This is needed with older compiler without shared_ptr" OFF )
-if( LINES_USE_BOOST )
-    find_package( Boost 1.63 REQUIRED )
-    include_directories( ${Boost_INCLUDE_DIRS} )
-    add_definitions(-DUSE_BOOST)
-endif()
 
 #----------------------------------------
 # Use Svl
@@ -22,31 +13,28 @@ include_directories( ${svlIncludeDir} )
 #----------------------------------------
 
 #----------------------------------------
-# Use Qt 5
-find_package( Qt5 COMPONENTS Widgets OpenGL Network REQUIRED )
-include_directories( ${Qt5Widgets_INCLUDE_DIRS} )
-include_directories( ${Qt5OpenGL_INCLUDE_DIRS} )
-include_directories( ${Qt5Network_INCLUDE_DIRS} )
+# Use Qt 6
+find_package( Qt6 6.10 COMPONENTS Widgets OpenGL OpenGLWidgets Network REQUIRED )
+include_directories( ${Qt6Widgets_INCLUDE_DIRS} )
+include_directories( ${Qt6OpenGL_INCLUDE_DIRS} )
+include_directories( ${Qt6OpenGLWidgets_INCLUDE_DIRS} )
+include_directories( ${Qt6Network_INCLUDE_DIRS} )
 #----------------------------------------
 
 #----------------------------------------
-# Tell the compiler to use c++11 which is required with Qt >= 5.7
-if( Qt5_VERSION VERSION_GREATER 5.7 OR Qt5_VERSION VERSION_EQUAL 5.7 )
-    set( CMAKE_CXX_STANDARD 11 )
-endif()
+# Qt 6 requires C++17
+set( CMAKE_CXX_STANDARD 17 )
 #----------------------------------------
 
-#----------------------------------------
-# Use Opengl
-find_package(OpenGL)
+# OpenGL is provided by Qt6::OpenGL and Qt6::OpenGLWidgets
 #----------------------------------------
 
 #----------------------------------------
 # configure version and git hash
 set( LINES_MAJOR_VERSION 1 )
-set( LINES_MINOR_VERSION 2 )
+set( LINES_MINOR_VERSION 3 )
 set( LINES_PATCH_VERSION 0 )
-set( LINES_VERSION_QUALIFIER Beta4 )
+set( LINES_VERSION_QUALIFIER Beta )
 set( LINES_BUILD_QUALIFIER "" )
 set( LINES_PROTOCOL_VERSION 0 )
 set( LINES_COPYRIGHT "2010 Simon Drouin" )

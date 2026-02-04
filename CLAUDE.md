@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Lines is a minimalistic frame-by-frame 2D animation program with real-time network collaboration between animators. Written in C++11 using Qt 5 and OpenGL. Current version: 1.2 Beta4.
+Lines is a minimalistic frame-by-frame 2D animation program with real-time network collaboration between animators. Written in C++17 using Qt 6 and OpenGL. Current version: 1.2 Beta4.
 
 ## Build Commands
 
@@ -21,7 +21,7 @@ cmake ../src -DLINES_USE_BOOST=ON      # Enable Boost shared_ptr (older compiler
 cmake ../src -DLINES_MASTER_BUILD=ON   # Enable master functionality
 ```
 
-**Dependencies:** Qt 5.7+ (Widgets, OpenGL, Network), OpenGL, CMake 3.1+, Boost 1.63+ (optional).
+**Dependencies:** Qt 6.8.2+ (Widgets, OpenGL, OpenGLWidgets, Network), OpenGL, CMake 3.16+, Boost 1.63+ (optional).
 
 **Bundled libraries:** SVL (vector/matrix math in `svl/`), GLee (OpenGL extensions in `GLee/`, non-macOS only).
 

@@ -198,7 +198,7 @@ void DrawingWidgetMT::mouseMoveEvent( QMouseEvent * e )
     }
 }
 
-void DrawingWidgetMT::enterEvent( QEvent * e )
+void DrawingWidgetMT::enterEvent( QEnterEvent * e )
 {
     m_lines->SetShowCursor( true );
     TryRender();
@@ -220,8 +220,8 @@ bool DrawingWidgetMT::event( QEvent * e )
 void DrawingWidgetMT::MouseCommand( drwMouseCommand::MouseCommandType commandType, QMouseEvent * e )
 {
     int ratio = this->devicePixelRatio();
-    double xWin = ratio * (double)e->x();
-    double yWin = ratio * (double)e->y();
+    double xWin = ratio * e->position().x();
+    double yWin = ratio * e->position().y();
     m_lines->MouseEvent( commandType, xWin, yWin );
     TryRender();
 }
@@ -229,10 +229,8 @@ void DrawingWidgetMT::MouseCommand( drwMouseCommand::MouseCommandType commandTyp
 void DrawingWidgetMT::MouseCommand( drwMouseCommand::MouseCommandType commandType, QTabletEvent * e )
 {
     int ratio = this->devicePixelRatio();
-    double deltaX = e->hiResGlobalX() - e->globalX();
-    double xWin = ratio * ((double)e->x() + deltaX);
-    double deltaY = e->hiResGlobalY() - e->globalY();
-    double yWin = ratio * ((double)e->y() + deltaY);
+    double xWin = ratio * e->position().x();
+    double yWin = ratio * e->position().y();
     m_lines->MouseEvent( commandType, xWin, yWin, e->pressure(), e->xTilt(), e->yTilt(), e->rotation(), e->tangentialPressure() );
     TryRender();
 }

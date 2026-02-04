@@ -26,7 +26,7 @@ protected:
     virtual void mouseReleaseEvent(QMouseEvent*);
     virtual void mouseMoveEvent(QMouseEvent*);
     virtual void tabletEvent ( QTabletEvent * event );
-    void enterEvent( QEvent * );
+    void enterEvent( QEnterEvent * );
     void leaveEvent( QEvent * );
     bool event( QEvent * event );
 

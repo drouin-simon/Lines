@@ -6,7 +6,6 @@
 
 class Scene;
 class drwGLRenderer;
-class QGLFramebufferObject;
 
 class drwBitmapExporter : public QThread
 {

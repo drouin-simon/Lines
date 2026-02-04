@@ -21,10 +21,10 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 # Create classes from Qt ui files
 set( Drw_ui ExportDialog.ui LinesPreferencesWidget.ui )
-qt5_wrap_ui( Drw_hdr_ui ${Drw_ui} )
+qt6_wrap_ui( Drw_hdr_ui ${Drw_ui} )
 
 # moc Qt source file without a ui file
-qt5_wrap_cpp( Drw_moc ${Drw_hdr})
+qt6_wrap_cpp( Drw_moc ${Drw_hdr})
 
 #--------------------------------------------------------------------------------
 # For Apple set the icns file containing icons
@@ -60,8 +60,7 @@ endif()
 #--------------------------------------------------------------------------------
 set( Drw_all_src ${Drw_src} ${Drw_hdr} ${Drw_moc} ${Drw_hdr_ui} )
 add_executable( ${ExecName} ${executable_flags} ${Drw_all_src} )
-target_link_libraries( ${ExecName} linesDesktopLib linesNetwork linesCore svl ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY} ${QT_LIBRARIES} )
-qt5_use_modules( ${ExecName} OpenGL Widgets Network )
+target_link_libraries( ${ExecName} linesDesktopLib linesNetwork linesCore svl Qt6::Widgets Qt6::OpenGL Qt6::OpenGLWidgets Qt6::Network )
 if (APPLE)
     set_target_properties( ${ExecName} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_BINARY_DIR}/LinesInfo.plist )
 else()
@@ -75,7 +74,7 @@ endif()
 #PrintVariables()
 
 # Run Qt deployment tool for each platform
-get_target_property( QMakeLocation Qt5::qmake LOCATION)
+get_target_property( QMakeLocation Qt6::qmake LOCATION)
 get_filename_component( QtBinLocation ${QMakeLocation} DIRECTORY )
 if( APPLE )
     set( MacDeployQtExec ${QtBinLocation}/macdeployqt )

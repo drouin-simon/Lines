@@ -104,7 +104,7 @@ void drwDrawableTexture::PasteToScreen( int x, int y, int width, int height )
 	glMatrixMode( GL_PROJECTION );
 	glPushMatrix();
 	glLoadIdentity();
-	gluOrtho2D( 0, m_width, 0, m_height );
+	glOrtho( 0, m_width, 0, m_height, -1, 1 );
 
 	glBindTexture( GL_TEXTURE_RECTANGLE_ARB, m_texId );
 	glBegin( GL_QUADS );
@@ -127,7 +127,7 @@ void drwDrawableTexture::Clear( int x, int y, int width, int height )
     glMatrixMode( GL_PROJECTION );
     glPushMatrix();
     glLoadIdentity();
-    gluOrtho2D( 0, m_width, 0, m_height );
+    glOrtho( 0, m_width, 0, m_height, -1, 1 );
 
     glColor4d( 0.0, 0.0, 0.0, 0.0 );
     glBegin( GL_QUADS );

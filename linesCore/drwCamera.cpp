@@ -90,7 +90,7 @@ void drwCamera::SetupForWindow()
     glViewport( 0, 0, m_winSizePix[0], m_winSizePix[1] );
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluOrtho2D( m_winPosWorld[0], m_winPosWorld[0] + m_winSizeWorld[0], m_winPosWorld[1], m_winPosWorld[1] + m_winSizeWorld[1] );
+    glOrtho( m_winPosWorld[0], m_winPosWorld[0] + m_winSizeWorld[0], m_winPosWorld[1], m_winPosWorld[1] + m_winSizeWorld[1], -1, 1 );
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 }
@@ -100,7 +100,7 @@ void drwCamera::SetupForFrame()
     glViewport( 0, 0, m_frameSizePix[0], m_frameSizePix[1] );
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluOrtho2D( 0.0, m_frameSizeWorld[0], 0.0, m_frameSizeWorld[1] );
+    glOrtho( 0.0, m_frameSizeWorld[0], 0.0, m_frameSizeWorld[1], -1, 1 );
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 }

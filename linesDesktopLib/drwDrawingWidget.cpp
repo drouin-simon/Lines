@@ -1,7 +1,6 @@
 #include "drwDrawingWidget.h"
 #include <iostream>
 #include <QtGui>
-#include <QtOpenGL>
 #include "LinesCore.h"
 
 drwDrawingWidget::drwDrawingWidget( QWidget * parent )
@@ -124,7 +123,7 @@ void drwDrawingWidget::tabletEvent ( QTabletEvent * e )
     }
 }
 
-void drwDrawingWidget::enterEvent( QEvent * e )
+void drwDrawingWidget::enterEvent( QEnterEvent * e )
 {
     m_lines->SetShowCursor( true );
 }
@@ -180,17 +179,15 @@ void drwDrawingWidget::PrintGLInfo()
 void drwDrawingWidget::MouseCommand( drwMouseCommand::MouseCommandType commandType, QMouseEvent * e )
 {
     int ratio = this->devicePixelRatio();
-    double xWin = ratio * (double)e->x();
-    double yWin = ratio * (double)e->y();
+    double xWin = ratio * e->position().x();
+    double yWin = ratio * e->position().y();
     m_lines->MouseEvent( commandType, xWin, yWin );
 }
 
 void drwDrawingWidget::MouseCommand( drwMouseCommand::MouseCommandType commandType, QTabletEvent * e )
 {
     int ratio = this->devicePixelRatio();
-    double deltaX = e->hiResGlobalX() - e->globalX();
-    double xWin = ratio * ((double)e->x() + deltaX);
-    double deltaY = e->hiResGlobalY() - e->globalY();
-    double yWin = ratio * ((double)e->y() + deltaY);
+    double xWin = ratio * e->position().x();
+    double yWin = ratio * e->position().y();
     m_lines->MouseEvent( commandType, xWin, yWin, e->pressure(), e->xTilt(), e->yTilt(), e->rotation(), e->tangentialPressure() );
 }
