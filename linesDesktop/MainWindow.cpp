@@ -14,6 +14,7 @@
 #include "LinesApp.h"
 #include "LinesCore.h"
 #include "LinesPreferencesWidget.h"
+#include "../GraphicsEngine/include/GraphicsEngineManager.h"
 
 const QString MainWindow::m_appName( "Lines" );
 
@@ -108,11 +109,11 @@ MainWindow::MainWindow()
 	// Tell the qApp unique instance to send event to MainWindow::eventFilter before anyone else
 	// so that we can grab global keyboard shortcuts.
 	qApp->installEventFilter(this);
-	
 }
 
 MainWindow::~MainWindow()
 {
+    GraphicsEngineManager::deleteGraphicsEngine();
     delete m_linesApp;
     delete m_lines;
 }
@@ -174,9 +175,9 @@ void MainWindow::CreateActions()
 	// Creates a file menu
     QMenu * file = menuBar()->addMenu( "&File" );
     m_fileNewAction = file->addAction( "New", this, SLOT( fileNew() ), Qt::CTRL + Qt::Key_N );
-    m_fileOpenAction = file->addAction( "Open...", this, SLOT( fileOpen() ), Qt::CTRL + Qt::Key_O );
+    m_fileOpenAction = file->addAction( "Open...", this, SLOT( fileOpen() ), Qt::CTRL | Qt::Key_O );
 	file->addAction( "Save", this, SLOT( fileSave() ), Qt::CTRL + Qt::Key_S );
-	file->addAction( "Save As...", this, SLOT( fileSaveAs() ), Qt::SHIFT + Qt::CTRL + Qt::Key_S );
+	file->addAction( "Save As...", this, SLOT( fileSaveAs() ), Qt::SHIFT | Qt::CTRL | Qt::Key_S );
 	file->addAction( "Export...", this, SLOT( fileExport() ) );
     file->addAction( "&Exit", this, SLOT( close() ) );
     connect( file, SIGNAL(aboutToShow()), this, SLOT(fileMenuAboutToShow()) );
@@ -638,14 +639,14 @@ void MainWindow::Reset()
 }
 
 #include "linesversion.h"
-#include "githash.h"
+//#include "githash.h"
 
 void MainWindow::about()
 {
     QString msg = QString( "Lines - version %1.%2.%3\n" ).arg(LINES_MAJOR_VERSION).arg(LINES_MINOR_VERSION).arg(LINES_PATCH_VERSION);
     msg += QString("%1\n").arg(LINES_VERSION_QUALIFIER);
     msg += QString("Protocol version %1\n").arg(LINES_PROTOCOL_VERSION);
-    msg += QString("Git Hash: %1\n").arg(LINES_GIT_HASH_SHORT);
+    //msg += QString("Git Hash: %1\n").arg(LINES_GIT_HASH_SHORT);
     msg += QString(LINES_COPYRIGHT);
     QMessageBox::about( this, m_appName, msg );
 }

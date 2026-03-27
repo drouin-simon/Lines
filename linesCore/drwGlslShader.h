@@ -1,11 +1,17 @@
 #ifndef __drwGlslShader_h_
 #define __drwGlslShader_h_
 
+#include "../GraphicsEngine/include/GraphicsEngineManager.h"
+
 #include <string>
 #include <vector>
 
+class IGraphicsEngine;
+
 class drwGlslShader
 {
+private:
+	IGraphicsEngine* m_engine;
 
 public:
 
@@ -21,6 +27,7 @@ public:
 	bool UseProgram( bool use );
 	bool SetVariable( const char * name, int value );
 	bool SetVariable( const char * name, float value );
+	bool SetVariable( const char * name, Vec4 value );
 
 protected:
 

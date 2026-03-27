@@ -1,6 +1,8 @@
 #ifndef __drwBitmapExporter_h_
 #define __drwBitmapExporter_h_
 
+#include "../GraphicsEngine/include/GraphicsEngineManager.h"
+
 #include <QThread>
 #include <QSize>
 
@@ -16,7 +18,6 @@ class drwBitmapExporter : public QThread
 public:
 	
 	drwBitmapExporter();
-	~drwBitmapExporter();
 	void SetScene( Scene * scene ) { m_scene = scene; }
 	void SetFilename( QString filename ) { m_filename = filename; }
 	void SetSize( const QSize & size );
@@ -38,6 +39,10 @@ protected:
 	QString m_fileExtension;
 	QSize m_size;
     bool m_exportAlpha;
+
+private:
+
+	IGraphicsEngine* m_engine;
 };
 
 #endif

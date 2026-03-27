@@ -1,19 +1,19 @@
 #include "drwBitmapExporter.h"
 #include "drwGLRenderer.h"
 #include "Scene.h"
-#include <QGLFramebufferObject>
-#include <QGLPixelBuffer>
 #include <QFileInfo>
 #include <QDir>
+#include <QSurfaceFormat>
+#include <QWindow>
+#include <QOpenGLContext>
+#include <QOpenGLFramebufferObjectFormat>
+#include <QOpenGLFramebufferObject>
 
 drwBitmapExporter::drwBitmapExporter()
 : m_scene(0)
 {
     m_exportAlpha = false;
-}
-
-drwBitmapExporter::~drwBitmapExporter()
-{
+    m_engine = GraphicsEngineManager::getGraphicsEngine();
 }
 
 void drwBitmapExporter::SetSize( const QSize & size ) 
@@ -38,12 +38,6 @@ bool drwBitmapExporter::StartWriting()
 	
 	return true;
 }
-
-#include <QSurfaceFormat>
-#include <QWindow>
-#include <QOpenGLContext>
-#include <QOpenGLFramebufferObjectFormat>
-#include <QOpenGLFramebufferObject>
 
 void drwBitmapExporter::run()
 {
@@ -85,7 +79,7 @@ void drwBitmapExporter::run()
         ren.RenderToTexture( i );
         ren.RenderTextureToScreen();
 
-        glFlush();
+        m_engine->Flush();
 
         fbo.release();
         QImage im = fbo.toImage();

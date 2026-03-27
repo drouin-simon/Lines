@@ -12,9 +12,12 @@ class drwCamera;
 class drwDrawingContext;
 class drwDrawingSurface;
 class Box2i;
+class IGraphicsEngine;
 
 class drwGLRenderer
 {
+private:
+    IGraphicsEngine* m_engine;
 
 public:
 

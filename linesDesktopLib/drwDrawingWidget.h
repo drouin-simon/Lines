@@ -1,6 +1,8 @@
 #ifndef __drwDrawingWidget_h_
 #define __drwDrawingWidget_h_
 
+#include "../GraphicsEngine/include/GraphicsEngineManager.h"
+
 #include <QOpenGLWidget>
 #include "drwCommand.h"
 #include "drwDrawingSurface.h"
@@ -17,7 +19,6 @@ class drwDrawingWidget : public QOpenGLWidget, public drwDrawingSurface
 public:
 		
     drwDrawingWidget( QWidget * parent );
-	~drwDrawingWidget();
 
     void SetLinesCore( LinesCore * lc ) { m_lines = lc; }
 
@@ -48,7 +49,7 @@ protected:
 	// Manage timer that generates updateGL in playback mode
 	int m_timerId;
 	
-	void enterEvent( QEvent * );
+	void enterEvent( QEnterEvent * );
 	void leaveEvent( QEvent * );
 	
 	// stuff to do for all events
@@ -66,6 +67,8 @@ private:
 
     bool m_muteMouse;
     bool m_tabletHasControl;  // make sur not to generate both mouse and tablet events
+
+	IGraphicsEngine* m_engine;
 }; 
 
-#endif
+#endif // __drwDrawingWidget_h_

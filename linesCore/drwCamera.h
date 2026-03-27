@@ -1,6 +1,8 @@
 #ifndef __drwCamera_h_
 #define __drwCamera_h_
 
+#include "../GraphicsEngine/include/GraphicsEngineManager.h"
+
 class drwCamera
 {
 
@@ -47,6 +49,7 @@ private:
     double m_winPosWorld[2];    // position of the bottom left corner of the window in world space
     double m_winSizeWorld[2];   // size of the window in world coordinates.
     
+    IGraphicsEngine* m_engine;
 };
 
 

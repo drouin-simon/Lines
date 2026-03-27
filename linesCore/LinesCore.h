@@ -2,7 +2,7 @@
 #define __LinesCore_h_
 
 #include <QObject>
-#include <QTime>
+#include <QElapsedTimer>
 #include <QMap>
 #include <QMutex>
 #include "drwCommand.h"
@@ -119,7 +119,7 @@ private:
     void ClearAllToolboxesButLocal();
 
     // Attributes for playback
-    QTime m_time;
+    QElapsedTimer m_timer;
     int   m_frameInterval;  // number of miliseconds between frames
     bool  m_isPlaying;
     int	  m_lastFrameWantedTime;

@@ -50,7 +50,7 @@ int Scene::AddNodeToFrame( Node * node, int frame )
     return nodeIndex;
 }
 
-Node * Scene::GetNodeById( int frame, GLuint Id )
+Node * Scene::GetNodeById( int frame, unsigned int Id )
 {
     m_framesLock.lockForRead();
     Node * ret = m_frames[ frame ]->GetNodeById( Id );

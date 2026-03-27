@@ -19,7 +19,7 @@ drwGradientWidget::~drwGradientWidget()
 {
 }
 
-void drwGradientWidget::enterEvent(QEvent *event)
+void drwGradientWidget::enterEvent(QEnterEvent *event)
 {
     Q_UNUSED(event)
     setCursor(Qt::CrossCursor);
@@ -79,7 +79,7 @@ void drwGradientWidget::paintEvent( QPaintEvent * event )
     Q_UNUSED(event)
 
     QPainter painter(this);
-	painter.setRenderHint( QPainter::HighQualityAntialiasing );
+	painter.setRenderHint( QPainter::Antialiasing );
 
 	// Draw gradient
     QPoint topLeft( 0, 0 );
