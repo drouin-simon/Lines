@@ -173,41 +173,48 @@ void MainWindow::CreateActions()
 {
 	// Creates a file menu
     QMenu * file = menuBar()->addMenu( "&File" );
-    m_fileNewAction = file->addAction( "New", this, SLOT( fileNew() ), QKeySequence(Qt::CTRL | Qt::Key_N) );
-    m_fileOpenAction = file->addAction( "Open...", this, SLOT( fileOpen() ), QKeySequence(Qt::CTRL | Qt::Key_O) );
-	file->addAction( "Save", this, SLOT( fileSave() ), QKeySequence(Qt::CTRL | Qt::Key_S) );
-	file->addAction( "Save As...", this, SLOT( fileSaveAs() ), QKeySequence(Qt::SHIFT | Qt::CTRL | Qt::Key_S) );
-	file->addAction( "Export...", this, SLOT( fileExport() ) );
-    file->addAction( "&Exit", this, SLOT( close() ) );
-    connect( file, SIGNAL(aboutToShow()), this, SLOT(fileMenuAboutToShow()) );
+    m_fileNewAction = file->addAction( "New", this, [this]() { fileNew(); } );
+    m_fileNewAction->setShortcut( QKeySequence(Qt::CTRL | Qt::Key_N) );
+    m_fileOpenAction = file->addAction( "Open...", this, [this]() { fileOpen(); } );
+    m_fileOpenAction->setShortcut( QKeySequence(Qt::CTRL | Qt::Key_O) );
+	QAction * saveAction = file->addAction( "Save", this, [this]() { fileSave(); } );
+    saveAction->setShortcut( QKeySequence(Qt::CTRL | Qt::Key_S) );
+	QAction * saveAsAction = file->addAction( "Save As...", this, [this]() { fileSaveAs(); } );
+    saveAsAction->setShortcut( QKeySequence(Qt::SHIFT | Qt::CTRL | Qt::Key_S) );
+	file->addAction( "Export...", this, [this]() { fileExport(); } );
+    file->addAction( "&Exit", this, [this]() { close(); } );
+    connect( file, &QMenu::aboutToShow, this, &MainWindow::fileMenuAboutToShow );
 	
 	// Create the Edit menu
 	m_editMenu = menuBar()->addMenu( "&Edit" );
-    m_editSetNumberOfFramesAction = m_editMenu->addAction( "Set Number of Frames", this, SLOT( editSetNumberOfFrames() ), QKeySequence(Qt::CTRL | Qt::Key_G) );
+    m_editSetNumberOfFramesAction = m_editMenu->addAction( "Set Number of Frames", this, [this]() { editSetNumberOfFrames(); } );
+    m_editSetNumberOfFramesAction->setShortcut( QKeySequence(Qt::CTRL | Qt::Key_G) );
     //m_whiteOnBlackAction = new QAction( "White on black", m_editMenu );
     //m_whiteOnBlackAction->setCheckable( true );
     //m_whiteOnBlackAction->setChecked( true );
-    //connect( m_whiteOnBlackAction, SIGNAL(toggled(bool)), this, SLOT(editWhiteOnBlackToggled(bool)) );
+    //connect( m_whiteOnBlackAction, &QAction::toggled, this, &MainWindow::editWhiteOnBlackToggled );
     //m_editMenu->addAction( m_whiteOnBlackAction );
-    connect( m_editMenu, SIGNAL(aboutToShow()), this, SLOT(editMenuAboutToShow()) );
-    QAction * preferencesAction = m_editMenu->addAction( "preferences...", this, SLOT( editPreferences() ) );
+    connect( m_editMenu, &QMenu::aboutToShow, this, &MainWindow::editMenuAboutToShow );
+    QAction * preferencesAction = m_editMenu->addAction( "preferences...", this, [this]() { editPreferences(); } );
 	
 	// Create the Network menu
 	m_networkMenu = menuBar()->addMenu( "&Network" );
-	m_netShareSessionMenuAction = m_networkMenu->addAction( "Share session", this, SLOT( NetShareSession() ), QKeySequence(Qt::CTRL | Qt::Key_T) );
-	m_netConnectMenuItem = m_networkMenu->addAction( "Connect...", this, SLOT( NetConnect() ) );
+	m_netShareSessionMenuAction = m_networkMenu->addAction( "Share session", this, [this]() { NetShareSession(); } );
+    m_netShareSessionMenuAction->setShortcut( QKeySequence(Qt::CTRL | Qt::Key_T) );
+	m_netConnectMenuItem = m_networkMenu->addAction( "Connect...", this, [this]() { NetConnect(); } );
 	
 	// Create the View menu
     m_viewMenu = menuBar()->addMenu( "&View" );
 #ifdef Q_OS_WIN
-	m_viewMenu->addAction("Fullscreen", this, SLOT(viewFullscreen()), QKeySequence(Qt::CTRL | Qt::Key_F));
+	QAction * fullscreenAction = m_viewMenu->addAction("Fullscreen", this, [this]() { viewFullscreen(); });
+    fullscreenAction->setShortcut( QKeySequence(Qt::CTRL | Qt::Key_F) );
 #endif // Q_OS_WIN
 	
     // Create a Help menu
     menuBar()->addSeparator();
     QMenu * help = menuBar()->addMenu( "&Help" );
     help->addSeparator();
-    help->addAction( "&About", this, SLOT(about()) );
+    help->addAction( "&About", this, [this]() { about(); } );
 }
 
 
