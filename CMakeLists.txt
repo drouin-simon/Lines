@@ -1,6 +1,10 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.21)
 
-PROJECT( Lines )
+# Make sure we control minimal OSX version supported, usually same as embeded Qt binary.
+# THIS LINE MUST BE BEFORE the call to project
+set(CMAKE_OSX_DEPLOYMENT_TARGET "13.0" CACHE STRING "Minimum macOS deployment version")
+
+project( Lines )
 
 # Include some CMake utilities
 set( CMAKE_EXT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cmake )
